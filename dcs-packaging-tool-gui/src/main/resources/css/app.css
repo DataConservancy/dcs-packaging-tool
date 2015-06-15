@@ -1,0 +1,442 @@
+/*
+ * Copyright 2014 Johns Hopkins University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.View {
+   -fx-font-family: OpenSans-Regular;
+   -fx-font-size: 14px;
+   -fx-text-fill: #06070b;
+}
+
+.View .ViewFooter {
+	-fx-background-color: #f2f2f2;
+	-fx-border-width: 1px 0px 0px 0px;
+	-fx-border-color: #ccc;
+	-fx-padding: 0px 30px 0px 30px;
+	-fx-spacing: 30px;
+}
+
+.ViewFooter .PackageName {
+	-fx-font-size: 12px;
+	-fx-text-fill: #8c8c8c;
+}
+
+.ViewFooter .hyperlink {
+	-fx-underline: true;
+	-fx-font-size: 12px;
+	-fx-text-fill: #8c8c8c;
+	-fx-font-weight: bold;
+	-fx-border-width: 0;
+}
+
+.ViewFooter .hyperlink:visited {
+	-fx-underline: true;
+	-fx-font-size: 12px;
+	-fx-text-fill: #8c8c8c;
+	-fx-font-weight: bold;
+	-fx-border-width: 0;
+}
+
+.ViewFooter .button {
+	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+	-fx-border-radius: 6px;
+	-fx-border-width: 1;
+	-fx-border-color: #008330;
+	-fx-font-weight: bold;
+	-fx-text-fill: #ffffff;
+	-fx-pref-height: 28px;
+	-fx-pref-width: 100px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+                1, 0.0, 1, 1);
+}
+
+.ViewFooter .button:hover {
+	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+}
+
+.PackageCreateView {
+    -fx-background-image: url("../images/pattern.png");
+}
+
+.PackageDescriptionValidateView {
+    -fx-background-image: url("../images/pattern.png");
+}
+
+.PackageDescriptionValidateView .ViewContent {
+    -fx-spacing: 10px;
+}
+
+.ViewText {
+   -fx-font-weight: bold;
+}
+
+.ViewContent {
+   -fx-padding: 10px;
+}
+
+.PackageToolPopup {
+    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-width: 1, 3, 3, 1;
+    -fx-border-radius: 3;
+    -fx-font-family: OpenSans-Regular;
+    -fx-font-size: 14px;
+    -fx-background-color: #ffffff;
+}
+
+.PackageToolPopup .Content {
+	-fx-padding: 12px;
+	-fx-spacing: 18px;
+}
+
+.PackageToolPopup .Header {
+	-fx-background-color: #4ca89d;
+	-fx-padding: 6px;
+}
+
+.PackageToolPopup .Header .label {
+	-fx-text-fill: #ffffff;
+}
+
+.PackageToolPopup .button {
+	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+	-fx-border-radius: 6px;
+	-fx-border-width: 1;
+	-fx-border-color: #008330;
+	-fx-font-weight: bold;
+	-fx-text-fill: #ffffff;
+	-fx-pref-height: 28px;
+	-fx-pref-width: 100px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+                1, 0.0, 1, 1);
+}
+
+.PackageToolPopup .button:hover {
+	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+}
+
+.PackageToolPopup .hyperlink {
+   	-fx-text-fill: #316a93;
+   	-fx-border-width: 0;
+   	-fx-font-weight: bold;
+   	-fx-underline: true;   	
+}
+
+.PackageToolPopup .hyperlink:visited {
+	-fx-text-fill: #316a93;
+}
+
+.PackageToolPopup .hyperlink:hover {
+	-fx-text-fill: #1487d4;
+}
+
+.PackageToolPopup .PropertyTabContent {
+	-fx-padding: 16px 16px 16px 24px;
+}
+
+.PackageToolPopup .PropertyTabContent .combo-box:disabled {
+  -fx-text-fill: #000000;
+  -fx-prompt-text-fill: #000000;
+  -fx-opacity: 1.0;
+  -fx-background-color: white;
+}
+
+.PackageToolPopup .PropertyTabContent .text-area .scroll-bar:vertical:disabled {
+    -fx-opacity: 0;
+}
+
+.PackageToolPopup .PropertyPopup {
+	-fx-padding: 8px;
+	-fx-background-color: #f2f2f2;
+}
+
+.PackageToolPopup .ViewFooter {
+	-fx-background-color: #f2f2f2;
+	-fx-padding: 0px 30px 0px 30px;
+	-fx-spacing: 30px;
+}
+
+.PackageToolPopup .ViewFooter .hyperlink {
+	-fx-underline: true;
+	-fx-font-size: 12px;
+	-fx-text-fill: #8c8c8c;
+	-fx-font-weight: bold;
+   	-fx-border-width: 0;	
+}
+
+.PackageToolPopup .ViewFooter .hyperlink:visited {
+	-fx-underline: true;
+	-fx-font-size: 12px;
+	-fx-text-fill: #8c8c8c;
+	-fx-font-weight: bold;
+   	-fx-border-width: 0;	
+}
+
+.PackageToolPopup .ViewFooter .button {
+	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+	-fx-border-radius: 6px;
+	-fx-border-width: 1;
+	-fx-border-color: #008330;
+	-fx-font-weight: bold;
+	-fx-text-fill: #ffffff;
+	-fx-pref-height: 28px;
+	-fx-pref-width: 100px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+                1, 0.0, 1, 1);
+}
+
+.PackgeToolPopup .ViewFooter .button:hover {
+	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+}
+
+.PackageToolPopup .PropertyPopup .tab-pane .tab-header-area .tab-header-background {
+	-fx-background-color: #f2f2f2;
+	-fx-effect: null;
+}
+
+.ViewHeader {
+   	-fx-font-family: OpenSans-Regular;
+   	-fx-font-size: 12px;
+   	-fx-text-fill: #06070b;
+    -fx-background-image: url("../images/DCpackageTool-header.png");
+    -fx-background-repeat: stretch;
+    -fx-background-color: #F2F2F2;
+    -fx-border-width: 0 0 4 0;
+    -fx-border-color: #EF8623;
+    -fx-border-insets: 0 0 0 600;
+    -fx-padding: 18px 18px 14px 18px;
+    -fx-spacing: 18px;
+}
+
+.ViewHeader .hyperlink {
+   	-fx-underline: false;
+   	-fx-border-width: 0;
+}
+
+.ViewHeader .hyperlink:visited {
+	-fx-text-fill: #06070b;
+	-fx-border-width: 0;
+}
+
+.PageOneUnselected {
+	-fx-graphic: url("../images/1-inactive.png");
+	-fx-text-fill: #8c8c8c;	
+}
+
+.PageTwoUnselected {
+	-fx-graphic: url("../images/2-inactive.png");
+	-fx-text-fill: #8c8c8c;	
+}
+
+.PageThreeUnselected {
+	-fx-graphic: url("../images/3-inactive.png");
+	-fx-text-fill: #8c8c8c;		
+}
+
+.PageOneSelected {
+	-fx-graphic: url("../images/1.png");
+	-fx-text-fill: #06070b;
+}
+
+.PageTwoSelected {
+	-fx-graphic: url("../images/2.png");
+	-fx-text-fill: #06070b;
+}
+
+.PageThreeSelected {
+	-fx-graphic: url("../images/3.png");
+	-fx-text-fill: #06070b;
+}
+
+.ViewLocationBar {
+   	-fx-font-family: OpenSans-Regular;
+   	-fx-font-size: 14px;
+   	-fx-text-fill: #06070b;
+	-fx-alignment: center;
+	-fx-padding: 12 18 12 18;
+	-fx-spacing: 20px;
+}
+
+.Title {
+    -fx-font-size: 32px;
+    -fx-text-fill: #48A79C;
+}
+
+.DirectoryBox {
+    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-width: 2;
+    -fx-border-radius: 3 3 3 3;
+    -fx-padding: 4px;
+}
+
+.PackageGenerationView {
+	-fx-padding: 8 60 8 60;
+	-fx-spacing: 24px;
+}
+
+.PackageGenerationView .button {
+	-fx-font-size: 12;
+}
+
+.PackageGenerationView .SectionLabel {
+	-fx-font-size: 18;
+	-fx-font-weight: bold;
+}
+
+.PackageGenerationView .combo-box .text-field {
+    -fx-padding: 0 20 0 0;
+}
+
+.FileLabel {
+  -fx-background-color: yellow;
+  -fx-border-style: solid;
+  -fx-border-width: 2px;
+  -fx-border-color: black;
+}
+
+.PackageDescriptionView {
+	-fx-padding: 8 20 8 20;
+	-fx-spacing: 12px;
+}
+
+.PackageDescriptionView .tree-cell {
+    -fx-border-color: #B0B0B0;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 24;
+}
+
+.PackageDescriptionView .tree-cell:selected {
+    -fx-background-color: #48a79c;
+}
+
+.PackageDescriptionView .tree-cell:hover {
+    -fx-background-color: #E0E0E0;
+}
+
+.PackageDescriptionView .tree-cell:hover:selected {
+     -fx-background-color: #00766c;
+}
+
+.PackageDescriptionView .tree-view {
+    -fx-background-color: #E0E0E0;
+}
+
+.PackageDescriptionView .InheritanceControls {
+    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-width: 2;
+    -fx-border-radius: 3 3 3 3;
+    -fx-padding: 4px;
+}
+
+.PackageDescriptionView .button {
+	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+	-fx-border-radius: 6px;
+	-fx-border-width: 1;
+	-fx-border-color: #008330;
+	-fx-font-weight: bold;
+	-fx-text-fill: #ffffff;
+	-fx-pref-height: 28px;
+	-fx-pref-width: 100px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+                1, 0.0, 1, 1);
+}
+
+.PackageDescriptionView .button:hover {
+	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+}
+
+.PackageDescriptionViewArrowsImage {
+    -fx-image: url("../images/gray-arrows.png");
+}
+
+.GoodUserInputImage {
+    -fx-image: url("../images/check.png");
+}
+
+.BadUserInputImage {
+    -fx-image: url("../images/x.png");
+}
+
+.PackageArtifactPopup {
+    -fx-background-color: white;
+    -fx-padding: 24;
+    -fx-border-color: black; 
+    -fx-border-width: 2;
+}
+
+.PackageArtifactPopup .PopupHeader {
+	-fx-font-size: 16;
+	-fx-text-fill: gray;
+	-fx-padding: 12 0 0 0;
+}
+
+.PackageArtifactPopup .PopupText {
+	-fx-font-size: 12;
+}
+
+.CreateNewPackage {
+	-fx-padding: 30 40 0 40;
+}
+
+.CreateNewPackage .text-field {
+	-fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-width: 2;
+    -fx-border-radius: 3 3 3 3;
+    -fx-focus-color: transparent;
+}
+
+.DirectoryBox .button {
+	-fx-font-size: 12;
+}
+
+.DirectoryBox .InvisibleTextField {
+	-fx-border-width: 0;
+	-fx-padding: 0;
+	-fx-focus-color: transparent;
+	-fx-border-color: transparent;
+	-fx-background-color: transparent;
+}
+
+.AboutFooter {
+	-fx-padding: 8px;
+}
+
+.BoldText {
+    -fx-font-weight: bold;
+}
+
+.PackageDescriptionView-IgnoreRow {
+  -fx-background-color: #FFD9BE;
+}
+
+.PackageDescriptionView-IgnoreRow .label .text {
+  -fx-strikethrough: true;
+}
+
+.PackageDescriptionView-IgnoreRow .tree-cell:selected {
+    -fx-background-color: #FFAC6E;
+}
+
+.PackageDescriptionView-IgnoreRow .tree-cell:hover {
+    -fx-background-color: #FFC193;
+}
+
+.PackageDescriptionView-IgnoreRow .tree-cell:hover:selected {
+     -fx-background-color: #EA8D48;
+}
+
+.UneditablePropertyValue {
+     -fx-border-width: 0;
+     -fx-padding: 0;
+     -fx-background-color: transparent;
+}

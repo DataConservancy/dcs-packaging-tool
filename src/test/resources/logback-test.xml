@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2014 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<configuration>
+
+<!--
+ | Appenders
+ +-->
+
+<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+        <pattern>%-3p [%t]: %c{3}@%L %d %m %n</pattern>
+    </encoder>
+</appender>
+
+<appender name="SPRING" class="ch.qos.logback.core.FileAppender">
+    <file>target/logs/spring.log</file>
+    <encoder>
+        <pattern>%-3p [%t]: %c{3}@%L %d %m %n</pattern>
+    </encoder>
+</appender>
+
+<appender name="GUI" class="ch.qos.logback.core.FileAppender">
+    <file>target/logs/dcs-packaging-tool-gui.log</file>
+    <encoder>
+        <pattern>%-3p [%t]: %c{3}@%L %d %m %n</pattern>
+    </encoder>
+</appender>
+
+<appender name="PACKAGING" class="ch.qos.logback.core.FileAppender">
+    <file>target/logs/dcs-packaging.log</file>
+    <encoder>
+        <pattern>%-3p [%t]: %c{3}@%L %d %m %n</pattern>
+    </encoder>
+</appender>
+
+
+<appender name="NOOP" class="ch.qos.logback.core.helpers.NOPAppender"/>
+
+<!--
+ | Loggers
+ +-->
+
+<root level="WARN">
+    <appender-ref ref="SPRING"/>
+    <appender-ref ref="GUI"/>
+    <appender-ref ref="PACKAGING"/>
+</root>
+
+
+<logger name="org.springframework" additivity="true" level="INFO">
+    <appender-ref ref="SPRING"/>
+</logger>
+
+<logger name="org.dataconservancy.ui" additivity="true" level="INFO">
+    <appender-ref ref="GUI"/>
+</logger>
+
+<logger name="org.dataconservancy.packaging" additivity = "true" level="INFO">
+    <appender-ref ref="PACKAGING"/>
+</logger>
+
+
+
+</configuration>

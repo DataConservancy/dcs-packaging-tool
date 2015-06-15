@@ -1,0 +1,49 @@
+[
+    {
+        "description": "Dublin Core Element Set, Version 1.1",
+        "label": "DC Elements",
+        "groupURL": "http://dublincore.org/documents/2012/06/14/dces/",
+        "relationships": [
+            {
+                "description": "An account of the resource. Description may include but is not limited to: an abstract, a table of contents, a graphical representation, or a free-text account of the resource.",
+                "requiresURI": false,
+                "label": "Description",
+                "relationshipURI": "http://purl.org/dc/elements/1.1/description"
+            },
+            {
+                "description": "An entity primarily responsible for making the resource. Examples of a Creator include a person, an organization, or a service. Typically, the name of a Creator should be used to indicate the entity.",
+                "requiresURI": false,
+                "label": "Creator",
+                "relationshipURI": "http://purl.org/dc/elements/1.1/creator"
+            },
+            {
+                "description": "A related resource from which the described resource is derived. The described resource may be derived from the related resource in whole or in part. Recommended best practice is to identify the related resource by means of a string conforming to a formal identification system.",
+                "requiresURI": false,
+                "label": "Source",
+                "relationshipURI": "http://purl.org/dc/elements/1.1/source"
+            }
+        ]
+    },
+    {
+        "description": "Dublin Core Metadata Initiative Metadata Terms",
+        "label": "DCMI Terms",
+        "groupURL": "http://dublincore.org/documents/2012/06/14/dcmi-terms/",
+        "relationships": [{
+            "description": "An account of the resource. Description may include but is not limited to: an abstract, a table of contents, a graphical representation, or a free-text account of the resource.",
+            "requiresURI": false,
+            "label": "Description",
+            "relationshipURI": "http://purl.org/dc/terms/description"
+        }]
+    },
+    {
+        "description": "Relationships from DCS-UC-3355",
+        "label": "DCS Relationships",
+        "groupURL": "",
+        "relationships": [{
+            "description": "An account of the resource. Description may include but is not limited to: an abstract, a table of contents, a graphical representation, or a free-text account of the resource.",
+            "requiresURI": false,
+            "label": "hasDocumentation",
+            "relationshipURI": "http://purl.org/dc/elements/1.1/description"
+        }]
+    }
+]

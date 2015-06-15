@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2014 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<rules>
+  <rule>
+    <!-- Ignore .svn directories -->
+    <select action="exclude">
+      <test operation="count" min="0">
+        <file rel="ancestors">
+          <test operation="match" value=".svn">
+            <value type="FileMetadata" specifier="filename" />
+          </test>
+        </file>
+      </test>
+    </select>
+  </rule>
+
+  <rule>
+    <!-- Directories containing only files are DataItems,
+    and are members of the collection implied by the parent
+    directory -->
+    <select action="include">
+      <test operation="count" max="0">
+        <file rel="children">
+          <test operation="match" value="Directory">
+            <value type="FileMetadata" specifier="filetype" />
+          </test>
+        </file>
+      </test>
+    </select>
+    <mapping>
+      <type>DataItem</type>
+      <properties>
+        <property name="created">
+          <value type="FileMetadata" specifier="createDate" />
+        </property>
+      </properties>
+      <relationships>
+        <relationship name="isMemberOf">
+          <file rel="parent" />
+        </relationship>
+      </relationships>
+    </mapping>
+  </rule>
+
+  <rule>
+    <!-- Individual files are Bytestreams -->
+    <select action="include">
+      <test operation="match" value="File">
+        <value type="FileMetadata" specifier="fileType" />
+      </test>
+    </select>
+    <mapping>
+      <type>Bytestream</type>
+    </mapping>
+  </rule>
+
+  <rule>
+    <!-- Non-root directories are Collections -->
+    <select action="include">
+      <test operation="and">
+        <test operation="match" value="Directory">
+          <value type="FileMetadata" specifier="filetype" />
+        </test>
+        <test operation="count" min="0">
+          <file rel="parent" />
+        </test>
+      </test>
+    </select>
+    <mapping>
+      <type>Collection</type>
+    </mapping>
+  </rule>
+
+  <rule>
+    <!-- Root directories are Projects -->
+    <select action="include">
+      <test operation="count" max="0">
+        <file rel="parent" />
+      </test>
+    </select>
+    <mapping>
+      <type>Project</type>
+    </mapping>
+  </rule>
+</rules>

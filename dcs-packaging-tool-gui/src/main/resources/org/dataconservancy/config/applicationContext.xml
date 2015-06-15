@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2014 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~     http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                      http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+  <context:annotation-config />
+
+  <bean id="propertyPlaceholderConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+    <property name="ignoreResourceNotFound" value="true" />
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+    <property name="locations">
+      <list>
+        <value>classpath:bundles/config_default.properties</value>
+        <value>classpath:bundles/revision.properties</value>
+      </list>
+    </property>
+  </bean>
+
+
+  <!-- RESOURCE BUNDLES -->
+  <bean id="labelResource" class="java.util.ResourceBundle" factory-method="getBundle">
+    <constructor-arg type="java.lang.String">
+      <value>bundles/labels</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="messageResource" class="java.util.ResourceBundle" factory-method="getBundle">
+    <constructor-arg type="java.lang.String">
+      <value>bundles/messages</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="errorResource" class="java.util.ResourceBundle" factory-method="getBundle">
+  	<constructor-arg type="java.lang.String">
+  	  <value>bundles/errors</value>
+  	</constructor-arg>
+  </bean>
+  
+  <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
+  	<constructor-arg type="java.lang.String">
+  		<value>${ontologyLabels.file}</value>
+  	</constructor-arg>
+  </bean>
+  
+  <bean id="helpResource" class="java.util.ResourceBundle" factory-method="getBundle">
+  	<constructor-arg type="java.lang.String">
+  		<value>bundles/help</value>
+  	</constructor-arg>
+  </bean>
+
+  <bean id="internalPropertyResource" class="java.util.ResourceBundle" factory-method="getBundle">
+      <constructor-arg type="java.lang.String">
+        <value>bundles/internal</value>
+      </constructor-arg>
+  </bean>
+
+  <!-- BASIC CONFIGURATION/RESOURCE RELATED BEANS -->
+  <bean id="configuration" class="org.dataconservancy.packaging.gui.Configuration">
+    <!--<property name="ontologyFile" value="${ontology.file}" />-->
+    <property name="packageGenerationParamsFile" value="${generationParams.file}"/>
+    <property name="packageFilenameIllegalCharacters" value="${packageFilename.illegalCharacters}"/>
+  </bean>
+
+  <bean id="labels" class="org.dataconservancy.packaging.gui.Labels">
+    <constructor-arg ref="labelResource" />
+  </bean>
+
+  <bean id="messages" class="org.dataconservancy.packaging.gui.Messages">
+    <constructor-arg ref="messageResource" />
+  </bean>
+  
+  <bean id="errors" class="org.dataconservancy.packaging.gui.Errors">
+  	<constructor-arg ref="errorResource"/>
+  </bean>
+  
+  <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
+  	<constructor-arg ref="ontologyLabelResource"/>
+  </bean>
+  
+  <bean id="help" class="org.dataconservancy.packaging.gui.Help">
+  	<constructor-arg ref="helpResource"/>
+  </bean>
+
+  <bean id="internalProperties" class="org.dataconservancy.packaging.gui.InternalProperties">
+      <constructor-arg ref="internalPropertyResource"/>
+  </bean>
+  
+
+  <!-- SERVICES AND BUILDERS -->
+  <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
+  <bean id="packageDescriptionBuilder" class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
+  <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
+
+
+  <!--
+  <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
+    <property name="generatorMap">
+      <map key-type="org.dataconservancy.packaging.tool.api.PackagingFormat">
+        <entry key="BOREM" value-ref="boremPackageGenerator" />
+        <entry key="TEST" value-ref="testPackageGenerator" />
+      </map>
+    </property>
+    <property name="packageDescriptionValidator" ref="packageDescriptionValidator" />
+  </bean>
+  -->
+
+  <bean id="packageOntologyService" class="org.dataconservancy.packaging.tool.impl.DcsBoPackageOntologyServiceImpl">
+    <property name="creatorPropertiesByString" value="${ontology.creatorProperties}"/>
+  </bean>
+
+  <bean id="phoneNumberValidator" class="org.dataconservancy.packaging.gui.util.PhoneNumberValidator">
+    <property name="localCountryCode" value="${localCountryCode}"/>
+  </bean>
+
+  <!-- VIEWS -->
+  <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
+    <constructor-arg ref="labels" />
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>    
+  </bean>
+
+  <bean id="packageGenerationView" class="org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl">
+    <constructor-arg ref="labels" />
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>    
+  </bean>
+
+  <bean id="packageDescriptionView" class="org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl">
+    <constructor-arg ref="labels" />
+    <constructor-arg ref="errors" />
+    <constructor-arg ref="messages"/>
+    <constructor-arg ref="ontologyLabels"/>
+    <constructor-arg ref="internalProperties"/>
+    <constructor-arg value="${defaultRelationships.file}"/>
+    <constructor-arg ref="disciplineService"/>
+    <property name="packageOntologyService" ref="packageOntologyService"/>
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>
+  </bean>
+  
+  <bean id="headerView" class="org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl">
+  	<constructor-arg ref="labels"/>
+  </bean>
+
+
+  <!-- PRESENTERS -->
+  <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
+    <constructor-arg ref="createNewPackageView" />
+    <property name="controller" ref="controller" />
+    <property name="messages" ref="messages" />  
+    <property name="errors" ref="errors"/>  
+    <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
+  <bean id="packageDescriptionPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageDescriptionPresenterImpl">
+    <constructor-arg ref="packageDescriptionView" />
+    <property name="controller" ref="controller" />
+    <property name="labels" ref="labels" />
+    <property name="packageOntologyService" ref="packageOntologyService" />
+    <property name="errors" ref="errors"/>
+    <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
+    <property name="packageDescriptionValidator" ref="packageDescriptionValidator"/>
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
+  <bean id="packageGenerationPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageGenerationPresenterImpl">
+    <constructor-arg ref="packageGenerationView"/>
+    <property name="controller" ref="controller"/>
+    <property name="packageGenerationParametersBuilder" ref="propertiesConfigurationParametersBuilder"/>
+    <property name="packageGenerationService" ref="packageGenerationService"/>
+    <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
+    <property name="messages" ref="messages"/>
+    <property name="errors" ref="errors"/>
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
+  <!-- FACTORY -->
+  <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
+    <property name="labels" ref="labels" />
+    <property name="configuration" ref="configuration" />
+
+    <property name="createNewPackageView" ref="createNewPackageView" />
+    <property name="packageGenerationView" ref="packageGenerationView" />
+    <property name="packageDescriptionView" ref="packageDescriptionView" />
+
+    <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
+    <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
+    <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
+
+    <property name="controller" ref="controller" />
+    
+    <property name="headerView" ref="headerView"/>
+
+  </bean>
+
+  <bean id="controller" class="org.dataconservancy.packaging.gui.Controller">
+    <property name="factory" ref="factory" />
+    <property name="buildNumber" value="${build.number}"/>
+    <property name="buildTimeStamp" value="${build.timeStamp}"/>
+    <property name="buildRevision" value="${build.revision}"/>
+  </bean>
+
+  <!--  Discipline Service  -->
+  <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
+    <constructor-arg value="${disciplines.file}"/>
+  </bean>
+
+</beans>

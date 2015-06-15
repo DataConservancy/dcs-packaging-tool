@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2015 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <!--
+    This assembly produces a binary distribution of the dcs-package-tool-cli
+    module.  The distribution has a directory structure with a base directory
+    named 'dcs-package-tool-cli-dist', with the following structure:
+
+        dcs-package-tool-cli-dist
+        |- DEPENDENCIES
+        |- LICENSE
+        |- NOTICE
+        |- bin
+        |   |- dcs-package-tool-cli-standalone.jar
+        |   |- dcs-package-tool-cli.jar
+        |   `- pkg-gen.sh
+        `- lib
+            |- aopalliance-1.0.jar
+            |- ...
+            |- <more runtime libs>
+            |- ...
+            `- xmlunit-1.3.jar    
+    
+    The 'lib' directory contains all runtime dependenencies of the 'dcs-package-tool-cli' project.
+    The 'bin' directory contains the standalone cli jar (produced by the 
+    package-generator-standalone.xml assembly), the cli jar itself, and a shell script which is 
+    a wrapper for executing the standalone cli jar.
+  -->
+  
+  <!--
+    Unfortunately, the <id> of the assembly affects a number of things, including the filenames
+    of the generated assemblies; the <id> is also used as the artifact classifier for the
+    assembly, and is used when attaching the assembly to the Maven project.    
+  -->
+  <id>dist</id>
+  
+  <!-- produce a .tar.gz distribution file, and a .zip distribution file -->    
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  
+  <!-- include the base directory, it will be the same name as the artifact name 
+    of the project referencing this descriptor -->
+  <includeBaseDirectory>true</includeBaseDirectory>
+  
+  <fileSets>
+    
+    <!-- Include the proper LICENSE, NOTICE, and DEPENDENCIES files in the distribution -->
+    <fileSet>
+      <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>LICENSE</include>
+        <include>NOTICE</include>
+        <include>DEPENDENCIES</include>
+      </includes>
+    </fileSet>
+    
+  </fileSets>
+  
+  <files>
+    
+    <!-- Include the wrapper shel script (unix platform) for the cli standalone jar file; this file is 
+      filtered so that the proper standalone jar file name is used in the script file. -->
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>src/main/resources/bin/pkg-gen.sh</source>
+      <fileMode>0775</fileMode>
+      <filtered>true</filtered>      
+    </file>
+    
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>src/main/resources/bin/pkg-validate.sh</source>
+      <fileMode>0775</fileMode>
+      <filtered>true</filtered>      
+    </file>
+
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>src/main/resources/bin/pseudo-pkg-gen.sh</source>
+      <fileMode>0775</fileMode>
+      <filtered>true</filtered>
+    </file>
+    
+    <!-- Include the wrapper batch file (windows platform) for the cli standalone jar file; this file is 
+      filtered so that the proper standalone jar file name is used in the script file. -->
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>src/main/resources/bin/pkg-gen.bat</source>
+      <fileMode>0775</fileMode>
+      <filtered>true</filtered>      
+    </file>
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>src/main/resources/bin/pkg-validate.bat</source>
+      <fileMode>0775</fileMode>
+      <filtered>true</filtered>      
+    </file>
+
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>src/main/resources/bin/pseudo-pkg-gen.bat</source>
+      <fileMode>0775</fileMode>
+      <filtered>true</filtered>
+    </file>
+    
+    <!-- Include the standalone cli jar file produced by the package-generator-standalone.xml assembly -->
+    <file>
+      <outputDirectory>bin/</outputDirectory>
+      <source>${project.build.directory}/${pkg.gen.assembly.standalone.fileName}-${pkg.gen.assembly.standalone.id}.jar</source>
+      <destName>${pkg.gen.assembly.standalone.fileName}-${pkg.gen.assembly.standalone.id}.jar</destName>
+      <fileMode>0775</fileMode>
+      <filtered>false</filtered>      
+    </file>
+    
+  </files>
+  
+  <dependencySets>
+        
+    <!-- Include the cli jar file (not the standalone jar) in the bin directory -->
+    <dependencySet>
+      <includes>
+        <include>org.dataconservancy.packaging:dcs-package-tool-cli</include>
+      </includes>      
+      <outputDirectory>bin/</outputDirectory>
+      <directoryMode>0755</directoryMode>
+      <fileMode>0644</fileMode>
+      <scope>runtime</scope>
+      <unpack>false</unpack>      
+      <useProjectArtifact>true</useProjectArtifact>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>      
+    </dependencySet>    
+    
+    <!-- Include all runtime dependencies of dcs-package-tool-cli in the lib directory -->
+    <dependencySet>
+      <outputDirectory>lib/</outputDirectory>
+      <directoryMode>0755</directoryMode>
+      <fileMode>0644</fileMode>
+      <scope>runtime</scope>
+      <unpack>false</unpack>      
+      <useProjectArtifact>false</useProjectArtifact>      
+    </dependencySet>
+    
+  </dependencySets> 
+  
+</assembly>
+

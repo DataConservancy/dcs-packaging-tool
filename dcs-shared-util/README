@@ -1,0 +1,3 @@
+This is a module containing commonly shared code and utilities for other modules.
+The purpose to try and increase consistency of such utilities and reducing 
+unnecessary code duplication.

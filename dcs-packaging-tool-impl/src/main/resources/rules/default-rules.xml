@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+-->
+<rules xmlns="http://dataconservancy.org/schemas/rules/1.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dataconservancy.org/schemas/rules/1.0/ rules.xsd">
+	<rule>
+		<!-- Ignore dotfiles and dot directories -->
+		<select action="exclude">
+			<test operation="match" matchType="regex" specifier="^\..*">
+				<value type="FileMetadata" specifier="name" />
+			</test>
+		</select>
+	</rule>
+
+	<!-- Got rid of this rule, as it seems that nobody really wants collections 
+		It was: Root directories containing no files are projects <rule> <select 
+		action="include"> <test operation="and"> <test operation="count" max="0"> 
+		<file rel="parent" /> </test> <test operation="count" max="0"> <file rel="children"> 
+		<test operation="match" value="File"> <value type="FileMetadata" specifier="fileType" 
+		/> </test> </file> </test> </test> </select> <mapping> <type>Project</type> 
+		<properties> <property name="id"> <value type="Property" specifier="project.id" 
+		description="Project ID" /> </property> </properties> </mapping> </rule> -->
+
+	<!-- Other root directories are Collections -->
+	<rule>
+		<!-- Root directories containing no files are Projects -->
+		<select action="include">
+			<test operation="count" max="0">
+				<file rel="parent" />
+			</test>
+		</select>
+		<mappings>
+			<mapping>
+				<type>Collection</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="title">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+				</properties>
+				<relationships>
+					<!-- Since we're moving to late binding of the project commenting out this requirement. Leaving it here in case the plan changes again.
+					This root collection should be part of the declared project.
+					<relationship name="http://purl.org/dc/terms/isPartOf">
+						<value type="Property" specifier="project.id" description="Project ID" />
+					</relationship>-->
+
+				</relationships>
+			</mapping>
+		</mappings>
+	</rule>
+
+
+	<rule>
+		<!-- Directories containing only files are DataItems -->
+		<select action="include">
+			<test operation="and">
+
+				<!-- Is a directory -->
+				<test operation="match" specifier="Directory">
+					<value type="FileMetadata" specifier="fileType" />
+				</test>
+
+				<!-- ...and contains no directories -->
+				<test operation="count" max="0">
+					<file rel="children">
+						<test operation="match" specifier="Directory">
+							<value type="FileMetadata" specifier="fileType" />
+						</test>
+					</file>
+				</test>
+
+				<!-- ...but contains at least one file -->
+				<test operation="count" min="1">
+					<file rel="children">
+						<test operation="match" specifier="File">
+							<value type="FileMetadata" specifier="fileType" />
+						</test>
+					</file>
+				</test>
+
+			</test>
+		</select>
+		<mappings>
+			<mapping>
+				<type>DataItem</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="name">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+				</properties>
+				<relationships>
+
+					<!-- DataItems are members of the parent directory's collection -->
+					<relationship name="isMemberOf">
+						<file rel="parent" />
+					</relationship>
+
+				</relationships>
+			</mapping>
+		</mappings>
+	</rule>
+
+	<rule>
+		<!-- Non-root directories that aren't data items are Collections -->
+		<select action="include">
+			<test operation="and">
+
+				<!-- A directory -->
+				<test operation="match" specifier="Directory">
+					<value type="FileMetadata" specifier="fileType" />
+				</test>
+
+				<!-- That contains one parent (i.e. is not root) -->
+				<test operation="count" min="1">
+					<file rel="parent" />
+				</test>
+			</test>
+		</select>
+		<mappings>
+			<mapping>
+				<type>Collection</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="title">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+				</properties>
+				<relationships>
+					<!-- Aggregate by project if parent is root (i.e. parent has no parents) -->
+					<relationship name="isMemberOf">
+						<file rel="parent">
+							<test operation="count" max="0">
+								<file rel="parent" />
+							</test>
+						</file>
+					</relationship>
+
+					<!-- Aggregate by collection if the parent is a collection (i.e. has 
+						a parent) -->
+					<relationship name="isMemberOf">
+						<file rel="parent">
+							<test operation="count" min="0">
+								<file rel="parent" />
+							</test>
+						</file>
+					</relationship>
+
+				</relationships>
+			</mapping>
+		</mappings>
+	</rule>
+
+	<rule>
+		<!-- Individual files within DataItems are DataFiles -->
+		<select action="include">
+			<test operation="and">
+
+				<!-- A file... -->
+				<test operation="match" specifier="File">
+					<value type="FileMetadata" specifier="fileType" />
+				</test>
+
+				<!-- Who is not in the root directory (i.e. has a parent) -->
+				<test operation="count" min="1">
+					<file rel="parent">
+						<test operation="count" min="1">
+							<file rel="parent" />
+						</test>
+					</file>
+				</test>
+
+				<!-- ...who does not have a parent directory containing a directory -->
+				<test operation="count" max="0">
+					<file rel="parent">
+						<test operation="count" min="1">
+							<file rel="children">
+								<test operation="match" specifier="Directory">
+									<value type="FileMetadata" specifier="fileType" />
+								</test>
+							</file>
+						</test>
+					</file>
+				</test>
+			</test>
+		</select>
+		<mappings>
+			<mapping>
+				<type>DataFile</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="size">
+						<value type="FileMetadata" specifier="size" />
+					</property>
+					<property name="fileName">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+					<property name="format">
+						<value type="FileMetadata" specifier="format" />
+					</property>
+				</properties>
+				<relationships>
+					<relationship name="isMemberOf">
+						<file rel="parent" />
+					</relationship>
+				</relationships>
+			</mapping>
+		</mappings>
+	</rule>
+
+	<rule>
+		<!-- If there are N or more individual files in a directory, interpret 
+			them as DataItem + DataFiles. -->
+		<select action="include">
+
+			<!-- Has a parent directory... -->
+			<test operation="count" min="1" label="N File candidate">
+				<file rel="parent">
+
+					<!-- ... that contains at least N files -->
+					<test operation="count" label="N Files">
+						<params>
+							<param name="min">
+								<!-- This can be substituted for a system property value to make 
+									it dynamically settable -->
+								<value specifier="2" type="Literal" />
+							</param>
+						</params>
+						<file rel="children">
+							<test operation="and">
+								<test operation="match" specifier="File" label="N Files children">
+									<value type="FileMetadata" specifier="fileType" />
+								</test>
+								<test operation="not">
+									<test operation="match" matchType="regex" specifier="^\..*" label = "N Files Exclude">
+										<value type="FileMetadata" specifier="name" />
+									</test>
+								</test>
+							</test>
+						</file>
+					</test>
+				</file>
+			</test>
+		</select>
+		<mappings>
+			<mapping specifier="0">
+				<type byteStream="false">DataItem</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="name">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+				</properties>
+				<relationships>
+
+					<!-- DataItems are members of the parent directory's collection -->
+					<relationship name="isMemberOf">
+						<file rel="parent" />
+					</relationship>
+
+				</relationships>
+			</mapping>
+			<mapping>
+				<type byteStream="true">DataFile</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="size">
+						<value type="FileMetadata" specifier="size" />
+					</property>
+					<property name="fileName">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+					<property name="format">
+						<value type="FileMetadata" specifier="format" />
+					</property>
+				</properties>
+				<relationships>
+					<relationship name="isMemberOf" specifier="0">
+						<file rel="self" />
+					</relationship>
+				</relationships>
+			</mapping>
+		</mappings>
+	</rule>
+
+	<rule>
+		<!-- Other individual files are MetadataFiles for their parent container. -->
+		<select action="include">
+			<test operation="match" specifier="File">
+				<value type="FileMetadata" specifier="fileType" />
+			</test>
+		</select>
+		<mappings>
+			<mapping>
+				<type>MetadataFile</type>
+				<properties>
+					<property name="createDate">
+						<value type="FileMetadata" specifier="createDate" />
+					</property>
+					<property name="modifiedDate">
+						<value type="FileMetadata" specifier="modifiedDate" />
+					</property>
+					<property name="size">
+						<value type="FileMetadata" specifier="size" />
+					</property>
+					<property name="fileName">
+						<value type="FileMetadata" specifier="name" />
+					</property>
+					<property name="format">
+						<value type="FileMetadata" specifier="format" />
+					</property>
+				</properties>
+				<relationships>
+					<relationship name="isMetadataFor">
+						<file rel="parent" />
+					</relationship>
+				</relationships>
+			</mapping>
+		</mappings>
+	</rule>
+
+</rules>

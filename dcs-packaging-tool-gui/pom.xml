@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2013 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>  
+  <artifactId>dcs-package-tool-gui</artifactId>
+  <packaging>jar</packaging>
+  <name>Package Tool GUI</name>
+
+  <organization>
+    <name>Data Conservancy &lt;dc-ird@googlegroups.com&gt;</name>
+  </organization>
+
+  <parent>
+    <groupId>org.dataconservancy.pkgtool</groupId>
+    <artifactId>dcs-packaging-tool</artifactId>
+    <version>0.10.1-SNAPSHOT</version>
+  </parent>
+  
+  <properties>
+    <dcs.pkg.tool.buildNumber>Local</dcs.pkg.tool.buildNumber>
+    <dcs.pkg.tool.buildTimeStamp>Local</dcs.pkg.tool.buildTimeStamp>
+    <dcs.pkg.tool.repository.revision.number>Local</dcs.pkg.tool.repository.revision.number>
+    <dcs.package.tool.package.dir>${project.build.testOutputDirectory}/generated-packages</dcs.package.tool.package.dir>
+    <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
+  </properties>
+
+  <!-- Profiles  =================================================== -->
+
+  <!-- Build ====================================================== -->
+  
+    <build>
+      <finalName>DC Package Tool</finalName>
+	    
+      <plugins>
+        <!-- JavaFX only in Oracle Java 7 for now. Also need maven 3. -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>enforce-javafx-requirements</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requireJavaVersion>
+                    <version>1.8.0-40</version>
+                  </requireJavaVersion>
+                  <requireProperty>
+                    <property>java.vm.name</property>
+                    <regex>.*HotSpot.*</regex>
+                    <regexMessage>Oracle Java required.</regexMessage>
+                  </requireProperty>
+                  <requireMavenVersion>
+                    <version>3.0.5</version>
+                  </requireMavenVersion>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.zenjava</groupId>
+          <artifactId>javafx-maven-plugin</artifactId>
+          <configuration>
+            <mainClass>org.dataconservancy.packaging.gui.App</mainClass>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>${surefireArgLine}</argLine>
+            <systemPropertyVariables>
+              <dcs.package.tool.package.dir>${project.build.testOutputDirectory}/generated-packages</dcs.package.tool.package.dir>
+              <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
+              <dcs.package.tool.test.content>${project.basedir}/src/test/resources</dcs.package.tool.test.content>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+        </plugin>
+
+      </plugins>
+      
+      <resources>
+      	<resource>
+          <directory>src/main/resources</directory>
+          <filtering>true</filtering>
+          <excludes>
+              <exclude>fonts/*.ttf</exclude>
+          </excludes>
+      	</resource>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>false</filtering>
+            <includes>
+                <include>fonts/*.ttf</include>
+            </includes>
+        </resource>
+	  </resources>
+    </build>
+
+  <!-- Dependencies =============================================== -->
+  <dependencies>
+
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-model</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-impl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-model-builder-properties</artifactId>
+    </dependency>
+
+      <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-model-builder-xstream</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-model-builder-json</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>args4j</groupId>
+      <artifactId>args4j</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dataconservancy.dcs</groupId>
+      <artifactId>dcs-common-util</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.libphonenumber</groupId>
+      <artifactId>libphonenumber</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+</project>

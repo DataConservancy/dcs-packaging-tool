@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2013 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:dc="http://dataconservancy.org/schemas/rules/1.0/"
+	targetNamespace="http://dataconservancy.org/schemas/rules/1.0/"
+	elementFormDefault="qualified">
+	<element name="rules" type="dc:RulesSpec" />
+
+	<complexType name="RulesSpec">
+		<sequence>
+			<element name="rule" type="dc:RuleSpec" maxOccurs="unbounded"
+				minOccurs="1" />
+		</sequence>
+	</complexType>
+
+	<complexType name="RuleSpec">
+		<sequence>
+			<element name="select" type="dc:SelectSpec" maxOccurs="1"
+				minOccurs="1">
+			</element>
+			<element name="mappings" type="dc:MappingsSpec"
+				maxOccurs="1" minOccurs="0" />
+		</sequence>
+		<attribute name="label" type="string"></attribute>
+	</complexType>
+
+	<complexType name="SelectSpec">
+		<sequence>
+			<element name="test" type="dc:TestSpec" maxOccurs="1"
+				minOccurs="1" />
+		</sequence>
+		<attribute name="action" type="dc:Action" use="required" />
+		<attribute name="label" type="string"></attribute>
+	</complexType>
+
+	<complexType name="MappingsSpec">
+		<sequence>
+			<element name="mapping" type="dc:MappingSpec" maxOccurs="unbounded"
+				minOccurs="1" />
+		</sequence>
+	</complexType>
+
+	<simpleType name="Action">
+		<restriction base="string">
+			<enumeration value="include" />
+			<enumeration value="exclude" />
+		</restriction>
+	</simpleType>
+
+	<complexType name="TestSpec">
+		<sequence>
+			<element name="params" type="dc:TestParams" minOccurs="0"
+				maxOccurs="1" />
+			<choice maxOccurs="1" minOccurs="1">
+				<element name="test" type="dc:TestSpec"
+					maxOccurs="unbounded" minOccurs="1">
+				</element>
+				<element name="value" type="dc:ValueSpec" maxOccurs="1"
+					minOccurs="1">
+				</element>
+				<element name="file" type="dc:FileSpec" maxOccurs="1"
+					minOccurs="1">
+				</element>
+			</choice>
+		</sequence>
+		<attribute name="operation" type="string" use="required" />
+		<attribute name="min" type="int" />
+		<attribute name="max" type="int" />
+		<attribute name="matchType">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="value" />
+					<enumeration value="regex" />
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="specifier" type="string" />
+		<attribute name="label" type="string"></attribute>
+	</complexType>
+
+	<complexType name="ValueSpec">
+		<attribute name="type" type="dc:ValueType" use="required" />
+		<attribute name="specifier" type="string" use="required" />
+		<attribute name="description" type="string" use="optional" />
+		<attribute name="label" type="string"></attribute>
+	</complexType>
+
+	<complexType name="FileSpec">
+		<sequence>
+			<element name="test" type="dc:TestSpec" maxOccurs="1"
+				minOccurs="0" />
+		</sequence>
+		<attribute name="rel" type="dc:FileRel" use="required" />
+	</complexType>
+
+	<simpleType name="ValueType">
+		<restriction base="string">
+			<enumeration value="Literal" />
+			<enumeration value="Property" />
+			<enumeration value="FileMetadata" />
+		</restriction>
+	</simpleType>
+
+	<simpleType name="FileRel">
+		<restriction base="string">
+			<enumeration value="parent" />
+			<enumeration value="children" />
+			<enumeration value="ancestors" />
+			<enumeration value="descendents" />
+			<enumeration value="self" />
+		</restriction>
+	</simpleType>
+
+	<complexType name="MappingSpec">
+		<sequence>
+			<element name="type" type="dc:ArtifactTypeSpec"
+				maxOccurs="1" minOccurs="1">
+			</element>
+			<element name="properties" type="dc:PropertiesSpec"
+				maxOccurs="1" minOccurs="0" />
+			<element name="relationships" type="dc:RelationshipsSpec"
+				maxOccurs="1" minOccurs="0">
+			</element>
+		</sequence>
+		<attribute name="specifier" type="string" use="optional" />
+		<attribute name="label" type="string"></attribute>
+	</complexType>
+
+	<complexType name="PropertiesSpec">
+		<sequence>
+			<element name="property" type="dc:PropertySpec" maxOccurs="unbounded"
+				minOccurs="0">
+			</element>
+		</sequence>
+	</complexType>
+
+	<complexType name="RelationshipsSpec">
+		<sequence>
+			<element name="relationship" type="dc:RelationshipSpec"
+				maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+
+	<complexType name="PropertySpec">
+		<sequence>
+			<element name="value" type="dc:ValueSpec" maxOccurs="1"
+				minOccurs="1" />
+		</sequence>
+		<attribute name="name" type="string" use="required" />
+	</complexType>
+
+	<complexType name="RelationshipSpec">
+		<choice>
+			<element name="file" type="dc:FileSpec" maxOccurs="1"
+				minOccurs="1" />
+			<element name="value" type="dc:ValueSpec" maxOccurs="1"
+				minOccurs="1" />
+		</choice>
+		<attribute name="name" type="string" use="required" />
+		<attribute name="specifier" type="string"></attribute>
+	</complexType>
+
+	<complexType name="TestParams">
+		<sequence>
+			<element name="param" type="dc:TestParam" maxOccurs="unbounded" minOccurs="1"></element>
+		</sequence>
+	</complexType>
+
+	<complexType name="TestParam">
+		<sequence>
+			<element name="value" type="dc:ValueSpec"></element>
+		</sequence>
+		<attribute name="name" type="string"></attribute>
+	</complexType>
+
+	<complexType name="ArtifactTypeSpec">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="byteStream" type="boolean" use="optional" />
+			</extension>
+		</simpleContent>
+	</complexType>
+</schema>

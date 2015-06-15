@@ -1,0 +1,177 @@
+/*
+ * Copyright 2014 Johns Hopkins University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.dataconservancy.packaging.gui.view;
+
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.Button;
+
+import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
+
+import javafx.scene.control.CheckBox;
+
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Hyperlink;
+import javafx.stage.DirectoryChooser;
+import javafx.scene.control.Label;
+import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+
+/**
+ * The view that shows the package generation screen. This screen allows the user to select package creation options,
+ * a directory to save the file to, and the ability to then generate a package. If the package generation is successful the view shows a popup with
+ * options for creating another package or starting over.
+ */
+public interface PackageGenerationView extends View<PackageGenerationPresenter> {
+
+    /**
+     * A text field that is used for entering the package name.
+     * @return The text field for entering the package name.
+     */
+    public TextField getPackageNameField();
+
+    /**
+     * Gets the directory chooser for setting the output directory.
+     * @return  the directory chooser
+     */
+    public DirectoryChooser getOutputDirectoryChooser();
+
+    /**
+     * Gets the text field that displays the current output directory. 
+     * Note: A text field is used so the user can scroll the text to view the entire path. The text field
+     * however is not editable.
+     * @return the text field that displays the current output directory.
+     */
+    public TextField getCurrentOutputDirectoryTextField();
+    
+    /**
+     * Returns the button that is used to select an output directory.
+     * @return  the button that is used to select an output directory
+     */
+    public Button getSelectOutputDirectoryButton();
+
+    /**
+     * A label that is used to display messages to the user, mostly used for displaying error messages.
+     * @return   a   label that is used to display messages to the user
+     */
+    public Label getStatusLabel();
+    
+    /**
+     * Shows a popup when package generation was successful.
+     */
+    public void showSuccessPopup();
+
+    /**
+     * Shows a popup when about to save and the package file already exists
+     */
+    public void showFileOverwriteWarningPopup();
+    
+    /**
+     * Gets the popup that is shown when package generation was successful.
+     * @return The popup that is shown when package generation is successful, can be null if it wasn't shown.
+     */
+    public PackageToolPopup getSuccessPopup();
+
+    /**
+     * Gets the popup that is shown when a package file might be overwritten
+     * @return The popup that is shown when a package file is about to be saved, but to an existing file
+     */
+    public PackageToolPopup getFileOverwriteWarningPopup();
+    
+    /**
+     * Gets the no thanks link that appears on the package generation success popup. 
+     * @return the no thanks link that appears on the package generation success popup.
+     */
+    public Hyperlink getNoThanksLink();
+
+    /**
+     * Gets the create new package button that appears on the package generation success popup.
+     * @return   the create new package button that appears on the package generation success popup.
+     */
+    public Button getCreateNewPackageButton();
+
+    /**
+     * Gets the button for canceling a file overwrite that appears on the file overwrite popup
+     * @return  the button for canceling a file overwrite that appears on the file overwrite popup
+     */
+    public Button getCancelFileOverwriteButton();
+
+    /**
+     * Gets the button for OK'ing a file overwrite that appears on the file overwrite popup
+     * @return the button for OK'ing a file overwrite that appears on the file overwrite popup
+     */
+    public Button getOkFileOverwriteButton();
+    
+    /**
+     * Gets the archive format toggle group. 
+     * @return the archive format toggle group
+     */
+    public ToggleGroup getArchiveToggleGroup();
+    
+    /**
+     * Gets the compression format toggle group.
+     * @return  the compression format toggle group.
+     */
+    public ToggleGroup getCompressionToggleGroup();
+    
+    /**
+     * Gets the md5 checksum checkbox.
+     * @return The checkbox for selecting md5 generation.
+     */
+    public CheckBox getMd5CheckBox();
+    
+    /**
+     * Gets the sha1 checksum checkbox.
+     * @return The checkbox for selecting sha1 generation.
+     */
+    public CheckBox getSHA1CheckBox();
+    
+    /**
+     * Gets the contact information text field, that will be supplied in the bag.
+     * @return  the contact information text field
+     */
+    public TextField getContactEmailTextField();
+    
+    /**
+     * Gets the contact name text field, that will be supplied in the bag.
+     * @return   the contact name text field
+     */
+    public TextField getContactNameTextField();
+    
+    /**
+     * Gets the contact phone number text field, that will be supplied in the bag.
+     * @return The text field for entering in a contact phone number.
+     */
+    public TextField getContactPhoneTextField();
+    
+    /**
+     * Gets the text field for setting the external identifier if there is one.
+     * @return The text field for entering in an external identifier.
+     */
+    public TextField getExternalIdentifierTextField();
+
+    /**
+     * Gets the text field for setting the external project Identifier if there is one.
+     * @return The string property for labeling the project identifier field.
+     */
+    public StringProperty getExternalProjectIdentifierProperty();
+
+    /**
+     * Gets the progress dialog popup that's used when the package is being generated.
+     * @return The popup used to display package generation progress.
+     */
+    public PackageToolPopup getProgressPopup();
+}

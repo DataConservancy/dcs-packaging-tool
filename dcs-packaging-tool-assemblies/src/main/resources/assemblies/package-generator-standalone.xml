@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2015 Johns Hopkins University
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  
+  <!--
+    This assembly produces a jar that includes all of the dependencies 
+    of the package generator.  When the Maven assembly plugin is properly 
+    configured (that is, the <archiver> is configured to add the 
+    proper manifest entries to the jar), this assembly will result
+    in a stand-alone jar that can be executed using:
+      java -jar <jarfile>
+  -->
+  
+  
+  <!--
+    Unfortunately, the <id> of the assembly affects a number of things, including the filenames
+    of the generated assemblies; the <id> is also used as the artifact classifier for the
+    assembly, and is used when attaching the assembly to the Maven project.    
+  -->
+  <id>standalone</id>
+  
+  <!-- JAR format -->
+  <formats>
+    <format>jar</format>
+  </formats>
+  
+  <!-- the jar archive will not be packed under a base directory -->
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <dependencySets>
+    
+    <!--
+      Include all runtime dependencies in the assembled jar, in unpacked form.
+      Include the dcs-package-tool-cli (projectArtifact) jar as well.
+    -->
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <directoryMode>0755</directoryMode>
+      <fileMode>0644</fileMode>
+      <scope>runtime</scope>
+      <unpack>true</unpack>      
+      <useProjectArtifact>true</useProjectArtifact>
+    </dependencySet>
+    
+  </dependencySets> 
+  
+</assembly>

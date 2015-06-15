@@ -1,0 +1,7 @@
+This module requires Maven 3, Oracle Java 7, and a classpath with JavaFX.
+See http://zenjava.com/javafx/maven/fix-classpath.html for how to add JavaFX to the classpath.
+
+Useful goals:
+  * jfx:native will build a native install package for the current platform.
+  * jfx:run will run the GUI.
+  * jfx:jar will build an executable jar
