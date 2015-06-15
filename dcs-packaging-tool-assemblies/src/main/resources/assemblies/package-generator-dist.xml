@@ -148,17 +148,7 @@
       <useProjectArtifact>true</useProjectArtifact>
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>      
     </dependencySet>    
-    
-    <!-- Include all runtime dependencies of dcs-package-tool-cli in the lib directory -->
-    <dependencySet>
-      <outputDirectory>lib/</outputDirectory>
-      <directoryMode>0755</directoryMode>
-      <fileMode>0644</fileMode>
-      <scope>runtime</scope>
-      <unpack>false</unpack>      
-      <useProjectArtifact>false</useProjectArtifact>      
-    </dependencySet>
-    
+
   </dependencySets> 
   
 </assembly>
