@@ -70,8 +70,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.dataconservancy.dcs</groupId>
-        <artifactId>dcs-model-builder-xstream</artifactId>
+        <groupId>org.dataconservancy.shared</groupId>
+        <artifactId>dcs-shared-util</artifactId>
+        <scope>compile</scope>
       </dependency>
 
     </dependencies>

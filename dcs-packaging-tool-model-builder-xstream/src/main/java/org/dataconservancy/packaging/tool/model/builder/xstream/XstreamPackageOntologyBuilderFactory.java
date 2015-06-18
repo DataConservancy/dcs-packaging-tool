@@ -17,7 +17,7 @@ package org.dataconservancy.packaging.tool.model.builder.xstream;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.QNameMap;
-import org.dataconservancy.model.builder.xstream.DcsPullDriver;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 import org.dataconservancy.packaging.tool.model.PackageOntology;
 
 import javax.xml.namespace.QName;
@@ -31,13 +31,11 @@ public class XstreamPackageOntologyBuilderFactory {
 
         final QNameMap qnames = new QNameMap();
 
-        final DcsPullDriver driver = new DcsPullDriver(qnames);
-
         final String defaultnsUri ="http://dataconservancy.org/schemas/pkg/1.0";
         qnames.setDefaultNamespace(defaultnsUri);
 
         // The XStream Driver
-        final XStream x = new XStream(driver);
+        final XStream x = new XStream(new StaxDriver(qnames));
         x.setMode(XStream.NO_REFERENCES);
 
         x.registerConverter(new PackageOntologyConverter());

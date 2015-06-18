@@ -172,11 +172,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.dataconservancy.dcs</groupId>
-      <artifactId>dcs-content-detection-impl</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.googlecode.libphonenumber</groupId>
       <artifactId>libphonenumber</artifactId>
     </dependency>
