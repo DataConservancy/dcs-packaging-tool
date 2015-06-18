@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.view;
 import java.util.Map;
 import java.util.Set;
 
+import javafx.scene.control.TreeTableView;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactPropertyContainer;
@@ -29,7 +30,6 @@ import javafx.scene.control.Label;
 
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import javafx.scene.control.Button;
@@ -50,7 +50,7 @@ public interface PackageDescriptionView extends View<PackageDescriptionPresenter
      * Gets the artifact tree view that displays all the package artifacts. 
      * @return the artifact tree view
      */
-    public TreeView<PackageArtifact> getArtifactTreeView();
+    public TreeTableView<PackageArtifact> getArtifactTreeView();
 
     /**
      * Returns the tabbed popup that displays the artifact properties and relationships. 
@@ -154,12 +154,6 @@ public interface PackageDescriptionView extends View<PackageDescriptionPresenter
      * @return A map of the inherited property checkboxes.
      */
     public Map<String, CheckBox> getInheritMetadataCheckBoxMap();
-
-    /**
-    * A hack to force the display to refresh after making an interactive
-    * change
-    */
-    public void refreshDisplay();
 
     /**
      * Gets the button to renable warnings

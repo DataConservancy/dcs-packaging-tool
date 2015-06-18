@@ -560,7 +560,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
             }
 
             @Override
-            public TreeView<PackageArtifact> getArtifactTreeView() {
+            public TreeTableView<PackageArtifact> getArtifactTreeView() {
                 return null;
             }
 
@@ -704,10 +704,6 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
             @Override
             public Map<String, CheckBox> getInheritMetadataCheckBoxMap() {
                 return null;
-            }
-
-            @Override
-            public void refreshDisplay() {
             }
 
             @Override

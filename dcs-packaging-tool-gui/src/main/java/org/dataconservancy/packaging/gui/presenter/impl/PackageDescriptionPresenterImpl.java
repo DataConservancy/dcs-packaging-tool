@@ -233,7 +233,6 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             @Override
             public void handle(ActionEvent arg0) {
                 saveCurrentArtifact();
-                view.refreshDisplay();
                 if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
                     view.getPackageArtifactPopup().hide();
                 }

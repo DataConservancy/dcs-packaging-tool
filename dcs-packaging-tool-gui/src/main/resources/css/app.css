@@ -309,21 +309,21 @@
 	-fx-spacing: 12px;
 }
 
-.PackageDescriptionView .tree-cell {
+.PackageDescriptionView .tree-table-row-cell {
     -fx-border-color: #B0B0B0;
     -fx-border-width: 0 0 1 0;
     -fx-cell-size: 24;
 }
 
-.PackageDescriptionView .tree-cell:selected {
+.PackageDescriptionView .tree-table-row-cell:selected {
     -fx-background-color: #48a79c;
 }
 
-.PackageDescriptionView .tree-cell:hover {
+.PackageDescriptionView .tree-table-row-cell:hover {
     -fx-background-color: #E0E0E0;
 }
 
-.PackageDescriptionView .tree-cell:hover:selected {
+.PackageDescriptionView .tree-table-row-cell:hover:selected {
      -fx-background-color: #00766c;
 }
 
@@ -419,22 +419,15 @@
   -fx-background-color: #FFD9BE;
 }
 
-.PackageDescriptionView-IgnoreRow .label .text {
+.PackageDescriptionView-IgnoreRow .text {
   -fx-strikethrough: true;
 }
 
-.PackageDescriptionView-IgnoreRow .tree-cell:selected {
-    -fx-background-color: #FFAC6E;
+.PackageDescriptionView-IgnoreRow .selected .text{
+	-fx-strikethrough: false;
 }
 
-.PackageDescriptionView-IgnoreRow .tree-cell:hover {
-    -fx-background-color: #FFC193;
-}
-
-.PackageDescriptionView-IgnoreRow .tree-cell:hover:selected {
-     -fx-background-color: #EA8D48;
-}
-
+*/
 .UneditablePropertyValue {
      -fx-border-width: 0;
      -fx-padding: 0;
