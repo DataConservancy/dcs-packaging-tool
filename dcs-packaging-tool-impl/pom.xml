@@ -70,12 +70,6 @@
       <artifactId>dcs-package-shared</artifactId>
       <scope>compile</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.dataconservancy.dcs</groupId>
-      <artifactId>dcs-package-validation</artifactId>
-      <scope>compile</scope>
-    </dependency>
     
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>

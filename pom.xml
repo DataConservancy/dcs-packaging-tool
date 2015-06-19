@@ -273,14 +273,7 @@
         <version>1.1.3-SNAPSHOT</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.dataconservancy.dcs</groupId>
-        <artifactId>dcs-package-validation</artifactId>
-        <version>1.1.3-SNAPSHOT</version>
-      </dependency>
-
       <!-- DCS Packaging Tool Dependencies  -->
-
 
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>
