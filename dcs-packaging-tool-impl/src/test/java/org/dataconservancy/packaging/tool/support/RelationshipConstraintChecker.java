@@ -15,8 +15,8 @@
  */
 package org.dataconservancy.packaging.tool.support;
 
-import org.dataconservancy.mhf.representation.api.Attribute;
-import org.dataconservancy.mhf.representation.api.AttributeSet;
+import org.dataconservancy.dcs.model.Attribute;
+import org.dataconservancy.dcs.model.AttributeSet;
 import org.dataconservancy.dcs.model.AttributeSetName;
 
 import java.util.Collection;

@@ -64,12 +64,6 @@
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-model</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.dataconservancy.dcs</groupId>
-      <artifactId>dcs-package-shared</artifactId>
-      <scope>compile</scope>
-    </dependency>
     
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>

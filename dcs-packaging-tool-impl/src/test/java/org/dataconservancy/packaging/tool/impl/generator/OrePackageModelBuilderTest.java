@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.dataconservancy.mhf.representation.api.Attribute;
-import org.dataconservancy.mhf.representation.api.AttributeSet;
+import org.dataconservancy.dcs.model.Attribute;
+import org.dataconservancy.dcs.model.AttributeSet;
 import org.dataconservancy.dcs.model.AttributeSetName;
 import org.dataconservancy.dcs.model.Metadata;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;

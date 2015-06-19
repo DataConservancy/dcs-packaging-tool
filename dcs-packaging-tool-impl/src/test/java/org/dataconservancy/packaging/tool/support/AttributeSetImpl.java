@@ -15,8 +15,8 @@
  */
 package org.dataconservancy.packaging.tool.support;
 
-import org.dataconservancy.mhf.representation.api.Attribute;
-import org.dataconservancy.mhf.representation.api.AttributeSet;
+import org.dataconservancy.dcs.model.Attribute;
+import org.dataconservancy.dcs.model.AttributeSet;
 import org.dataconservancy.dcs.util.HierarchicalPrettyPrinter;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class AttributeSetImpl implements AttributeSet {
 
     public AttributeSetImpl(String name) {
         this.name = name;
-        this.attributes = new ArrayList<Attribute>();
+        this.attributes = new ArrayList<>();
     }
 
     public AttributeSetImpl(String name, Collection<Attribute> attributes) {
@@ -54,7 +54,7 @@ public class AttributeSetImpl implements AttributeSet {
         this.name = toCopy.getName();
         final Collection<Attribute> attributesToCopy = toCopy.getAttributes();
         if (attributesToCopy != null) {
-            this.attributes = new ArrayList<Attribute>(attributesToCopy.size());
+            this.attributes = new ArrayList<>(attributesToCopy.size());
             for (Attribute attr : attributesToCopy) {
                 attributes.add(new AttributeImpl(attr));
             }
@@ -80,7 +80,7 @@ public class AttributeSetImpl implements AttributeSet {
      */
     @Override
     public Collection<Attribute> getAttributesByName(String attributeName) {
-        Collection<Attribute> matchingAttributes = new HashSet<Attribute>();
+        Collection<Attribute> matchingAttributes = new HashSet<>();
         for (Attribute attribute : attributes) {
             if (attribute.getName().trim().equals(attributeName.trim())) {
                 matchingAttributes.add(attribute);
@@ -96,7 +96,7 @@ public class AttributeSetImpl implements AttributeSet {
      * @param attributes  the Attributes that are contained in this AttributeSet
      */
     public void setAttributes(Collection<Attribute> attributes) {
-        ArrayList<Attribute> attrs = new ArrayList<Attribute>(attributes.size());
+        ArrayList<Attribute> attrs = new ArrayList<>(attributes.size());
         attrs.addAll(attributes);
         this.attributes = attrs;
     }
@@ -107,11 +107,12 @@ public class AttributeSetImpl implements AttributeSet {
      */
     public void addAttribute(Attribute... attribute) {
         if (this.attributes == null) {
-            this.attributes = new ArrayList<Attribute>();
+            this.attributes = new ArrayList<>();
         }
 
         this.attributes.addAll(Arrays.asList(attribute));
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -142,21 +143,18 @@ public class AttributeSetImpl implements AttributeSet {
 
     public String toString(HierarchicalPrettyPrinter hpp) {
         // Sort the attributes so it makes them easier to find
-        List<Attribute> sorted = new ArrayList<Attribute>();
+        List<Attribute> sorted = new ArrayList<>();
         sorted.addAll(this.attributes);
-        Collections.sort(sorted, new Comparator<Attribute>() {
-            @Override
-            public int compare(Attribute a1, Attribute a2) {
-                if (!a1.getName().equals(a2.getName())) {
-                    return a1.getName().compareTo(a2.getName());
-                }
-
-                if (!a1.getType().equals(a2.getType())) {
-                    return a1.getType().compareTo(a2.getType());
-                }
-
-                return a1.getValue().compareTo(a2.getValue());
+        Collections.sort(sorted, (a1, a2) -> {
+            if (!a1.getName().equals(a2.getName())) {
+                return a1.getName().compareTo(a2.getName());
             }
+
+            if (!a1.getType().equals(a2.getType())) {
+                return a1.getType().compareTo(a2.getType());
+            }
+
+            return a1.getValue().compareTo(a2.getValue());
         });
 
         hpp.appendWithIndent("AttributeSet: ").appendWithNewLine(name);

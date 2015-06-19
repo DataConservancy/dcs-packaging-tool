@@ -15,7 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.support;
 
-import org.dataconservancy.mhf.representation.api.Attribute;
+import org.dataconservancy.dcs.model.Attribute;
 
 /**
  * Simple Attribute implementation used to support defensive copying.

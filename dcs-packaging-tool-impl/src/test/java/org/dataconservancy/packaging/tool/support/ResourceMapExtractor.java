@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dataconservancy.mhf.representation.api.Attribute;
-import org.dataconservancy.mhf.representation.api.AttributeSet;
+import org.dataconservancy.dcs.model.Attribute;
+import org.dataconservancy.dcs.model.AttributeSet;
 import org.dataconservancy.dcs.model.AttributeSetName;
 import org.dataconservancy.dcs.model.AttributeValueType;
 import org.dataconservancy.dcs.model.Metadata;

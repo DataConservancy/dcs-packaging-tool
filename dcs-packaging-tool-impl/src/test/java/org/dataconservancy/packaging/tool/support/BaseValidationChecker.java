@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.dataconservancy.mhf.representation.api.Attribute;
-import org.dataconservancy.mhf.representation.api.AttributeSet;
+import org.dataconservancy.dcs.model.Attribute;
+import org.dataconservancy.dcs.model.AttributeSet;
 import org.dataconservancy.packaging.validation.PackageValidationException;
 
 import static org.dataconservancy.dcs.model.AttributeSetName.ORE_REM_COLLECTION;
