@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.dataconservancy.packaging.model.Checksum;
+import org.dataconservancy.dcs.model.Checksum;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 
 /**
@@ -29,6 +29,6 @@ import org.dataconservancy.packaging.tool.model.PackageToolException;
  * Return a Map of Artifact Ids to  the corresponding list of Checksums for that Artifact
  */
 public interface PackageChecksumService {
-   public Map<File, List<Checksum>> generatePackageFileChecksums(Set<File> packageFiles, List<String> checksumAlgorithms) throws
+   Map<File, List<Checksum>> generatePackageFileChecksums(Set<File> packageFiles, List<String> checksumAlgorithms) throws
            PackageToolException;
 }

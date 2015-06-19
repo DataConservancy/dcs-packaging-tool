@@ -15,43 +15,38 @@
  */
 package org.dataconservancy.packaging.tool.support;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.dataconservancy.mhf.representation.api.Attribute;
 import org.dataconservancy.mhf.representation.api.AttributeSet;
 
-import static org.dataconservancy.packaging.model.AttributeSetName.*;
-import static org.dataconservancy.packaging.model.Metadata.*;
 
 /**
  * Insures that the Subject and Object AttributeSets of ORE-extracted relationships are the correct type.
  * The following relationships are examined by this service:
  * <ul>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#PACKAGE_AGGREGATES_PROJECT}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#PACKAGE_AGGREGATES_FILE}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#PACKAGE_AGGREGATES_COLLECTION}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#PACKAGE_AGGREGATES_DATAITEM}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#PROJECT_AGGREGATES_FILE}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#PROJECT_AGGREGATES_COLLECTION}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#COLLECTION_AGGREGATES_COLLECTION}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#COLLECTION_AGGREGATES_DATAITEM}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#COLLECTION_AGGREGATES_FILE}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#COLLECTION_IS_PART_OF_COLLECTION}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#COLLECTION_AGGREGATED_BY_PROJECT}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#DATA_ITEM_AGGREGATES_FILE}</li>
- *     <li>{@link org.dataconservancy.packaging.model.Metadata#DATA_ITEM_IS_PART_OF_COLLECTION}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#PACKAGE_AGGREGATES_PROJECT}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#PACKAGE_AGGREGATES_FILE}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#PACKAGE_AGGREGATES_COLLECTION}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#PACKAGE_AGGREGATES_DATAITEM}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#PROJECT_AGGREGATES_FILE}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#PROJECT_AGGREGATES_COLLECTION}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#COLLECTION_AGGREGATES_COLLECTION}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#COLLECTION_AGGREGATES_DATAITEM}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#COLLECTION_AGGREGATES_FILE}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#COLLECTION_AGGREGATED_BY_PROJECT}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#DATA_ITEM_AGGREGATES_FILE}</li>
+ *     <li>{@link org.dataconservancy.dcs.model.Metadata#DATA_ITEM_IS_PART_OF_COLLECTION}</li>
  * </ul>
  * For example, this service insures that the Subject of a {@code PACKAGE_AGGREGATES_PROJECT} relationship is a Package,
  * and the Object is a Project.  The name of an AttributeSet is used as a proxy for type; so in this example the
- * Subject AttributeSet name must be {@link org.dataconservancy.packaging.model.AttributeSetName#ORE_REM_PACKAGE}, and
- * the Object AttributeSet name must be {@link org.dataconservancy.packaging.model.AttributeSetName#ORE_REM_PROJECT}.
+ * Subject AttributeSet name must be {@link org.dataconservancy.dcs.model.AttributeSetName#ORE_REM_PACKAGE}, and
+ * the Object AttributeSet name must be {@link org.dataconservancy.dcs.model.AttributeSetName#ORE_REM_PROJECT}.
  * <p/>
  * The resource identifier Attribute is used to look up the Object of the relationship.
  * <p/>
@@ -77,17 +72,6 @@ public class RelationshipTypeChecker extends BaseValidationChecker {
     }
 
     /**
-     * Accepts a mutable List that is updated with the errors.  Typically used in a test environment.  The List is
-     * cleared each time {@link #execute(String, org.dataconservancy.packaging.ingest.api.IngestWorkflowState) execute}
-     * is invoked.
-     *
-     * @param errors a mutable List populated with errors after each run of the {@code execute(...)} method
-     */
-    public RelationshipTypeChecker(List<String> errors) {
-        super(errors);
-    }
-
-    /**
      * Insures that the types in the {@code typeMap} match the {@code expectedType}.
      *
      * @param aggregatingAsKey the aggregating attribute set key (used for logging errors)
@@ -97,7 +81,7 @@ public class RelationshipTypeChecker extends BaseValidationChecker {
      * @param expectedType the expected type
      */
     private void checkTypes(String aggregatingAsKey, AttributeSet aggregatingAs, String aggregatingRelationship,
-                            Map<String, Set<String>> typeMap, String expectedType, List<String> errors) {
+                            Map<String, Set<String>> typeMap, String expectedType) {
         for (Map.Entry<String, Set<String>> e : typeMap.entrySet()) {
             for (String type : e.getValue()) {
                 if (!type.equals(expectedType)) {
@@ -125,15 +109,15 @@ public class RelationshipTypeChecker extends BaseValidationChecker {
      * be returned for a particular business id.
      *
      * @param resourceIds the resource ids to produce the type map for.  The supplied ids will be keys in the returned Map.
-     * @param asm the AttributeSetManager
+     * @param attributeMap the AttributeSetManager
      * @return a Map of AttributeSet names keyed by resource id.  As noted above, AttributeSet names can be used
      *         as a proxy for business object type.
      */
     static Map<String, Set<String>> types(Collection<String> resourceIds, Map<String, AttributeSet> attributeMap) {
-        Map<String, Set<String>> typeMap = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> typeMap = new HashMap<>();
 
         for (final String id : resourceIds) {
-            typeMap.put(id, new HashSet<String>());
+            typeMap.put(id, new HashSet<>());
             final Set<AttributeSet> candidates = findAttributeSetContainingId(id, attributeMap);
 
 
@@ -155,12 +139,12 @@ public class RelationshipTypeChecker extends BaseValidationChecker {
      * </ol>
      * If the Attribute satisfies these criteria, then the AttributeSet it belongs to is returned in the results.
      *
-     * @param asm the AttributeSetManager containing the AttributeSets to search
+     * @param attributeMap the AttributeSetManager containing the AttributeSets to search
      * @param s a String that may be an identifier of a business object
      * @return AttributeSets that use the supplied string as an identifier
      */
     static Set<AttributeSet> findAttributeSetContainingId(final String s, Map<String, AttributeSet> attributeMap) {
-        Set<AttributeSet> matches = new HashSet<AttributeSet>();
+        Set<AttributeSet> matches = new HashSet<>();
         // Match any Attribute Set that has the identifier of the Business Object as an Attribute value
         for (AttributeSet candidate : attributeMap.values()) {
             for (Attribute candidateAttr : candidate.getAttributes()) {
@@ -181,7 +165,8 @@ public class RelationshipTypeChecker extends BaseValidationChecker {
      * @param aggregatingType the type of AttributeSet that is the aggregator (i.e., the Subject)
      * @param aggregatedType the type of AttributeSet that is being aggregated (i.e. the Object)
      * @param aggregatingRelationship the relationship that relates the Subject to the Object
-     * @param asm the AttributeSetManager, used to look up the relationships
+     * @param attributeMap the AttributeSetManager, used to look up the relationships
+     * @param errors a map containing errors generated when checking aggregations
      */
     @Override
     protected void checkAggregation(String aggregatingType, String aggregatedType, String aggregatingRelationship,
@@ -197,7 +182,7 @@ public class RelationshipTypeChecker extends BaseValidationChecker {
 
             // Retrieve a Map of ResourceIds to types
             Map<String, Set<String>> typeMap = types(values(aggregatingAs, aggregatingRelationship), attributeMap);
-            checkTypes(null, aggregatingAs, aggregatingRelationship, typeMap, aggregatedType, errors);
+            checkTypes(null, aggregatingAs, aggregatingRelationship, typeMap, aggregatedType);
         }
     }
 }

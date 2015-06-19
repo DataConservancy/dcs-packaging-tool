@@ -16,8 +16,8 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.dataconservancy.dcs.util.ChecksumGeneratorVerifier;
-import org.dataconservancy.packaging.model.Checksum;
-import org.dataconservancy.packaging.model.impl.ChecksumImpl;
+import org.dataconservancy.dcs.model.Checksum;
+import org.dataconservancy.dcs.model.ChecksumImpl;
 import org.dataconservancy.packaging.tool.api.PackageChecksumService;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
@@ -25,7 +25,6 @@ import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,9 +41,9 @@ public class PackageChecksumServiceImpl implements PackageChecksumService {
     public Map<File, List<Checksum>> generatePackageFileChecksums(
             Set<File> packageFiles, List<String> checksumAlgorithms) throws PackageToolException {
 
-        Map<File, List<Checksum>> packageChecksums = new HashMap<File, List<Checksum>>();
+        Map<File, List<Checksum>> packageChecksums = new HashMap<>();
         for(File file : packageFiles){
-            List<Checksum> fileChecksums = new ArrayList<Checksum>();
+            List<Checksum> fileChecksums = new ArrayList<>();
             for(String algorithm : checksumAlgorithms){
                 try{
                     FileInputStream fis = new FileInputStream(file);
@@ -54,10 +53,8 @@ public class PackageChecksumServiceImpl implements PackageChecksumService {
                    throw new PackageToolException(PackagingToolReturnInfo.PKG_FILE_NOT_FOUND_EXCEPTION, fnfe, file.getPath());
                 } catch (NoSuchAlgorithmException nsae){
                    throw new PackageToolException(PackagingToolReturnInfo.PKG_NO_SUCH_CHECKSUM_ALGORITHM_EXCEPTION, nsae, algorithm);
-                } catch (IOException ioe){
-                   throw new PackageToolException(PackagingToolReturnInfo.PKG_IO_EXCEPTION, ioe);
                 }
-            packageChecksums.put(file, fileChecksums);
+                packageChecksums.put(file, fileChecksums);
             }
 
         }

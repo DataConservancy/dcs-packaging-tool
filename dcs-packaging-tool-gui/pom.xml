@@ -189,11 +189,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.dataconservancy.dcs</groupId>
-      <artifactId>dcs-common-util</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>

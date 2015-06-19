@@ -33,7 +33,7 @@ import org.apache.commons.io.IOUtils;
 
 import org.dataconservancy.dcs.util.FilePathUtil;
 import org.dataconservancy.dcs.util.UriUtility;
-import org.dataconservancy.packaging.model.Checksum;
+import org.dataconservancy.dcs.model.Checksum;
 import org.dataconservancy.packaging.tool.api.PackageChecksumService;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;

@@ -43,8 +43,8 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.dataconservancy.mhf.representation.api.Attribute;
 import org.dataconservancy.mhf.representation.api.AttributeSet;
-import org.dataconservancy.packaging.model.AttributeSetName;
-import org.dataconservancy.packaging.model.Metadata;
+import org.dataconservancy.dcs.model.AttributeSetName;
+import org.dataconservancy.dcs.model.Metadata;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.impl.generator.mocks.FunctionalAssemblerMock;
@@ -65,9 +65,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-
 
 /**
  */
@@ -119,31 +116,22 @@ public class OrePackageModelBuilderTest {
          */
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return REM_URI;
-                    }
+                    return REM_URI;
                 });
 
-        doAnswer(new Answer<Object>() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ResourceMap rem =
-                        parse((InputStream) invocation.getArguments()[1]);
-                Aggregation agg = rem.getAggregation();
-                assertNotNull(agg);
-                return null;
-            }
+        doAnswer(invocation -> {
+            ResourceMap rem =
+                    parse((InputStream) invocation.getArguments()[1]);
+            Aggregation agg = rem.getAggregation();
+            assertNotNull(agg);
+            return null;
         }).when(assembler).putResource(eq(REM_URI), any(InputStream.class));
 
         builder.buildModel(mock(PackageDescription.class), assembler);
@@ -162,37 +150,28 @@ public class OrePackageModelBuilderTest {
 
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
-        doAnswer(new Answer<Object>() {
+        doAnswer(invocation -> {
+            ResourceMap rem =
+                    parse((InputStream) invocation.getArguments()[1]);
+            Aggregation agg = rem.getAggregation();
+            assertNotNull(agg);
 
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                ResourceMap rem =
-                        parse((InputStream) invocation.getArguments()[1]);
-                Aggregation agg = rem.getAggregation();
-                assertNotNull(agg);
-
-                //TODO: What should go in here?  Commenting out
-                /*
-                 * if (agg.getTypes()
-                 * .contains(ResourceMapConstants.DC_PACKAGE_TYPE)) { }
-                 */
-                return null;
-            }
+            //TODO: What should go in here?  Commenting out
+            /*
+             * if (agg.getTypes()
+             * .contains(ResourceMapConstants.DC_PACKAGE_TYPE)) { }
+             */
+            return null;
         }).when(assembler).putResource(any(URI.class), any(InputStream.class));
 
         PackageDescription desc = new PackageDescription();
@@ -217,19 +196,14 @@ public class OrePackageModelBuilderTest {
 
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         PackageArtifact project = newArtifact(ArtifactType.Project);
@@ -254,19 +228,14 @@ public class OrePackageModelBuilderTest {
 
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         PackageArtifact project = newArtifact(ArtifactType.Project);
@@ -293,36 +262,26 @@ public class OrePackageModelBuilderTest {
 
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         when(assembler.createResource(anyString(),
                                       eq(PackageResourceType.DATA),
                                       any(InputStream.class)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.endsWith("tst"));
 
-                        assertTrue(path.endsWith("tst"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         PackageArtifact project = newArtifact(ArtifactType.Project);
@@ -382,36 +341,26 @@ public class OrePackageModelBuilderTest {
 
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         when(assembler.createResource(anyString(),
                                       eq(PackageResourceType.DATA),
                                       any(InputStream.class)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.endsWith("tst"));
 
-                        assertTrue(path.endsWith("tst"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         PackageArtifact project = newArtifact(ArtifactType.Project);
@@ -544,12 +493,10 @@ public class OrePackageModelBuilderTest {
         Map<String, AttributeSet> attrs =
                 extractor.execute(baseDir, builder.getPackageRemURI());
 
-        Set<Attribute> extractedAttributes = new HashSet<Attribute>();
-        Set<String> extractedValues = new HashSet<String>();
+        Set<String> extractedValues = new HashSet<>();
 
         for (AttributeSet attSet : attrs.values()) {
             for (Attribute att : attSet.getAttributes()) {
-                extractedAttributes.add(att);
                 extractedValues.add(att.getValue());
             }
         }
@@ -624,12 +571,10 @@ public class OrePackageModelBuilderTest {
         Map<String, AttributeSet> attrs =
                 extractor.execute(baseDir, builder.getPackageRemURI());
 
-        Set<Attribute> extractedAttributes = new HashSet<Attribute>();
-        Set<String> extractedValues = new HashSet<String>();
+        Set<String> extractedValues = new HashSet<>();
 
         for (AttributeSet attSet : attrs.values()) {
             for (Attribute att : attSet.getAttributes()) {
-                extractedAttributes.add(att);
                 extractedValues.add(att.getValue());
             }
         }
@@ -672,7 +617,7 @@ public class OrePackageModelBuilderTest {
         Map<String, AttributeSet> attrs =
                 extractor.execute(baseDir, builder.getPackageRemURI());
 
-        Set<String> extractedValues = new HashSet<String>();
+        Set<String> extractedValues = new HashSet<>();
 
         for (AttributeSet attSet : attrs.values()) {
             for (Attribute att : attSet.getAttributes()) {
@@ -699,36 +644,26 @@ public class OrePackageModelBuilderTest {
 
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.startsWith("/ORE-REM"));
+                    assertTrue(path.endsWith(".xml"));
 
-                        assertTrue(path.startsWith("/ORE-REM"));
-                        assertTrue(path.endsWith(".xml"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         when(assembler.createResource(anyString(),
                                       eq(PackageResourceType.DATA),
                                       any(InputStream.class)))
-                .thenAnswer(new Answer<URI>() {
+                .thenAnswer(invocation -> {
 
-                    @Override
-                    public URI answer(InvocationOnMock invocation)
-                            throws Throwable {
+                    String path = (String) invocation.getArguments()[0];
 
-                        String path = (String) invocation.getArguments()[0];
+                    assertTrue(path.endsWith("tst"));
 
-                        assertTrue(path.endsWith("tst"));
-
-                        return uriFor(path);
-                    }
+                    return uriFor(path);
                 });
 
         PackageArtifact project = newArtifact(ArtifactType.Project);
@@ -922,7 +857,7 @@ public class OrePackageModelBuilderTest {
     }
 
     private Set<PackageArtifact> asSet(PackageArtifact... artifacts) {
-        Set<PackageArtifact> asSet = new HashSet<PackageArtifact>();
+        Set<PackageArtifact> asSet = new HashSet<>();
         Collections.addAll(asSet, artifacts);
 
         return asSet;
@@ -931,7 +866,7 @@ public class OrePackageModelBuilderTest {
     private void addRel(String rel, PackageArtifact to, PackageArtifact from) {
         PackageRelationship relationship = from.getRelationshipByName(rel);
         if ( relationship == null) {
-            relationship = new PackageRelationship(rel, true, new HashSet<String>());
+            relationship = new PackageRelationship(rel, true, new HashSet<>());
             from.getRelationships().add(relationship);
         }
 
@@ -941,7 +876,7 @@ public class OrePackageModelBuilderTest {
     private void addExternalRel(PackageArtifact subject, String rel, String target) {
         PackageRelationship relationship = subject.getRelationshipByName(rel);
         if (relationship == null) {
-            relationship = new PackageRelationship(rel, true, new HashSet<String>());
+            relationship = new PackageRelationship(rel, true, new HashSet<>());
             subject.getRelationships().add(relationship);
         }
         
@@ -951,7 +886,7 @@ public class OrePackageModelBuilderTest {
     private void addRandomPropertiesTo(PackageArtifact artifact) {
         PackageOntology ontology = DcsBoPackageOntology.getInstance();
 
-        List<String> validProperties = new ArrayList<String>();
+        List<String> validProperties = new ArrayList<>();
 
         for (Property p : ontology.getProperties(artifact.getType())) {
             validProperties.add(p.getName());

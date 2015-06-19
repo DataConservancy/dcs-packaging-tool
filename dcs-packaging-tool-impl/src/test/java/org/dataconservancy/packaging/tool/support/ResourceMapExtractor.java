@@ -29,9 +29,9 @@ import java.util.Set;
 
 import org.dataconservancy.mhf.representation.api.Attribute;
 import org.dataconservancy.mhf.representation.api.AttributeSet;
-import org.dataconservancy.packaging.model.AttributeSetName;
-import org.dataconservancy.packaging.model.AttributeValueType;
-import org.dataconservancy.packaging.model.Metadata;
+import org.dataconservancy.dcs.model.AttributeSetName;
+import org.dataconservancy.dcs.model.AttributeValueType;
+import org.dataconservancy.dcs.model.Metadata;
 import org.dataconservancy.packaging.shared.PackageException;
 import org.dataconservancy.packaging.shared.ResourceMapConstants;
 import org.dataconservancy.packaging.shared.ResourceMapUtil;
@@ -270,15 +270,13 @@ public class ResourceMapExtractor implements ResourceMapConstants {
             Types type) throws PackageValidationException {
 
         String attNamePrefix = type.getString();
-        boolean currentSet = true;
-        int attsSize = 0;
+        int attsSize;
 
         AttributeSet attSet = null;
 
         if (type == Types.Package) {
             attSet = state.attributeMap.get(AttributeSetName.ORE_REM_PACKAGE + "_" + resource.getURI());
             if (attSet == null) {
-                currentSet = false;
                 attSet = new AttributeSetImpl(AttributeSetName.ORE_REM_PACKAGE);
                 ((AttributeSetImpl)attSet).addAttribute(
                         new AttributeImpl(Metadata.PACKAGE_RESOURCEID, AttributeValueType.STRING, resource.getURI()));
@@ -288,7 +286,6 @@ public class ResourceMapExtractor implements ResourceMapConstants {
         } else if (type == Types.Project) {
             attSet = state.attributeMap.get(AttributeSetName.ORE_REM_PROJECT + "_" + resource.getURI());
             if (attSet == null) {
-                currentSet = false;
                 attSet = new AttributeSetImpl(AttributeSetName.ORE_REM_PROJECT);
                 ((AttributeSetImpl)attSet).addAttribute(
                         new AttributeImpl(Metadata.PROJECT_RESOURCEID, AttributeValueType.STRING, resource.getURI()));
@@ -299,7 +296,6 @@ public class ResourceMapExtractor implements ResourceMapConstants {
             attSet = state.attributeMap.get(AttributeSetName.ORE_REM_COLLECTION + "_"
                     + resource.getURI());
             if (attSet == null) {
-                currentSet = false;
                 attSet = new AttributeSetImpl(AttributeSetName.ORE_REM_COLLECTION);
                 ((AttributeSetImpl)attSet).addAttribute(
                         new AttributeImpl(Metadata.COLLECTION_RESOURCEID, AttributeValueType.STRING, resource.getURI()));
@@ -310,7 +306,6 @@ public class ResourceMapExtractor implements ResourceMapConstants {
             attSet = state.attributeMap
                     .get(AttributeSetName.ORE_REM_DATAITEM + "_" + resource.getURI());
             if (attSet == null) {
-                currentSet = false;
                 attSet = new AttributeSetImpl(AttributeSetName.ORE_REM_DATAITEM);
                 ((AttributeSetImpl)attSet).addAttribute(
                         new AttributeImpl(Metadata.DATAITEM_RESOURCEID, AttributeValueType.STRING, resource.getURI()));
@@ -320,13 +315,16 @@ public class ResourceMapExtractor implements ResourceMapConstants {
         } else if (type == Types.File) {
             attSet = state.attributeMap.get(AttributeSetName.ORE_REM_FILE + "_" + resource.getURI());
             if (attSet == null) {
-                currentSet = false;
                 attSet = new AttributeSetImpl(AttributeSetName.ORE_REM_FILE);
                 ((AttributeSetImpl)attSet).addAttribute(
                         new AttributeImpl(Metadata.FILE_RESOURCEID, AttributeValueType.STRING, resource.getURI()));
             } else {
                 return;
             }
+        }
+
+        if (attSet == null) {
+            return;
         }
 
         Collection<Attribute> atts = attSet.getAttributes();
@@ -399,7 +397,7 @@ public class ResourceMapExtractor implements ResourceMapConstants {
                                 state.attributeMap.get(collectionAttributeSetName);
 
                         List<Attribute> collectionAttributes 
-                                = new ArrayList<Attribute>(collectionAttributeSet.getAttributes());
+                                = new ArrayList<>(collectionAttributeSet.getAttributes());
                         
                         add(collectionAttributes, Types.Collection.toString(), Metadata.AGGREGATED_BY_PROJECT, resource.getURI());
 
@@ -428,16 +426,12 @@ public class ResourceMapExtractor implements ResourceMapConstants {
             if (t.getObject().isLiteral()) {
                 add(atts, attNamePrefix, t.getPredicate().getURI(), t.getObject().getLiteralValue().toString());
             } else if (t.getObject().isURI()) {
-                add(atts, attNamePrefix, t.getPredicate().getURI(), t.getObject().getURI().toString());
+                add(atts, attNamePrefix, t.getPredicate().getURI(), t.getObject().getURI());
             }
         }
 
         if (atts.size() > attsSize) {
-            if (!currentSet) {
-                state.attributeMap.put(attSet.getName() + "_" + resource.getURI(), attSet);
-            } else {
-                state.attributeMap.put(attSet.getName() + "_" + resource.getURI(), attSet);
-            }
+            state.attributeMap.put(attSet.getName() + "_" + resource.getURI(), attSet);
         }
 
         else {
@@ -447,7 +441,7 @@ public class ResourceMapExtractor implements ResourceMapConstants {
     
     private String nodeValue(RDFNode node) throws PackageValidationException {
 
-        String value = null;
+        String value;
         
         if (node.isLiteral()) {
             value = node.asLiteral().getString();
@@ -462,13 +456,13 @@ public class ResourceMapExtractor implements ResourceMapConstants {
     
     private class State {
         /* Keeps track of ReMs visited */
-        public Set<String> visitedResourceMaps = new HashSet<String>();
+        public Set<String> visitedResourceMaps = new HashSet<>();
         
         Model model = ModelFactory.createDefaultModel();
         
         private File baseDir;
 
-        Map<String, AttributeSet> attributeMap = new HashMap<String, AttributeSet>();
+        Map<String, AttributeSet> attributeMap = new HashMap<>();
     }
     
     private static String getAttributeSetNameFor(String uri, Map<String,AttributeSet> attributes) {

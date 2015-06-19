@@ -20,7 +20,7 @@ import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.DCTerms;
 import org.apache.commons.io.IOUtils;
-import org.dataconservancy.packaging.model.impl.Pair;
+import org.dataconservancy.dcs.model.Pair;
 import org.dataconservancy.packaging.shared.ResourceMapConstants;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
@@ -150,24 +150,24 @@ public class OrePackageModelBuilder
             };
 
     private final Map<ArtifactType, Set<PackageArtifact>> artifactsByType =
-            new HashMap<ArtifactType, Set<PackageArtifact>>();
+            new HashMap<>();
 
     private final Map<String, PackageArtifact> artifactsById =
-            new HashMap<String, PackageArtifact>();
+            new HashMap<>();
 
     private final Map<PackageArtifact, Set<Pair<URI, PackageArtifact>>> oreRelationships =
-            new HashMap<PackageArtifact, Set<Pair<URI, PackageArtifact>>>();
+            new HashMap<>();
 
     /* Maps an artifact to its rdf identity in a ReM */
     private final Map<PackageArtifact, URI> oreIdentities =
-            new HashMap<PackageArtifact, URI>();
+            new HashMap<>();
 
     /* Maps an artifact to the containing ReM */
     private final Map<PackageArtifact, URI> oreRemForArtifact =
-            new HashMap<PackageArtifact, URI>();
+            new HashMap<>();
 
     private final Map<URI, ResourceMap> oreRems =
-            new HashMap<URI, ResourceMap>();
+            new HashMap<>();
 
     private URI packageRemURI;
 
@@ -245,7 +245,7 @@ public class OrePackageModelBuilder
             ORESerialiser serializer =
                     ORESerialiserFactory.getInstance("RDF/XML");
 
-            /* Add the root artifact aggregation to the pacakge */
+            /* Add the root artifact aggregation to the package */
             if (desc.getRootArtifact() != null) {
                 ResourceMap artifactRem =
                         oreRems.get(oreRemForArtifact.get(desc.getRootArtifact()));
@@ -280,7 +280,7 @@ public class OrePackageModelBuilder
 
         /* First, initialize the maps */
         for (ArtifactType type : ArtifactType.values()) {
-            artifactsByType.put(type, new HashSet<PackageArtifact>());
+            artifactsByType.put(type, new HashSet<>());
         }
 
         /* Then categorize by id and type */
@@ -292,7 +292,7 @@ public class OrePackageModelBuilder
                 artifactsByType.get(type).add(artifact);
                 artifactsById.put(artifact.getId(), artifact);
                 oreRelationships.put(artifact,
-                        new HashSet<Pair<URI, PackageArtifact>>());
+                        new HashSet<>());
             }
         }
 
@@ -352,7 +352,7 @@ public class OrePackageModelBuilder
 
             if (subject != null ) {
                 oreRelationships.get(subject)
-                        .add(new Pair<URI, PackageArtifact>(rel, object));
+                        .add(new Pair<>(rel, object));
             }
 
         }

@@ -26,24 +26,24 @@ import org.dataconservancy.mhf.representation.api.Attribute;
 import org.dataconservancy.mhf.representation.api.AttributeSet;
 import org.dataconservancy.packaging.validation.PackageValidationException;
 
-import static org.dataconservancy.packaging.model.AttributeSetName.ORE_REM_COLLECTION;
-import static org.dataconservancy.packaging.model.AttributeSetName.ORE_REM_DATAITEM;
-import static org.dataconservancy.packaging.model.AttributeSetName.ORE_REM_FILE;
-import static org.dataconservancy.packaging.model.AttributeSetName.ORE_REM_PACKAGE;
-import static org.dataconservancy.packaging.model.AttributeSetName.ORE_REM_PROJECT;
-import static org.dataconservancy.packaging.model.Metadata.COLLECTION_AGGREGATED_BY_PROJECT;
-import static org.dataconservancy.packaging.model.Metadata.COLLECTION_AGGREGATES_COLLECTION;
-import static org.dataconservancy.packaging.model.Metadata.COLLECTION_AGGREGATES_DATAITEM;
-import static org.dataconservancy.packaging.model.Metadata.COLLECTION_AGGREGATES_FILE;
-import static org.dataconservancy.packaging.model.Metadata.COLLECTION_IS_PART_OF;
-import static org.dataconservancy.packaging.model.Metadata.DATA_ITEM_AGGREGATES_FILE;
-import static org.dataconservancy.packaging.model.Metadata.DATA_ITEM_IS_PART_OF_COLLECTION;
-import static org.dataconservancy.packaging.model.Metadata.PACKAGE_AGGREGATES_COLLECTION;
-import static org.dataconservancy.packaging.model.Metadata.PACKAGE_AGGREGATES_DATAITEM;
-import static org.dataconservancy.packaging.model.Metadata.PACKAGE_AGGREGATES_FILE;
-import static org.dataconservancy.packaging.model.Metadata.PACKAGE_AGGREGATES_PROJECT;
-import static org.dataconservancy.packaging.model.Metadata.PROJECT_AGGREGATES_COLLECTION;
-import static org.dataconservancy.packaging.model.Metadata.PROJECT_AGGREGATES_FILE;
+import static org.dataconservancy.dcs.model.AttributeSetName.ORE_REM_COLLECTION;
+import static org.dataconservancy.dcs.model.AttributeSetName.ORE_REM_DATAITEM;
+import static org.dataconservancy.dcs.model.AttributeSetName.ORE_REM_FILE;
+import static org.dataconservancy.dcs.model.AttributeSetName.ORE_REM_PACKAGE;
+import static org.dataconservancy.dcs.model.AttributeSetName.ORE_REM_PROJECT;
+import static org.dataconservancy.dcs.model.Metadata.COLLECTION_AGGREGATED_BY_PROJECT;
+import static org.dataconservancy.dcs.model.Metadata.COLLECTION_AGGREGATES_COLLECTION;
+import static org.dataconservancy.dcs.model.Metadata.COLLECTION_AGGREGATES_DATAITEM;
+import static org.dataconservancy.dcs.model.Metadata.COLLECTION_AGGREGATES_FILE;
+import static org.dataconservancy.dcs.model.Metadata.COLLECTION_IS_PART_OF;
+import static org.dataconservancy.dcs.model.Metadata.DATA_ITEM_AGGREGATES_FILE;
+import static org.dataconservancy.dcs.model.Metadata.DATA_ITEM_IS_PART_OF_COLLECTION;
+import static org.dataconservancy.dcs.model.Metadata.PACKAGE_AGGREGATES_COLLECTION;
+import static org.dataconservancy.dcs.model.Metadata.PACKAGE_AGGREGATES_DATAITEM;
+import static org.dataconservancy.dcs.model.Metadata.PACKAGE_AGGREGATES_FILE;
+import static org.dataconservancy.dcs.model.Metadata.PACKAGE_AGGREGATES_PROJECT;
+import static org.dataconservancy.dcs.model.Metadata.PROJECT_AGGREGATES_COLLECTION;
+import static org.dataconservancy.dcs.model.Metadata.PROJECT_AGGREGATES_FILE;
 
 /**
  * A base class providing minimal logic for iterating over the relationships between objects in the ORE graph, allowing
@@ -82,9 +82,7 @@ public abstract class BaseValidationChecker {
      * Accepts a mutable List that is updated with the errors.  <em>Only</em> for use in a test environment!  The
      * implementation is not thread-safe because access to the supplied list is not mediated in any way.
      * <p/>
-     * Subclasses are expected to populate this list as appropriate.  The {@link #execute(String, IngestWorkflowState)}
-     * method of {@code BaseOreChecker} manages the initial state of this list; subclasses will be able to simply add
-     * Strings to the List.
+     * Subclasses are expected to populate this list as appropriate.
      *
      * @param errors a mutable List populated with errors after each run of the {@code execute(...)} method
      */
@@ -100,18 +98,15 @@ public abstract class BaseValidationChecker {
      * errors; as errors are found, they are appended to the {@code List}.  If the List is non-empty at the end of
      * execution, a {@code StatefulIngestServiceException} is thrown.  No events are emitted by this service.
      *
-     * @param depositId the deposit identifier, must not be empty or {@code null}
-     * @param state the state associated with identified deposit, must not be {@code null}, and must have its components
-     *              set
      * @throws PackageValidationException 
-     * @throws StatefulIngestServiceException if any type check fails
+     * @throws PackageValidationException if any type check fails
      */
-    public void validate(String depositId, Map<String, AttributeSet> attributeMap) throws PackageValidationException {
+    public void validate(Map<String, AttributeSet> attributeMap) throws PackageValidationException {
 
         final List<String> localErrors;
 
         if (errors == null) {
-            localErrors = new ArrayList<String>();
+            localErrors = new ArrayList<>();
         } else {
             localErrors = errors;
             localErrors.clear();
@@ -177,13 +172,13 @@ public abstract class BaseValidationChecker {
      * @param aggregatedType the type (name) of the AttributeSet that is being aggregated by {@code aggregatingType}
      * @param aggregatingRelationship the relationship that is used to aggregate {@code aggregatingType} and
      *                                {@code aggregatedType}
-     * @param asm the AttributeSetManager used by implementations to retrieve AttributeSets
+     * @param attributeMap the AttributeSetManager used by implementations to retrieve AttributeSets
      * @param errors a mutable List populated by subclasses, containing Strings of error messages.
      */
     abstract void checkAggregation(String aggregatingType, String aggregatedType, String aggregatingRelationship, Map<String, AttributeSet> attributeMap, List<String> errors);
 
     protected Set<AttributeSet> matchAttribute(Map<String, AttributeSet> attributeMap, Attribute matchingAttribute) {
-        Set<AttributeSet> results = new HashSet<AttributeSet>();
+        Set<AttributeSet> results = new HashSet<>();
         for (AttributeSet attrSet : attributeMap.values()) {
             
             for (Attribute attr : attrSet.getAttributes()) {
@@ -212,7 +207,7 @@ public abstract class BaseValidationChecker {
     }
     
     protected Set<AttributeSet> matchAttributeSetName(Map<String, AttributeSet> attributeMap, String nameToMatch) {
-        Set<AttributeSet> results = new HashSet<AttributeSet>();
+        Set<AttributeSet> results = new HashSet<>();
         
         for (AttributeSet attrSet : attributeMap.values()) {
             if(attrSet.getName().equalsIgnoreCase(nameToMatch)) {
@@ -223,7 +218,7 @@ public abstract class BaseValidationChecker {
     }
     
     protected Set<String> values(AttributeSet attrSet, String attrName) {
-        final Set<String> results = new HashSet<String>();
+        final Set<String> results = new HashSet<>();
         for (Attribute idAttr : attrSet.getAttributesByName(attrName)) {
             results.add(idAttr.getValue());
         }
