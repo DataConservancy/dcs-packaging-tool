@@ -64,7 +64,7 @@
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-model</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-model-builder-xstream</artifactId>
