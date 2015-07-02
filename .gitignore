@@ -1,0 +1,17 @@
+.idea/
+.svn/
+*.ipr
+*.iws
+*.iml
+.idea
+target/
+*.swp
+*.log
+.DS_Store
+*.xpr
+release.properties
+.classpath
+.project
+.settings
+*.releaseBackup
+*.bak
