@@ -234,7 +234,7 @@ public class PackageValidationAppTest {
             PackageDescription desc = new PackageDescription();
             desc.setPackageOntologyIdentifier("valid");
             desc.setPackageArtifacts(new HashSet<PackageArtifact>());
-            desc.setRootArtifactRef("root");
+            desc.setRootArtifactRef("file:/root");
             PackageArtifact artifact1 = newArtifact(TYPE);
             PackageArtifact artifact2 = newArtifact(TYPE);
             addRel("rel", artifact2, artifact1);
@@ -260,7 +260,7 @@ public class PackageValidationAppTest {
 
             PackageDescription desc = new PackageDescription();
             desc.setPackageOntologyIdentifier("invalid");
-            desc.setRootArtifactRef("root");
+            desc.setRootArtifactRef("file:/root");
             desc.setPackageArtifacts(new HashSet<PackageArtifact>());
 
             PackageArtifact artifact1 = newArtifact(TYPE);

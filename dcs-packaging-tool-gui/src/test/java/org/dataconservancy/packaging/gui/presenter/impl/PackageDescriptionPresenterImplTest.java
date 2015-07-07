@@ -126,7 +126,9 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         
         datafile1 = new PackageArtifact();
         datafile1.setId("id:df1");
-        datafile1.setArtifactRef("some/file/path with spaces");
+        //datafile1.setArtifactRef("file:/some/file/path with spaces");
+        File file = new File("file:/some/file/path with spaces");
+        datafile1.setArtifactRef(file.toURI());
         datafile1.setType(DcsBoPackageOntology.DATAFILE);
         datafile1.setByteStream(true);
         datafile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di1"));
@@ -134,7 +136,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         metadatafile1 = new PackageArtifact();
         metadatafile1.setId("id:mdf1");
-        metadatafile1.setArtifactRef("some/file/path");
+        metadatafile1.setArtifactRef("file:/some/file/path");
         metadatafile1.setType(DcsBoPackageOntology.METADATAFILE);
         metadatafile1.setByteStream(true);
         metadatafile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_METADATA_FOR, true, "id:di1"));
@@ -142,7 +144,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         metadatafile2 = new PackageArtifact();
         metadatafile2.setId("id:mdf2");
-        metadatafile2.setArtifactRef("some/file/path");
+        metadatafile2.setArtifactRef("file:/some/file/path");
         metadatafile2.setType(DcsBoPackageOntology.METADATAFILE);
         metadatafile2.setByteStream(true);
         metadatafile2.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_METADATA_FOR, true, "id:col5"));
@@ -150,7 +152,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         metadatafile3 = new PackageArtifact();
         metadatafile3.setId("id:mdf3");
-        metadatafile3.setArtifactRef("some/file/path");
+        metadatafile3.setArtifactRef("file:/some/file/path");
         metadatafile3.setType(DcsBoPackageOntology.METADATAFILE);
         metadatafile3.setByteStream(true);
         metadatafile3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_METADATA_FOR, true, "id:col5"));
@@ -158,7 +160,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         dataitem1 = new PackageArtifact();
         dataitem1.setId("id:di1");
-        dataitem1.setArtifactRef("some/file/path");
+        dataitem1.setArtifactRef("file:/some/file/path");
         dataitem1.setType(DcsBoPackageOntology.DATAITEM);
         dataitem1.setByteStream(false);
         dataitem1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
@@ -166,7 +168,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         datafile2a = new PackageArtifact();
         datafile2a.setId("id:df2a");
-        datafile2a.setArtifactRef("some/file/path");
+        datafile2a.setArtifactRef("file:/some/file/path");
         datafile2a.setType(DcsBoPackageOntology.DATAFILE);
         datafile2a.setByteStream(true);
         datafile2a.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di2"));
@@ -174,7 +176,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         datafile2b = new PackageArtifact();
         datafile2b.setId("id:df2b");
-        datafile2b.setArtifactRef("some/file/path");
+        datafile2b.setArtifactRef("file:/some/file/path");
         datafile2b.setType(DcsBoPackageOntology.DATAFILE);
         datafile2b.setByteStream(true);
         datafile2b.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di2"));
@@ -182,7 +184,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         dataitem2 = new PackageArtifact();
         dataitem2.setId("id:di2");
-        dataitem2.setArtifactRef("some/file/path");
+        dataitem2.setArtifactRef("file:/some/file/path");
         dataitem2.setType(DcsBoPackageOntology.DATAITEM);
         dataitem2.setByteStream(false);
         dataitem2.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
@@ -190,7 +192,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         collection1 = new PackageArtifact();
         collection1.setId("id:col1");
-        collection1.setArtifactRef("some/file/path");
+        collection1.setArtifactRef("file:/some/file/path");
         collection1.setType(DcsBoPackageOntology.COLLECTION);
         collection1.setByteStream(false);
         collection1 .setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"));
@@ -198,7 +200,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         dataitem3 = new PackageArtifact();
         dataitem3.setId("id:di3");
-        dataitem3.setArtifactRef("some/file/path");
+        dataitem3.setArtifactRef("file:/some/file/path");
         dataitem3.setType(DcsBoPackageOntology.DATAITEM);
         dataitem3.setByteStream(false);
         dataitem3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col2"));
@@ -206,7 +208,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         collection2 = new PackageArtifact();
         collection2.setId("id:col2");
-        collection2.setArtifactRef("some/file/path");
+        collection2.setArtifactRef("file:/some/file/path");
         collection2.setType(DcsBoPackageOntology.COLLECTION);
         collection2.setByteStream(false);
         collection2 .setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"));
@@ -214,7 +216,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         collection3 = new PackageArtifact();
         collection3.setId("id:col3");
-        collection3.setArtifactRef("some/file/path");
+        collection3.setArtifactRef("file:/some/file/path");
         collection3.setType(DcsBoPackageOntology.COLLECTION);
         collection3.setByteStream(false);
         collection3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
@@ -222,7 +224,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         dataitem4 = new PackageArtifact();
         dataitem4.setId("id:di4");
-        dataitem4.setArtifactRef("some/file/path");
+        dataitem4.setArtifactRef("file:/some/file/path");
         dataitem4.setType(DcsBoPackageOntology.DATAITEM);
         dataitem4.setByteStream(false);
         dataitem4.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col3"));
@@ -230,7 +232,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
         collection4 = new PackageArtifact();
         collection4.setId("id:col4");
-        collection4.setArtifactRef("some/file/path");
+        collection4.setArtifactRef("file:/some/file/path");
         collection4.setType(DcsBoPackageOntology.COLLECTION);
         collection4.setByteStream(false);
         collection4.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col3"));
@@ -238,7 +240,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         
         collection5 = new PackageArtifact();
         collection5.setId("id:col5");
-        collection5.setArtifactRef("some/file/path");
+        collection5.setArtifactRef("file:/some/file/path");
         collection5.setType(DcsBoPackageOntology.COLLECTION);
         collection5.setByteStream(false);
         collection5.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"), new PackageRelationship(DcsBoPackageOntology.HAS_METADATA, true, metadatafile2.getId(), metadatafile3.getId()));
@@ -246,7 +248,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         
         project = new PackageArtifact();
         project.setId("id:project");
-        project.setArtifactRef("some/file/path");
+        project.setArtifactRef("file:/some/file/path");
         project.setType(DcsBoPackageOntology.PROJECT);
         project.setByteStream(false);
         artifacts.add(project);
@@ -472,7 +474,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         //Test an invalid artifact
         PackageArtifact badCollection = new PackageArtifact();
         badCollection.setId("collection:1");
-        badCollection.setArtifactRef("/project/collection/");
+        badCollection.setArtifactRef("file:/project/collection/");
         badCollection.setType(DcsBoPackageOntology.COLLECTION);
         badCollection.addSimplePropertyValue("BadProperty", "Collection summary blah blah");
         invalidProperties = presenter.findInvalidProperties(badCollection, badCollection.getType());
@@ -484,7 +486,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         //Test that an empty artifact shows no invalid properties
         PackageArtifact emptyCollection = new PackageArtifact();
         emptyCollection.setId("collection:1");
-        emptyCollection.setArtifactRef("/project/collection/");
+        emptyCollection.setArtifactRef("file:/project/collection/");
         emptyCollection.setType(DcsBoPackageOntology.COLLECTION);
         invalidProperties = presenter.findInvalidProperties(emptyCollection, emptyCollection.getType());
         assertNotNull(invalidProperties);
@@ -500,7 +502,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         //Test a collection to a data item with a shared property returns empty list
         PackageArtifact collection = new PackageArtifact();
         collection.setId("collection:1");
-        collection.setArtifactRef("/project/collection/");
+        collection.setArtifactRef("file:/project/collection/");
         collection.setType(DcsBoPackageOntology.COLLECTION);
 
         PropertyValueGroup creatorGroup = new PropertyValueGroup();
@@ -525,7 +527,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         //Test that an empty artifact shows no invalid properties
         PackageArtifact emptyCollection = new PackageArtifact();
         collection.setId("collection:1");
-        collection.setArtifactRef("/project/collection/");
+        collection.setArtifactRef("file:/project/collection/");
         collection.setType(DcsBoPackageOntology.COLLECTION);
         invalidProperties = presenter.findInvalidProperties(emptyCollection, dataitem1.getType());
         assertNotNull(invalidProperties);

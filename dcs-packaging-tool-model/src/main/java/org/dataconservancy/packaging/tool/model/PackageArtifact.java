@@ -13,6 +13,7 @@
 package org.dataconservancy.packaging.tool.model;
 
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.Set;
 public class PackageArtifact {
     private String id;
     private String type;
-    private String artifactRef;
+    private ArtifactReference artifactRef;
     private boolean isByteStream;
     private boolean isIgnored;
     
@@ -83,19 +84,30 @@ public class PackageArtifact {
     }
     
     /**
+     * Get the ArtifactReference for this artifact
      * @return the artifactRef
      */
-    public String getArtifactRef() {
+    public ArtifactReference getArtifactRef() {
         return artifactRef;
     }
-    
+
+
     /**
-     * Sets the reference to artifact usually a path to a file or folder.
-     * @param artifactRef The reference to the object this artifact represents
+     * Sets the reference to artifact usually a path to a file or folder. String must represent a valid URI
+     * @param artifactRefString The string representing a reference to the object this artifact represents
      */
-    public void setArtifactRef(String artifactRef) {
-        this.artifactRef = artifactRef;
+    public void setArtifactRef(String artifactRefString) {
+        this.artifactRef = new ArtifactReference(artifactRefString);
     }
+
+    /**
+     * Setter using an alternate constructor for ArtifactReference
+     * @param uri  the URI used to construct the ArtifactReference
+     */
+    public void setArtifactRef(URI uri){
+        this.artifactRef = new ArtifactReference(uri);
+    }
+
 
     /**
      * Returns the map of properties as map from properties' names to set of its values.

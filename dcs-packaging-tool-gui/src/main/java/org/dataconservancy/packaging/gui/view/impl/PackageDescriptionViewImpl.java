@@ -220,11 +220,11 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
                 viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
                 try {
-                    URI fileURI = new URI(packageArtifact.getArtifactRef());
+                    URI fileURI = packageArtifact.getArtifactRef().getRefURI();
                     String fragment = fileURI.getFragment();
 
                     if (getFullPathCheckBox().selectedProperty().getValue()) {
-                        String labelText = packageArtifact.getArtifactRef();
+                        String labelText = packageArtifact.getArtifactRef().getRefString();
                         if (fragment != null) {
                             labelText = labelText + synthesizedArtifactMarker;
                         }
@@ -240,7 +240,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                     }
                 } catch (Exception e) {
                     //Couldn't create a uri from the ref so just use the ref
-                    viewLabel.setText(packageArtifact.getArtifactRef());
+                    viewLabel.setText(packageArtifact.getArtifactRef().getRefString());
                     log.error(e.getMessage());
                 }
 
@@ -290,7 +290,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
                             log.warn("Changing artifact " + packageArtifact.getArtifactRef() + " from " + oldType + " to " + packageArtifact.getType());
                             //Notify the user that we are changing types
-                            showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_CHANGE_WARNING), messages.formatPackageDescriptionModificationWarning(packageArtifact.getArtifactRef(), oldType, packageArtifact.getType()), false, false);
+                            showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_CHANGE_WARNING), messages.formatPackageDescriptionModificationWarning(packageArtifact.getArtifactRef().getRefString(), oldType, packageArtifact.getType()), false, false);
                             getWarningPopupPositiveButton().setOnAction(new EventHandler<ActionEvent>() {
                                 @Override
                                 public void handle(ActionEvent actionEvent) {

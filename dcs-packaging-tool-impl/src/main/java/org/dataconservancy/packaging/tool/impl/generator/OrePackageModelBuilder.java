@@ -473,11 +473,10 @@ public class OrePackageModelBuilder
                                 ResourceMap rem,
                                 PackageAssembler assembler) throws Exception {
         /* Get file content */
-        URL contentLocation = new URL(artifact.getArtifactRef());
+        URL contentLocation = artifact.getArtifactRef().getRefURL();
 
         /* If file path isn't set, use the artifact ref */
-        String path =
-                artifact.getArtifactRef().replace(File.separatorChar, '/');
+        String path = artifact.getArtifactRef().getRefString().replace(File.separatorChar, '/');
 
         URI resourceURI =
                 assembler.createResource(path,

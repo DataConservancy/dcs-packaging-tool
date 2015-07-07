@@ -846,7 +846,7 @@ public class OrePackageModelBuilderTest {
     private PackageArtifact newArtifact(final ArtifactType type) {
         PackageArtifact artifact = new PackageArtifact();
         artifact.setId("_" + Math.random());
-        artifact.setArtifactRef("/" + Math.random());
+        artifact.setArtifactRef("file:/" + Math.random());
         artifact.setType(type.toString());
 
         return artifact;

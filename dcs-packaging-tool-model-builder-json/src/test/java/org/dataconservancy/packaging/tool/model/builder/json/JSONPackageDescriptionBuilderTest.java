@@ -65,7 +65,7 @@ public class JSONPackageDescriptionBuilderTest {
 
         artifactOne.setId(ARTIFACT_ONE_ID);
         artifactOne.setType(DcsPackageArtifactType.Collection.name());
-        artifactOne.setArtifactRef("this.ref");
+        artifactOne.setArtifactRef("file:/this.ref");
         artifactOne.addSimplePropertyValue("PropertyOne", "valueOne");
         artifactOne.addSimplePropertyValue("PropertyTwo", "valueTwo");
         artifactOne.setRelationships(relationshipSetOne);
@@ -74,7 +74,7 @@ public class JSONPackageDescriptionBuilderTest {
 
         artifactTwo.setId(ARTIFACT_TWO_ID);
         artifactTwo.setType(DcsPackageArtifactType.DataItem.name());
-        artifactTwo.setArtifactRef("this.ref");
+        artifactTwo.setArtifactRef("file:/this.ref");
         artifactTwo.addSimplePropertyValue("PropertyOne", "valueOne");
         artifactTwo.addSimplePropertyValue("PropertyTwo", "valueTwo");
         artifactTwo.setRelationships(relationshipSetOne);
@@ -82,14 +82,14 @@ public class JSONPackageDescriptionBuilderTest {
 
         artifactThree.setId(ARTIFACT_THREE_ID);
         artifactThree.setType(DcsPackageArtifactType.DataItem.name());
-        artifactThree.setArtifactRef("this.ref");
+        artifactThree.setArtifactRef("file:/this.ref");
         artifactThree.addSimplePropertyValue("PropertyThree", "valueThree");
         artifactThree.setRelationships(relationshipSetTwo);
         artifactThree.setByteStream(false);
 
         artifactFour.setId(ARTIFACT_FOUR_ID);
         artifactFour.setType(DcsPackageArtifactType.DataFile.name());
-        artifactFour.setArtifactRef("this.ref");
+        artifactFour.setArtifactRef("file:/this.ref");
         artifactFour.addSimplePropertyValue("PropertyThree", "valueThree");
         artifactFour.addSimplePropertyValue("PropertyThree", "valueFour");
         artifactFour.setRelationships(relationshipSetTwo);
@@ -106,7 +106,7 @@ public class JSONPackageDescriptionBuilderTest {
 
         sampleDescription.setPackageOntologyIdentifier(specIdentifierOne);
         sampleDescription.setPackageArtifacts(artifactSetOne);
-        sampleDescription.setRootArtifactRef("root");
+        sampleDescription.setRootArtifactRef("file:/root");
         serializedDescription = "{\n" +
                 "  \"@context\" : {\n" +
                 "    \"dc\" : \"http://dataconservancy.org/ns/types/\"\n" +
@@ -136,7 +136,7 @@ public class JSONPackageDescriptionBuilderTest {
                 "    }, {\n" +
                 "      \"@id\" : \"_:t12\"\n" +
                 "    } ],\n" +
-                "    \"dc:hasRef\" : \"this.ref\",\n" +
+                "    \"dc:hasRef\" : \"file:/this.ref\",\n" +
                 "    \"dc:hasRelationship\" : {\n" +
                 "      \"@id\" : \"_:t13\"\n" +
                 "    },\n" +
@@ -182,7 +182,7 @@ public class JSONPackageDescriptionBuilderTest {
                 "    \"dc:hasProperty\" : {\n" +
                 "      \"@id\" : \"_:t8\"\n" +
                 "    },\n" +
-                "    \"dc:hasRef\" : \"this.ref\",\n" +
+                "    \"dc:hasRef\" : \"file:/this.ref\",\n" +
                 "    \"dc:hasRelationship\" : {\n" +
                 "      \"@id\" : \"_:t7\"\n" +
                 "    },\n" +
@@ -198,7 +198,7 @@ public class JSONPackageDescriptionBuilderTest {
                 "    }, {\n" +
                 "      \"@id\" : \"_:t10\"\n" +
                 "    } ],\n" +
-                "    \"dc:hasRef\" : \"this.ref\",\n" +
+                "    \"dc:hasRef\" : \"file:/this.ref\",\n" +
                 "    \"dc:hasRelationship\" : {\n" +
                 "      \"@id\" : \"_:t6\"\n" +
                 "    },\n" +
@@ -212,7 +212,7 @@ public class JSONPackageDescriptionBuilderTest {
                 "    \"dc:hasProperty\" : {\n" +
                 "      \"@id\" : \"_:t9\"\n" +
                 "    },\n" +
-                "    \"dc:hasRef\" : \"this.ref\",\n" +
+                "    \"dc:hasRef\" : \"file:/this.ref\",\n" +
                 "    \"dc:hasRelationship\" : {\n" +
                 "      \"@id\" : \"_:t11\"\n" +
                 "    },\n" +
@@ -223,7 +223,7 @@ public class JSONPackageDescriptionBuilderTest {
                 "    \"@id\" : \"_:t5\",\n" +
                 "    \"@type\" : \"dc:Property\",\n" +
                 "    \"dc:hasName\" : \"root\",\n" +
-                "    \"dc:hasValue\" : \"root\"\n" +
+                "    \"dc:hasValue\" : \"file:/root\"\n" +
                 "  }, {\n" +
                 "    \"@id\" : \"_:t6\",\n" +
                 "    \"@type\" : \"dc:Relationship\",\n" +
@@ -267,7 +267,7 @@ public class JSONPackageDescriptionBuilderTest {
         assertTrue(outputDescription.contains("\"foo\""));
         assertTrue(outputDescription.contains("\"Spec:one\""));
         assertTrue(outputDescription.contains("\"root\""));
-        assertTrue(outputDescription.contains("\"this.ref\""));
+        assertTrue(outputDescription.contains("\"file:/this.ref\""));
         assertTrue(outputDescription.contains("\"PropertyOne\""));
         assertTrue(outputDescription.contains("\"valueOne\""));
     }

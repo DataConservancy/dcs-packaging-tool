@@ -134,7 +134,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
      */
     private void createArtifactDetailsPopup(PackageArtifact artifact) {
 
-        artifactDetailsPopup.setTitleText(artifact.getArtifactRef());
+        artifactDetailsPopup.setTitleText(artifact.getArtifactRef().getRefString());
 
         //The property popup will consist of the three tabs, general, creator and relationships.
         TabPane propertiesPopup = new TabPane();

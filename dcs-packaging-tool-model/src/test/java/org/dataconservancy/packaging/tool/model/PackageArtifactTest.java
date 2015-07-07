@@ -45,23 +45,23 @@ public class PackageArtifactTest {
         
         artifactOne.setId("id:a");
         artifactOne.setType(DcsPackageArtifactType.Collection.name());
-        artifactOne.setArtifactRef("this.ref");
+        artifactOne.setArtifactRef("file:/this.ref");
         artifactOne.addSimplePropertyValue(propertyOneName, propertyOneValue);
         artifactOne.addSimplePropertyValue(propertyTwoName, propertyTwoValue);
         artifactOne.setRelationships(relationshipSetOne);
         artifactOne.setIgnored(true);
-        
+
         artifactTwo.setId("id:a");
         artifactTwo.setType(DcsPackageArtifactType.Collection.name());
-        artifactTwo.setArtifactRef("this.ref");
+        artifactTwo.setArtifactRef("file:/this.ref");
         artifactTwo.addSimplePropertyValue(propertyOneName, propertyOneValue);
         artifactTwo.addSimplePropertyValue(propertyTwoName, propertyTwoValue);
         artifactTwo.setRelationships(relationshipSetOne);
         artifactTwo.setIgnored(true);
-        
+
         artifactThree.setId("id:b");
         artifactThree.setType(DcsPackageArtifactType.Collection.name());
-        artifactThree.setArtifactRef("this.ref");
+        artifactThree.setArtifactRef("file:/this.ref");
         artifactThree.addSimplePropertyValue(propertyThreeName, propertyThreeValue);
         artifactThree.setRelationships(relationshipSetTwo);
         artifactThree.setIgnored(false);

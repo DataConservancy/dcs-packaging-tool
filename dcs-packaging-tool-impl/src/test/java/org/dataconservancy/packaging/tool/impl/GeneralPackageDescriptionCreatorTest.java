@@ -53,6 +53,7 @@ import org.dataconservancy.packaging.tool.model.ontologies.DcsBoPackageOntology;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
@@ -174,7 +175,7 @@ public class GeneralPackageDescriptionCreatorTest {
         PackageDescription firstDesc =
                 creator.createPackageDescription(packageOntologyIdentifier, contentDir);
         assertNotNull(firstDesc);
-        assertEquals(firstDesc, creator.createPackageDescription(packageOntologyIdentifier,contentDir));
+        assertEquals(firstDesc, creator.createPackageDescription(packageOntologyIdentifier, contentDir));
     }
 
     /*
@@ -409,12 +410,12 @@ public class GeneralPackageDescriptionCreatorTest {
         List<PackageArtifact> childDataFiles = new ArrayList<PackageArtifact>();
 
         for (PackageArtifact artifact : desc.getPackageArtifacts()) {
-            if (artifact.getArtifactRef().contains("impliedData")) {
+            if (artifact.getArtifactRef().getRefString().contains("impliedData")) {
                 if (artifact.getType().equals("DataItem")) {
                     parentDataItems.put(artifact.getId(), artifact);
                     URI idUri = new URI(artifact.getId());
                     assertNotNull(idUri.getFragment());
-                    URI refUri = new URI(artifact.getArtifactRef());
+                    URI refUri = artifact.getArtifactRef().getRefURI();
                     assertNotNull(refUri.getFragment());
                     assertFalse(artifact.isByteStream());
                 } else {
@@ -436,7 +437,7 @@ public class GeneralPackageDescriptionCreatorTest {
                     .next()));
             URI idUri = new URI(child.getId());
             assertNull(idUri.getFragment());
-            URI refUri = new URI(child.getArtifactRef());
+            URI refUri = child.getArtifactRef().getRefURI();
             assertNull(refUri.getFragment());
 
         }
@@ -455,7 +456,7 @@ public class GeneralPackageDescriptionCreatorTest {
 
     private static PackageArtifact artifactFor(File file) {
         for (PackageArtifact artifact : desc.getPackageArtifacts()) {
-            if (artifact.getArtifactRef().equals(file.toURI().toString())) {
+            if (artifact.getArtifactRef().getRefURI().equals(file.toURI())) {
                 return artifact;
             }
         }

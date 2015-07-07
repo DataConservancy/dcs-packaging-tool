@@ -132,22 +132,15 @@ public class PackageDescriptionValidator {
             throws PackageValidationException {
 
         /* Artifact ref must be defined */
-        if (!isDefined(artifact.getArtifactRef())) {
+        if (artifact.getArtifactRef()==null) {
             throw new PackageValidationException(String.format("Artifact ref is not defined. for artifact '%s'",
                                                                artifact.getId()));
         }
 
-        /* Artifact ref must be a resolvable URI */
-        try {
-            if (!UriUtility.isResolvable(new URI(artifact.getArtifactRef()))) {
-                throw new PackageValidationException(String.format("Artifact ref '%s' must be resolvable for artifact '%s'",
-                                                                   artifact.getArtifactRef(),
-                                                                   artifact.getId()));
-            }
-        } catch (URISyntaxException e) {
-            throw new PackageValidationException(String.format("Artifact ref for package artifact '%s' must be a syntactically correct URI.  Instead, we have this: '%s'",
-                                                               artifact.getId(),
-                                                               artifact.getArtifactRef()));
+        if (!UriUtility.isResolvable(artifact.getArtifactRef().getRefURI())) {
+            throw new PackageValidationException(String.format("Artifact ref '%s' must be resolvable for artifact '%s'",
+                                                               artifact.getArtifactRef(),
+                                                               artifact.getId()));
         }
     }
 

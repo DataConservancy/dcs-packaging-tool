@@ -97,7 +97,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         datafile1 = new PackageArtifact();
         datafile1.setId("id:df1");
-        datafile1.setArtifactRef("some/file/path");
+        datafile1.setArtifactRef("file:/some/file/path");
         datafile1.setType(DcsBoPackageOntology.DATAFILE);
         datafile1.setByteStream(true);
         datafile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di1"));
@@ -105,7 +105,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         metadatafile1 = new PackageArtifact();
         metadatafile1.setId("id:mdf1");
-        metadatafile1.setArtifactRef("some/file/path");
+        metadatafile1.setArtifactRef("file:/some/file/path");
         metadatafile1.setType(DcsBoPackageOntology.METADATAFILE);
         metadatafile1.setByteStream(true);
         metadatafile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_METADATA_FOR, true, "id:di1"));
@@ -113,7 +113,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         dataitem1 = new PackageArtifact();
         dataitem1.setId("id:di1");
-        dataitem1.setArtifactRef("some/file/path");
+        dataitem1.setArtifactRef("file:/some/file/path");
         dataitem1.setType(DcsBoPackageOntology.DATAITEM);
         dataitem1.setByteStream(false);
         dataitem1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
@@ -121,7 +121,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         datafile2a = new PackageArtifact();
         datafile2a.setId("id:df2a");
-        datafile2a.setArtifactRef("some/file/path");
+        datafile2a.setArtifactRef("file:/some/file/path");
         datafile2a.setType(DcsBoPackageOntology.DATAFILE);
         datafile2a.setByteStream(true);
         datafile2a.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di2"));
@@ -129,7 +129,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         datafile2b = new PackageArtifact();
         datafile2b.setId("id:df2b");
-        datafile2b.setArtifactRef("some/file/path");
+        datafile2b.setArtifactRef("file:/some/file/path");
         datafile2b.setType(DcsBoPackageOntology.DATAFILE);
         datafile2b.setByteStream(true);
         datafile2b.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di2"));
@@ -137,7 +137,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         dataitem2 = new PackageArtifact();
         dataitem2.setId("id:di2");
-        dataitem2.setArtifactRef("some/file/path");
+        dataitem2.setArtifactRef("file:/some/file/path");
         dataitem2.setType(DcsBoPackageOntology.DATAITEM);
         dataitem2.setByteStream(false);
         dataitem2.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
@@ -145,7 +145,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         collection1 = new PackageArtifact();
         collection1.setId("id:col1");
-        collection1.setArtifactRef("some/file/path");
+        collection1.setArtifactRef("file:/some/file/path");
         collection1.setType(DcsBoPackageOntology.COLLECTION);
         collection1.setByteStream(false);
         collection1 .setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"));
@@ -153,7 +153,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         dataitem3 = new PackageArtifact();
         dataitem3.setId("id:di3");
-        dataitem3.setArtifactRef("some/file/path");
+        dataitem3.setArtifactRef("file:/some/file/path");
         dataitem3.setType(DcsBoPackageOntology.DATAITEM);
         dataitem3.setByteStream(false);
         dataitem3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col2"));
@@ -161,7 +161,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         collection2 = new PackageArtifact();
         collection2.setId("id:col2");
-        collection2.setArtifactRef("some/file/path");
+        collection2.setArtifactRef("file:/some/file/path");
         collection2.setType(DcsBoPackageOntology.COLLECTION);
         collection2.setByteStream(false);
         collection2 .setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"));
@@ -169,7 +169,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         collection3 = new PackageArtifact();
         collection3.setId("id:col3");
-        collection3.setArtifactRef("some/file/path");
+        collection3.setArtifactRef("file:/some/file/path");
         collection3.setType(DcsBoPackageOntology.COLLECTION);
         collection3.setByteStream(false);
         collection3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
@@ -177,7 +177,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         dataitem4 = new PackageArtifact();
         dataitem4.setId("id:di4");
-        dataitem4.setArtifactRef("some/file/path");
+        dataitem4.setArtifactRef("file:/some/file/path");
         dataitem4.setType(DcsBoPackageOntology.DATAITEM);
         dataitem4.setByteStream(false);
         dataitem4.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col3"));
@@ -185,7 +185,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         collection4 = new PackageArtifact();
         collection4.setId("id:col4");
-        collection4.setArtifactRef("some/file/path");
+        collection4.setArtifactRef("file:/some/file/path");
         collection4.setType(DcsBoPackageOntology.COLLECTION);
         collection4.setByteStream(false);
         collection4.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col3"));
@@ -193,7 +193,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         project = new PackageArtifact();
         project.setId("id:project");
-        project.setArtifactRef("some/file/path");
+        project.setArtifactRef("file:/some/file/path");
         project.setType(DcsBoPackageOntology.PROJECT);
         project.setByteStream(false);
         artifacts.add(project);

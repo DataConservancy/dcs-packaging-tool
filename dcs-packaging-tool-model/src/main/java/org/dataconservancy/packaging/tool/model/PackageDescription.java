@@ -18,7 +18,7 @@ public class PackageDescription {
     
     private Set<PackageArtifact> packageArtifacts;
     private String packageOntologyIdentifier;
-    private String rootArtifactRef;
+    private ArtifactReference rootArtifactRef;
     
     public PackageDescription() {
         packageArtifacts = new HashSet<>();
@@ -52,30 +52,35 @@ public class PackageDescription {
     }
     
     /**
-     * Sets the ref of the root artifact of the package description.
-     * @param rootArtifact The reference pointing to the root artifact of the description.
+     * Sets the ref of the root artifact of the package description using the ArtifactReference String constructor.
+     * The string must represent a valid URI
+     * @param rootArtifactString The reference pointing to the root artifact of the description.
      */
-    public void setRootArtifactRef(String rootArtifact) {
-        this.rootArtifactRef = rootArtifact;
-    }
-    
+    public void setRootArtifactRef(String rootArtifactString) { this.rootArtifactRef = new ArtifactReference(rootArtifactString);}
+
+    /**
+     * Sets the root ArtifactReference of the package description.
+     * @param rootArtifact
+     */
+    public void setRootArtifactRef(ArtifactReference rootArtifact) {this.rootArtifactRef = rootArtifact;}
+
     /**
      * Gets the reference of the root artifact of the package description if one exists.
      * @return The reference pointing to the root artifact of the description.
      */
-    public String getRootArtifactRef() {
+    public ArtifactReference getRootArtifactRef() {
         return rootArtifactRef;
     }
-    
+
     /**
      * Convenience method for fetching the root artifact.
      * @return The package artifact that is the root of the description, or null if the root isn't set or can't be found.
      */
     public PackageArtifact getRootArtifact() {
         PackageArtifact root = null;
-        if (rootArtifactRef != null && !rootArtifactRef.isEmpty()) {
+        if (rootArtifactRef != null) {
             for (PackageArtifact artifact : packageArtifacts) {
-                if (artifact.getArtifactRef().equalsIgnoreCase(rootArtifactRef)) {
+                if (artifact.getArtifactRef().equals(rootArtifactRef)) {
                     root = artifact;
                     break;
                 }

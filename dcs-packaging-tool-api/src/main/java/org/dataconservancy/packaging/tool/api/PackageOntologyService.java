@@ -17,6 +17,7 @@ package org.dataconservancy.packaging.tool.api;
 
 import org.dataconservancy.packaging.tool.model.*;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
@@ -83,10 +84,11 @@ public interface PackageOntologyService {
      * Performs necessary mapping to change the {@code artifact}'s type to the new type specified by {@code newTypeName}.
      * @param packageDesc  the PackageDescription
      * @param packageTree tree containing the package artifact. Will be used to determine whether the new type is a valid one.
-     * @param artifactId id of the the artifact whose type is to be change
+     * @param artifactId id of the the artifact whose type is to be changed
+     * @param artifactURI the URI of the artifact whose type is to be changed
      * @param newTypeName the name of the new type
      */
-    public void changeType(PackageDescription packageDesc, PackageTree packageTree, String artifactId, String newTypeName) throws PackageOntologyException;
+    public void changeType(PackageDescription packageDesc, PackageTree packageTree, String artifactId, URI artifactURI, String newTypeName) throws PackageOntologyException;
     
     /**
      * Gets the max number of times a property can occur. 

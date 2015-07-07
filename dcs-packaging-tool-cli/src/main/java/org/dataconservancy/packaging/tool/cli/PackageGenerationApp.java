@@ -255,7 +255,7 @@ public class PackageGenerationApp {
         // be provided in the params files anyway
         PackageDescription desc = getPackageDescription();
         packageParams.removeParam(GeneralParameterNames.CONTENT_ROOT_LOCATION);
-        packageParams.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, desc.getRootArtifactRef());
+        packageParams.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, desc.getRootArtifactRef().getRefString());
 
         // Print package generation parameters, if desired
         if (info) {

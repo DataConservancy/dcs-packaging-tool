@@ -164,8 +164,31 @@ public class PackageDescriptionValidatorTest {
         PackageArtifact artifact = newArtifact(TYPE_1);
         desc.getPackageArtifacts().add(artifact);
 
-        /* null artifact ref should fail */
-        artifact.setArtifactRef(null);
+        /* Incomprehensible artifact ref should fail */
+
+        try {
+            artifact.setArtifactRef("urn:cannot_be_resolved");
+            //next line should never be reached, as the construction of the artifactRef should fail
+            validator.validate(desc);
+            fail("non resolvable artifact ref passed validation");
+        } catch (IllegalArgumentException e) {
+            /* expected */
+        }
+
+        /* Resolvable ref should pass */
+        artifact.setArtifactRef("http://dataconservancy.org");
+        validator.validate(desc);
+    }
+
+    @Test
+    public void nullArtifactRefTest() throws PackageValidationException {
+        PackageDescription desc = newPackageDescription();
+        PackageArtifact artifact = new PackageArtifact();
+
+        desc.getPackageArtifacts().add(artifact);
+
+        artifact.setId(Integer.toString(idSource.incrementAndGet()));
+        artifact.setType(TYPE_1);
         try {
             validator.validate(desc);
             fail("null artifact ref passed validation");
@@ -173,18 +196,6 @@ public class PackageDescriptionValidatorTest {
             /* expected */
         }
 
-        /* Incomprehensible artifact ref should fail */
-        artifact.setArtifactRef("urn:cannot_be_resolved");
-        try {
-            validator.validate(desc);
-            fail("non resolvable artifact ref passed validation");
-        } catch (PackageValidationException e) {
-            /* expected */
-        }
-
-        /* Resolvable ref should pass */
-        artifact.setArtifactRef("http://dataconservancy.org");
-        validator.validate(desc);
     }
 
     /* Verify properties are sane */

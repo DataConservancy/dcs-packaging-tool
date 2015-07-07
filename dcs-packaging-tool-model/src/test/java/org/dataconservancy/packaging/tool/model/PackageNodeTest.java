@@ -170,7 +170,7 @@ public class PackageNodeTest {
 
         art1.setId("id:mdf3");
         art1.setType("MetadataFile");
-        art1.setArtifactRef("some/file/path");
+        art1.setArtifactRef("file:/some/file/path");
         art1.setByteStream(true);
         art1.setRelationships(new PackageRelationship("isMetadataFor", true, "id:col5"));
         
@@ -185,7 +185,7 @@ public class PackageNodeTest {
         
         art3.setId("id:mdf2#DataFile");
         art3.setType("MetadataFile");
-        art3.setArtifactRef("some/file/path");
+        art3.setArtifactRef("file:/some/file/path");
         art3.setByteStream(true);
         art3.addSimplePropertyValue("name", "File to be transformed to cow.");
         art3.addSimplePropertyValue("format", "application/octet-stream");

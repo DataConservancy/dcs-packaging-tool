@@ -42,7 +42,7 @@ public class PackageDescriptionRDFTransform implements PackageResourceMapConstan
         Resource rootPropertyResource = descriptionModel.createResource();
         rootPropertyResource.addProperty(RDF.type, PROPERTY_TYPE);
         rootPropertyResource.addProperty(HAS_NAME, "root");
-        rootPropertyResource.addProperty(HAS_VALUE, description.getRootArtifactRef());     
+        rootPropertyResource.addProperty(HAS_VALUE, description.getRootArtifactRef().getRefString());
         
         descriptionResource.addProperty(HAS_PROPERTY, rootPropertyResource);
         
@@ -52,7 +52,7 @@ public class PackageDescriptionRDFTransform implements PackageResourceMapConstan
             artifactResource.addProperty(RDF.type, ARTIFACT_TYPE);
             artifactResource.addProperty(HAS_TYPE, descriptionArtifact.getType());
             artifactResource.addProperty(HAS_ID, descriptionArtifact.getId());
-            artifactResource.addProperty(HAS_REF, descriptionArtifact.getArtifactRef());
+            artifactResource.addProperty(HAS_REF, descriptionArtifact.getArtifactRef().getRefString());
             artifactResource.addProperty(IS_BYTE_STREAM, Boolean.toString(descriptionArtifact.isByteStream()));
             artifactResource.addProperty(IS_IGNORED, Boolean.toString(descriptionArtifact.isIgnored()));
 
