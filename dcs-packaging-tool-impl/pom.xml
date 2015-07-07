@@ -14,7 +14,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dataconservancy.pkgtool</groupId>
   <artifactId>dcs-packaging-tool-impl</artifactId>
@@ -28,48 +30,49 @@
   </parent>
 
   <!-- Build ====================================================== -->
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <argLine>${surefireArgLine}</argLine>
-            <systemPropertyVariables>
-              <dcs.package.tool.package.dir>${project.build.testOutputDirectory}/generated-packages</dcs.package.tool.package.dir>
-              <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
-              <dcs.package.tool.test.content>${project.basedir}/src/test/resources</dcs.package.tool.test.content>
-            </systemPropertyVariables>
-          </configuration>
-        </plugin>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>${surefireArgLine}</argLine>
+          <systemPropertyVariables>
+            <dcs.package.tool.package.dir>${project.build.testOutputDirectory}/generated-packages</dcs.package.tool.package.dir>
+            <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
+            <dcs.package.tool.test.content>${project.basedir}/src/test/resources</dcs.package.tool.test.content>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
 
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-        </plugin>
-      </plugins>
-    </build>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
   <!-- Dependencies =============================================== -->
-  
+
   <!-- Compiles -->
   <dependencies>
-    
+
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-model</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-model-builder-xstream</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>com.googlecode.foresite-toolkit</groupId>
       <artifactId>foresite</artifactId>
@@ -108,7 +111,7 @@
       <groupId>org.dataconservancy.shared</groupId>
       <artifactId>dcs-shared-util</artifactId>
     </dependency>
-      <!-- Test -->
+    <!-- Test -->
 
     <dependency>
       <groupId>org.springframework</groupId>
@@ -126,7 +129,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-    <!--  <version>${spring.version}</version> -->
+      <!--  <version>${spring.version}</version> -->
     </dependency>
 
     <dependency>
@@ -140,19 +143,19 @@
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>net.lingala.zip4j</groupId>
       <artifactId>zip4j</artifactId>

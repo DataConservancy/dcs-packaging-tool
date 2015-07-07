@@ -51,10 +51,17 @@
 
     <!-- Dependencies =============================================== -->
     <dependencies>
+      <!-- Xerces had to be included in model-builder due to a jean requiring it. So it's excluded again here, as it causes issues -->
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>
         <artifactId>dcs-packaging-tool-model-builder</artifactId>
         <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
