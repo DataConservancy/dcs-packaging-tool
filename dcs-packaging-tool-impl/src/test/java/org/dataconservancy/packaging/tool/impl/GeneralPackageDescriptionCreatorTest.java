@@ -415,7 +415,7 @@ public class GeneralPackageDescriptionCreatorTest {
                     parentDataItems.put(artifact.getId(), artifact);
                     URI idUri = new URI(artifact.getId());
                     assertNotNull(idUri.getFragment());
-                    URI refUri = artifact.getArtifactRef().getRefURI();
+                    URI refUri = artifact.getArtifactRef().getRefURI(contentDir);
                     assertNotNull(refUri.getFragment());
                     assertFalse(artifact.isByteStream());
                 } else {
@@ -437,7 +437,7 @@ public class GeneralPackageDescriptionCreatorTest {
                     .next()));
             URI idUri = new URI(child.getId());
             assertNull(idUri.getFragment());
-            URI refUri = child.getArtifactRef().getRefURI();
+            URI refUri = child.getArtifactRef().getRefURI(contentDir);
             assertNull(refUri.getFragment());
 
         }
@@ -456,7 +456,7 @@ public class GeneralPackageDescriptionCreatorTest {
 
     private static PackageArtifact artifactFor(File file) {
         for (PackageArtifact artifact : desc.getPackageArtifacts()) {
-            if (artifact.getArtifactRef().getRefURI().equals(file.toURI())) {
+            if (artifact.getArtifactRef().getRefURI(contentDir).equals(file.toURI())) {
                 return artifact;
             }
         }

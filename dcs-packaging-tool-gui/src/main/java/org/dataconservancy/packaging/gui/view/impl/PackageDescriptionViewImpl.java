@@ -220,7 +220,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
                 viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
                 try {
-                    URI fileURI = packageArtifact.getArtifactRef().getRefURI();
+                    File tempDir = new File("/tmp");//doesn't matter where this is, we just need to get the fragment
+                    URI fileURI = packageArtifact.getArtifactRef().getRefURI(tempDir);
                     String fragment = fileURI.getFragment();
 
                     if (getFullPathCheckBox().selectedProperty().getValue()) {
@@ -231,7 +232,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                         viewLabel.setText(labelText);
                     } else {
                         if (fragment == null) {
-                            File file = new File(fileURI);
+                            File file = new File(packageArtifact.getArtifactRef().getRefString());
                             viewLabel.setText(file.getName());
                         } else {
                             File file = new File(new URIBuilder(fileURI).setFragment(null).build());

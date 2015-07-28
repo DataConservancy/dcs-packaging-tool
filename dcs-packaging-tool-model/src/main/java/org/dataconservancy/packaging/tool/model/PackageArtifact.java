@@ -100,14 +100,6 @@ public class PackageArtifact {
         this.artifactRef = new ArtifactReference(artifactRefString);
     }
 
-    /**
-     * Setter using an alternate constructor for ArtifactReference
-     * @param uri  the URI used to construct the ArtifactReference
-     */
-    public void setArtifactRef(URI uri){
-        this.artifactRef = new ArtifactReference(uri);
-    }
-
 
     /**
      * Returns the map of properties as map from properties' names to set of its values.

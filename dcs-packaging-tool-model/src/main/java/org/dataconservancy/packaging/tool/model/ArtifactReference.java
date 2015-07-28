@@ -16,6 +16,7 @@
 
 package org.dataconservancy.packaging.tool.model;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,47 +24,30 @@ import java.net.URL;
 
 /**
  *  A class to implement the functionality we need for a PackageArtifact's artifactRef. We sometimes need this to have a
- *  String, URL or URI aspect. This class localizes the translations required, to obviate conversions in calling classes.
- *  Constructor taking a String requires that the String be a valid URI. Additional constructors may be added in the future;
- *  all constructors should ensure that every getter will return a valid instance of its type.
+ *  String,  URI aspect. This class localizes the translations required, to obviate conversions in calling classes.
+ *  Constructor taking a String requires that the String be a valid relative URI. Additional constructors may be added in the future;
+ *  all constructors should ensure that every getter will return a valid instance of its type. The getRefURI method takes
+ *  the content root directory (or its URI) as an argument, and returns an absolute URI for the artifact reference, resolved against the content root.
  */
 public class ArtifactReference {
 
     private final String refString;
-    private final URI refURI;
-    private final URL refURL;
 
-    public ArtifactReference(String refString) throws IllegalArgumentException{
+    public ArtifactReference(String refString) {
        this.refString=refString;
-       try {
-           refURI = new URI(refString);
-           refURL = new URL(refString);
-       } catch (MalformedURLException e){
-           throw new IllegalArgumentException("Illegal argument: '" + refString + "' cannot be converted to a valid URL",e);
-       } catch (URISyntaxException e) {
-           throw new IllegalArgumentException("Illegal argument: '" + refString + "' cannot be converted to a valid URI",e);
-       }
     }
 
-    public ArtifactReference(URI uri) throws IllegalArgumentException{
-        this.refURI = uri;
-        try{
-            refString = uri.toString();
-            refURL=uri.toURL();
-        } catch (MalformedURLException e){
-           throw new IllegalArgumentException("Illegal argument: '" + uri.toString() + "' cannot be converted to a valid URL",e);
-        }
-    }
+    public URI getRefURI(URI rootURI){ return rootURI.resolve(refString); }
 
-    public URI getRefURI(){ return refURI; }
+    public URI getRefURI(File rootDir){
+        URI uri = rootDir.toURI();
+        return uri.resolve(refString);
+    }
 
     public String getRefString(){
         return refString;
     }
 
-    public URL getRefURL(){
-        return refURL;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -74,25 +58,18 @@ public class ArtifactReference {
 
         if(refString != null ? !refString.equals(artifactReference.refString) : artifactReference.refString != null)
             return false;
-        if(refURI != null ? !refURI.equals(artifactReference.refURI) : artifactReference.refURI != null)
-            return false;
-        if(refURL!= null ? !refURL.equals(artifactReference.refURL) : artifactReference.refURL != null)
-            return false;
         return true;
     }
 
     @Override
     public int hashCode() {
         int result = refString != null ? refString.hashCode() : 0;
-        result = 31 * result + (refString != null ? refString.hashCode() : 0);
-        result = 31 * result + (refURI != null ? refURI.hashCode() : 0);
-        result = 31 * result + (refURL != null ? refURL.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "ArtifactReference{Reference String= " + refString + ", Reference URI= " + refURI.toString() + ", Reference URL= " + refURL.toString() + "}" ;
+        return "ArtifactReference{Reference String= " + refString + "}" ;
     }
 
 }

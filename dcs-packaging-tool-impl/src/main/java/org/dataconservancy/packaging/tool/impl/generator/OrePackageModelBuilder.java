@@ -20,11 +20,13 @@ import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 import com.hp.hpl.jena.vocabulary.DC;
 import com.hp.hpl.jena.vocabulary.DCTerms;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.dataconservancy.dcs.model.Pair;
 import org.dataconservancy.packaging.shared.ResourceMapConstants;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageArtifact.PropertyValueGroup;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
@@ -171,12 +173,19 @@ public class OrePackageModelBuilder
 
     private URI packageRemURI;
 
+    private URI rootContentURI;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void init(PackageGenerationParameters params) {
-
+        try {
+            rootContentURI = new URI(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
+        } catch (URISyntaxException e) {
+            //TODO handle this exception
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -445,10 +454,10 @@ public class OrePackageModelBuilder
         aggregation.clearReMSerialisations();
         aggregation
                 .removeTriple(OREFactory.createTriple(aggregation,
-                                                      new Predicate(URI
-                                                              .create(ResourceMapConstants.IS_DESCRIBED_BY_PROPERTY
-                                                                      .getURI())),
-                                                      rem));
+                        new Predicate(URI
+                                .create(ResourceMapConstants.IS_DESCRIBED_BY_PROPERTY
+                                        .getURI())),
+                        rem));
         aggregation.addType(oreAggregationTypes.get(ArtifactType
                 .valueOf(artifact.getType())));
 
@@ -473,7 +482,10 @@ public class OrePackageModelBuilder
                                 ResourceMap rem,
                                 PackageAssembler assembler) throws Exception {
         /* Get file content */
-        URL contentLocation = artifact.getArtifactRef().getRefURL();
+        URIBuilder urib = new URIBuilder(artifact.getArtifactRef().getRefURI(rootContentURI));
+        urib.setScheme("file");
+
+        URL contentLocation = urib.build().toURL();
 
         /* If file path isn't set, use the artifact ref */
         String path = artifact.getArtifactRef().getRefString().replace(File.separatorChar, '/');
@@ -550,13 +562,13 @@ public class OrePackageModelBuilder
                     addAggregationFor(relationship.getValue(), assembler);
                 } else {
                     addResourceFor(relationship.getValue(),
-                                   inRem.getAggregation(),
-                                   inRem,
-                                   assembler);
+                            inRem.getAggregation(),
+                            inRem,
+                            assembler);
                 }
             }
 
-            
+
             /*
              * If it's defined in another ReM, then add a resource that
              * ore:isDescribedBy the other ReM, and point to that

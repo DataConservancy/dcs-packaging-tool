@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import java.net.URI;
 
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreator;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.impl.rules.FileContext;
@@ -166,7 +168,8 @@ public class GeneralPackageDescriptionCreator
         for (Mapping mapping : mappings) {
 
             /* We are using file URI as artifact IDs, unless multiple mappings */
-            String id = cxt.getFile().toURI().toString();
+            URIBuilder urib = new URIBuilder(cxt.getFile().toURI());
+            //String id = cxt.getFile().toURI().toString();
 
             /*
              * If multiple mappings implicated by this file, then make sure
@@ -175,16 +178,23 @@ public class GeneralPackageDescriptionCreator
             if (mappings.size() > 1) {
                 String specifier = mapping.getSpecifier();
                 if (specifier != null) {
-                    id = id + "#" + specifier;
+                    urib.setFragment(specifier);
                 }
             }
+
+            URI uri = null;
+            try {
+                uri = urib.build();
+            } catch (URISyntaxException e){
+
+            }
+            String id = uri.toString();
 
             PackageArtifact artifact = new PackageArtifact();
             artifacts.put(id, artifact);
             artifact.setId(id);
             artifact.setIgnored(cxt.isIgnored());
-            artifact.setArtifactRef(id);
-
+            artifact.setArtifactRef(cxt.getRoot().getParentFile().toURI().relativize(uri).toString());
             /*
              * if file is a normal file, set the isByteStream flag to true on
              * PackageArtifact

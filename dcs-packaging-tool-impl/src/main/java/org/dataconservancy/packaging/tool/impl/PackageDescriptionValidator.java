@@ -137,11 +137,11 @@ public class PackageDescriptionValidator {
                                                                artifact.getId()));
         }
 
-        if (!UriUtility.isResolvable(artifact.getArtifactRef().getRefURI())) {
+     /*   if (!UriUtility.isResolvable(artifact.getArtifactRef().getRefURI())) {
             throw new PackageValidationException(String.format("Artifact ref '%s' must be resolvable for artifact '%s'",
                                                                artifact.getArtifactRef(),
                                                                artifact.getId()));
-        }
+        }  */
     }
 
     /**

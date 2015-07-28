@@ -99,7 +99,7 @@ public class BOREMPackageGeneratorTest {
         artifact.setId("artifact:id:1");
         artifact.setType(DcsPackageArtifactType.Project.name());
         File pathToProject = new File(testContentLocation, "ProjectOne");
-        String artifactRef = pathToProject.toURI().toString();
+        String artifactRef = "ProjectOne"; //pathToProject.toURI().toString();
         artifact.setArtifactRef(artifactRef);
         //artifact.addProperty(DcsPackageDescriptionSpec.Property.PROJECT_NAME.toString(), "Test Project");
         List<PackageRelationship> relationships = new ArrayList<PackageRelationship>();
@@ -112,7 +112,8 @@ public class BOREMPackageGeneratorTest {
         artifact.setId("artifact:id:2");
         artifact.setType(DcsPackageArtifactType.Collection.name());
         File pathToCollection = new File(pathToProject, "Collection One");
-        artifact.setArtifactRef(pathToCollection.toURI().toString());
+        //artifact.setArtifactRef(pathToCollection.toURI().toString());
+        artifact.setArtifactRef("Collection One");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.TITLE, "Test collection One");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.PUBLICATION_DATE, "2013-06-15");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.DESCRIPTION, "Collection used in testing borem package generator");
@@ -134,7 +135,8 @@ public class BOREMPackageGeneratorTest {
         artifact.setId("artifact:id:3");
         artifact.setType(DcsPackageArtifactType.DataItem.name());
         File pathToDataItem = new File(pathToCollection, "DataItem One");
-        artifact.setArtifactRef(pathToDataItem.toURI().toString());
+        //artifact.setArtifactRef(pathToDataItem.toURI().toString());
+        artifact.setArtifactRef("DataItem One");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.TITLE, "Test DataItem One");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.DESCRIPTION, "Description for Test DataItem One");
         relatedArtifacts = new HashSet<String>();

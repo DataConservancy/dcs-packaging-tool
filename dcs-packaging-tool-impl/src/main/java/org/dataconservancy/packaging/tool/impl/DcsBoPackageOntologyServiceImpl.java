@@ -29,6 +29,7 @@ import org.dataconservancy.packaging.tool.model.ontologies.DcsBoPackageOntology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -102,7 +103,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
      * @param desc the  PackageDescription d
      * @throws PackageOntologyException
      */
-    private void fixIgnoredType(PackageTree tree, PackageNode node, PackageDescription desc) throws PackageOntologyException {
+    private void fixIgnoredType(PackageTree tree, PackageNode node, PackageDescription desc, File contentRoot) throws PackageOntologyException {
         PackageArtifact artifact = node.getValue();
         
         Set<String> valid_types = getValidTypes(tree, artifact.getId());
@@ -112,12 +113,12 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
         } else if (valid_types.isEmpty()) {
             throw new PackageOntologyException("No valid types for: " + artifact);
         } else {
-            changeType(desc, tree, artifact.getId(), artifact.getArtifactRef().getRefURI(),  valid_types.iterator().next());
+            changeType(desc, tree, artifact, contentRoot,  valid_types.iterator().next());
         }
         
         for (PackageNode kid: node.getChildrenNodes()) {
             if (!kid.getValue().isIgnored()) {
-                fixIgnoredType(tree, kid, desc);
+                fixIgnoredType(tree, kid, desc, contentRoot);
             }
         }
      }
@@ -327,10 +328,11 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
      * Change the current artifact to DataFile. Add a DataItem to contain it in the proper spot in the PackageTree
      * @param packageDesc the PackageDescription
      * @param tree  the  PackageTree
-     * @param currentArtifactId  the current artifact ID
-     * @param currentArtifactURI the current artifact ArtifactReference's URI
+     * @param packageArtifact  the current artifact
+     * @param contentRoot the root directory for the package content
      */
-    protected void makeDataItemFileCombo(PackageDescription packageDesc, PackageTree tree, String currentArtifactId, URI currentArtifactURI) {
+    protected void makeDataItemFileCombo(PackageDescription packageDesc, PackageTree tree, PackageArtifact packageArtifact, File contentRoot) {
+        String currentArtifactId = packageArtifact.getId();
         if (ontology == null) {
             throw new RuntimeException("Ontology and hierarchical relationship names all have to be specified, " +
                     "before service could be used.");
@@ -349,7 +351,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
 
         //Create a new URIBuilder to help manipulate file uris to be used for new DI and DF ids and ArtifactReferences
         URIBuilder fileURIBuilder;
-            fileURIBuilder = new URIBuilder(currentArtifactURI);
+            fileURIBuilder = new URIBuilder(packageArtifact.getArtifactRef().getRefURI(contentRoot));
         //obtain the containing Collection node as a starting place
         PackageNode containingCollectionNode = tree.getNodesMap().get(fileNode.getParentNode().getValue().getId());
 
@@ -369,8 +371,11 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
         //set new DI's id and artifact ref
         //TODO: do we want to use a different ID?
         diArtifact.setId((fileURIBuilder.setFragment(Integer.toString(rand.nextInt(Integer.MAX_VALUE)))).toString());
+
         try {
-            diArtifact.setArtifactRef(fileURIBuilder.build());
+            URI absoluteURI = fileURIBuilder.build();
+            URI relativeURI = contentRoot.getParentFile().toURI().relativize(absoluteURI);
+            diArtifact.setArtifactRef(relativeURI.toString());
         } catch (URISyntaxException e){
            throw new IllegalArgumentException("Invalid URI, cannot create ArtifactReference",e) ;
         }
@@ -451,8 +456,9 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
             return false;
         }
 
-        URI parentURI= parentNode.getValue().getArtifactRef().getRefURI();
-        URI fileURI = fileNode.getValue().getArtifactRef().getRefURI();
+        File tempRoot = new File("/tmp");//this is all we need to check, dont need actual absolute URI
+        URI parentURI= parentNode.getValue().getArtifactRef().getRefURI(tempRoot);
+        URI fileURI = fileNode.getValue().getArtifactRef().getRefURI(tempRoot);
         return parentURI.getScheme().equals(fileURI.getScheme()) &&
             parentURI.getSchemeSpecificPart().equals(fileURI.getSchemeSpecificPart()) &&
             parentURI.getFragment() != null &&
@@ -583,7 +589,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
     }
 
     @Override
-    public PackageTree buildPackageTree(PackageDescription packageDescription) throws PackageOntologyException {
+    public PackageTree buildPackageTree(PackageDescription packageDescription, File contentRoot) throws PackageOntologyException {
         PackageTree tree = new PackageTree();
         Map<String, PackageNode> nodemap = tree.getNodesMap();
         
@@ -620,7 +626,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
         // Modify tree to handle any ignored nodes
         
         fixIgnoredFlag(tree.getRoot());
-        fixIgnoredType(tree, tree.getRoot(), packageDescription);
+        fixIgnoredType(tree, tree.getRoot(), packageDescription, contentRoot);
         
         return tree;
     }
@@ -692,21 +698,21 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
      *
      * @param packageDesc the PackageDescription
      * @param tree The tree representing the {@link org.dataconservancy.packaging.tool.model.PackageDescription} the artifact is a member of
-     * @param artifactId id of the the artifact whose type is to be change
-     * @param artifactURI the artifact ArtifactReference's URI
+     * @param packageArtifact the artifact whose type is to be change
+     * @param contentRoot the root artifact for the package content
      * @param newTypeName The type the artifact should be changed to.
      * @throws PackageOntologyException if the new type is not valid
      */
     @Override
-    public void changeType(PackageDescription packageDesc, PackageTree tree, String artifactId,URI artifactURI, String newTypeName) throws PackageOntologyException {
-        PackageNode currentNode = tree.getNodesMap().get(artifactId);
+    public void changeType(PackageDescription packageDesc, PackageTree tree, PackageArtifact packageArtifact, File contentRoot, String newTypeName) throws PackageOntologyException {
+        PackageNode currentNode = tree.getNodesMap().get(packageArtifact.getId());
         PackageArtifact currentArtifact = currentNode.getValue();
 
         if (currentArtifact.getType().equals(newTypeName)) {
             return;
         }
         
-        Set<String> validTypes =  getValidTypes(tree, artifactId);
+        Set<String> validTypes =  getValidTypes(tree, packageArtifact.getId());
         if (!validTypes.contains(newTypeName)) {
             throw new PackageOntologyException("The provided new type was not a valid one. Valid types for this " +
                     "currentNode (based on the package tree include: " + validTypes +
@@ -725,7 +731,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
         // If new type is the DI-F combo, call helper method to do so and call it done.
         //*********************************************************************************************************
         if (newTypeName.equals(didfComboType)) {
-            makeDataItemFileCombo(packageDesc, tree, artifactId, artifactURI);
+            makeDataItemFileCombo(packageDesc, tree, packageArtifact, contentRoot);
             return;
         }
         //*********************************************************************************************************
@@ -745,7 +751,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
             for (PackageNode childNode : currentNode.getChildrenNodes()) {
                 PackageArtifact child = childNode.getValue();
                 if (child.isByteStream() && !child.isIgnored()) {
-                    changeType(packageDesc, tree, child.getId(), child.getArtifactRef().getRefURI(), DcsBoPackageOntology.METADATAFILE);
+                    changeType(packageDesc, tree, child, contentRoot, DcsBoPackageOntology.METADATAFILE);
                 }
             }
 
@@ -757,7 +763,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
                 PackageArtifact child = childNode.getValue();
                 
                 if (!child.isIgnored()) {
-                    changeType(packageDesc, tree, child.getId(), child.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAFILE);
+                    changeType(packageDesc, tree, child, contentRoot, DcsBoPackageOntology.DATAFILE);
                 }
             }
 

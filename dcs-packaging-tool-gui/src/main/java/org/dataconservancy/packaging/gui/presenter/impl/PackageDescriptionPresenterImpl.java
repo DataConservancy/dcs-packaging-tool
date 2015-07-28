@@ -610,7 +610,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     public void changeType(PackageArtifact packageArtifact, String type) {
         if (packageArtifact.getId() != null && packageTree != null) {
             try {
-                packageOntologyService.changeType(packageDescription, packageTree, packageArtifact.getId(), packageArtifact.getArtifactRef().getRefURI(), type);
+                packageOntologyService.changeType(packageDescription, packageTree, packageArtifact, controller.getContentRoot(), type);
 
                 displayPackageTree();
 
@@ -736,8 +736,8 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         
         if (packageDescription != null) {
             try {
-                packageTree = packageOntologyService.buildPackageTree(packageDescription);
-                controller.setContentRoot(new File(packageTree.getRoot().getValue().getArtifactRef().getRefString()));
+                packageTree = packageOntologyService.buildPackageTree(packageDescription, controller.getContentRoot());
+                //controller.setContentRoot(new File(packageTree.getRoot().getValue().getArtifactRef().getRefString()));
             } catch (PackageOntologyException e) {
                 log.error("Unable to create package tree", e);
                 // TODO User message?

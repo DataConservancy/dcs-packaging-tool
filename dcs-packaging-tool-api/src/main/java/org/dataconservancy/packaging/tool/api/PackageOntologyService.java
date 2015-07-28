@@ -17,6 +17,7 @@ package org.dataconservancy.packaging.tool.api;
 
 import org.dataconservancy.packaging.tool.model.*;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -69,9 +70,10 @@ public interface PackageOntologyService {
      * Given a valid PackageDescription, returns a tree of {@link org.dataconservancy.packaging.tool.model.PackageNode}s,
      * keyed by the ids of the artifacts in the PackageNodes.
      * @param packageDescription  the PackageDescription
+     * @param contentRoot the root directory of the package content
      * @return a tree of PackageNodes
      */
-    public PackageTree buildPackageTree(PackageDescription packageDescription) throws PackageOntologyException;
+    public PackageTree buildPackageTree(PackageDescription packageDescription, File contentRoot) throws PackageOntologyException;
 
     /**
      * Ensure that the PackageArtifact has the required properties according to specified ontology. Throws
@@ -84,11 +86,11 @@ public interface PackageOntologyService {
      * Performs necessary mapping to change the {@code artifact}'s type to the new type specified by {@code newTypeName}.
      * @param packageDesc  the PackageDescription
      * @param packageTree tree containing the package artifact. Will be used to determine whether the new type is a valid one.
-     * @param artifactId id of the the artifact whose type is to be changed
-     * @param artifactURI the URI of the artifact whose type is to be changed
+     * @param packageArtifact the artifact whose type is to be changed
+     * @param contentRoot  the root directory of the content for this package
      * @param newTypeName the name of the new type
      */
-    public void changeType(PackageDescription packageDesc, PackageTree packageTree, String artifactId, URI artifactURI, String newTypeName) throws PackageOntologyException;
+    public void changeType(PackageDescription packageDesc, PackageTree packageTree, PackageArtifact packageArtifact, File contentRoot, String newTypeName) throws PackageOntologyException;
     
     /**
      * Gets the max number of times a property can occur. 

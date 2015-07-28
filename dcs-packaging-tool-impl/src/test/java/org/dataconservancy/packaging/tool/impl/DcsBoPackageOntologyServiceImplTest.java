@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -62,10 +63,12 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     PackageDescription pd;
 
+    File contentRoot = new File("/tmp");
 
     PackageTree tree;
     DcsBoPackageOntologyServiceImpl underTest;
 
+    String filePathString = "some/file/path";
     /**
      * Set up Service with hierarchical relationship names.
      * Set up a package description in the following structure
@@ -94,21 +97,21 @@ public class DcsBoPackageOntologyServiceImplTest {
 
         datafile1 = new PackageArtifact();
         datafile1.setId("id:df1");
-        datafile1.setArtifactRef("file:/some/file/path");
+        datafile1.setArtifactRef(filePathString);
         datafile1.setType(DcsBoPackageOntology.DATAFILE);
         datafile1.setByteStream(true);
         datafile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di1"));
 
         metadataFile1 = new PackageArtifact();
         metadataFile1.setId("id:mdf1");
-        metadataFile1.setArtifactRef("file:/some/file/path");
+        metadataFile1.setArtifactRef(filePathString);
         metadataFile1.setType(DcsBoPackageOntology.METADATAFILE);
         metadataFile1.setByteStream(true);
         metadataFile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_METADATA_FOR, true, "id:di1"));
 
         metadataFile2 = new PackageArtifact();
         metadataFile2.setId("id:mdf2");
-        metadataFile2.setArtifactRef("file:/some/file/path");
+        metadataFile2.setArtifactRef(filePathString);
         metadataFile2.setType(DcsBoPackageOntology.METADATAFILE);
         metadataFile2.setByteStream(true);
         metadataFile2.setSimplePropertyValues(DcsBoPackageOntology.CREATE_DATE, "2014-04-12");
@@ -123,42 +126,42 @@ public class DcsBoPackageOntologyServiceImplTest {
 
         metadataFile3 = new PackageArtifact();
         metadataFile3.setId("id:mdf3");
-        metadataFile3.setArtifactRef("file:/some/file/path");
+        metadataFile3.setArtifactRef(filePathString);
         metadataFile3.setType(DcsBoPackageOntology.METADATAFILE);
         metadataFile3.setByteStream(true);
         metadataFile3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_METADATA_FOR, true, "id:col5"));
 
         dataItem1 = new PackageArtifact();
         dataItem1.setId("id:di1");
-        dataItem1.setArtifactRef("file:/some/file/path");
+        dataItem1.setArtifactRef(filePathString);
         dataItem1.setType(DcsBoPackageOntology.DATAITEM);
         dataItem1.setByteStream(false);
         dataItem1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
 
         datafile2a = new PackageArtifact();
         datafile2a.setId("id:df2a");
-        datafile2a.setArtifactRef("file:/some/file/path");
+        datafile2a.setArtifactRef(filePathString);
         datafile2a.setType(DcsBoPackageOntology.DATAFILE);
         datafile2a.setByteStream(true);
         datafile2a.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di2"));
 
         datafile2b = new PackageArtifact();
         datafile2b.setId("id:df2b");
-        datafile2b.setArtifactRef("file:/some/file/path");
+        datafile2b.setArtifactRef(filePathString);
         datafile2b.setType(DcsBoPackageOntology.DATAFILE);
         datafile2b.setByteStream(true);
         datafile2b.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di2"));
 
         dataItem2 = new PackageArtifact();
         dataItem2.setId("id:di2");
-        dataItem2.setArtifactRef("file:/some/file/path");
+        dataItem2.setArtifactRef(filePathString);
         dataItem2.setType(DcsBoPackageOntology.DATAITEM);
         dataItem2.setByteStream(false);
         dataItem2.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
 
         collection1 = new PackageArtifact();
         collection1.setId("id:col1");
-        collection1.setArtifactRef("file:/some/file/path");
+        collection1.setArtifactRef(filePathString);
         collection1.setType(DcsBoPackageOntology.COLLECTION);
         collection1.setByteStream(false);
         collection1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"));
@@ -166,28 +169,28 @@ public class DcsBoPackageOntologyServiceImplTest {
 
         dataItem3 = new PackageArtifact();
         dataItem3.setId("id:di3");
-        dataItem3.setArtifactRef("file:/some/file/path");
+        dataItem3.setArtifactRef(filePathString);
         dataItem3.setType(DcsBoPackageOntology.DATAITEM);
         dataItem3.setByteStream(false);
         dataItem3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col2"));
 
         collection2 = new PackageArtifact();
         collection2.setId("id:col2");
-        collection2.setArtifactRef("file:/some/file/path");
+        collection2.setArtifactRef(filePathString);
         collection2.setType(DcsBoPackageOntology.COLLECTION);
         collection2.setByteStream(false);
         collection2.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"));
 
         collection3 = new PackageArtifact();
         collection3.setId("id:col3");
-        collection3.setArtifactRef("file:/some/file/path");
+        collection3.setArtifactRef(filePathString);
         collection3.setType(DcsBoPackageOntology.COLLECTION);
         collection3.setByteStream(false);
         collection3.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col1"));
 
         dataItem4 = new PackageArtifact();
         dataItem4.setId("id:di4");
-        dataItem4.setArtifactRef("file:/some/file/path");
+        dataItem4.setArtifactRef(filePathString);
         dataItem4.setType(DcsBoPackageOntology.DATAITEM);
         dataItem4.setByteStream(false);
         dataItem4.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col3"));
@@ -195,14 +198,14 @@ public class DcsBoPackageOntologyServiceImplTest {
 
         collection4 = new PackageArtifact();
         collection4.setId("id:col4");
-        collection4.setArtifactRef("file:/some/file/path");
+        collection4.setArtifactRef(filePathString);
         collection4.setType(DcsBoPackageOntology.COLLECTION);
         collection4.setByteStream(false);
         collection4.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:col3"));
 
         collection5 = new PackageArtifact();
         collection5.setId("id:col5");
-        collection5.setArtifactRef("file:/some/file/path");
+        collection5.setArtifactRef(filePathString);
         collection5.setType(DcsBoPackageOntology.COLLECTION);
         collection5.setByteStream(false);
         collection5.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:project"), new PackageRelationship(DcsBoPackageOntology.HAS_METADATA, true, metadataFile2.getId(), metadataFile3.getId()));
@@ -210,7 +213,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
         project = new PackageArtifact();
         project.setId("id:project");
-        project.setArtifactRef("file:/some/file/path");
+        project.setArtifactRef(filePathString);
         project.setType(DcsBoPackageOntology.PROJECT);
         project.setByteStream(false);
 
@@ -237,12 +240,12 @@ public class DcsBoPackageOntologyServiceImplTest {
     }
 
     /**
-     * Test that resulted PackageNode has a same hierarchical structure to the provided PackageDescription.
+     * Test that resulted PackageNode has the same hierarchical structure to the provided PackageDescription.
      * @throws PackageOntologyException 
      */
     @Test
     public void testBuildPackageTree() throws PackageOntologyException{
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         //test that the Root node of the tree contains the project.
         assertEquals(project, tree.getRoot().getValue());
         PackageNode col1Node = null;
@@ -350,7 +353,7 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testGetValidTypeWithoutChangingFileType() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         Set<String> validTypes = underTest.getValidTypes(tree, collection4.getId());
         assertEquals(2, validTypes.size());
         assertTrue(validTypes.contains("Collection"));
@@ -389,7 +392,7 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testGetValidTypeChangingFileTypeFromDataFileToMetadataFile() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         Set<String> validTypes = underTest.getValidTypes(tree, dataItem2.getId());
         assertEquals(2, validTypes.size());
         assertTrue(validTypes.contains("Collection"));
@@ -404,7 +407,7 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testsGetValidTypesForMdF() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         Set<String> validTypes = underTest.getValidTypes(tree, metadataFile2.getId());
         assertEquals(2, validTypes.size());
         assertTrue(validTypes.contains("MetadataFile"));
@@ -418,7 +421,7 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testsGetValidTypesForDIMdF() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         Set<String> validTypes = underTest.getValidTypes(tree, metadataFile1.getId());
         assertEquals(2, validTypes.size());
         assertTrue(validTypes.contains("MetadataFile"));
@@ -433,7 +436,7 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testGetValidTypeChangingFileTypeFromMetadataFileToDataFile() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         Set<String> validTypes = underTest.getValidTypes(tree, dataItem1.getId());
         assertEquals(2, validTypes.size());
         assertTrue(validTypes.contains("Collection"));
@@ -446,10 +449,10 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testChangeType() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Change dataItem2 to a collection
-        underTest.changeType(pd, tree, dataItem2.getId(), dataItem2.getArtifactRef().getRefURI(), DcsBoPackageOntology.COLLECTION);
+        underTest.changeType(pd, tree, dataItem2, contentRoot, DcsBoPackageOntology.COLLECTION);
 
         assertEquals(DcsBoPackageOntology.COLLECTION, tree.getNodesMap().get(dataItem2.getId()).getValue().getType());
         assertEquals(DcsBoPackageOntology.METADATAFILE, tree.getNodesMap().get(datafile2a.getId()).getValue().getType());
@@ -469,7 +472,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
 
         //Change dataItem1 to a collection
-        underTest.changeType(pd, tree, dataItem1.getId(), dataItem1.getArtifactRef().getRefURI(), DcsBoPackageOntology.COLLECTION);
+        underTest.changeType(pd, tree, dataItem1, contentRoot, DcsBoPackageOntology.COLLECTION);
 
         assertEquals(DcsBoPackageOntology.COLLECTION, tree.getNodesMap().get(dataItem1.getId()).getValue().getType());
         assertEquals(DcsBoPackageOntology.METADATAFILE, tree.getNodesMap().get(datafile1.getId()).getValue().getType());
@@ -498,9 +501,9 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testChangeTypeForDataFile() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
-        underTest.changeType(pd, tree, datafile2a.getId(), datafile2a.getArtifactRef().getRefURI(), DcsBoPackageOntology.METADATAFILE);
+        underTest.changeType(pd, tree, datafile2a, contentRoot, DcsBoPackageOntology.METADATAFILE);
         assertEquals(DcsBoPackageOntology.METADATAFILE, tree.getNodesMap().get(datafile2a.getId()).getValue().getType());
     }
 
@@ -511,9 +514,9 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testChangeTypeForMetadataFile() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
-        underTest.changeType(pd, tree, metadataFile1.getId(), metadataFile1.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAFILE);
+        underTest.changeType(pd, tree, metadataFile1, contentRoot, DcsBoPackageOntology.DATAFILE);
         assertEquals(DcsBoPackageOntology.DATAFILE, tree.getNodesMap().get(metadataFile1.getId()).getValue().getType());
     }
 
@@ -524,9 +527,9 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testChangeTypeForCollection() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
-        underTest.changeType(pd, tree, collection4.getId(), collection4.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAITEM);
+        underTest.changeType(pd, tree, collection4, contentRoot, DcsBoPackageOntology.DATAITEM);
         assertEquals(DcsBoPackageOntology.DATAITEM, tree.getNodesMap().get(collection4.getId()).getValue().getType());
     }
 
@@ -537,15 +540,15 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testChangeTypeForDataItemAndBack() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
-        underTest.changeType(pd, tree, dataItem2.getId(), dataItem2.getArtifactRef().getRefURI(), DcsBoPackageOntology.COLLECTION);
+        underTest.changeType(pd, tree, dataItem2, contentRoot, DcsBoPackageOntology.COLLECTION);
         assertEquals(DcsBoPackageOntology.COLLECTION, tree.getNodesMap().get(dataItem2.getId()).getValue().getType());
         for (PackageNode node : tree.getNodesMap().get(dataItem2.getId()).getChildrenNodes()) {
             assertEquals(DcsBoPackageOntology.METADATAFILE, node.getValue().getType());
         }
 
-        underTest.changeType(pd, tree, dataItem2.getId(), dataItem2.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAITEM);
+        underTest.changeType(pd, tree, dataItem2, contentRoot, DcsBoPackageOntology.DATAITEM);
         assertEquals(DcsBoPackageOntology.DATAITEM, tree.getNodesMap().get(dataItem2.getId()).getValue().getType());
         for (PackageNode node : tree.getNodesMap().get(dataItem2.getId()).getChildrenNodes()) {
             assertEquals(DcsBoPackageOntology.DATAFILE, node.getValue().getType());
@@ -558,19 +561,19 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testChangeTypeForCollectionsMdF() throws PackageOntologyException, URISyntaxException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         int originalNodesMapSize = tree.getNodesMap().size();
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
-        underTest.changeType(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI(), DcsBoPackageOntologyServiceImpl.didfComboType);
+        underTest.changeType(pd, tree, metadataFile2, contentRoot, DcsBoPackageOntologyServiceImpl.didfComboType);
         verifyFilesTransformationToDIDF(originalNodesMapSize, originalFileUri);
     }
 
     @Test
     public void testPointMdFToGrandparent() throws PackageOntologyException, URISyntaxException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         int originalNodesMapSize = tree.getNodesMap().size();
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
-        underTest.changeType(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI(), DcsBoPackageOntologyServiceImpl.didfComboType);
+        underTest.changeType(pd, tree, metadataFile2, contentRoot, DcsBoPackageOntologyServiceImpl.didfComboType);
         verifyFilesTransformationToDIDF(originalNodesMapSize, originalFileUri);
 
         PackageNode grandparentNode = tree.getNodesMap().get(collection5.getId());
@@ -586,7 +589,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         assertNotNull(diNode);
         assertEquals(1, diNode.getChildrenNodes().size());
         PackageNode fileNode = diNode.getChildrenNodes().get(0);
-        underTest.changeType(pd, tree, fileNode.getValue().getId(), fileNode.getValue().getArtifactRef().getRefURI(), DcsBoPackageOntology.METADATAFILE);
+        underTest.changeType(pd, tree, fileNode.getValue(), contentRoot, DcsBoPackageOntology.METADATAFILE);
         underTest.collapseParentArtifact(pd, tree, fileNode.getValue().getId());
 
         assertEquals(2, grandparentNode.getChildrenNodes().size());
@@ -607,25 +610,25 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test (expected = PackageOntologyException.class)
     public void testIllegalTypeChangeIntoDIDF() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
-        underTest.changeType(pd, tree, metadataFile1.getId(), metadataFile1.getArtifactRef().getRefURI(), DcsBoPackageOntologyServiceImpl.didfComboType);
+        tree = underTest.buildPackageTree(pd, contentRoot);
+        underTest.changeType(pd, tree, metadataFile1, contentRoot, DcsBoPackageOntologyServiceImpl.didfComboType);
     }
 
     @Test(expected = PackageOntologyException.class)
     public void testIllegalTypeChange() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
-        underTest.changeType(pd, tree, collection1.getId(), collection1.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAITEM);
+        tree = underTest.buildPackageTree(pd, contentRoot);
+        underTest.changeType(pd, tree, collection1, contentRoot, DcsBoPackageOntology.DATAITEM);
     }
 
     @Test(expected = PackageOntologyException.class)
     public void testIllegalTypeChangeForCollection() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
-        underTest.changeType(pd, tree, collection5.getId(), collection5.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAITEM);
+        tree = underTest.buildPackageTree(pd, contentRoot);
+        underTest.changeType(pd, tree, collection5, contentRoot, DcsBoPackageOntology.DATAITEM);
     }
 
     @Test
     public void testGetProperties() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         Map<String, String> collectionProperties = underTest.getProperties(collection1);
 
         assertTrue(collectionProperties.containsKey(DcsBoPackageOntology.ALTERNATE_ID));
@@ -646,7 +649,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetMaxOccurances() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         assertEquals(1, underTest.getPropertyMaxOccurrences(collection1, DcsBoPackageOntology.TITLE, ""));
         assertEquals(Integer.MAX_VALUE, underTest.getPropertyMaxOccurrences(datafile1, DcsBoPackageOntology.FORMAT, ""));
 
@@ -661,7 +664,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetMaxOccurancesBadArtifact() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Test a null artifact
         assertEquals(-1, underTest.getPropertyMaxOccurrences(null, DcsBoPackageOntology.CONTACT_INFO, ""));
@@ -680,7 +683,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetMaxOccurancesBadProperty() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Test a property that doesn't exist
         assertEquals(-1, underTest.getPropertyMaxOccurrences(collection1, "foo", ""));
@@ -695,7 +698,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetMinOccurances() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         assertEquals(0, underTest.getPropertyMinOccurrences(collection1, DcsBoPackageOntology.TITLE, ""));
         assertEquals(1, underTest.getPropertyMinOccurrences(datafile1, DcsBoPackageOntology.CREATE_DATE, ""));
 
@@ -710,7 +713,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetMinOccurancesBadArtifact() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Test a null artifact
         assertEquals(-1, underTest.getPropertyMinOccurrences(null, DcsBoPackageOntology.CONTACT_INFO, ""));
@@ -729,7 +732,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetMinOccurancesBadProperty() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Test a property that doesn't exist
         assertEquals(-1, underTest.getPropertyMinOccurrences(collection1, "foo", ""));
@@ -744,7 +747,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testGetPropertyGroupNames() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Test that contact info returns the correct number.
         assertEquals(3, underTest.getGroupPropertyNames(DcsBoPackageOntology.CONTACT_INFO_TYPE).size());
@@ -761,7 +764,7 @@ public class DcsBoPackageOntologyServiceImplTest {
 
     @Test
     public void testIsComplexProperty() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         //Test that contact info returns true
         assertTrue(underTest.isPropertyComplex(DcsBoPackageOntology.CONTACT_INFO_TYPE));
@@ -912,7 +915,7 @@ public class DcsBoPackageOntologyServiceImplTest {
      */
     @Test
     public void testCanTransformFile() throws PackageOntologyException {
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         assertTrue(underTest.canBeDataItemFile(tree, metadataFile2.getId()));
         assertFalse(underTest.canBeDataItemFile(tree, datafile1.getId()));
         assertFalse(underTest.canBeDataItemFile(tree, metadataFile1.getId()));
@@ -927,12 +930,12 @@ public class DcsBoPackageOntologyServiceImplTest {
     @Test
     public void testTransformFile() throws PackageOntologyException, URISyntaxException {
         //build tree
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         int originalNodesMapSize = tree.getNodesMap().size();
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
 
         //transform metadataFile2 into DI+DF combo
-        underTest.makeDataItemFileCombo(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI());
+        underTest.makeDataItemFileCombo(pd, tree, metadataFile2, contentRoot);
         verifyFilesTransformationToDIDF(originalNodesMapSize, originalFileUri);
     }
 
@@ -944,12 +947,12 @@ public class DcsBoPackageOntologyServiceImplTest {
     @Test
     public void testGetValidTypesForSynthesizedDI() throws PackageOntologyException, URISyntaxException {
         //build tree
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         int originalNodesMapSize = tree.getNodesMap().size();
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
 
         //transform metadataFile2 into DI+DF combo
-        underTest.makeDataItemFileCombo(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI());
+        underTest.makeDataItemFileCombo(pd, tree, metadataFile2, contentRoot);
         verifyFilesTransformationToDIDF(originalNodesMapSize, originalFileUri);
         PackageNode diNode = null;
         //Get the containing collection: collection5
@@ -988,7 +991,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         assertNotNull(diNode);
         //verify that the DataItem's ArtifactRef being set properly
         assertTrue(diNode.getValue().getArtifactRef().getRefString().contains(originalFileUri));
-        assertNotNull(diNode.getValue().getArtifactRef().getRefURI().getFragment());
+        assertNotNull(diNode.getValue().getArtifactRef().getRefURI(contentRoot).getFragment());
 
         //verify that properties are transferred properly to the resulting Data Item
         assertTrue(diNode.getValue().getSimplePropertyValues(DcsBoPackageOntology.CREATE_DATE).
@@ -1038,12 +1041,12 @@ public class DcsBoPackageOntologyServiceImplTest {
         //****************************************
         // Setting up the test
         //****************************************
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
 
         //transform metadataFile2 into DI+DF combo
-        underTest.makeDataItemFileCombo(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI());
+        underTest.makeDataItemFileCombo(pd, tree, metadataFile2, contentRoot);
 
         PackageNode containingCollection = tree.getNodesMap().get(collection5.getId());
         PackageNode diNode = null;
@@ -1060,7 +1063,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         assertEquals(1, diNode.getChildrenNodes().size());
         PackageNode fileNode = diNode.getChildrenNodes().get(0);
 
-        underTest.changeType(pd, tree, fileNode.getValue().getId(), fileNode.getValue().getArtifactRef().getRefURI(), DcsBoPackageOntology.METADATAFILE);
+        underTest.changeType(pd, tree, fileNode.getValue(), contentRoot, DcsBoPackageOntology.METADATAFILE);
         assertTrue(underTest.canCollapseParentArtifact(tree, fileNode.getValue().getId()));
     }
 
@@ -1073,7 +1076,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         //****************************************
         // Setting up the test
         //****************************************
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         assertFalse(underTest.canCollapseParentArtifact(tree, metadataFile1.getId()));
         assertFalse(underTest.canCollapseParentArtifact(tree, dataItem2.getId()));
         assertFalse(underTest.canCollapseParentArtifact(tree, collection2.getId()));
@@ -1091,12 +1094,12 @@ public class DcsBoPackageOntologyServiceImplTest {
         //****************************************
         // Setting up the test
         //****************************************
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         int originalNodesMapSize = tree.getNodesMap().size();
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
         //transform metadataFile2 into DI+DF combo
-        underTest.makeDataItemFileCombo(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI());
+        underTest.makeDataItemFileCombo(pd, tree, metadataFile2, contentRoot);
 
         //****************************************
         // Checking preconditions
@@ -1148,7 +1151,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         //****************************************
         //the test
         //****************************************
-        underTest.changeType(pd, tree, fileNode.getValue().getId(), fileNode.getValue().getArtifactRef().getRefURI(), DcsBoPackageOntology.METADATAFILE);
+        underTest.changeType(pd, tree, fileNode.getValue(), contentRoot, DcsBoPackageOntology.METADATAFILE);
         String removedArtifactId = underTest.collapseParentArtifact(pd, tree, fileNode.getValue().getId());
         //****************************************
         //verifying result
@@ -1231,7 +1234,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     public void testIgnoreCollection() throws PackageOntologyException {
 
         collection1.setIgnored(true);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         //All children of the collection should be ignored.
         assertTrue(dataItem1.isIgnored());
@@ -1250,7 +1253,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     @Test
     public void testIgnoreDataItem() throws PackageOntologyException {
         dataItem1.setIgnored(true);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         //Parents shouldn't be ignored
         assertFalse(collection1.isIgnored());
@@ -1275,7 +1278,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     @Test
     public void testUnIgnoreCollection() throws PackageOntologyException {
         collection1.setIgnored(true);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         assertTrue(dataItem1.isIgnored());
         assertTrue(collection3.isIgnored());
@@ -1283,7 +1286,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         assertTrue(metadataFile1.isIgnored());
 
         collection1.setIgnored(false);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         //All children should still be ignored.
         assertTrue(dataItem1.isIgnored());
@@ -1303,7 +1306,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     @Test
     public void testUnIgnoreDataItem() throws PackageOntologyException {
         collection1.setIgnored(true);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         assertTrue(dataItem1.isIgnored());
         assertTrue(collection3.isIgnored());
@@ -1311,7 +1314,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         assertTrue(metadataFile1.isIgnored());
 
         dataItem1.setIgnored(false);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         //This is kind of a strange test, since the collection is still ignored, all of it's children will be ignored
         assertTrue(dataItem1.isIgnored());
@@ -1330,7 +1333,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     //Test that after a collection has all it's data items and sub collections ignored it can become a data item.
     @Test
     public void testIgnoreAdjustsAvailableTypes() throws PackageOntologyException {
-        PackageTree tree = underTest.buildPackageTree(pd);
+        PackageTree tree = underTest.buildPackageTree(pd, contentRoot);
         Set<String> types = underTest.getValidTypes(tree, collection3.getId());
         assertEquals(1, types.size());
 
@@ -1339,7 +1342,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         dataItem4.setIgnored(true);
         collection4.setIgnored(true);
 
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
 
         types = underTest.getValidTypes(tree, collection3.getId());
         assertEquals(2, types.size());
@@ -1353,7 +1356,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     // Then when a child collection is unignored, the DataItem becomes a Collection again.
     @Test
     public void testIgnoreAndUnignoreTypeTransform() throws PackageOntologyException {
-        PackageTree tree = underTest.buildPackageTree(pd);
+        PackageTree tree = underTest.buildPackageTree(pd, contentRoot);
 
         assertEquals(1, underTest.getValidTypes(tree, collection3.getId()).size());
         assertEquals(DcsBoPackageOntology.COLLECTION, collection3.getType());
@@ -1362,7 +1365,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         
         dataItem4.setIgnored(true);
         collection4.setIgnored(true);        
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         
         assertEquals(DcsBoPackageOntology.COLLECTION, collection3.getType());
         assertEquals(DcsBoPackageOntology.COLLECTION, collection4.getType());
@@ -1371,7 +1374,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         
         // Change collection3 type to DataItem
         
-        underTest.changeType(pd, tree, collection3.getId(), collection3.getArtifactRef().getRefURI(), DcsBoPackageOntology.DATAITEM);
+        underTest.changeType(pd, tree, collection3, contentRoot, DcsBoPackageOntology.DATAITEM);
         
         assertEquals(DcsBoPackageOntology.DATAITEM, collection3.getType());       
         assertEquals(DcsBoPackageOntology.COLLECTION, collection4.getType());
@@ -1380,7 +1383,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         // Unignore collection3 child collection and rebuild tree
         
         collection4.setIgnored(false);        
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         
         assertFalse(collection4.isIgnored());
         assertTrue(dataItem4.isIgnored());
@@ -1400,7 +1403,7 @@ public class DcsBoPackageOntologyServiceImplTest {
     public void testTransformUnignoredMdFIntoDiDf() throws PackageOntologyException, URISyntaxException {
         //build a tree with ignored collectin's mdf
         metadataFile2.setIgnored(true);
-        tree = underTest.buildPackageTree(pd);
+        tree = underTest.buildPackageTree(pd, contentRoot);
         assertTrue(tree.getNodesMap().get(metadataFile2.getId()).getValue().isIgnored());
 
         //get info for later verification
@@ -1408,22 +1411,22 @@ public class DcsBoPackageOntologyServiceImplTest {
         String originalFileUri = metadataFile2.getArtifactRef().getRefString();
         //unignore the mdf
         metadataFile2.setIgnored(false);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
         //turn unignored mdf into DIDF
-        underTest.changeType(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI(), DcsBoPackageOntologyServiceImpl.didfComboType);
+        underTest.changeType(pd, tree, metadataFile2, contentRoot, DcsBoPackageOntologyServiceImpl.didfComboType);
         //verify successful transformation
         verifyFilesTransformationToDIDF(originalNodesMapSize, originalFileUri);
 
         //collapse the didf backto mdf of collection
-        underTest.changeType(pd, tree, metadataFile2.getId(), metadataFile2.getArtifactRef().getRefURI(), DcsBoPackageOntology.METADATAFILE);
+        underTest.changeType(pd, tree, metadataFile2, contentRoot, DcsBoPackageOntology.METADATAFILE);
         underTest.collapseParentArtifact(pd, tree, metadataFile2.getId());
 
         assertFalse(metadataFile2.isIgnored());
 
         //ignore mdf
         metadataFile2.setIgnored(true);
-        underTest.buildPackageTree(pd);
+        underTest.buildPackageTree(pd, contentRoot);
 
     }
 

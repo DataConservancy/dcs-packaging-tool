@@ -122,6 +122,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                         view.showProgressIndicatorPopUp();
                         controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
+                        controller.setContentRoot(content_dir);
 
                         packageDescriptionService.setOnFailed((new EventHandler<WorkerStateEvent>() {
                             @Override
