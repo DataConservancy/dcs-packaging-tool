@@ -180,12 +180,7 @@ public class OrePackageModelBuilder
      */
     @Override
     public void init(PackageGenerationParameters params) {
-        try {
-            rootContentURI = new URI(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
-        } catch (URISyntaxException e) {
-            //TODO handle this exception
-            e.printStackTrace();
-        }
+        rootContentURI = new File(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0)).toURI();
     }
 
     /**
