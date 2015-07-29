@@ -349,7 +349,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             } catch (RuntimeException e) {
                 log.error(e.getMessage());
-                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " moo" + e.getMessage();
+                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " "  + e.getMessage();
             }
 
         } else {
