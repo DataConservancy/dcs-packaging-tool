@@ -180,12 +180,7 @@ public class OrePackageModelBuilder
      */
     @Override
     public void init(PackageGenerationParameters params) {
-        try {
-            rootContentURI = new URI(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0) + "/");
-        } catch (URISyntaxException e) {
-            //TODO handle this exception
-            e.printStackTrace();
-        }
+        rootContentURI = new File(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0)).toURI();
     }
 
     /**
@@ -499,10 +494,10 @@ public class OrePackageModelBuilder
                 aggregation.createAggregatedResource(resourceURI);
         aggregation
                 .addTriple(OREFactory.createTriple(aggregation,
-                        new Predicate(URI
-                                .create(ResourceMapConstants.AGGREGATES_PROPERTY
-                                        .getURI())),
-                        aggregatedResource));
+                                                   new Predicate(URI
+                                                           .create(ResourceMapConstants.AGGREGATES_PROPERTY
+                                                                   .getURI())),
+                                                   aggregatedResource));
 
         /* Track */
         oreIdentities.put(artifact, aggregatedResource.getURI());
@@ -526,7 +521,7 @@ public class OrePackageModelBuilder
         }
 
         /*
-         * Add its outward pointing relationships. If the target of the
+         * Add it's outward pointing relationships. If the target of the
          * relationship doesn't exist anywhere, create is as appropriate.
          */
         for (Pair<URI, PackageArtifact> relationship : oreRelationships
