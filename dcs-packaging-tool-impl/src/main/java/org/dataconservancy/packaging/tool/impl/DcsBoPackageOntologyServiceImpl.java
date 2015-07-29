@@ -374,7 +374,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
 
         try {
             URI absoluteURI = fileURIBuilder.build();
-            URI relativeURI = contentRoot.getParentFile().toURI().relativize(absoluteURI);
+            URI relativeURI = contentRoot.toURI().relativize(absoluteURI);
             diArtifact.setArtifactRef(relativeURI.toString());
         } catch (URISyntaxException e){
            throw new IllegalArgumentException("Invalid URI, cannot create ArtifactReference",e) ;

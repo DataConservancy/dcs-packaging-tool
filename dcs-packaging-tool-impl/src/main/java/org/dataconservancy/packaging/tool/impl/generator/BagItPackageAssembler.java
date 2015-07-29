@@ -340,8 +340,7 @@ public class BagItPackageAssembler implements PackageAssembler {
      */
     @Override
     public URI createResource(String path, PackageResourceType type, InputStream content) {
-        //URI resourceUri = reserveResource(buildPath(path), type);
-        URI resourceUri = reserveResource(path, type);
+        URI resourceUri = reserveResource(buildPath(path), type);
         putResource(resourceUri, content);
 
         return resourceUri;
@@ -534,27 +533,18 @@ public class BagItPackageAssembler implements PackageAssembler {
     private String buildPath(String string) {
 
         String contentRoot = FilePathUtil.convertToUnixSlashes(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
-        String contentRootParent = new File(contentRoot).getParent(); //our "content root" contains the top level artifact
-        //we really want to take its parent as the base for content
-        File base = new File(contentRootParent, string);
 
-       /** if (!string.contains(contentRoot)) {
-            throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
+        File file = new File(contentRoot, string);
+
+        if(!file.exists()){
+               throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
                     "Provided file path indicates that that file does not reside within the " +
                     "specified content root location of: " + params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
 
         }
 
-        return string.substring(string.lastIndexOf(contentRoot)
-                + contentRoot.length());    **/
-
-        if(!base.exists()){
-            throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
-                    "Provided file path indicates that that file does not reside within the " +
-                    "specified content root location of: " + params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
-
-        }
-        return base.getPath();
+      //return file.getPath();
+        return string;
     }
 
     private File archiveBag() throws PackageToolException {

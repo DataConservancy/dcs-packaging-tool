@@ -373,8 +373,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         if(existingDescriptionFile != null){
             packageDescriptionFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
             packageDescriptionFileChooser.setInitialFileName(existingDescriptionFile.getName());
-        } else if (presenter.getController().getContentRoot() != null) {
-            packageDescriptionFileChooser.setInitialFileName(presenter.getController().getContentRoot().getName()+".json");
+        } else if (presenter.getController().getRootArtifactDir() != null) {
+            packageDescriptionFileChooser.setInitialFileName(presenter.getController().getRootArtifactDir().getName()+".json");
         } else {
             packageDescriptionFileChooser.setInitialFileName("default.json");
         }

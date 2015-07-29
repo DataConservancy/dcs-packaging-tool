@@ -41,6 +41,7 @@ public class Controller {
     private PackageDescription packageDescription;
     private File packageDescriptionFile;
     private File contentRoot;
+    private File rootArtifactDir;
     private File outputDirectory;
     private String packageGenerationParams;
     private String packageFilenameIllegalCharacters;
@@ -301,6 +302,10 @@ public class Controller {
     public void setContentRoot(File contentRoot) {
         this.contentRoot = contentRoot;
     }
+
+    public File getRootArtifactDir() { return rootArtifactDir; }
+
+    public void setRootArtifactDir(File rootArtifactDir) { this.rootArtifactDir = rootArtifactDir; }
 
     public File getOutputDirectory() { return outputDirectory; }
 

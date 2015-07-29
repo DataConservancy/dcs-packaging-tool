@@ -194,6 +194,7 @@ public class GeneralPackageDescriptionCreator
             artifacts.put(id, artifact);
             artifact.setId(id);
             artifact.setIgnored(cxt.isIgnored());
+            //we need to relativize against the content root, not the supplied root artifact dir
             artifact.setArtifactRef(cxt.getRoot().getParentFile().toURI().relativize(uri).toString());
             /*
              * if file is a normal file, set the isByteStream flag to true on

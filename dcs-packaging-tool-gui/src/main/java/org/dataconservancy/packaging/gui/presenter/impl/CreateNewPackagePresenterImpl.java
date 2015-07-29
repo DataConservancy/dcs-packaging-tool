@@ -61,6 +61,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     private CreateNewPackageView view;
 
     private File content_dir;
+    private File root_artifact_dir; //has content_dir as parent
 
     private PackageDescriptionCreator creator;
     private PackageDescriptionBuilder packageDescriptionBuilder;
@@ -118,11 +119,12 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         // choice of ontology identifier instead of hardcoded value here
 
                         final PackageDescriptionServiceWorker packageDescriptionService =
-                                new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, content_dir);
+                                new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
 
                         view.showProgressIndicatorPopUp();
                         controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
                         controller.setContentRoot(content_dir);
+                        controller.setRootArtifactDir(root_artifact_dir);
 
                         packageDescriptionService.setOnFailed((new EventHandler<WorkerStateEvent>() {
                             @Override
@@ -149,7 +151,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                         packageDescriptionService.start();
 
-                    } else if (content_dir != null && (!content_dir.exists() || !content_dir.canRead())) {
+                    } else if (content_dir != null && (!content_dir.exists() || !content_dir.canRead()) ||
+                            root_artifact_dir != null && (!root_artifact_dir.exists() || !root_artifact_dir.canRead())) {
                         view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
                         view.getErrorMessage().setVisible(true);
                     } else if (controller.getPackageDescription() != null ){
@@ -179,8 +182,9 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         File dir = controller.showOpenDirectoryDialog(directoryChooser);
 
                         if (dir != null) {
-                            content_dir = dir;
-                            view.getSelectedBaseDirectoryTextField().setText(content_dir.getPath());
+                            root_artifact_dir = dir;
+                            content_dir = root_artifact_dir.getParentFile();
+                            view.getSelectedBaseDirectoryTextField().setText(root_artifact_dir.getPath());
                             view.getSelectedPackageDescriptionTextField().setText("");
                             //If the error message happens to be visible erase it.
                             view.getErrorMessage().setVisible(false);
@@ -202,7 +206,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         PackageDescription description = packageDescriptionBuilder.deserialize(fis);
                         //If the selected package description file is valid set it on the controller and remove the content directory if it was set.
                         if (description != null) {
-                            content_dir = null;
+                            //content_dir = null;
                             controller.setPackageDescription(description);
                             controller.setPackageDescriptionFile(descriptionFile);
                             view.getErrorMessage().setVisible(false);
@@ -234,6 +238,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             view.getErrorMessage().setText("");
             
             content_dir = null;
+            root_artifact_dir = null;
         }
         
         //Setup help content and then rebind the base class to this view.
@@ -288,11 +293,11 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
      */
     private class PackageDescriptionServiceWorker extends Service<PackageDescription> {
 
-        private File content_dir;
+        private File root_artifact_dir;
         private String packageOntologyIdentifier;
 
-        public PackageDescriptionServiceWorker(String packageOntologyIdentifier, File content_dir) {
-            this.content_dir = content_dir;
+        public PackageDescriptionServiceWorker(String packageOntologyIdentifier, File root_artifact_dir) {
+            this.root_artifact_dir = root_artifact_dir;
             this.packageOntologyIdentifier = packageOntologyIdentifier;
         }
 
@@ -301,7 +306,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             return new Task<PackageDescription>() {
                 @Override
                 protected PackageDescription call() throws Exception {
-                    return creator.createPackageDescription(packageOntologyIdentifier, content_dir);
+                    return creator.createPackageDescription(packageOntologyIdentifier, root_artifact_dir);
                 }
             };
         }

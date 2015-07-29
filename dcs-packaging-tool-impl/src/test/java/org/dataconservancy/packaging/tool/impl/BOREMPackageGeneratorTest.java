@@ -80,6 +80,7 @@ public class BOREMPackageGeneratorTest {
     String contactName;
     String contactEmail;
     String contactPhone;
+    String contentRootLocation;
     String compressionFormat = CompressorStreamFactory.GZIP;
     String checksumAlg;
     String dataFileOneName = "Data File One.txt";
@@ -98,9 +99,9 @@ public class BOREMPackageGeneratorTest {
         PackageArtifact artifact = new PackageArtifact();
         artifact.setId("artifact:id:1");
         artifact.setType(DcsPackageArtifactType.Project.name());
+        URI contentRootURI = testContentLocation.toURI();
         File pathToProject = new File(testContentLocation, "ProjectOne");
-        String artifactRef = "ProjectOne"; //pathToProject.toURI().toString();
-        artifact.setArtifactRef(artifactRef);
+        artifact.setArtifactRef(contentRootURI.relativize(pathToProject.toURI()).toString());
         //artifact.addProperty(DcsPackageDescriptionSpec.Property.PROJECT_NAME.toString(), "Test Project");
         List<PackageRelationship> relationships = new ArrayList<PackageRelationship>();
         artifact.setRelationships(relationships);
@@ -112,8 +113,7 @@ public class BOREMPackageGeneratorTest {
         artifact.setId("artifact:id:2");
         artifact.setType(DcsPackageArtifactType.Collection.name());
         File pathToCollection = new File(pathToProject, "Collection One");
-        //artifact.setArtifactRef(pathToCollection.toURI().toString());
-        artifact.setArtifactRef("Collection One");
+        artifact.setArtifactRef(contentRootURI.relativize(pathToCollection.toURI()).toString());
         artifact.addSimplePropertyValue(DcsBoPackageOntology.TITLE, "Test collection One");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.PUBLICATION_DATE, "2013-06-15");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.DESCRIPTION, "Collection used in testing borem package generator");
@@ -135,8 +135,7 @@ public class BOREMPackageGeneratorTest {
         artifact.setId("artifact:id:3");
         artifact.setType(DcsPackageArtifactType.DataItem.name());
         File pathToDataItem = new File(pathToCollection, "DataItem One");
-        //artifact.setArtifactRef(pathToDataItem.toURI().toString());
-        artifact.setArtifactRef("DataItem One");
+        artifact.setArtifactRef(contentRootURI.relativize(pathToDataItem.toURI()).toString());
         artifact.addSimplePropertyValue(DcsBoPackageOntology.TITLE, "Test DataItem One");
         artifact.addSimplePropertyValue(DcsBoPackageOntology.DESCRIPTION, "Description for Test DataItem One");
         relatedArtifacts = new HashSet<String>();
@@ -152,8 +151,8 @@ public class BOREMPackageGeneratorTest {
         artifact.setId("artifact:id:4");
         artifact.setType(DcsPackageArtifactType.DataFile.name());
         pathToFileOne = new File(pathToDataItem, dataFileOneName);
-        URI test = pathToFileOne.toURI() ;
-        artifact.setArtifactRef(test.toString());
+        URI test = pathToFileOne.toURI() ;;
+        artifact.setArtifactRef(contentRootURI.relativize(test).toString());
         //artifact.addSimplePropertyValue(DcsPackageDescriptionSpec.Property.FILE_NAME.toString(), "Test DataFile One");
         //artifact.addSimplePropertyValue(DcsPackageDescriptionSpec.Property.FILE_PATH.toString(), test.getPath());
         artifact.addSimplePropertyValue(DcsBoPackageOntology.FORMAT, "application/text");
@@ -171,7 +170,7 @@ public class BOREMPackageGeneratorTest {
         artifact.setType(DcsPackageArtifactType.DataFile.name());
         pathToFileTwo = new File(pathToDataItem, dataFileTwoName);
         test = pathToFileTwo.toURI() ;
-        artifact.setArtifactRef(test.toString());
+        artifact.setArtifactRef(contentRootURI.relativize(test).toString());
         //artifact.addSimplePropertyValue(DcsPackageDescriptionSpec.Property.FILE_NAME.toString(), "Test DataFile Two");
         relatedArtifacts = new HashSet<String>();
         relatedArtifacts.add("artifact:id:3");
@@ -188,6 +187,7 @@ public class BOREMPackageGeneratorTest {
         packageName = "WillardDoodle";
         packageLocationName = packageLocation.getAbsolutePath();
         packageStagingLocationName = packageStagingLocation.getAbsolutePath();
+        contentRootLocation = testContentLocation.getAbsolutePath();
         pkgBagDir = pathToProject.getName();
         bagItProfileId = "http://dataconservancy.org/formats/data-conservancy-pkg-0.9";
         contactName = "Willy Bean";
@@ -243,8 +243,8 @@ public class BOREMPackageGeneratorTest {
         params.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksumAlg);
         params.addParam(BagItParameterNames.COMPRESSION_FORMAT, compressionFormat);
         params.addParam(BagItParameterNames.PKG_BAG_DIR, packageName);
-        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, pkgBagDir);
-
+       // params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, pkgBagDir);
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, contentRootLocation);
         Package resultedPackage = underTest.generatePackage(desc, params);
 
         //Decompress and de archive files
