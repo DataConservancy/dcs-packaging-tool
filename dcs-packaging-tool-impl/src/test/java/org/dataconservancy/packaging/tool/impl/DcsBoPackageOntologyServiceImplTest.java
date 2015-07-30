@@ -991,7 +991,7 @@ public class DcsBoPackageOntologyServiceImplTest {
         assertNotNull(diNode);
         //verify that the DataItem's ArtifactRef being set properly
         assertTrue(diNode.getValue().getArtifactRef().getRefString().contains(originalFileUri));
-        assertNotNull(diNode.getValue().getArtifactRef().getRefURI(contentRoot).getFragment());
+        assertNotNull(diNode.getValue().getArtifactRef().getFragment());
 
         //verify that properties are transferred properly to the resulting Data Item
         assertTrue(diNode.getValue().getSimplePropertyValues(DcsBoPackageOntology.CREATE_DATE).

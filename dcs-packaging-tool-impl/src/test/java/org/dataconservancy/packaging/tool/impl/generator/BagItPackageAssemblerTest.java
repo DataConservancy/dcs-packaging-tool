@@ -97,7 +97,7 @@ public class BagItPackageAssemblerTest {
         contactPhone = "0000000000";
         checksumAlg = "md5";
 
-        contentLocation = this.getClass().getResource("/TestContent/ProjectOne/").getPath();
+        contentLocation = this.getClass().getResource("/").getPath();
         PackageGenerationParameters params = new PackageGenerationParameters();
         setupCommonPackageParams(params);
         params.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksumAlg);
@@ -190,9 +190,9 @@ public class BagItPackageAssemblerTest {
         // Prepare and create the resource
 
         InputStream df1IS = this.getClass().getResourceAsStream("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        URL df1URL = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        URI result = underTest.createResource(df1URL.getPath(), PackageResourceType.DATA, df1IS);
-
+        //URL df1URL = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
+        URI result = underTest.createResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1IS);
+        System.err.println("%%%%%%%%%%%%%%%%%% " + result.toString());
         // Verify that the URI is as expected
         String expectedURI = "file:///" + packageName + "/data/Collection%20One/DataItem%20One/Data%20File%20One.txt";
         assertTrue(expectedURI.equals(result.toString()));
@@ -210,8 +210,8 @@ public class BagItPackageAssemblerTest {
     public void testCreateResourceForTwoDataFilesWithSameName() throws IOException {
         // Prepare and create the resource
         InputStream df1ISa = this.getClass().getResourceAsStream("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        URL df1URLa = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        URI resulta = underTest.createResource(df1URLa.getPath(), PackageResourceType.DATA, df1ISa);
+        //URL df1URLa = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
+        URI resulta = underTest.createResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1ISa);
 
         InputStream df1ISb = this.getClass().getResourceAsStream("/TestContent/ProjectOne/CollectionTwo/DataItemTwo/DataFileOne.txt");
         URL df1URLb = this.getClass().getResource("/TestContent/ProjectOne/CollectionTwo/DataItemTwo/DataFileOne.txt");

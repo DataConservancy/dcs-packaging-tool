@@ -261,10 +261,10 @@ public class BOREMPackageGeneratorTest {
             if (entry.getName().equals(packageName + "/bag-info.txt") && ais.canReadEntryData(entry)) {
                 verifyBagInfoContent(ais);
             }
-            if (entry.getName().equals(packageName + "/data/Collection One/DataItem One/" + dataFileOneName)) {
+            if (entry.getName().equals(packageName + "/data/ProjectOne/Collection One/DataItem One/" + dataFileOneName)) {
                 compareDataFile(ais, pathToFileOne);
             }
-            if (entry.getName().equals(packageName + "/data/Collection One/DataItem One/" + dataFileTwoName)) {
+            if (entry.getName().equals(packageName + "/data/ProjectOne/Collection One/DataItem One/" + dataFileTwoName)) {
                 compareDataFile(ais, pathToFileTwo);
             }
             entry = ais.getNextEntry();
@@ -274,8 +274,8 @@ public class BOREMPackageGeneratorTest {
         assertTrue(files.contains(packageName + "/tagmanifest-md5.txt"));
         assertTrue(files.contains(packageName + "/manifest-md5.txt"));
         assertTrue(files.contains(packageName + "/data/"));
-        assertTrue(files.contains(packageName + "/data/Collection One/DataItem One/" + dataFileOneName));
-        assertTrue(files.contains(packageName + "/data/Collection One/DataItem One/" + dataFileTwoName));
+        assertTrue(files.contains(packageName + "/data/ProjectOne/Collection One/DataItem One/" + dataFileOneName));
+        assertTrue(files.contains(packageName + "/data/ProjectOne/Collection One/DataItem One/" + dataFileTwoName));
         assertTrue(files.contains(packageName + "/ORE-REM/"));
 
         assertTrue(SupportedMimeTypes.getMimeType(compressionFormat).contains(resultedPackage.getContentType()));

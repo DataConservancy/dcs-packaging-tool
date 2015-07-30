@@ -127,8 +127,8 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         datafile1 = new PackageArtifact();
         datafile1.setId("id:df1");
         //datafile1.setArtifactRef("file:/some/file/path with spaces");
-        File file = new File("file:/some/file/path with spaces");
-        datafile1.setArtifactRef(file.toURI());
+        File file = new File("some/file/path with spaces");
+        datafile1.setArtifactRef(file.getPath());
         datafile1.setType(DcsBoPackageOntology.DATAFILE);
         datafile1.setByteStream(true);
         datafile1.setRelationships(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, "id:di1"));

@@ -538,7 +538,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         if(!file.exists()){
                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
-                    "Provided file path indicates that that file does not reside within the " +
+                    "Provided file path indicates that that file " + file.getPath() + " does not reside within the " +
                     "specified content root location of: " + params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
 
         }
