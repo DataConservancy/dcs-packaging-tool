@@ -224,7 +224,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 String labelText;
 
                 if (getFullPathCheckBox().selectedProperty().getValue()) {
-                    labelText = packageArtifact.getArtifactRef().getRefString();
+                    labelText = packageArtifact.getArtifactRef().getResolvedAbsoluteRefString(presenter.getContentRoot());
                 } else {
                     labelText = packageArtifact.getArtifactRef().getRefName();
                 }
