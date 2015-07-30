@@ -59,22 +59,23 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
         
         for (Page page : Page.values()) {
             Label pageLabel = new Label(labels.get(page.getLabelKey()));
-            switch (page.getPosition()) {
-                case 1: 
+            switch (page) {
+                case CREATE_NEW_PACKAGE:
+                    locationBar.getChildren().add(pageLabel);
                     pageLabel.getStyleClass().add(PAGE_ONE_SELECTED);
                     break;
-                case 2:
+                 case DEFINE_RELATIONSHIPS:
                     pageLabel.getStyleClass().add(PAGE_TWO_UNSELECTED);
+                    locationBar.getChildren().add(pageLabel);
                     break;
-                case 3:
+                case GENERATE_PACKAGE:
                     pageLabel.getStyleClass().add(PAGE_THREE_UNSELECTED);
+                    locationBar.getChildren().add(pageLabel);
                     break;
                 default:
                     //Set no style if we don't have a page for it
                     break;
-
             }
-            locationBar.getChildren().add(pageLabel);
         }
         
         getChildren().add(locationBar);
@@ -82,49 +83,47 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
     
     @Override
     public void highlightNextPage(int nextPosition) {
-        if (locationBar.getChildren().size() >= nextPosition) {
-            
-            switch (nextPosition) {
-                case 1: 
-                    //Remove the old selection, occurs on cancel or finish
-                    locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
-                    locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
-                    
-                    //This happens if cancel was selected
-                    locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
-                    locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
-                    
-                    //Select the new page
-                    locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
-                    locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
-                    break;
-                case 2:
-                    //Remove the old selection
-                    locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_SELECTED);
-                    locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_UNSELECTED);
+        switch (nextPosition) {
+            case 10:
+            case 11:
+                //Remove the old selection, occurs on cancel or finish
+                locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
+                locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
 
-                    //Handle returning from page 3
-                    locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
-                    locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
-                    
-                    //Select the new page
-                    locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_UNSELECTED);
-                    locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_SELECTED);
-                    break;
-                case 3:
-                    //Remove the old selection
-                    locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
-                    locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
-                    
-                    //Select the new page
-                    locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_UNSELECTED);
-                    locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_SELECTED);
-                    break;
-                default:
-                    //Set no style if we don't have a page for it
-                    break;
-    
-            }
+                //This happens if cancel was selected
+                locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
+                locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
+
+                //Select the new page
+                locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
+                locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
+                break;
+            case 20:
+                //Remove the old selection
+                locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_SELECTED);
+                locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_UNSELECTED);
+
+                //Handle returning from page 3
+                locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
+                locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
+
+                //Select the new page
+                locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_UNSELECTED);
+                locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_SELECTED);
+                break;
+            case 30:
+                //Remove the old selection
+                locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
+                locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
+
+                //Select the new page
+                locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_UNSELECTED);
+                locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_SELECTED);
+                break;
+            default:
+                //Set no style if we don't have a page for it
+                break;
+
         }
     }
 

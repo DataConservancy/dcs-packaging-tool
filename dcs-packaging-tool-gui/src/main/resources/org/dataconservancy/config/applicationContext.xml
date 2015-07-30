@@ -17,10 +17,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-                      http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <context:annotation-config />
 
@@ -163,6 +161,11 @@
   	<constructor-arg ref="labels"/>
   </bean>
 
+  <bean id="contentDirectoryView" class="org.dataconservancy.packaging.gui.view.impl.SelectContentDirectoryViewImpl">
+    <constructor-arg ref="labels"/>
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>
+  </bean>
 
   <!-- PRESENTERS -->
   <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
@@ -196,6 +199,15 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
+  <bean id="contentDirectoryPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter">
+    <constructor-arg ref="contentDirectoryView"/>
+    <property name="controller" ref="controller" />
+    <property name="messages" ref="messages" />
+    <property name="errors" ref="errors"/>
+    <property name="labels" ref="labels" />
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
     <property name="labels" ref="labels" />
@@ -204,10 +216,12 @@
     <property name="createNewPackageView" ref="createNewPackageView" />
     <property name="packageGenerationView" ref="packageGenerationView" />
     <property name="packageDescriptionView" ref="packageDescriptionView" />
+    <property name="contentDirectoryView" ref="contentDirectoryView" />
 
     <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
     <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
+    <property name="contentDirectoryPresenter" ref="contentDirectoryPresenter" />
 
     <property name="controller" ref="controller" />
     

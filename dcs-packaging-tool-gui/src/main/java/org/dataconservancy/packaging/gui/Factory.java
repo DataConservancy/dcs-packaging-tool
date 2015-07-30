@@ -22,6 +22,7 @@ import java.util.Map;
 import javafx.stage.Stage;
 
 import org.dataconservancy.packaging.gui.presenter.*;
+import org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter;
 import org.dataconservancy.packaging.gui.view.*;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
@@ -56,6 +57,8 @@ public class Factory {
     private PackageDescriptionPresenter pkgDescriptionPresenter;
     private PackageDescriptionView pkgDescriptionView;
     private HeaderView headerView;
+    private SelectContentDirectoryPresenter contentDirectoryPresenter;
+    private SelectContentDirectoryView contentDirectoryView;
     
     private Labels labels;
     private Messages messages;
@@ -67,11 +70,11 @@ public class Factory {
     }
     
     private void initializeAssemblers() {
-        Map<String, Class<? extends PackageAssembler>> assemblers = new HashMap<String, Class<? extends PackageAssembler>>();
+        Map<String, Class<? extends PackageAssembler>> assemblers = new HashMap<>();
         assemblers.put("BOREM",  BagItPackageAssembler.class);
         PackageAssemblerFactory.setAssemblers(assemblers);
         
-        Map<String, Class<? extends PackageModelBuilder>> builders = new HashMap<String, Class<? extends PackageModelBuilder>>();
+        Map<String, Class<? extends PackageModelBuilder>> builders = new HashMap<>();
         builders.put("http://dataconservancy.org/spec/dcs-pkg-desc-BOREM", OrePackageModelBuilder.class);
         PackageModelBuilderFactory.setBuilders(builders);
     }
@@ -130,4 +133,10 @@ public class Factory {
     
     public HeaderView getHeaderView() { return headerView; }
     public void setHeaderView(HeaderView headerView) { this.headerView = headerView; }
+
+    public SelectContentDirectoryPresenter getContentDirectoryPresenter() { return contentDirectoryPresenter; }
+    public void setContentDirectoryPresenter(SelectContentDirectoryPresenter presenter) {this.contentDirectoryPresenter = presenter; }
+
+    public SelectContentDirectoryView getContentDirectoryView() { return contentDirectoryView; }
+    public void setContentDirectoryView(SelectContentDirectoryView contentDirectoryView) { this.contentDirectoryView = contentDirectoryView; }
 }
