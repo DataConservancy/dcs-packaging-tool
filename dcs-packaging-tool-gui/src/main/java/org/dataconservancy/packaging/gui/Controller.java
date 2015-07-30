@@ -76,7 +76,8 @@ public class Controller {
         currentPage = Page.CREATE_NEW_PACKAGE;
         packageDescription = null;
         packageDescriptionFile = null;
-
+        contentRoot = null;
+        rootArtifactDir = null;
         showPage(clear);
     }
 
@@ -288,7 +289,7 @@ public class Controller {
         }
         
         currentPage = nextPage;
-        showPage(false);
+        showPage(true);
     }
     
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
