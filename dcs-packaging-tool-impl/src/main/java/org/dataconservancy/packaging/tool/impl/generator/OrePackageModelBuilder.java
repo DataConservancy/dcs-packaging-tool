@@ -173,14 +173,14 @@ public class OrePackageModelBuilder
 
     private URI packageRemURI;
 
-    private URI rootContentURI;
+    private File rootContentFile;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void init(PackageGenerationParameters params) {
-        rootContentURI = new File(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0)).toURI();
+        rootContentFile = new File(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
     }
 
     /**
@@ -477,7 +477,8 @@ public class OrePackageModelBuilder
                                 ResourceMap rem,
                                 PackageAssembler assembler) throws Exception {
         /* Get file content */
-        URIBuilder urib = new URIBuilder(artifact.getArtifactRef().getRefURI(rootContentURI));
+        URI artifactFileURI = artifact.getArtifactRef().getResolvedAbsoluteRefPath(rootContentFile).toUri();
+        URIBuilder urib = new URIBuilder(artifactFileURI);
         urib.setScheme("file");
 
         URL contentLocation = urib.build().toURL();

@@ -219,31 +219,21 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 Label viewLabel = new Label();
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
                 viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
-                try {
-                    File tempDir = new File("/tmp");//doesn't matter where this is, we just need to get the fragment
-                    URI fileURI = packageArtifact.getArtifactRef().getRefURI(tempDir);
-                    String fragment = fileURI.getFragment();
 
-                    if (getFullPathCheckBox().selectedProperty().getValue()) {
-                        String labelText = packageArtifact.getArtifactRef().getRefString();
-                        if (fragment != null) {
-                            labelText = labelText + synthesizedArtifactMarker;
-                        }
-                        viewLabel.setText(labelText);
-                    } else {
-                        if (fragment == null) {
-                            File file = new File(packageArtifact.getArtifactRef().getRefString());
-                            viewLabel.setText(file.getName());
-                        } else {
-                            File file = new File(new URIBuilder(fileURI).setFragment(null).build());
-                            viewLabel.setText(file.getName() + "#" + fragment + synthesizedArtifactMarker);
-                        }
-                    }
-                } catch (Exception e) {
-                    //Couldn't create a uri from the ref so just use the ref
-                    viewLabel.setText(packageArtifact.getArtifactRef().getRefString());
-                    log.error(e.getMessage());
+                String fragment = packageArtifact.getArtifactRef().getFragment();
+                String labelText;
+
+                if (getFullPathCheckBox().selectedProperty().getValue()) {
+                    labelText = packageArtifact.getArtifactRef().getRefString();
+                } else {
+                    labelText = packageArtifact.getArtifactRef().getRefName();
                 }
+
+                if (fragment != null) {
+                    labelText = labelText + synthesizedArtifactMarker;
+                }
+                viewLabel.setText(labelText);
+
 
                 Tooltip t = TooltipBuilder.create().prefWidth(300).wrapText(true).text(viewLabel.getText()).build();
                 viewLabel.setTooltip(t);

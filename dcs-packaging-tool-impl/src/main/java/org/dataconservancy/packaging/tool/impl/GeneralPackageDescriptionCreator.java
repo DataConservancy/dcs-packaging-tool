@@ -24,6 +24,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -195,7 +197,9 @@ public class GeneralPackageDescriptionCreator
             artifact.setId(id);
             artifact.setIgnored(cxt.isIgnored());
             //we need to relativize against the content root, not the supplied root artifact dir
-            artifact.setArtifactRef(cxt.getRoot().getParentFile().toURI().relativize(uri).toString());
+            Path rootPath = Paths.get(cxt.getRoot().getParentFile().getPath());
+            Path filePath = Paths.get(cxt.getFile().getPath());
+            artifact.setArtifactRef(String.valueOf(rootPath.relativize(filePath)));
             /*
              * if file is a normal file, set the isByteStream flag to true on
              * PackageArtifact

@@ -17,10 +17,10 @@
 package org.dataconservancy.packaging.tool.model;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  *  A class to implement the functionality we need for a PackageArtifact's artifactRef. We sometimes need this to have a
@@ -31,23 +31,50 @@ import java.net.URL;
  */
 public class ArtifactReference {
 
-    private final String refString;
+    private String fragment = null;
+    private String refPath;
 
-    public ArtifactReference(String refString) {
-       this.refString=refString;
+    public ArtifactReference(String refPath) {
+       this.refPath=refPath;
     }
 
-    public URI getRefURI(URI rootURI){ return rootURI.resolve(refString); }
+    public String getResolvedAbsoluteRefString(File contentRootFile) {
+        File absFile = new File(contentRootFile, getRefString());
+        return absFile.getPath();
+    }
 
-    public URI getRefURI(File rootDir){
-        URI uri = rootDir.toURI();
-        return uri.resolve(refString);
+    public Path getResolvedAbsoluteRefPath(File contentRootFile) {
+        return Paths.get(contentRootFile.getPath(), getRefString());
     }
 
     public String getRefString(){
-        return refString;
+        if (fragment == null || fragment.isEmpty()){
+            return refPath;
+        } else {
+            return refPath + "#" + fragment;
+        }
     }
 
+    public String getRefPath(){
+        return refPath;
+    }
+
+    public void setFragment(String fragment){
+        this.fragment = fragment;
+    }
+
+    public String getFragment(){
+        return this.fragment;
+    }
+
+    public String getRefName(){
+        File refFile = new File(refPath);
+        if (fragment == null || fragment.isEmpty()){
+            return refFile.getName();
+        } else {
+            return refFile.getName() + "#" + fragment;
+        }
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -56,20 +83,20 @@ public class ArtifactReference {
 
         ArtifactReference artifactReference = (ArtifactReference) o;
 
-        if(refString != null ? !refString.equals(artifactReference.refString) : artifactReference.refString != null)
+        if(refPath != null ? !refPath.equals(artifactReference.refPath) : artifactReference.refPath != null)
             return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = refString != null ? refString.hashCode() : 0;
+        int result = refPath != null ? refPath.hashCode() : 0;
         return result;
     }
 
     @Override
     public String toString() {
-        return "ArtifactReference{Reference String= " + refString + "}" ;
+        return "ArtifactReference{Reference String= " + refPath + "}" ;
     }
 
 }

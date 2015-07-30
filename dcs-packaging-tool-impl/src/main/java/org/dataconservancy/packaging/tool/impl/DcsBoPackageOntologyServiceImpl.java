@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -348,10 +347,6 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
                     " package artifact in the package.");
         }
 
-
-        //Create a new URIBuilder to help manipulate file uris to be used for new DI and DF ids and ArtifactReferences
-        URIBuilder fileURIBuilder;
-            fileURIBuilder = new URIBuilder(packageArtifact.getArtifactRef().getRefURI(contentRoot));
         //obtain the containing Collection node as a starting place
         PackageNode containingCollectionNode = tree.getNodesMap().get(fileNode.getParentNode().getValue().getId());
 
@@ -366,19 +361,23 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
         //remove file node with the old id from nodes map
         tree.getNodesMap().remove(fileNode.getValue().getId());
 
+        //Create a new URIBuilder to help manipulate file uris to be used for new DI and DF ids and ArtifactReferences
+        URIBuilder fileURIBuilder;
+        URI artifactFileURI = packageArtifact.getArtifactRef().getResolvedAbsoluteRefPath(contentRoot).toUri();
+        fileURIBuilder = new URIBuilder(artifactFileURI);
+
         //Set up package artifact for the new DI
         PackageArtifact diArtifact = new PackageArtifact();
+
         //set new DI's id and artifact ref
         //TODO: do we want to use a different ID?
-        diArtifact.setId((fileURIBuilder.setFragment(Integer.toString(rand.nextInt(Integer.MAX_VALUE)))).toString());
+        String fragment =  Integer.toString(rand.nextInt(Integer.MAX_VALUE));
 
-        try {
-            URI absoluteURI = fileURIBuilder.build();
-            URI relativeURI = contentRoot.toURI().relativize(absoluteURI);
-            diArtifact.setArtifactRef(relativeURI.toString());
-        } catch (URISyntaxException e){
-           throw new IllegalArgumentException("Invalid URI, cannot create ArtifactReference",e) ;
-        }
+        diArtifact.setId((fileURIBuilder.setFragment(fragment).toString()));
+
+        diArtifact.setArtifactRef(packageArtifact.getArtifactRef().getRefString());
+        diArtifact.getArtifactRef().setFragment(fragment);
+
         diArtifact.setIgnored(containingCollectionNode.getValue().isIgnored());
 
         //set package artifact type
@@ -456,13 +455,11 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
             return false;
         }
 
-        File tempRoot = new File("/tmp");//this is all we need to check, dont need actual absolute URI
-        URI parentURI= parentNode.getValue().getArtifactRef().getRefURI(tempRoot);
-        URI fileURI = fileNode.getValue().getArtifactRef().getRefURI(tempRoot);
-        return parentURI.getScheme().equals(fileURI.getScheme()) &&
-            parentURI.getSchemeSpecificPart().equals(fileURI.getSchemeSpecificPart()) &&
-            parentURI.getFragment() != null &&
-            !parentURI.getFragment().isEmpty();
+       // File tempRoot = new File("/tmp");//this is all we need to check, dont need actual absolute URI
+        String parentRefPath = parentNode.getValue().getArtifactRef().getRefPath();
+        String fileRefPath = fileNode.getValue().getArtifactRef().getRefPath();
+        String parentFragment = parentNode.getValue().getArtifactRef().getFragment();
+        return parentFragment != null && !parentFragment.isEmpty();
     }
 
     @Override
@@ -543,6 +540,8 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
         grandparentNode.getChildrenNodes().add(fileNode);
         fileNode.setParentNode(grandparentNode);
         fileNode.getValue().getRelationships().add(new PackageRelationship(DcsBoPackageOntology.IS_MEMBER_OF, true, grandparentNode.getValue().getId()));
+
+        parentNode.getValue().getArtifactRef().setFragment(null);
 
         return parentNode.getValue().getId();
     }
