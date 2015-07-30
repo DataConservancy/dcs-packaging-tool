@@ -122,7 +122,8 @@ public class Labels {
         SYNTHESIZED_ARTIFACT_NOTATION("synthesizedartifact.label"),
         SHOW_FULL_PATHS_TIP("showfullpaths.tip"),
         SHOW_IGNORED("showignored.label"),
-        SHOW_IGNORED_TIP("showignored.tip");
+        SHOW_IGNORED_TIP("showignored.tip"),
+        CONTENT_DIRECTORY_LABEL("contentdirectory.label");
 
         private String property;
 
