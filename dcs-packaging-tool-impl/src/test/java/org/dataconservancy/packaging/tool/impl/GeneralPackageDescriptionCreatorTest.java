@@ -110,7 +110,7 @@ public class GeneralPackageDescriptionCreatorTest {
 
     private static PackageDescription desc;
 
-    private static File contentDir;
+    private static File rootArtifactDir;
 
     private static String packageOntologyIdentifier = "ontologyIdentifier";
 
@@ -138,8 +138,8 @@ public class GeneralPackageDescriptionCreatorTest {
         ZipFile zip = new ZipFile(zipFile);
         zip.extractAll(temp.getPath());
 
-        contentDir = new File(temp, "content");
-        if (!contentDir.isDirectory()) {
+        rootArtifactDir = new File(temp, "content");
+        if (!rootArtifactDir.isDirectory()) {
             throw new RuntimeException();
         }
 
@@ -157,7 +157,7 @@ public class GeneralPackageDescriptionCreatorTest {
         creator =
                 new GeneralPackageDescriptionCreator(builder.buildPackageDescriptionRules(rulesStream));
 
-        desc = creator.createPackageDescription(packageOntologyIdentifier, contentDir);
+        desc = creator.createPackageDescription(packageOntologyIdentifier, rootArtifactDir);
     }
 
     /* Verify that PackageDescription is well-formed */
@@ -173,9 +173,9 @@ public class GeneralPackageDescriptionCreatorTest {
     public void repeatSamePackageDescriptionCreationTest()
             throws PackageDescriptionCreatorException {
         PackageDescription firstDesc =
-                creator.createPackageDescription(packageOntologyIdentifier, contentDir);
+                creator.createPackageDescription(packageOntologyIdentifier, rootArtifactDir);
         assertNotNull(firstDesc);
-        assertEquals(firstDesc, creator.createPackageDescription(packageOntologyIdentifier, contentDir));
+        assertEquals(firstDesc, creator.createPackageDescription(packageOntologyIdentifier, rootArtifactDir));
     }
 
     /*
@@ -246,7 +246,7 @@ public class GeneralPackageDescriptionCreatorTest {
                 /* ... and make sure it points to the project */
                 assertTrue(artifact
                         .getRelationshipByName(DcsBoPackageOntology.IS_MEMBER_OF)
-                        .getTargets().contains(artifactFor(contentDir).getId()));
+                        .getTargets().contains(artifactFor(rootArtifactDir).getId()));
             }
         }
     }
@@ -445,7 +445,7 @@ public class GeneralPackageDescriptionCreatorTest {
         List<File> files = new ArrayList<File>(paths.size());
 
         for (String path : paths) {
-            files.add(new File(contentDir, path
+            files.add(new File(rootArtifactDir, path
                     .replace('/', File.separatorChar)));
         }
 
@@ -454,7 +454,7 @@ public class GeneralPackageDescriptionCreatorTest {
 
     private static PackageArtifact artifactFor(File file) {
         for (PackageArtifact artifact : desc.getPackageArtifacts()) {
-            if (artifact.getArtifactRef().getResolvedAbsoluteRefString(contentDir).equals(file.getPath())) {
+            if (artifact.getArtifactRef().getResolvedAbsoluteRefString(rootArtifactDir.getParentFile()).equals(file.getPath())) {
                 return artifact;
             }
         }
