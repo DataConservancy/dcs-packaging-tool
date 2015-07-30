@@ -74,6 +74,8 @@ public class BagItPackageAssemblerTest {
     String packageLocationName;
     String packageStagingLocationName;
     String contentLocation;
+    File contentLocationFile;
+    URI contentLocationURI;
     String bagItProfileId;
     String contactName;
     String contactEmail;
@@ -97,7 +99,10 @@ public class BagItPackageAssemblerTest {
         contactPhone = "0000000000";
         checksumAlg = "md5";
 
-        contentLocation = this.getClass().getResource("/").getPath();
+        contentLocation = this.getClass().getResource("/TestContent/").getPath();
+        contentLocationFile = new File(contentLocation);
+        contentLocationURI = contentLocationFile.toURI();
+
         PackageGenerationParameters params = new PackageGenerationParameters();
         setupCommonPackageParams(params);
         params.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksumAlg);
@@ -186,15 +191,14 @@ public class BagItPackageAssemblerTest {
     }
 
     @Test
-    public void testCreateResourceForOneDataFile() throws IOException {
+    public void testCreateResourceForOneDataFile() throws IOException, URISyntaxException {
         // Prepare and create the resource
 
         InputStream df1IS = this.getClass().getResourceAsStream("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        //URL df1URL = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        URI result = underTest.createResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1IS);
-        System.err.println("%%%%%%%%%%%%%%%%%% " + result.toString());
+        URL df1URL = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
+        URI result = underTest.createResource("/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1IS);
         // Verify that the URI is as expected
-        String expectedURI = "file:///" + packageName + "/data/Collection%20One/DataItem%20One/Data%20File%20One.txt";
+        String expectedURI = "file:///" + packageName + "/data/" + contentLocationURI.relativize(df1URL.toURI()).toString();
         assertTrue(expectedURI.equals(result.toString()));
 
         // Verify the content of the URI is as expected
@@ -207,22 +211,22 @@ public class BagItPackageAssemblerTest {
     }
 
     @Test
-    public void testCreateResourceForTwoDataFilesWithSameName() throws IOException {
+    public void testCreateResourceForTwoDataFilesWithSameName() throws IOException, URISyntaxException {
         // Prepare and create the resource
         InputStream df1ISa = this.getClass().getResourceAsStream("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        //URL df1URLa = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
-        URI resulta = underTest.createResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1ISa);
+        URL df1URLa = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
+        URI resulta = underTest.createResource("/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1ISa);
 
         InputStream df1ISb = this.getClass().getResourceAsStream("/TestContent/ProjectOne/CollectionTwo/DataItemTwo/DataFileOne.txt");
         URL df1URLb = this.getClass().getResource("/TestContent/ProjectOne/CollectionTwo/DataItemTwo/DataFileOne.txt");
-        URI resultb = underTest.createResource(df1URLb.getPath(), PackageResourceType.DATA, df1ISb);
+        URI resultb = underTest.createResource("/ProjectOne/CollectionTwo/DataItemTwo/DataFileOne.txt", PackageResourceType.DATA, df1ISb);
 
         // Verify that the URI is as expected
-        String expectedURIa = "file:///" + packageName + "/data/Collection%20One/DataItem%20One/Data%20File%20One.txt";
+        String expectedURIa = "file:///" + packageName + "/data/" + contentLocationURI.relativize(df1URLa.toURI()).toString();
         assertTrue(expectedURIa.equals(resulta.toString()));
 
         // Verify that the URI is as expected
-        String expectedURIb = "file:///" + packageName + "/data/CollectionTwo/DataItemTwo/DataFileOne.txt";
+        String expectedURIb = "file:///" + packageName + "/data/" + contentLocationURI.relativize(df1URLb.toURI()).toString();
         assertTrue(expectedURIb.equals(resultb.toString()));
 
         // Verify the content of the URI is as expected
