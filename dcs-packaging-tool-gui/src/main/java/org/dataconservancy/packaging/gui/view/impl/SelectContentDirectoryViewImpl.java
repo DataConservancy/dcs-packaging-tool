@@ -39,6 +39,7 @@ public class SelectContentDirectoryViewImpl extends BaseViewImpl<SelectContentDi
         super(labels);
 
         getContinueButton().setText(labels.get(Labels.LabelKey.CONTINUE_BUTTON));
+        getCancelLink().setText(labels.get(Labels.LabelKey.BACK_LINK));
 
         VBox content = new VBox();
         content.setSpacing(32);
@@ -56,7 +57,7 @@ public class SelectContentDirectoryViewImpl extends BaseViewImpl<SelectContentDi
         VBox contentDirectorySelectionFields = new VBox(4);
         contentDirectorySelectionFields.setAlignment(Pos.TOP_LEFT);
 
-        Label chooseContentDirectoryLabel = new Label(labels.get(Labels.LabelKey.BASE_DIRECTORY_LABEL));
+        Label chooseContentDirectoryLabel = new Label(labels.get(Labels.LabelKey.CONTENT_DIRECTORY_LABEL));
         contentDirectorySelectionFields.getChildren().add(chooseContentDirectoryLabel);
 
         HBox baseDirectorySelector = new HBox(6);
