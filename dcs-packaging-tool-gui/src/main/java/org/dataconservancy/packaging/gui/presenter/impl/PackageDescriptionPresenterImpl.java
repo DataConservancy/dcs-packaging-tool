@@ -767,4 +767,9 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         setupPackageTree();
         displayPackageTree();
     }
+
+    @Override
+    public File getContentRoot(){
+        return controller.getContentRoot();
+    }
 }

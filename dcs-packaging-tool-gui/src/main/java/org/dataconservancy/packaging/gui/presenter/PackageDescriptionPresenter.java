@@ -22,6 +22,7 @@ import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 
+import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -121,4 +122,11 @@ public interface PackageDescriptionPresenter extends Presenter {
      * @return True if the artifact can be attached to a grandparent, false otherwise
      */
     public boolean canCollapseParentArtifact(PackageArtifact packageArtifact);
+
+
+    /**
+     * Returns the content root directory
+     * @return The content root directory
+     */
+    public File getContentRoot();
 }
