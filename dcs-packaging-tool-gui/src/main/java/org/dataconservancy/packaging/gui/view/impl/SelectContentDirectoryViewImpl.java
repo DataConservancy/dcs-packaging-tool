@@ -39,6 +39,7 @@ public class SelectContentDirectoryViewImpl extends BaseViewImpl<SelectContentDi
         super(labels);
 
         getContinueButton().setText(labels.get(Labels.LabelKey.CONTINUE_BUTTON));
+        getCancelLink().setText(labels.get(Labels.LabelKey.BACK_LINK));
 
         VBox content = new VBox();
         content.setSpacing(32);
