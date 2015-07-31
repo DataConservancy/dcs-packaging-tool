@@ -21,7 +21,7 @@
                "@id":"_:t4"
             }
          ],
-         "dc:hasRef":"file:/this.ref",
+         "dc:hasRef":"this.ref",
          "dc:hasRelationship":{
             "@id":"_:t2"
          },
@@ -84,7 +84,7 @@
          "dc:hasProperty":{
             "@id":"_:t5"
          },
-         "dc:hasRef":"file:/this.ref",
+         "dc:hasRef":"this.ref",
          "dc:hasRelationship":{
             "@id":"_:t0"
          },
@@ -118,7 +118,7 @@
                "@id":"_:t10"
             }
          ],
-         "dc:hasRef":"file:/this.ref",
+         "dc:hasRef":"this.ref",
          "dc:hasRelationship":{
             "@id":"_:t11"
          },

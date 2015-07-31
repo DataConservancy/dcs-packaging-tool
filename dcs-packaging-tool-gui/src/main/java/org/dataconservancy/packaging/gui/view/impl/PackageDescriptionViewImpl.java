@@ -38,7 +38,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
-import org.apache.http.client.utils.URIBuilder;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.*;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
@@ -53,8 +52,7 @@ import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.net.URI;
+import java.io.File;;
 import java.util.*;
 import java.util.prefs.Preferences;
 
