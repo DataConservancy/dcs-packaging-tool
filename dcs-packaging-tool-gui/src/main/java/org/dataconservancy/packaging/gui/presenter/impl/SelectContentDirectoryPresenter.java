@@ -51,7 +51,7 @@ public class SelectContentDirectoryPresenter extends BasePresenterImpl
                         view.getErrorMessage().setText(errors.get(Errors.ErrorKey.INACCESSIBLE_CONTENT_DIR));
                         view.getErrorMessage().setVisible(true);
                     } else {
-                        view.getErrorMessage().setText(errors.get(Errors.ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
+                        view.getErrorMessage().setText(errors.get(Errors.ErrorKey.CONTENT_DIRECTORY_ERROR));
                         view.getErrorMessage().setVisible(true);
                     }
                 } catch (Exception e) {

@@ -49,12 +49,13 @@ public class Errors {
         PACKAGE_DESCRIPTION_BUILD_ERROR("packagedescriptionbuild.error"),
         PACKAGE_DESCRIPTION_CHANGE_WARNING("packagedescriptionchange.warning"),
         INACCESSIBLE_CONTENT_DIR("inaccessiblepackagecontent.error"),
-        ARTIFACT_GRAPH_ERROR("artifactgraph.error");
+        ARTIFACT_GRAPH_ERROR("artifactgraph.error"),
+        CONTENT_DIRECTORY_ERROR("contentdirectory.error");
 
 
         private String property;
 
-        private ErrorKey(String property) {
+        ErrorKey(String property) {
             this.property = property;
         }
 
