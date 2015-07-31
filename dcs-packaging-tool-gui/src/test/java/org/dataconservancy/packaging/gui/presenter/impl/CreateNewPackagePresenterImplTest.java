@@ -150,7 +150,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testDisplay() {
-        assertNotNull(presenter.display(false));
+        assertNotNull(presenter.display());
     }
 
     /**

@@ -122,7 +122,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
      *
      */
     private Set<PackageArtifact> setupPackageArtifacts() {
-        Set<PackageArtifact> artifacts = new HashSet<PackageArtifact>();
+        Set<PackageArtifact> artifacts = new HashSet<>();
         
         datafile1 = new PackageArtifact();
         datafile1.setId("id:df1");
@@ -312,7 +312,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testDisplay() throws InterruptedException {
-        assertNotNull(presenter.display(false));
+        assertNotNull(presenter.display());
     }
 
     /**
@@ -614,7 +614,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
 
             @Override
             public Map<String, ArtifactPropertyContainer> getArtifactPropertyFields() {
-                return new HashMap<String, ArtifactPropertyContainer>();
+                return new HashMap<>();
             }
 
             @Override
