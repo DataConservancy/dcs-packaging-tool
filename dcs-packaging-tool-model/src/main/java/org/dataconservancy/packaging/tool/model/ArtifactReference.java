@@ -136,7 +136,7 @@ public class ArtifactReference {
 
     @Override
     public String toString() {
-        return "ArtifactReference{Reference String= " + refPath + "}" ;
+        return "ArtifactReference{Reference String= " + refPath + ", Fragment= " + fragment + "}" ;
     }
 
 }
