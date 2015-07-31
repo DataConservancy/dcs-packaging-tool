@@ -114,7 +114,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
         content.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
-        contentScrollPane.setStyle("-fx-background: #ffffff;");
         contentScrollPane.setContent(content);
 
         setCenter(contentScrollPane);
