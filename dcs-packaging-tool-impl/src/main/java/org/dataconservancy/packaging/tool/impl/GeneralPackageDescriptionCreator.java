@@ -200,6 +200,7 @@ public class GeneralPackageDescriptionCreator
             Path rootPath = Paths.get(cxt.getRoot().getParentFile().getPath());
             Path filePath = Paths.get(cxt.getFile().getPath());
             artifact.setArtifactRef(String.valueOf(rootPath.relativize(filePath)));
+            artifact.getArtifactRef().setFragment(uri.getFragment());
             /*
              * if file is a normal file, set the isByteStream flag to true on
              * PackageArtifact

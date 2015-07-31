@@ -414,7 +414,7 @@ public class GeneralPackageDescriptionCreatorTest {
                 if (artifact.getType().equals("DataItem")) {
                     parentDataItems.put(artifact.getId(), artifact);
                     URI idUri = new URI(artifact.getId());
-                    assertNotNull(idUri.getFragment());;
+                    assertNotNull(idUri.getFragment());
                     assertNotNull(artifact.getArtifactRef().getFragment());
                     assertFalse(artifact.isByteStream());
                 } else {
