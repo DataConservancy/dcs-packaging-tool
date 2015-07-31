@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui;
 
 import java.io.File;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
@@ -49,6 +50,7 @@ public class Controller {
     private String buildRevision;
     private String buildTimeStamp;
     private PackageToolPopup crossPageProgressIndicatorPopUp;
+    private Stack<Page> previousPages;
     
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
     private final ConcurrentHashMap<Object, Semaphore> locks = new ConcurrentHashMap<>();
@@ -56,6 +58,7 @@ public class Controller {
     public Controller() {
         this.container = new BorderPane();
         container.getStyleClass().add(CssConstants.ROOT_CLASS);
+        previousPages = new Stack<>();
     }
 
     public Factory getFactory() { return factory; }
@@ -287,31 +290,18 @@ public class Controller {
                 nextPage = pageForPosition;
             }
         }
-        
+
+        previousPages.push(currentPage);
         currentPage = nextPage;
         showPage(true);
     }
     
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
     public void goToPreviousPage() {
-        Page nextPage = currentPage;
-        int currentPosition = currentPage.getPosition();
-        int nextPosition = Integer.MIN_VALUE;
-        for (Page pages : Page.values()) {
-            if (pages.position < currentPosition && pages.position > nextPosition) {
-                nextPosition = pages.position;
-            }
+        if (previousPages != null && !previousPages.isEmpty()) {
+            currentPage = previousPages.pop();
+            showPage(false);
         }
-        
-        if (nextPosition < Integer.MAX_VALUE) {
-            Page pageForPosition = Page.getPageByPosition(nextPosition);
-            if (pageForPosition != null) {
-                nextPage = pageForPosition;
-            }
-        }
-        
-        currentPage = nextPage;
-        showPage(false);
     }
     
     /**

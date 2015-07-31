@@ -209,16 +209,17 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                             //content_dir = null;
                             controller.setPackageDescription(description);
                             controller.setPackageDescriptionFile(descriptionFile);
+                            controller.setRootArtifactDir(null);
+                            controller.setContentRoot(null);
+                            content_dir = null;
+                            root_artifact_dir = null;
+
                             view.getErrorMessage().setVisible(false);
                             view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
                             view.getSelectedBaseDirectoryTextField().setText("");
                             fileChooser.setInitialDirectory(descriptionFile.getParentFile());
                         }
-                    } catch (FileNotFoundException e) {
-                        view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
-                        view.getErrorMessage().setVisible(true);
-                        log.error(e.getMessage());
-                    } catch (PackageToolException e) {
+                    } catch (FileNotFoundException | PackageToolException e) {
                         view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
                         view.getErrorMessage().setVisible(true);
                         log.error(e.getMessage());
@@ -240,7 +241,16 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             content_dir = null;
             root_artifact_dir = null;
         }
-        
+
+        //If the user navigated back from having selected the package description, clear out the directory fields so the content directory window displays.
+        if (!view.getSelectedPackageDescriptionTextField().getText().isEmpty()) {
+            content_dir = null;
+            root_artifact_dir = null;
+
+            controller.setContentRoot(null);
+            controller.setRootArtifactDir(null);
+        }
+
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);
