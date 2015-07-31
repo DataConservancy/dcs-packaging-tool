@@ -242,15 +242,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             root_artifact_dir = null;
         }
 
-        //If the user navigated back from having selected the package description, clear out the directory fields so the content directory window displays.
-        if (!view.getSelectedPackageDescriptionTextField().getText().isEmpty()) {
-            content_dir = null;
-            root_artifact_dir = null;
-
-            controller.setContentRoot(null);
-            controller.setRootArtifactDir(null);
-        }
-
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);

@@ -263,7 +263,7 @@ public class Controller {
         public boolean isValidPage(Controller controller) {
             switch(this) {
                 case SELECT_CONTENT_DIRECTORY:
-                    if(controller.getContentRoot() != null && controller.getRootArtifactDir() != null) {
+                    if (controller.getPackageDescriptionFile() == null) {
                         return false;
                     }
                     break;
@@ -293,7 +293,7 @@ public class Controller {
 
         previousPages.push(currentPage);
         currentPage = nextPage;
-        showPage(true);
+        showPage(false);
     }
     
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
