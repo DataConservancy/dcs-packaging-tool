@@ -104,12 +104,13 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
        
         //Handles the continue button in the footer being pressed. Validates that all required fields are present, sets the state on the controller,
         //and instructs the controller to move to the next page.
-        view.getContinueButton().setOnAction( new EventHandler<ActionEvent>() {
+        view.getContinueButton().setOnAction(new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent arg0) {
                 try {
-                    if (content_dir != null && content_dir.exists() && content_dir.canRead()) {
+                    if (content_dir != null && content_dir.exists() &&
+                        content_dir.canRead()) {
                         
                         /* Insert properties, if any */
                         for (Map.Entry<String, String> property : view.getPropertyValues().entrySet()) {
@@ -118,8 +119,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         //TODO: when we support multiple ontologies we will need to adjust the handling of the user's
                         // choice of ontology identifier instead of hardcoded value here
 
-                        final PackageDescriptionServiceWorker packageDescriptionService =
-                                new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
+                        final PackageDescriptionServiceWorker packageDescriptionService = new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
 
                         view.showProgressIndicatorPopUp();
                         controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
@@ -128,7 +128,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                         packageDescriptionService.setOnFailed((new EventHandler<WorkerStateEvent>() {
                             @Override
-                            public void handle(WorkerStateEvent workerStateEvent) {
+                            public void handle(
+                                WorkerStateEvent workerStateEvent) {
                                 displayExceptionMessage(workerStateEvent.getSource().getException());
                                 view.getErrorMessage().setVisible(true);
                                 packageDescriptionService.reset();
@@ -139,9 +140,9 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                         packageDescriptionService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                             @Override
-                            public void handle(WorkerStateEvent workerStateEvent) {
-                                PackageDescription packageDescription =
-                                        (PackageDescription)workerStateEvent.getSource().getValue();
+                            public void handle(
+                                WorkerStateEvent workerStateEvent) {
+                                PackageDescription packageDescription = (PackageDescription) workerStateEvent.getSource().getValue();
                                 controller.setPackageDescription(packageDescription);
                                 controller.setPackageDescriptionFile(null);
                                 packageDescriptionService.reset();
@@ -151,22 +152,25 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                         packageDescriptionService.start();
 
-                    } else if (content_dir != null && (!content_dir.exists() || !content_dir.canRead()) ||
-                            root_artifact_dir != null && (!root_artifact_dir.exists() || !root_artifact_dir.canRead())) {
+                    } else if (content_dir != null &&
+                        (!content_dir.exists() || !content_dir.canRead()) ||
+                        root_artifact_dir != null &&
+                            (!root_artifact_dir.exists() ||
+                                 !root_artifact_dir.canRead())) {
                         view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
                         view.getErrorMessage().setVisible(true);
-                    } else if (controller.getPackageDescription() != null ){
+                    } else if (controller.getPackageDescription() != null) {
                         controller.goToNextPage();
                     } else {
                         view.getErrorMessage().setText(errors.get(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
                         view.getErrorMessage().setVisible(true);
                     }
-               } catch (Exception e) {
+                } catch (Exception e) {
                     view.getErrorMessage().setText(messages.formatErrorCreatingNewPackage(e.getMessage()));
                     view.getErrorMessage().setVisible(true);
                     log.error(e.getMessage());
-               }
-            }            
+                }
+            }
         });
         
         //Handles the user pressing the button to choose a base directory to create a package from.
@@ -174,8 +178,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 .setOnAction(new EventHandler<ActionEvent>() {
 
                     public void handle(ActionEvent event) {
-                        if (directoryChooser.getInitialDirectory() != null
-                                && !directoryChooser.getInitialDirectory().exists()) {
+                        if (directoryChooser.getInitialDirectory() != null &&
+                            !directoryChooser.getInitialDirectory().exists()) {
                             directoryChooser.setInitialDirectory(null);
                         }
 
@@ -199,7 +203,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             @Override
             public void handle(ActionEvent arg0) {
                 File descriptionFile = controller.showOpenFileDialog(fileChooser);
-                
+
                 if (descriptionFile != null) {
                     try {
                         FileInputStream fis = new FileInputStream(descriptionFile);
@@ -224,24 +228,24 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         view.getErrorMessage().setVisible(true);
                         log.error(e.getMessage());
                     }
-                }                
+                }
             }
-            
+
         });
 
     }
 
-    public Node display(boolean clear) {
-        //Clear out any values that already exist, this happens when canceling and returning to this screen.
-        if (clear) {
-            view.getSelectedBaseDirectoryTextField().setText("");
-            view.getSelectedPackageDescriptionTextField().setText("");
-            view.getErrorMessage().setText("");
-            
-            content_dir = null;
-            root_artifact_dir = null;
-        }
+    @Override
+    public void clear() {
+        view.getSelectedBaseDirectoryTextField().setText("");
+        view.getSelectedPackageDescriptionTextField().setText("");
+        view.getErrorMessage().setText("");
 
+        content_dir = null;
+        root_artifact_dir = null;
+    }
+
+    public Node display() {
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);

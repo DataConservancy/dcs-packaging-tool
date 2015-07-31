@@ -81,23 +81,35 @@ public class Controller {
         packageDescriptionFile = null;
         contentRoot = null;
         rootArtifactDir = null;
-        showPage(clear);
+
+        if (clear) {
+            clearPresenters();
+        }
+        showPage();
+    }
+
+    /**
+     * Method to clear stale information from the presenters.
+     */
+    private void clearPresenters() {
+        factory.getCreateNewPackagePresenter().clear();
+        factory.getContentDirectoryPresenter().clear();
+        factory.getPackageDescriptionPresenter().clear();
+        factory.getPackageGenerationPresenter().clear();
     }
 
     /**
      * Switch to creating package description.
-     * @param clear A flag to clear out any previous presenter information
      */
-    public void showCreatePackageDescription(boolean clear) {
-        show(factory.getCreateNewPackagePresenter(), clear);
+    public void showCreatePackageDescription() {
+        show(factory.getCreateNewPackagePresenter());
     }
 
     /**
      * Switch to the screen for selecting a content directory.
-     * @param clear A flag to clear out any previous presenter information
      */
-    public void showSelectContentDirectory(boolean clear) {
-        show(factory.getContentDirectoryPresenter(), clear);
+    public void showSelectContentDirectory() {
+        show(factory.getContentDirectoryPresenter());
     }
 
     /**
@@ -110,19 +122,18 @@ public class Controller {
     /**
      * Shows the presenter and optionally clears the information
      * @param presenter The presenter to show
-     * @param clear A flag that tells whether the presenter state should be cleared
      */
-    private void show(Presenter presenter, boolean clear) {
-        container.setCenter(presenter.display(clear));
+    private void show(Presenter presenter) {
+        container.setCenter(presenter.display());
     }
     
-    public void showGeneratePackage(boolean clear) {
-        show(factory.getPackageGenerationPresenter(), clear);
+    public void showGeneratePackage() {
+        show(factory.getPackageGenerationPresenter());
     }
 
-    public PackageDescriptionPresenter showPackageDescriptionViewer(boolean clear) {
+    public PackageDescriptionPresenter showPackageDescriptionViewer() {
         PackageDescriptionPresenter presenter = factory.getPackageDescriptionPresenter();
-        show(presenter, clear);
+        show(presenter);
         return presenter;
     }
     /**
@@ -293,35 +304,34 @@ public class Controller {
 
         previousPages.push(currentPage);
         currentPage = nextPage;
-        showPage(false);
+        showPage();
     }
     
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
     public void goToPreviousPage() {
         if (previousPages != null && !previousPages.isEmpty()) {
             currentPage = previousPages.pop();
-            showPage(false);
+            showPage();
         }
     }
     
     /**
      * Shows the current page, a tells the presenter if it should clear it's information. 
-     * @param clear A boolean flag passed to the presenter letting it now if information should be cleared when displaying.
      */
-    private void showPage(boolean clear) {
+    private void showPage() {
         factory.getHeaderView().highlightNextPage(currentPage.getPosition());
         switch (currentPage) {
             case CREATE_NEW_PACKAGE:
-                showCreatePackageDescription(clear);
+                showCreatePackageDescription();
                 break;
             case DEFINE_RELATIONSHIPS:
-                showPackageDescriptionViewer(clear);
+                showPackageDescriptionViewer();
                 break;
             case GENERATE_PACKAGE:
-                showGeneratePackage(clear);
+                showGeneratePackage();
                 break;
             case SELECT_CONTENT_DIRECTORY:
-                showSelectContentDirectory(clear);
+                showSelectContentDirectory();
                 break;
             default:
                 //There is no next page do nothing

@@ -87,16 +87,17 @@ public class SelectContentDirectoryPresenter extends BasePresenterImpl
     }
 
     @Override
-    public Node display(boolean clear) {
-        //Clear out any values that already exist, this happens when canceling and returning to this screen.
-        if (clear) {
-            view.getSelectedContentDirectoryTextField().setText("");
-            view.getErrorMessage().setText("");
+    public void clear() {
+        // Default method body
+        view.getSelectedContentDirectoryTextField().setText("");
+        view.getErrorMessage().setText("");
 
-            content_dir = null;
-            root_artifact_dir = null;
-        }
+        content_dir = null;
+        root_artifact_dir = null;
+    }
 
+    @Override
+    public Node display() {
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);

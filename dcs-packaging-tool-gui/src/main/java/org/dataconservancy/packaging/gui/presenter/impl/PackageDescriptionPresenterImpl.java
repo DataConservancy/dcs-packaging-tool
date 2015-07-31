@@ -76,12 +76,17 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         super(view);
         this.view = view;
         packageDescription = null;
-        expandedArtifacts = new HashSet<String>();
+        expandedArtifacts = new HashSet<>();
         view.setPresenter(this);
         bind();
     }
 
-    public Node display(boolean clear) {
+    @Override
+    public void clear() {
+        //This presenter has no information to clear
+    }
+
+    public Node display() {
         final PackageArtifactTreeServiceWorker worker =
                 new PackageArtifactTreeServiceWorker();
 
@@ -257,7 +262,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
                 //Get the field container for the property
                 ArtifactPropertyContainer container = view.getArtifactPropertyFields().get(property);
-                Set<PropertyValueGroup> propertyGroups = new HashSet<PropertyValueGroup>();
+                Set<PropertyValueGroup> propertyGroups = new HashSet<>();
 
                 //If the property is complex create a property group
                 if (container.isComplex()) {
@@ -266,7 +271,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
                     for (Map<String, Set<StringProperty>> groupValues : container.getSubProperties()) {
                         PropertyValueGroup group = new PropertyValueGroup();
                         for (String subPropertyName : groupValues.keySet()) {
-                            Set<String> values = new HashSet<String>();
+                            Set<String> values = new HashSet<>();
                             for (StringProperty field : groupValues.get(subPropertyName)) {
                                 if (field.getValue() != null && !field.getValue().isEmpty()) {
                                     values.add(packageOntologyService.getFormattedProperty(view.getPopupArtifact(), property, subPropertyName,field.getValue()));
@@ -284,7 +289,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
                 } else {
                     //Otherwise set the simple property values.
-                    Set<String> values = new HashSet<String>();
+                    Set<String> values = new HashSet<>();
                     for (StringProperty propertyValue : container.getValues()) {
                         if (propertyValue.getValue() != null && !propertyValue.getValue().isEmpty()) {
                             values.add(packageOntologyService.getFormattedProperty(view.getPopupArtifact(), "", property, propertyValue.getValue()));
@@ -296,7 +301,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             }
 
             //Then loop through all relationships and set them on the artifact.
-            List<PackageRelationship> relationships = new ArrayList<PackageRelationship>();
+            List<PackageRelationship> relationships = new ArrayList<>();
             for(ArtifactRelationshipContainer relationshipContainer : view.getArtifactRelationshipFields()) {
                 if (relationshipContainer.getRelationship().getValue() != null) {
                     Relationship relationship = relationshipContainer.getRelationship().getValue();
@@ -310,7 +315,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
                             }
                         } else if (RDFURIValidator.isValid(relationshipUri)) {
                             //If it's not hierarchical we just add it
-                            Set<String> targets = new HashSet<String>();
+                            Set<String> targets = new HashSet<>();
                             for (StringProperty field : relationshipContainer.getRelationshipTargets()) {
                                 //If target is not empty or null and is a valid RDF URI
                                 if (field.getValue() != null && !field.getValue().isEmpty()) {
@@ -347,7 +352,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     }
 
     protected TreeItem<PackageArtifact> buildTree(PackageNode pkg_node, boolean showIgnoredArtifacts) {
-        final TreeItem<PackageArtifact> item = new TreeItem<PackageArtifact>(pkg_node.getValue());
+        final TreeItem<PackageArtifact> item = new TreeItem<>(pkg_node.getValue());
 
         item.expandedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -360,7 +365,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             }
         });
         for (PackageNode pkg_kid: pkg_node.getChildrenNodes()) {
-            if (showIgnoredArtifacts == false && pkg_kid.getValue().isIgnored()) {
+            if (!showIgnoredArtifacts && pkg_kid.getValue().isIgnored()) {
                 continue;
             } else {
                 item.getChildren().add(buildTree(pkg_kid, showIgnoredArtifacts));
@@ -428,7 +433,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     
     @Override
     public List<String> findInvalidProperties(PackageArtifact packageArtifact, String type) {
-        List<String> invalidProps = new ArrayList<String>();
+        List<String> invalidProps = new ArrayList<>();
 
         // If there's no description object, nothing to trim
         if (packageArtifact == null) {
@@ -472,10 +477,10 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
                     } else if (artifact.getPropertyValueGroups(prop) != null) {
                         // clean up property groups
 
-                        Set<PropertyValueGroup> emptyGroups = new HashSet<PropertyValueGroup>();
+                        Set<PropertyValueGroup> emptyGroups = new HashSet<>();
                         for (PropertyValueGroup group : artifact.getPropertyValueGroups(prop)) {
                             boolean groupEmpty = true;
-                            Set<String> invalidSubProps = new HashSet<String>();
+                            Set<String> invalidSubProps = new HashSet<>();
 
                             // Clean up any empty subproperties from a group.  If the group has at least one
                             // non-empty subproperty, the group is not empty
@@ -538,7 +543,9 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         for (final String inheritablePropertyName : inheritablePropertyNames) {
             if (view.getInheritMetadataCheckBoxMap().get(inheritablePropertyName).isSelected()) {
                 try {
-                    applyParentPropertyValue(view.getPopupArtifact(), item.getChildren(), inheritablePropertyName);
+                    if (item != null) {
+                        applyParentPropertyValue(view.getPopupArtifact(), item.getChildren(), inheritablePropertyName);
+                    }
                 } catch (PackageOntologyException e) {
                     log.error(e.getMessage());
                     view.getErrorMessageLabel().setText(e.getMessage());
@@ -589,7 +596,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
     @Override
     public Set<String> getValidTypes(PackageArtifact packageArtifact){
-        Set<String> validTypeSet = new HashSet<String>();
+        Set<String> validTypeSet = new HashSet<>();
         if(packageArtifact.getId() != null && packageTree != null) {
             try {
                 validTypeSet.addAll(packageOntologyService.getValidTypes(packageTree, packageArtifact.getId()));

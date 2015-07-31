@@ -29,44 +29,48 @@ import org.dataconservancy.packaging.gui.InternalProperties;
 public interface Presenter {
     /**
      * Called every time the user navigates to the presenter.
-     * @param clear boolean value which will clear all presenter information
      * @return a node which displays the presenter view.
      */
-    Node display(boolean clear);
+    Node display();
+
+    /**
+     * Clears out the presenter information.
+     */
+    void clear();
 
     /**
      * Getter and setter methods needed for every presenter. 
      * The controller handles navigation between views and presenters, as well as storing any state information of the package generation process.
      * @return the Controller
      */
-    public Controller getController();
-    public void setController(Controller controller);
+    Controller getController();
+    void setController(Controller controller);
     
     /**
      * Sets the messages object to use for the presenter. 
      * Messages is a helper class the loads strings from the errors resource bundle.
      * @param messages the Messages object
      */
-    public void setMessages(Messages messages);
+    void setMessages(Messages messages);
     
     /**
      * Sets the errors object to use for the presenter.
      * Errors is a helper class that loads strings from the errors resource bundle.
      * @param errors the Errors object
      */
-    public void setErrors(Errors errors);
+    void setErrors(Errors errors);
     
     /**
      * Sets the labels object to use for the presenter.
      * Labels is a helper class that loads strings from the labels resource bundle.
      * @param labels the Labels object
      */
-    public void setLabels(Labels labels);
+    void setLabels(Labels labels);
 
     /**
      * Sets the internal properties object to use for the presenter.
      * InternalProperties is a helper class that loads strings from the internal properties resource bundle.
      * @param internalProperties  the InternalProperties object
      */
-    public void setInternalProperties(InternalProperties internalProperties);
+    void setInternalProperties(InternalProperties internalProperties);
 }

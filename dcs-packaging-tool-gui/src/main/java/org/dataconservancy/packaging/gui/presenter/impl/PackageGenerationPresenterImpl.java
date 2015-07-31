@@ -79,7 +79,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         bind();
     }
 
-    public Node display(boolean clear) {
+    @Override
+    public void clear() {
+        //This presenter has no information to clear
+    }
+
+    public Node display() {
         //Clear out any values from the previous run
         view.getStatusLabel().setText("");
         view.getCurrentOutputDirectoryTextField().setText("");
@@ -327,7 +332,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
      */
     private String generateAndSavePackage() {
         //PackageDescription packageDescription = controller.getPackageDescription();
-        PackageDescription packageDescription = null;
+        PackageDescription packageDescription;
         try {
             FileInputStream fis = new FileInputStream(controller.getPackageDescriptionFile());
             packageDescription = packageDescriptionBuilder.deserialize(fis);
@@ -458,7 +463,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         
         if (generationParams.getParam(GeneralParameterNames.CHECKSUM_ALGORITHMS) == null ||
                 generationParams.getParam(GeneralParameterNames.CHECKSUM_ALGORITHMS).isEmpty()) {
-            List<String> checksumAlgs = new ArrayList<String>();
+            List<String> checksumAlgs = new ArrayList<>();
             
             if (view.getMd5CheckBox().isSelected()) {
                 checksumAlgs.add("md5");
@@ -784,17 +789,17 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
      * Simple interface that shadows JavaFX service this is used so we can create our own instance to use in testing.
      */
     protected interface GeneratePackageService {
-        public void execute();
+        void execute();
 
-        public void setOnFailed(EventHandler<WorkerStateEvent> handler);
+        void setOnFailed(EventHandler<WorkerStateEvent> handler);
 
-        public void setOnCancelled(EventHandler<WorkerStateEvent> handler);
+        void setOnCancelled(EventHandler<WorkerStateEvent> handler);
 
-        public void setOnSucceeded(EventHandler<WorkerStateEvent> handler);
+        void setOnSucceeded(EventHandler<WorkerStateEvent> handler);
 
-        public void setOverwriteFile(boolean overwriteFile);
+        void setOverwriteFile(boolean overwriteFile);
 
-        public void reset();
+        void reset();
     }
 
 
