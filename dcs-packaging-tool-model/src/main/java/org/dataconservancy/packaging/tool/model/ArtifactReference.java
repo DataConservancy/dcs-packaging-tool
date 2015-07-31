@@ -85,12 +85,16 @@ public class ArtifactReference {
 
         if(refPath != null ? !refPath.equals(artifactReference.refPath) : artifactReference.refPath != null)
             return false;
+
+       if(fragment != null ? !fragment.equals(artifactReference.fragment) : artifactReference.fragment != null)
+            return false;
         return true;
     }
 
     @Override
     public int hashCode() {
         int result = refPath != null ? refPath.hashCode() : 0;
+        result = 31 * result + (fragment != null ? fragment.hashCode() : 0);
         return result;
     }
 
