@@ -1,6 +1,7 @@
 package org.dataconservancy.packaging.tool.model;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,14 +12,25 @@ import java.net.URISyntaxException;
  * Unit testing for ArtifactReference
  */
 public class ArtifactReferenceTest {
-        final String string1 = "foo/bar/baz";
-        final String string2 = "foo/bar/baz";
-        final String slashRoot = "/root/content/";
-        final String noSlashRoot = "/root/content";
+    String string1;
+    String string2;
+    String slashRoot;
+    String noSlashRoot;
 
-        File slashRootContentFile = new File(slashRoot);
-        File noSlashRootContentFile = new File(noSlashRoot);
+    File slashRootContentFile;
+    File noSlashRootContentFile;
 
+    @Before
+    public void setup() {
+        string1 = "foo" + File.separator + "bar" + File.separator + "baz";
+        string2 = "foo" + File.separator + "bar" + File.separator + "baz";
+
+        slashRoot = File.separator + "root" + File.separator + "content" + File.separator;
+        noSlashRoot = File.separator + "root" + File.separator + "content";
+
+        slashRootContentFile = new File(slashRoot);
+        noSlashRootContentFile = new File(noSlashRoot);
+    }
 
     @Test
     public void testEquality(){
@@ -35,15 +47,17 @@ public class ArtifactReferenceTest {
     @Test
     public void testAbsRefString(){
         ArtifactReference ref = new ArtifactReference(string1);
-        Assert.assertTrue(ref.getResolvedAbsoluteRefString(slashRootContentFile).equals(slashRoot + string1));
-        Assert.assertTrue(ref.getResolvedAbsoluteRefString(slashRootContentFile).equals(ref.getResolvedAbsoluteRefString(noSlashRootContentFile)));
+        Assert.assertTrue(ref.getResolvedAbsoluteRefString(slashRootContentFile).equalsIgnoreCase(
+            slashRoot + string1));
+        Assert.assertTrue(ref.getResolvedAbsoluteRefString(slashRootContentFile).equalsIgnoreCase(ref.getResolvedAbsoluteRefString(noSlashRootContentFile)));
     }
 
     @Test
     public void testAbsRefPath(){
         ArtifactReference ref = new ArtifactReference(string1);
-        Assert.assertTrue(ref.getResolvedAbsoluteRefPath(slashRootContentFile).toString().equals(slashRoot + string1));
-        Assert.assertTrue(ref.getResolvedAbsoluteRefPath(slashRootContentFile).toString().equals(ref.getResolvedAbsoluteRefPath(noSlashRootContentFile).toString()));
+        Assert.assertTrue(ref.getResolvedAbsoluteRefPath(slashRootContentFile).toString().equalsIgnoreCase(
+            slashRoot + string1));
+        Assert.assertTrue(ref.getResolvedAbsoluteRefPath(slashRootContentFile).toString().equalsIgnoreCase(ref.getResolvedAbsoluteRefPath(noSlashRootContentFile).toString()));
     }
 
 }
