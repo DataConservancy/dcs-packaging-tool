@@ -64,7 +64,7 @@ public class PackageDescriptionRDFTransformTest {
 
         artifactOne.setId(ARTIFACT_ONE_ID);
         artifactOne.setType(DcsPackageArtifactType.Collection.name());
-        artifactOne.setArtifactRef("file:/this.ref");
+        artifactOne.setArtifactRef("this.ref");
         artifactOne.addSimplePropertyValue("PropertyOne", "valueOne");
         artifactOne.addSimplePropertyValue("PropertyTwo", "valueTwo");
         artifactOne.addPropertyValueGroup("PropertyGroup", groupOne);
@@ -76,7 +76,7 @@ public class PackageDescriptionRDFTransformTest {
         
         artifactTwo.setId(ARTIFACT_TWO_ID);
         artifactTwo.setType(DcsPackageArtifactType.DataItem.name());
-        artifactTwo.setArtifactRef("file:/this.ref");
+        artifactTwo.setArtifactRef("this.ref");
         artifactTwo.addSimplePropertyValue("PropertyOne", "valueOne");
         artifactTwo.addSimplePropertyValue("PropertyTwo", "valueTwo");
         artifactTwo.setRelationships(relationshipSetOne);
@@ -85,14 +85,14 @@ public class PackageDescriptionRDFTransformTest {
         
         artifactThree.setId(ARTIFACT_THREE_ID);
         artifactThree.setType(DcsPackageArtifactType.DataItem.name());
-        artifactThree.setArtifactRef("file:/this.ref");
+        artifactThree.setArtifactRef("this.ref");
         artifactThree.addSimplePropertyValue("PropertyThree", "valueThree");
         artifactThree.setRelationships(relationshipSetTwo);
         artifactThree.setByteStream(false);
 
         artifactFour.setId(ARTIFACT_FOUR_ID);
         artifactFour.setType(DcsPackageArtifactType.DataFile.name());
-        artifactFour.setArtifactRef("file:/this.ref");
+        artifactFour.setArtifactRef("this.ref");
         artifactFour.addSimplePropertyValue("PropertyThree", "valueThree");
         artifactFour.addSimplePropertyValue("PropertyThree", "valueFour");
         artifactFour.setRelationships(relationshipSetTwo);
@@ -108,7 +108,7 @@ public class PackageDescriptionRDFTransformTest {
         description = new PackageDescription();
         
         description.setPackageOntologyIdentifier(specIdentifierOne);
-        description.setRootArtifactRef("file:/root");
+        description.setRootArtifactRef("root");
         description.setPackageArtifacts(artifactSetOne);
     }
     
