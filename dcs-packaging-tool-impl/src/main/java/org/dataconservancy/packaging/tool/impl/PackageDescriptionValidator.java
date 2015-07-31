@@ -16,13 +16,9 @@
 
 package org.dataconservancy.packaging.tool.impl;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.HashSet;
 import java.util.Set;
 
-import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.ontologies.DcsBoPackageOntology;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;

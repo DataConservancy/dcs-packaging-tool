@@ -24,7 +24,6 @@ import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory;
 import org.dataconservancy.packaging.tool.model.*;
 
-import java.io.InputStream;
 import java.net.URI;
 
 /**
