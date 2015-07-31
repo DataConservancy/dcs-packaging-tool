@@ -60,8 +60,6 @@ public class SelectContentDirectoryPresenter extends BasePresenterImpl
                     log.error(e.getMessage());
                 }
             }
-
-
         });
 
         //Handles the user pressing the button to choose the content directory of the package
@@ -85,8 +83,6 @@ public class SelectContentDirectoryPresenter extends BasePresenterImpl
                     directoryChooser.setInitialDirectory(dir);
                 }
             }
-
-
         });
     }
 
