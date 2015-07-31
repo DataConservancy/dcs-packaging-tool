@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,9 +51,11 @@ import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.impl.generator.mocks.FunctionalAssemblerMock;
 import org.dataconservancy.packaging.tool.model.DcsPackageDescriptionSpec.ArtifactType;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageArtifact.PropertyValueGroup;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageOntology;
 import org.dataconservancy.packaging.tool.model.PackageOntology.Property;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
@@ -260,6 +264,10 @@ public class OrePackageModelBuilderTest {
         OrePackageModelBuilder builder = new OrePackageModelBuilder();
         PackageAssembler assembler = mock(PackageAssembler.class);
 
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, tmpfolder.getRoot().getPath());
+        builder.init(params);
+
         when(assembler.reserveResource(anyString(),
                                        eq(PackageResourceType.METADATA)))
                 .thenAnswer(invocation -> {
@@ -294,13 +302,16 @@ public class OrePackageModelBuilderTest {
         /* Add a file with no explicit path specified */
         File content = tmpfolder.newFile("dataFileTest.tst");
         IOUtils.write("test", new FileOutputStream(content));
-        dataFile.setArtifactRef(content.toURI().toString());
+
+        Path rootPath = Paths.get(tmpfolder.getRoot().getPath());
+        Path contentPath = Paths.get(content.getPath());
+        dataFile.setArtifactRef(rootPath.relativize(contentPath).toString());
 
         /* Add another file, this time with an explicit path */
         content = tmpfolder.newFile("dataFileTest2.tst");
-
+        contentPath = Paths.get(content.getPath());
         IOUtils.write("test", new FileOutputStream(content));
-        dataFileExplicitPath.setArtifactRef(content.toURI().toString());
+        dataFileExplicitPath.setArtifactRef(rootPath.relativize(contentPath).toString());
         //dataFileExplicitPath.addSimplePropertyValue(Property.FILE_PATH.toString(),
         //        EXPLICIT_FILE_PATH);
 
@@ -371,8 +382,15 @@ public class OrePackageModelBuilderTest {
         /* Add a file with no explicit path specified */
         File content = tmpfolder.newFile("dataFileTest32.tst");
 
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, tmpfolder.getRoot().getPath());
+        builder.init(params);
+
+        Path rootPath = Paths.get(tmpfolder.getRoot().getPath());
+        Path contentPath = Paths.get(content.getPath());
+
         IOUtils.write("test", new FileOutputStream(content));
-        metadataFile.setArtifactRef(content.toURI().toString());
+        metadataFile.setArtifactRef(rootPath.relativize(contentPath).toString());
 
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, project, collection);
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, collection, dataItem);
@@ -451,6 +469,10 @@ public class OrePackageModelBuilderTest {
         File baseDir = tmpfolder.newFolder("destiny");
         PackageAssembler assembler = new FunctionalAssemblerMock(baseDir);
 
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, baseDir.getPath());
+        builder.init(params);
+
         PackageArtifact project = newArtifact(ArtifactType.Project);
         PackageArtifact collection = newArtifact(ArtifactType.Collection);
         PackageArtifact dataItem = newArtifact(ArtifactType.DataItem);
@@ -467,17 +489,22 @@ public class OrePackageModelBuilderTest {
 
         addRel(DcsBoPackageOntology.IS_METADATA_FOR, collection, metadataFile);
         addRandomPropertiesTo(metadataFile);
-        File metaContent = tmpfolder.newFile("dataFileTest12.tst");
-        
+
+        Path rootPath = Paths.get(baseDir.getPath());
+
+        File metaContent = new File(baseDir, "dataFileTest12.tst");
+        Path metaConentPath = Paths.get(metaContent.getPath());
+
         IOUtils.write("test", new FileOutputStream(metaContent));
-        metadataFile.setArtifactRef(metaContent.toURI().toString());
+        metadataFile.setArtifactRef(rootPath.relativize(metaConentPath).toString());
 
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, dataItem, dataFile);
         addRandomPropertiesTo(dataFile);
-        File content = tmpfolder.newFile("cow");
+        File content = new File(baseDir, "cow");
 
         IOUtils.write("test", new FileOutputStream(content));
-        dataFile.setArtifactRef(content.toURI().toString());
+        Path contentPath = Paths.get(content.getPath());
+        dataFile.setArtifactRef(rootPath.relativize(contentPath).toString());
 
         PackageDescription desc = new PackageDescription();
         desc.setPackageArtifacts(asSet(project,
@@ -533,7 +560,6 @@ public class OrePackageModelBuilderTest {
                     Assert.fail("No value for property " + key);
                 }
             }
-
         }
     }
     
@@ -544,16 +570,22 @@ public class OrePackageModelBuilderTest {
         File baseDir = tmpfolder.newFolder("grass");
         PackageAssembler assembler = new FunctionalAssemblerMock(baseDir);
 
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, baseDir.getPath());
+        builder.init(params);
+
         PackageArtifact collection = newArtifact(ArtifactType.Collection);
         PackageArtifact dataItem = newArtifact(ArtifactType.DataItem);
         PackageArtifact dataFile = newArtifact(ArtifactType.DataFile);
 
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, collection, dataItem);
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, dataItem, dataFile);
-        File content = tmpfolder.newFile("pastures");
+        File content = new File(baseDir, "pastures");
 
         IOUtils.write("test", new FileOutputStream(content));
-        dataFile.setArtifactRef(content.toURI().toString());
+        Path rootPath = Paths.get(baseDir.getPath());
+        Path filePath = Paths.get(content.getPath());
+        dataFile.setArtifactRef(String.valueOf(rootPath.relativize(filePath)));
         
         final String EXTERNAL_REL = "http://arbitrary/rel";
         final String EXTERNAL_REL_VALUE = "http://external/target";
@@ -589,16 +621,24 @@ public class OrePackageModelBuilderTest {
         File baseDir = tmpfolder.newFolder("flowers");
         PackageAssembler assembler = new FunctionalAssemblerMock(baseDir);
 
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, baseDir.getPath());
+        builder.init(params);
+
         PackageArtifact collection = newArtifact(ArtifactType.Collection);
         PackageArtifact dataItem = newArtifact(ArtifactType.DataItem);
         PackageArtifact dataFile = newArtifact(ArtifactType.DataFile);
 
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, collection, dataItem);
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, dataItem, dataFile);
-        File content = tmpfolder.newFile("barn.tst");
+        File content = new File(baseDir, "barn.tst");
 
         IOUtils.write("test", new FileOutputStream(content));
-        dataFile.setArtifactRef(content.toURI().toString());
+
+        Path rootPath = Paths.get(baseDir.getPath());
+        Path filePath = Paths.get(content.getPath());
+
+        dataFile.setArtifactRef(rootPath.relativize(filePath).toString());
         
         final String REL = "http://arbitrary/rel";
         final String EXTERNAL_REL_VALUE = "http://external/target";
@@ -716,6 +756,10 @@ public class OrePackageModelBuilderTest {
         File baseDir = tmpfolder.newFolder("moocow");
         PackageAssembler assembler = new FunctionalAssemblerMock(baseDir);
 
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, baseDir.getPath());
+        builder.init(params);
+
         PackageArtifact collection = newArtifact(ArtifactType.Collection);
         PackageArtifact ignoredDataItem = newArtifact(ArtifactType.DataItem);
         ignoredDataItem.setIgnored(true);
@@ -731,10 +775,13 @@ public class OrePackageModelBuilderTest {
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, collection, unignoredDataItem);
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, unignoredDataItem, unignoredDataFile);
 
-        File content = tmpfolder.newFile("batman");
+        File content = new File(baseDir, "batman");
+
+        Path rootPath = Paths.get(baseDir.getPath());
+        Path filePath = Paths.get(content.getPath());
 
         IOUtils.write("test", new FileOutputStream(content));
-        unignoredDataFile.setArtifactRef(content.toURI().toString());
+        unignoredDataFile.setArtifactRef(rootPath.relativize(filePath).toString());
 
         PackageDescription desc = new PackageDescription();
         desc.setPackageArtifacts(asSet(collection, ignoredDataItem, ignoredDataFile, unignoredDataFile, unignoredDataItem));
@@ -774,6 +821,11 @@ public class OrePackageModelBuilderTest {
     public void multipleCreatorsTest() throws Exception {
         OrePackageModelBuilder builder = new OrePackageModelBuilder();
         File baseDir = tmpfolder.newFolder("moocow");
+
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, baseDir.getPath());
+        builder.init(params);
+
         PackageAssembler assembler = new FunctionalAssemblerMock(baseDir);
 
         PackageArtifact collection = newArtifact(ArtifactType.Collection);
@@ -798,10 +850,12 @@ public class OrePackageModelBuilderTest {
 
         PackageArtifact dataFile = newArtifact(ArtifactType.DataFile);
         addRel(DcsBoPackageOntology.IS_MEMBER_OF, dataItem, dataFile);
-        File content = tmpfolder.newFile("catman");
+        File content = new File(baseDir, "catman");
 
         IOUtils.write("test", new FileOutputStream(content));
-        dataFile.setArtifactRef(content.toURI().toString());
+        Path rootPath = Paths.get(baseDir.getPath());
+        Path filePath = Paths.get(content.getPath());
+        dataFile.setArtifactRef(rootPath.relativize(filePath).toString());
 
         PackageDescription desc = new PackageDescription();
         desc.setPackageArtifacts(asSet(collection,dataItem,dataFile));
