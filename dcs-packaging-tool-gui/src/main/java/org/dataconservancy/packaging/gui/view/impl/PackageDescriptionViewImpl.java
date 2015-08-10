@@ -118,7 +118,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         this.messages = messages;
         this.ontologyLabels = ontologyLabels;
         this.internalProperties = internalProperties;
-        
+
         //Sets the text of the footer controls.
         getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
@@ -136,6 +136,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         buttonBar.setAlignment(Pos.TOP_RIGHT);
         reenableWarningsButton = new Button(labels.get(LabelKey.RENABLE_PROPERTY_WARNINGS_BUTTON));
         reenableWarningsButton.setVisible(hideWarningPopup);
+        reenableWarningsButton.setPrefWidth(23 * rem);
         buttonBar.getChildren().add(reenableWarningsButton);
         content.getChildren().add(buttonBar);
 

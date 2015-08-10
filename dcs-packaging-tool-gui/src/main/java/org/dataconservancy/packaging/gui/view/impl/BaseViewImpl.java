@@ -53,7 +53,9 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     private Node helpContent;
     private Node aboutContent;
     protected Help help;
-    
+
+    final double rem = javafx.scene.text.Font.getDefault().getSize();
+
     public BaseViewImpl(Labels labels) {
 
         getStyleClass().add(VIEW_CLASS);
@@ -80,9 +82,11 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         
         saveButton = new Button();
         saveButton.setVisible(false);
+        saveButton.setPrefWidth(7*rem);
         footerControls.getChildren().add(saveButton);
         
         continueButton = new Button();  
+        continueButton.setPrefWidth(10*rem);
         footerControls.getChildren().add(continueButton);
         
         footerView.setRight(footerControls);

@@ -356,6 +356,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         //PopupControls
         noThanksLink = new Hyperlink(labels.get(LabelKey.NO_THANKS_LINK));
         createAnotherPackageButton = new Button(labels.get(LabelKey.CREATE_ANOTHER_PACKAGE_BUTTON));
+        createAnotherPackageButton.setPrefWidth(20*rem);
 
         cancelOverwriteButton = new Button(labels.get(LabelKey.CANCEL_BUTTON));
         okOverwriteButton = new Button(labels.get(LabelKey.OK_BUTTON));
