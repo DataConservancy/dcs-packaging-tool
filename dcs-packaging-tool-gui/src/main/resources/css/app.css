@@ -56,7 +56,6 @@
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-pref-width: 100px;
 	-fx-effect: dropshadow( one-pass-box , #005048,
                 1, 0.0, 1, 1);
 }
@@ -116,7 +115,6 @@
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-pref-width: 100px;
 	-fx-effect: dropshadow( one-pass-box , #005048,
                 1, 0.0, 1, 1);
 }
@@ -190,7 +188,6 @@
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-pref-width: 100px;
 	-fx-effect: dropshadow( one-pass-box , #005048,
                 1, 0.0, 1, 1);
 }
@@ -346,7 +343,6 @@
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-pref-width: 100px;
 	-fx-effect: dropshadow( one-pass-box , #005048,
                 1, 0.0, 1, 1);
 }
