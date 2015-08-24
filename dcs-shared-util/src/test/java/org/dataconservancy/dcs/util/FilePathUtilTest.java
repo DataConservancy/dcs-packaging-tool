@@ -151,7 +151,8 @@ public class FilePathUtilTest {
         final File relativeFile = new File("relative/file.txt");
         final String resultPath = FilePathUtil.relativizePath(null, relativeFile);
 
-        assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
+        assertTrue("Expected: " + expectedPath + " but was: " +
+                       resultPath, expectedPath.equalsIgnoreCase(resultPath));
     }
 
     /**
@@ -232,7 +233,8 @@ public class FilePathUtilTest {
         assertTrue("Expected empty string but was: " + extension, extension.isEmpty());
 
         extension = FilePathUtil.getFileExtension(windowsPath);
-        assertTrue("Expected empty string but was: " + extension, extension.isEmpty());
+        assertTrue(
+            "Expected empty string but was: " + extension, extension.isEmpty());
     }
 
     /**
@@ -321,7 +323,8 @@ public class FilePathUtilTest {
         assertTrue("Expected empty string but was: " + extension, extension.isEmpty());
 
         extension = FilePathUtil.getLastFileExtension(windowsPath);
-        assertTrue("Expected empty string but was: " + extension, extension.isEmpty());
+        assertTrue(
+            "Expected empty string but was: " + extension, extension.isEmpty());
     }
 
     /**
@@ -399,7 +402,8 @@ public class FilePathUtilTest {
         assertTrue("Expected:" + unixPath + " but was: " + filePath, unixPath.equalsIgnoreCase(filePath));
 
         filePath = FilePathUtil.removeFileExtension(windowsPath);
-        assertTrue("Expected:" + windowsPath + " but was: " + filePath, windowsPath.equalsIgnoreCase(filePath));
+        assertTrue("Expected:" + windowsPath + " but was: " +
+                       filePath, windowsPath.equalsIgnoreCase(filePath));
     }
 
     /**
@@ -462,7 +466,8 @@ public class FilePathUtilTest {
     public void testRemoveExtensionWithPeriodsInName() {
         String nameWithPeriods = "test.pd.name.txt.jpg.tar";
         String name = FilePathUtil.removeFileExtension(nameWithPeriods);
-        assertTrue("Expected test.pd.name but was: " + name, name.equalsIgnoreCase("test.pd.name"));
+        assertTrue("Expected test.pd.name but was: " +
+                       name, name.equalsIgnoreCase("test.pd.name"));
     }
 
     /**
@@ -559,7 +564,8 @@ public class FilePathUtilTest {
 
         File returnedFile = FilePathUtil.absolutize(testDir, testFile);
 
-        assertTrue("Expected: " + testFile.getPath() + " but was: " + returnedFile.getPath(), testFile.getPath().equalsIgnoreCase(returnedFile.getPath()));
+        assertTrue("Expected: " + testFile.getPath() + " but was: " +
+                       returnedFile.getPath(), testFile.getPath().equalsIgnoreCase(returnedFile.getPath()));
     }
 
     /**
@@ -593,7 +599,8 @@ public class FilePathUtilTest {
 
         String returnedPath = FilePathUtil.convertToClasspathUrl(filePath, null);
 
-        assertTrue("Expected: " + expectedPath + " but was: " + returnedPath, expectedPath.equalsIgnoreCase(returnedPath));
+        assertTrue("Expected: " + expectedPath + " but was: " +
+                       returnedPath, expectedPath.equalsIgnoreCase(returnedPath));
     }
 
     /**
@@ -673,5 +680,25 @@ public class FilePathUtilTest {
         final File testFile = tmpFolder.newFolder("badFileName:oops");
         Assert.assertFalse(FilePathUtil.hasValidFilePath(testFile));
     }
+
+    /**
+     * Expect paths to be returned as is if no illegal characters are found
+     */
+    @Test
+    public void testSanitizeCleanPaths() {
+        assertTrue("abc".equalsIgnoreCase(FilePathUtil.sanitizePath("abc")));
+        assertTrue("a/b/c".equalsIgnoreCase(FilePathUtil.sanitizePath("a/b/c")));
+    }
+
+    /**
+     * Expect bad characters to removed from paths
+     */
+    @Test
+    public void testSanitizeDirtyPaths() {
+        assertTrue("C/".equalsIgnoreCase(FilePathUtil.sanitizePath("C:/")));
+        assertTrue("Foo/Bar".equalsIgnoreCase(FilePathUtil.sanitizePath("Fo:?o/B?*a\"r")));
+
+    }
+
 
 }

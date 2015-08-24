@@ -316,4 +316,13 @@ public class FilePathUtil {
         return "<>:\"/|?*";
     }
 
+    /**
+     * Takes a string path and removes bagit specification blacklisted characters from it, note that path characters are ignored.
+     * @param path The path to remove blacklisted characters from
+     * @return The sanitized path string with no invalid characters
+     */
+    public static String sanitizePath(String path) {
+        //Check for all the characters except path separators
+        return StringUtils.replaceChars(path, "<>:\"|?*", null);
+    }
 }
