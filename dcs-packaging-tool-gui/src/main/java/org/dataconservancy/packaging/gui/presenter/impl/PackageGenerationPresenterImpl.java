@@ -110,6 +110,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 if (Platform.isFxApplicationThread()) {
                     view.getProgressPopup().hide();
                     view.showSuccessPopup();
+                    view.scrollToTop();
                 }
                 backgroundService.reset();
             }
@@ -129,6 +130,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
                 view.getStatusLabel().setTextFill(Color.RED);
                 view.getStatusLabel().setVisible(true);
+                view.scrollToTop();
                 backgroundService.reset();
             }
         });
@@ -142,6 +144,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
                 view.getStatusLabel().setTextFill(Color.RED);
                 view.getStatusLabel().setVisible(true);
+                view.scrollToTop();
                 backgroundService.reset();
             }
         });
@@ -872,7 +875,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                                    cancel();
                                }
                            } else {
-
                                Platform.runLater(new Runnable() {
                                    @Override
                                    public void run() {
@@ -881,7 +883,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                                    }
                                });
                                cancel();
-
                            }
                        }
                        return null;

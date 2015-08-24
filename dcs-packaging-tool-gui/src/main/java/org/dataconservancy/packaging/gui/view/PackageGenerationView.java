@@ -41,13 +41,13 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      * A text field that is used for entering the package name.
      * @return The text field for entering the package name.
      */
-    public TextField getPackageNameField();
+    TextField getPackageNameField();
 
     /**
      * Gets the directory chooser for setting the output directory.
      * @return  the directory chooser
      */
-    public DirectoryChooser getOutputDirectoryChooser();
+    DirectoryChooser getOutputDirectoryChooser();
 
     /**
      * Gets the text field that displays the current output directory. 
@@ -55,123 +55,128 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      * however is not editable.
      * @return the text field that displays the current output directory.
      */
-    public TextField getCurrentOutputDirectoryTextField();
+    TextField getCurrentOutputDirectoryTextField();
     
     /**
      * Returns the button that is used to select an output directory.
      * @return  the button that is used to select an output directory
      */
-    public Button getSelectOutputDirectoryButton();
+    Button getSelectOutputDirectoryButton();
 
     /**
      * A label that is used to display messages to the user, mostly used for displaying error messages.
      * @return   a   label that is used to display messages to the user
      */
-    public Label getStatusLabel();
+    Label getStatusLabel();
     
     /**
      * Shows a popup when package generation was successful.
      */
-    public void showSuccessPopup();
+    void showSuccessPopup();
 
     /**
      * Shows a popup when about to save and the package file already exists
      */
-    public void showFileOverwriteWarningPopup();
+    void showFileOverwriteWarningPopup();
     
     /**
      * Gets the popup that is shown when package generation was successful.
      * @return The popup that is shown when package generation is successful, can be null if it wasn't shown.
      */
-    public PackageToolPopup getSuccessPopup();
+    PackageToolPopup getSuccessPopup();
 
     /**
      * Gets the popup that is shown when a package file might be overwritten
      * @return The popup that is shown when a package file is about to be saved, but to an existing file
      */
-    public PackageToolPopup getFileOverwriteWarningPopup();
+    PackageToolPopup getFileOverwriteWarningPopup();
     
     /**
      * Gets the no thanks link that appears on the package generation success popup. 
      * @return the no thanks link that appears on the package generation success popup.
      */
-    public Hyperlink getNoThanksLink();
+    Hyperlink getNoThanksLink();
 
     /**
      * Gets the create new package button that appears on the package generation success popup.
      * @return   the create new package button that appears on the package generation success popup.
      */
-    public Button getCreateNewPackageButton();
+    Button getCreateNewPackageButton();
 
     /**
      * Gets the button for canceling a file overwrite that appears on the file overwrite popup
      * @return  the button for canceling a file overwrite that appears on the file overwrite popup
      */
-    public Button getCancelFileOverwriteButton();
+    Button getCancelFileOverwriteButton();
 
     /**
      * Gets the button for OK'ing a file overwrite that appears on the file overwrite popup
      * @return the button for OK'ing a file overwrite that appears on the file overwrite popup
      */
-    public Button getOkFileOverwriteButton();
+    Button getOkFileOverwriteButton();
     
     /**
      * Gets the archive format toggle group. 
      * @return the archive format toggle group
      */
-    public ToggleGroup getArchiveToggleGroup();
+    ToggleGroup getArchiveToggleGroup();
     
     /**
      * Gets the compression format toggle group.
      * @return  the compression format toggle group.
      */
-    public ToggleGroup getCompressionToggleGroup();
+    ToggleGroup getCompressionToggleGroup();
     
     /**
      * Gets the md5 checksum checkbox.
      * @return The checkbox for selecting md5 generation.
      */
-    public CheckBox getMd5CheckBox();
+    CheckBox getMd5CheckBox();
     
     /**
      * Gets the sha1 checksum checkbox.
      * @return The checkbox for selecting sha1 generation.
      */
-    public CheckBox getSHA1CheckBox();
+    CheckBox getSHA1CheckBox();
     
     /**
      * Gets the contact information text field, that will be supplied in the bag.
      * @return  the contact information text field
      */
-    public TextField getContactEmailTextField();
+    TextField getContactEmailTextField();
     
     /**
      * Gets the contact name text field, that will be supplied in the bag.
      * @return   the contact name text field
      */
-    public TextField getContactNameTextField();
+    TextField getContactNameTextField();
     
     /**
      * Gets the contact phone number text field, that will be supplied in the bag.
      * @return The text field for entering in a contact phone number.
      */
-    public TextField getContactPhoneTextField();
+    TextField getContactPhoneTextField();
     
     /**
      * Gets the text field for setting the external identifier if there is one.
      * @return The text field for entering in an external identifier.
      */
-    public TextField getExternalIdentifierTextField();
+    TextField getExternalIdentifierTextField();
 
     /**
      * Gets the text field for setting the external project Identifier if there is one.
      * @return The string property for labeling the project identifier field.
      */
-    public StringProperty getExternalProjectIdentifierProperty();
+    StringProperty getExternalProjectIdentifierProperty();
 
     /**
      * Gets the progress dialog popup that's used when the package is being generated.
      * @return The popup used to display package generation progress.
      */
-    public PackageToolPopup getProgressPopup();
+    PackageToolPopup getProgressPopup();
+
+    /**
+     * Scrolls the view back to the top of the window.
+     */
+    void scrollToTop();
 }

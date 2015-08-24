@@ -101,12 +101,14 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     private ProgressDialogPopup progressDialogPopup;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
+    private ScrollPane contentScrollPane;
+
     public PackageGenerationViewImpl(Labels labels) {
         super(labels);
         this.labels = labels;
         
-        ScrollPane contentScrollPane = new ScrollPane();
+        contentScrollPane = new ScrollPane();
         VBox content = new VBox();
 
         //Set up the text for the controls in the footer.
@@ -145,7 +147,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label externalProjectIdLabel = new Label(labels.get(LabelKey.EXTERNAL_PROJECT_LABEL));
         externalProjectIdBox.getChildren().add(externalProjectIdLabel);
 
-        ComboBox<String> externalProjectIdComboBox = new ComboBox<String>();
+        ComboBox<String> externalProjectIdComboBox = new ComboBox<>();
         externalProjectIdComboBox.getItems().addAll(loadAvailableProjects());
         externalProjectIdComboBox.setPrefWidth(240);
         externalProjectIdComboBox.setMaxWidth(350);
@@ -587,6 +589,11 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     }
 
     @Override
+    public void scrollToTop() {
+        contentScrollPane.setVvalue(0);
+    }
+
+    @Override
     public void setupHelp() {
         Label helpText = new Label(help.get(HelpKey.PACKAGE_GENERATION_HELP));
         helpText.setMaxWidth(300);
@@ -596,7 +603,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     }
 
     private List<String> loadAvailableProjects() {
-        List<String> projects = new ArrayList<String>();
+        List<String> projects = new ArrayList<>();
         try {
             InputStream fileStream = PackageGenerationViewImpl.class.getResourceAsStream("/availableProjects");
             if (fileStream != null) {
