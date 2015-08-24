@@ -27,8 +27,10 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 
+import javafx.event.Event;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
+import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreator;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
@@ -122,11 +124,28 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         final PackageDescriptionServiceWorker packageDescriptionService = new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
 
                         view.showProgressIndicatorPopUp();
+
+                        ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                packageDescriptionService.cancel();
+                            }
+                        });
+
                         controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
                         controller.setContentRoot(content_dir);
                         controller.setRootArtifactDir(root_artifact_dir);
 
-                        packageDescriptionService.setOnFailed((new EventHandler<WorkerStateEvent>() {
+                        packageDescriptionService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
+                            @Override
+                            public void handle(WorkerStateEvent event) {
+                                packageDescriptionService.reset();
+                                controller.getCrossPageProgressIndicatorPopUp().hide();
+                                controller.showHome(false);
+                            }
+                        });
+
+                        packageDescriptionService.setOnFailed(new EventHandler<WorkerStateEvent>() {
                             @Override
                             public void handle(
                                 WorkerStateEvent workerStateEvent) {
@@ -136,7 +155,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                                 controller.getCrossPageProgressIndicatorPopUp().hide();
                                 controller.showHome(false);
                             }
-                        }));
+                        });
 
                         packageDescriptionService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                             @Override

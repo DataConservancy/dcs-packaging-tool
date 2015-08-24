@@ -151,6 +151,10 @@ public class GeneralPackageDescriptionCreator
 
         if (cxt.getFile().isDirectory()) {
             for (File child : cxt.getFile().listFiles()) {
+                //To support the cancelling of package description creation we check here to see if the thread has been interrupted.
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 visitFile(new FileContextImpl(child, cxt.getRoot(), cxt.isIgnored()), artifacts);
             }
         }

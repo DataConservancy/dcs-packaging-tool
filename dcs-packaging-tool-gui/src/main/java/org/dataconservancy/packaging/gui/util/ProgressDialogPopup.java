@@ -15,11 +15,15 @@
  */
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
+import org.dataconservancy.packaging.gui.Labels;
 
 /**
  * A popup that includes a progress dialog. You don't use setContent with this popup only setTitle and setMessage.
@@ -27,7 +31,8 @@ import javafx.scene.layout.VBox;
 public class ProgressDialogPopup extends PackageToolPopup {
 
     Label message;
-    public ProgressDialogPopup() {
+    Button cancelButton;
+    public ProgressDialogPopup(Labels labels) {
         super();
 
         VBox content = new VBox();
@@ -38,6 +43,10 @@ public class ProgressDialogPopup extends PackageToolPopup {
         ProgressBar progressBar = new ProgressBar();
         progressBar.setPrefWidth(300);
         content.getChildren().add(progressBar);
+
+        cancelButton = new Button();
+        cancelButton.setText(labels.get(Labels.LabelKey.CANCEL_BUTTON));
+        content.getChildren().add(cancelButton);
 
         super.setContent(content);
     }
@@ -50,4 +59,9 @@ public class ProgressDialogPopup extends PackageToolPopup {
     public void setMessage(String message) {
         this.message.setText(message);
     }
+
+    public void setCancelEventHandler(EventHandler<ActionEvent> handler) {
+        cancelButton.setOnAction(handler);
+    }
+
 }

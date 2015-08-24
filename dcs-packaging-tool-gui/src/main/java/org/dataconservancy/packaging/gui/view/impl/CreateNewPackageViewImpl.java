@@ -57,7 +57,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
 
     private Labels labels;
     
-    private Map<String, TextField> propertyFields = new HashMap<String, TextField>();
+    private Map<String, TextField> propertyFields = new HashMap<>();
     
     public CreateNewPackageViewImpl(Labels labels) {
         super(labels); 
@@ -226,7 +226,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     @Override
     public Map<String, String> getPropertyValues() {
         
-        Map<String, String> propertyValues = new HashMap<String, String>();
+        Map<String, String> propertyValues = new HashMap<>();
         for (Map.Entry<String, TextField> field : propertyFields.entrySet()) {
             String value = field.getValue().getText();
             if (value != null && !value.equals("")) {
@@ -241,7 +241,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     public void showProgressIndicatorPopUp() {
 
         if (progressIndicatorPopUp == null) {
-            progressIndicatorPopUp = new ProgressDialogPopup();
+            progressIndicatorPopUp = new ProgressDialogPopup(labels);
         }
 
 
