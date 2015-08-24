@@ -585,6 +585,10 @@ public class BagItPackageAssembler implements PackageAssembler {
             }
             // Get to putting all the files in the compressed output file
             for (File f : bagBaseDir.listFiles()) {
+                //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 addFilesToArchive(aos, f);
             }
             aos.close();

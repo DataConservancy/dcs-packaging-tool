@@ -264,6 +264,12 @@ public class OrePackageModelBuilder
                 }
             }
             for (ResourceMap rem : oreRems.values()) {
+
+                //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+
                 writeREM(rem, serializer, assembler);
             }
 
@@ -287,11 +293,23 @@ public class OrePackageModelBuilder
 
         /* First, initialize the maps */
         for (ArtifactType type : ArtifactType.values()) {
+
+            //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
+
             artifactsByType.put(type, new HashSet<>());
         }
 
         /* Then categorize by id and type */
         for (PackageArtifact artifact : desc.getPackageArtifacts()) {
+
+            //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
+
             if (!artifact.isIgnored()) {
                 /* First, categorize artifacts by ID and type */
                 ArtifactType type = ArtifactType.valueOf(artifact.getType());
@@ -313,7 +331,12 @@ public class OrePackageModelBuilder
                  */
                 for (PackageRelationship rel : artifact.getRelationships()) {
 
-                /* Record reverse relationship (if defined) */
+                    //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+
+                    /* Record reverse relationship (if defined) */
                     URI oreRel = getReverseRelationshipURI(rel.getName());
 
                     if (oreRel != null) {

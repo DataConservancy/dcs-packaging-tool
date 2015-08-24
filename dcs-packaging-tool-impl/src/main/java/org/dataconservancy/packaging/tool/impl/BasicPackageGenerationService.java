@@ -112,7 +112,7 @@ public class BasicPackageGenerationService implements PackageGenerationService {
 			validate = Boolean.valueOf(validateParam);
 		}
 
-		if (validate) {
+		if (validate && !Thread.currentThread().isInterrupted()) {
 			try {
 				validator.validate(desc);
 			} catch (PackageValidationException e) {
@@ -121,7 +121,7 @@ public class BasicPackageGenerationService implements PackageGenerationService {
 			}
 		}
 
-        return generator.generatePackage(desc, params);
+		return generator.generatePackage(desc, params);
 	}
 
 	private PackageGenerator getGenerator(PackagingFormat fmt) {

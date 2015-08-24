@@ -98,6 +98,12 @@ public class BOREMPackageGenerator implements PackageGenerator {
 
             assembler.addParameter(BoremParameterNames.PKG_ORE_REM, packageRemURI.toString());
 
+
+            //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+
             return assembler.assemblePackage();
 
         } catch (IllegalAccessException | InstantiationException e) {

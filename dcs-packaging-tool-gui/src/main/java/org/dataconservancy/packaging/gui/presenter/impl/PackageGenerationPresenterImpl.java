@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
+import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
@@ -310,7 +311,14 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
             
         });
-        
+
+        ((ProgressDialogPopup)view.getProgressPopup()).setCancelEventHandler(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                backgroundService.cancel();
+            }
+        });
+
         /*Handles when the continue button is pressed in the footer. 
         * In this case it creates package params based on the options selected, it then tries to generate a package and save it to the output directory.
         * If successful a popup is shown asking the user if they want to create another package, otherwise an error message is displayed informing the user what went wrong
@@ -348,8 +356,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         Package createdPackage;
-        //If we have all the objects we need attempt to create a package with the package generation service.
-        if (generationParams != null && packageDescription != null) {
+        //If we have all the objects we need attempt to create a package with the package generation service, and check that we haven't been canceled
+        if (generationParams != null && packageDescription != null && !Thread.currentThread().isInterrupted()) {
             try {
                 createdPackage = packageGenerationService.generatePackage(packageDescription, generationParams);
             } catch (PackageToolException e) {
@@ -365,7 +373,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
         }
 
-        if(!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded")) {
+        if(!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded") && !Thread.currentThread().isInterrupted()) {
             //If we've successfully generated a package, save the package to the provided output directory,
             //unless we wanted the package exploded, in which case there is no package file produced
             if (createdPackage != null) {
@@ -803,6 +811,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         void setOverwriteFile(boolean overwriteFile);
 
         void reset();
+
+        void cancel();
     }
 
 
@@ -836,6 +846,11 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         @Override
         public void setOverwriteFile(boolean overwriteFile) {
             service.setOverwriteFile(overwriteFile);
+        }
+
+        @Override
+        public void cancel() {
+            service.cancel();
         }
 
         @Override
@@ -966,6 +981,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         @Override
         public void reset() {
+        }
+
+        @Override
+        public void cancel() {
         }
 
         private class AsyncWorker implements Worker {
