@@ -122,9 +122,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             public void handle(WorkerStateEvent workerStateEvent) {
 
                 view.getProgressPopup().hide();
-                if (workerStateEvent.getSource().getMessage() == null || workerStateEvent.getSource().getMessage().isEmpty()) {
+                if (workerStateEvent.getSource().getMessage() == null ||
+                    workerStateEvent.getSource().getMessage().isEmpty()) {
                     Throwable e = workerStateEvent.getSource().getException();
-                    view.getStatusLabel().setText(errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage());
+                    view.getStatusLabel().setText(
+                        errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
+                            " " + e.getMessage());
                 } else {
                     view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
                 }
@@ -171,7 +174,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         //Handles the user changing the package name
         view.getPackageNameField().textProperty().addListener(new ChangeListener<String>() {
             @Override
-            public void changed(ObservableValue<? extends String> observableValue, String oldVal, String newVal) {
+            public void changed(
+                ObservableValue<? extends String> observableValue,
+                String oldVal, String newVal) {
                 setOutputDirectory(true);
             }
         });
@@ -295,12 +300,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
             @Override
             public void changed(ObservableValue<? extends Boolean> ov,
-                                Boolean oldValue,
-                                Boolean newValue) {
+                                Boolean oldValue, Boolean newValue) {
                 List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
 
                 if (newValue) {
-                    if (params != null && !params.isEmpty() && !params.contains("sha1")) {
+                    if (params != null && !params.isEmpty() &&
+                        !params.contains("sha1")) {
                         params.add("sha1");
                     }
                 } else {
@@ -309,15 +314,17 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     }
                 }
             }
-            
+
         });
 
-        ((ProgressDialogPopup)view.getProgressPopup()).setCancelEventHandler(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                backgroundService.cancel();
-            }
-        });
+        if (Platform.isFxApplicationThread()) {
+            ((ProgressDialogPopup) view.getProgressPopup()).setCancelEventHandler(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    backgroundService.cancel();
+                }
+            });
+        }
 
         /*Handles when the continue button is pressed in the footer. 
         * In this case it creates package params based on the options selected, it then tries to generate a package and save it to the output directory.
