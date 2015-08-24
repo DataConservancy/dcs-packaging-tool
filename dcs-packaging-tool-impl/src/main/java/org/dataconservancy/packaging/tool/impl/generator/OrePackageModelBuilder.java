@@ -180,7 +180,10 @@ public class OrePackageModelBuilder
      */
     @Override
     public void init(PackageGenerationParameters params) {
-        rootContentFile = new File(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
+        String rootContentDir = params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0);
+        if (rootContentDir != null) {
+            rootContentFile = new File(rootContentDir);
+        }
     }
 
     /**

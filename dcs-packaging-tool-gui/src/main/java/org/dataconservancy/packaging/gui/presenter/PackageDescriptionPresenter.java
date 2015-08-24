@@ -36,41 +36,44 @@ public interface PackageDescriptionPresenter extends Presenter {
      * Sets the ontology service that is used for determining property and relationship types, as well as acceptable artifact types.
      * @param packageOntologyService the PackageOntologyService
      */
-    public void setPackageOntologyService(PackageOntologyService packageOntologyService);
+    void setPackageOntologyService(
+        PackageOntologyService packageOntologyService);
 
     /**
      * Given an artifact queries the ontology service to determine the acceptable artifact types. 
      * @param packageArtifact The artifact to check for available types.
      * @return The set of acceptable types for the artifact.
      */
-    public Set<String> getValidTypes(PackageArtifact packageArtifact);
+    Set<String> getValidTypes(PackageArtifact packageArtifact);
 
     /**
      * Used to serialize the package description, for saving to a file.
      * @param packageDescriptionBuilder The package description builder to use for serialization.
      */
-    public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder);
+    void setPackageDescriptionBuilder(
+        PackageDescriptionBuilder packageDescriptionBuilder);
 
     /**
      * Used to validate the package description before the user is allowed to move on to generating a package.
      * Validation is only performed when this presenter is being exited, we don't validate before saving a description.
      * @param packageDescriptionValidator the PackageDescriptionValidator
      */
-    public void setPackageDescriptionValidator(PackageDescriptionValidator packageDescriptionValidator);
+    void setPackageDescriptionValidator(
+        PackageDescriptionValidator packageDescriptionValidator);
 
     /**
      * Changes the type of the provided artifact to the provided type. 
      * @param packageArtifact The artifact to change the type of.
      * @param type The new type of the artifact.
      */
-    public void changeType(PackageArtifact packageArtifact, String type);
+    void changeType(PackageArtifact packageArtifact, String type);
 
     /**
      * Trims out invalid and empty properties from the package description, primarily before serializing,
      * to keep it clean and uncluttered.
      * @param packageDescription The package description to clean
      */
-    public void trimInvalidProperties(PackageDescription packageDescription);
+    void trimInvalidProperties(PackageDescription packageDescription);
 
     /**
      * Goes through all the artifacts in the package description and finds any properties that aren't valid.
@@ -80,7 +83,8 @@ public interface PackageDescriptionPresenter extends Presenter {
      * @param type The type to check the properties of the artifact against, if you want to test if the artifact has invalid properties pass it's current type.
      * @return A map of strings with properties that are invalid keyed by the artifact, maybe empty but never null.
      */
-    public List<String> findInvalidProperties(PackageArtifact packageArtifact, String type);
+    List<String> findInvalidProperties(PackageArtifact packageArtifact,
+                                       String type);
 
     /**
      * Given the type of the current artifact and a propertyName, this method returns a Set of names of the artifact types
@@ -89,17 +93,17 @@ public interface PackageDescriptionPresenter extends Presenter {
      * @param propertyName the property name
      * @return  a Set of name of the artifact types which can inherit the specified property fro the current artifact
      */
-    public Set<String> getInheritingTypes(String parentType, String propertyName);
+    Set<String> getInheritingTypes(String parentType, String propertyName);
     
     /**
      * Rerun the ontology service on the PackageDescription and redisplay the resulting PackageTree.
      */
-    public void rebuildTreeView();
+    void rebuildTreeView();
 
     /**
      * Refresh the display of a new PackageTree.
      */
-    public void displayPackageTree();
+    void displayPackageTree();
     
     /**
      * Return the TreeItem containing the given PackageArtifact or null if none found.
@@ -107,13 +111,13 @@ public interface PackageDescriptionPresenter extends Presenter {
      * @param packageArtifact the PackageArtifact
      * @return matching TreeItem
      */
-    public TreeItem<PackageArtifact> findItem(PackageArtifact packageArtifact);
+    TreeItem<PackageArtifact> findItem(PackageArtifact packageArtifact);
 
     /**
      * Collapses synthesized DI + F pair into MdF for the containing collection
      * @param packageArtifact The package artifact to collapse into a metadata file.
      */
-    public void collapseParentArtifact(PackageArtifact packageArtifact);
+    void collapseParentArtifact(PackageArtifact packageArtifact);
 
     /**
      * Determines whether the current artifact can be attached to its grandparent artifact, essentially cutting off
@@ -121,12 +125,5 @@ public interface PackageDescriptionPresenter extends Presenter {
      * @param packageArtifact  the PackageArtifact
      * @return True if the artifact can be attached to a grandparent, false otherwise
      */
-    public boolean canCollapseParentArtifact(PackageArtifact packageArtifact);
-
-
-    /**
-     * Returns the content root directory
-     * @return The content root directory
-     */
-    public File getContentRoot();
+    boolean canCollapseParentArtifact(PackageArtifact packageArtifact);
 }

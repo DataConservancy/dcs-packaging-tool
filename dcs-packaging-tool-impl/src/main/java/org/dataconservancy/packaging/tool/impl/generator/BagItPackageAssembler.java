@@ -29,6 +29,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import org.dataconservancy.dcs.util.FilePathUtil;
@@ -40,7 +41,12 @@ import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.impl.PackageChecksumServiceImpl;
-import org.dataconservancy.packaging.tool.model.*;
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
+import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
+import org.dataconservancy.packaging.tool.model.SupportedMimeTypes;
 import org.joda.time.DateTime;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -48,13 +54,25 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import java.nio.file.Path;
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -276,7 +294,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
             log.info(("Reserving " + path));
 
-            String fileName = decodedPath;
+            String fileName = FilePathUtil.sanitizePath(decodedPath);
             File containingDirectory =  null;
             if (type.equals(PackageResourceType.DATA)) {
                 containingDirectory = payloadDir;
@@ -459,7 +477,8 @@ public class BagItPackageAssembler implements PackageAssembler {
 
             for (File file : files) {
                 List<Checksum> checksums = fileChecksums.get(file);
-                final String filePath = FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(bagBaseDir.getPath(), file));
+
+                final String filePath = FilenameUtils.separatorsToUnix(Paths.get(bagBaseDir.getPath()).relativize(Paths.get(file.getPath())).toString());
                 for (Checksum checksum : checksums) {
                     if (checksum.getAlgorithm().equals(alg)) {
                         writer.write(String.format(lineFormat, checksum.getValue(),
@@ -532,9 +551,17 @@ public class BagItPackageAssembler implements PackageAssembler {
      */
     private String buildPath(String string) {
 
-        String contentRoot = FilePathUtil.convertToUnixSlashes(params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
+        String rootLocation = params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0);
 
-        File file = new File(contentRoot, string);
+        File file;
+        if(rootLocation != null) {
+            String contentRoot = FilenameUtils.separatorsToUnix(rootLocation);
+            file = new File(contentRoot, string);
+        }
+        else
+        {
+            file = new File(string);
+        }
 
         if(!file.exists()){
                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
@@ -581,19 +608,19 @@ public class BagItPackageAssembler implements PackageAssembler {
         //taos.putArchiveEntry(new TarArchiveEntry(file, file.getParentFile().toURI().relativize(file.toURI()).toString()));
         switch (archivingFormat) {
             case ArchiveStreamFactory.TAR:
-                taos.putArchiveEntry(new TarArchiveEntry(file, FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(packageLocationDir.getPath(), file))));
+                taos.putArchiveEntry(new TarArchiveEntry(file, FilenameUtils.separatorsToUnix(Paths.get(packageLocationDir.getPath()).relativize(Paths.get(file.getPath())).toString())));
                 break;
             case ArchiveStreamFactory.ZIP:
-                taos.putArchiveEntry(new ZipArchiveEntry(file, FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(packageLocationDir.getPath(), file))));
+                taos.putArchiveEntry(new ZipArchiveEntry(file, FilenameUtils.separatorsToUnix(Paths.get(packageLocationDir.getPath()).relativize(Paths.get(file.getPath())).toString())));
                 break;
             case ArchiveStreamFactory.JAR:
-                taos.putArchiveEntry(new JarArchiveEntry(new ZipArchiveEntry(file, FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(packageLocationDir.getPath(), file)))));
+                taos.putArchiveEntry(new JarArchiveEntry(new ZipArchiveEntry(file, FilenameUtils.separatorsToUnix(Paths.get(packageLocationDir.getPath()).relativize(Paths.get(file.getPath())).toString()))));
                 break;
             case ArchiveStreamFactory.AR:
-                taos.putArchiveEntry(new ArArchiveEntry(file, FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(packageLocationDir.getPath(), file))));
+                taos.putArchiveEntry(new ArArchiveEntry(file, FilenameUtils.separatorsToUnix(Paths.get(packageLocationDir.getPath()).relativize(Paths.get(file.getPath())).toString())));
                 break;
             case ArchiveStreamFactory.CPIO:
-                taos.putArchiveEntry(new CpioArchiveEntry(file, FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(packageLocationDir.getPath(), file))));
+                taos.putArchiveEntry(new CpioArchiveEntry(file, FilenameUtils.separatorsToUnix(Paths.get(packageLocationDir.getPath()).relativize(Paths.get(file.getPath())).toString())));
                 break;
         }
         if (file.isFile()) {
@@ -680,10 +707,6 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         if (!paramNames.contains(BagItParameterNames.PACKAGE_LOCATION)) {
             missingParams.add(BagItParameterNames.PACKAGE_LOCATION);
-        }
-
-        if (!paramNames.contains(GeneralParameterNames.CONTENT_ROOT_LOCATION)) {
-            missingParams.add(GeneralParameterNames.CONTENT_ROOT_LOCATION);
         }
 
         if (!paramNames.contains(BagItParameterNames.BAGIT_PROFILE_ID)) {

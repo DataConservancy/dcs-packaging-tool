@@ -109,8 +109,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             @Override
             public void handle(ActionEvent arg0) {
                 try {
-                    if (content_dir != null && content_dir.exists() &&
-                        content_dir.canRead()) {
+                    if (root_artifact_dir != null && root_artifact_dir.exists() &&
+                        root_artifact_dir.canRead()) {
                         
                         /* Insert properties, if any */
                         for (Map.Entry<String, String> property : view.getPropertyValues().entrySet()) {
@@ -152,9 +152,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                         packageDescriptionService.start();
 
-                    } else if (content_dir != null &&
-                        (!content_dir.exists() || !content_dir.canRead()) ||
-                        root_artifact_dir != null &&
+                    } else if (root_artifact_dir != null &&
                             (!root_artifact_dir.exists() ||
                                  !root_artifact_dir.canRead())) {
                         view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));

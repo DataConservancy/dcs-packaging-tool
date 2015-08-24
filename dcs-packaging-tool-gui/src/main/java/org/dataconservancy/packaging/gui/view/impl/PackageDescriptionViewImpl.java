@@ -28,7 +28,21 @@ import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.TooltipBuilder;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -39,10 +53,14 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
-import org.dataconservancy.packaging.gui.*;
+import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
+import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
@@ -52,8 +70,13 @@ import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 /**
@@ -189,7 +212,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         content.getChildren().add(syntheticArtifactLabel);
 
         //The main element of the view a tree of all the package artifacts.
-        artifactTree = new TreeTableView<PackageArtifact>();
+        artifactTree = new TreeTableView<>();
 
         //disable column sorting in the view
         artifactTree.setSortPolicy(
@@ -223,7 +246,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 String labelText;
 
                 if (getFullPathCheckBox().selectedProperty().getValue()) {
-                    labelText = packageArtifact.getArtifactRef().getResolvedAbsoluteRefString(presenter.getContentRoot());
+                    labelText = packageArtifact.getArtifactRef().getRefPath();
                 } else {
                     labelText = packageArtifact.getArtifactRef().getRefName();
                 }
@@ -248,7 +271,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 String type = p.getValue().getValue().getType();
                 Label typeLabel = new Label(type);
                 typeLabel.setPrefWidth(typeColumn.getWidth());
-                return new ReadOnlyObjectWrapper<Label>(typeLabel);
+                return new ReadOnlyObjectWrapper<>(typeLabel);
             }
         });
 
@@ -271,7 +294,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                     contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
                 } else {
                     Set<String> validTypeSet = presenter.getValidTypes(packageArtifact);
-                    List<String> validTypes = new ArrayList<String>();
+                    List<String> validTypes = new ArrayList<>();
                     validTypes.addAll(validTypeSet);
                     if (validTypes.size() > 0 ) {
                         if (!validTypes.contains(packageArtifact.getType())) {
@@ -302,7 +325,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                         }
                     }
                 });
-                return new ReadOnlyObjectWrapper<Label>(optionsLabel);
+                return new ReadOnlyObjectWrapper<>(optionsLabel);
             }
         });
 
@@ -313,7 +336,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         artifactTree.setRowFactory(new Callback<TreeTableView<PackageArtifact>, TreeTableRow<PackageArtifact>>() {
             @Override
              public TreeTableRow<PackageArtifact> call(TreeTableView<PackageArtifact> ttv) {
-                TreeTableRow<PackageArtifact> row = new TreeTableRow<PackageArtifact>() {
+                return new TreeTableRow<PackageArtifact>() {
                     @Override
                     public void updateItem(PackageArtifact packageArtifact, boolean empty) {
                         super.updateItem(packageArtifact, empty);
@@ -324,7 +347,6 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                         }
                     }
                 };
-                return row;
             }
         });
 
@@ -341,7 +363,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         hideFutureWarningPopupCheckBox = new CheckBox(labels.get(LabelKey.DONT_SHOW_WARNING_AGAIN_CHECKBOX));
 
         //Instantiating metadata inheritance button map
-        metadataInheritanceButtonMap = new HashMap<String, CheckBox>();
+        metadataInheritanceButtonMap = new HashMap<>();
 
         popupBuilder = new PackageArtifactPropertiesPopupBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
@@ -363,9 +385,15 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
             packageDescriptionFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
             packageDescriptionFileChooser.setInitialFileName(existingDescriptionFile.getName());
         } else if (presenter.getController().getRootArtifactDir() != null) {
-            packageDescriptionFileChooser.setInitialFileName(presenter.getController().getRootArtifactDir().getName()+".json");
-            if (presenter.getContentRoot() != null) {
-                packageDescriptionFileChooser.setInitialDirectory(presenter.getContentRoot());
+            String fileName = presenter.getController().getRootArtifactDir().getName();
+            if (fileName.isEmpty()) {
+                fileName = "description";
+            }
+            packageDescriptionFileChooser.setInitialFileName(fileName + ".json");
+            if (presenter.getController().getContentRoot() != null) {
+                packageDescriptionFileChooser.setInitialDirectory(presenter.getController().getContentRoot());
+            } else {
+                packageDescriptionFileChooser.setInitialDirectory(presenter.getController().getRootArtifactDir());
             }
         } else {
             packageDescriptionFileChooser.setInitialFileName("default.json");
@@ -386,7 +414,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
      * @return
      */
     private List<MenuItem> createMenuItemList(final TreeItem<PackageArtifact> treeItem, List<String> validTypes, final Label label){
-        List<MenuItem> itemList = new ArrayList<MenuItem>();
+        List<MenuItem> itemList = new ArrayList<>();
 
         final PackageArtifact packageArtifact = treeItem.getValue();
 
@@ -566,8 +594,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         popupArtifact = artifact;
 
         //Initialize the containers that are used to hold the text fields.
-        artifactPropertyFields = new HashMap<String, ArtifactPropertyContainer>();
-        artifactRelationshipFields = new HashSet<ArtifactRelationshipContainer>();
+        artifactPropertyFields = new HashMap<>();
+        artifactRelationshipFields = new HashSet<>();
 
 
         artifactDetailsPopup = popupBuilder.buildArtifactPropertiesPopup(artifact, artifactPropertyFields,
@@ -710,8 +738,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
      * Complex property values are stored in the subProperties map.
      */
     public static class ArtifactPropertyContainer {
-        Set<Map<String, Set<StringProperty>>> subProperties = new HashSet<Map<String, Set<StringProperty>>>();
-        Set<StringProperty> values = new HashSet<StringProperty>();
+        Set<Map<String, Set<StringProperty>>> subProperties = new HashSet<>();
+        Set<StringProperty> values = new HashSet<>();
         boolean isComplex = false;
 
         public boolean isComplex() {
@@ -733,7 +761,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
      */
     public static class ArtifactRelationshipContainer {
         public ObservableValue<Relationship> relationship;
-        public Set<StringProperty> relationshipTargets = new HashSet<StringProperty>();
+        public Set<StringProperty> relationshipTargets = new HashSet<>();
         public BooleanProperty requiresURI = new SimpleBooleanProperty(true);
 
         public ObservableValue<Relationship> getRelationship() {

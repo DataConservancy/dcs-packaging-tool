@@ -51,9 +51,9 @@ import org.dataconservancy.packaging.tool.model.description.RulesSpec;
 public class GeneralPackageDescriptionCreator
         implements PackageDescriptionCreator {
 
-    private final List<Rule> rules = new ArrayList<Rule>();
+    private final List<Rule> rules = new ArrayList<>();
 
-    private Set<String> visitedFiles = new HashSet<String>();
+    private Set<String> visitedFiles = new HashSet<>();
 
     public GeneralPackageDescriptionCreator(RulesSpec rulesSpec) {
         for (RuleSpec ruleSpec : rulesSpec.getRule()) {
@@ -83,14 +83,12 @@ public class GeneralPackageDescriptionCreator
                                */
         PackageDescription desc = new PackageDescription();
 
-        Map<String, PackageArtifact> artifacts =
-                new HashMap<String, PackageArtifact>();
+        Map<String, PackageArtifact> artifacts = new HashMap<>();
 
         visitFile(new FileContextImpl(directoryTreeRoot, directoryTreeRoot, false),
                   artifacts);
 
-        desc.setPackageArtifacts(new HashSet<PackageArtifact>(artifacts
-                .values()));
+        desc.setPackageArtifacts(new HashSet<>(artifacts.values()));
         desc.setRootArtifactRef(directoryTreeRoot.toURI().toString());
         desc.setPackageOntologyIdentifier(packageOntologyIdentifier);
         return desc;
@@ -196,10 +194,16 @@ public class GeneralPackageDescriptionCreator
             artifacts.put(id, artifact);
             artifact.setId(id);
             artifact.setIgnored(cxt.isIgnored());
-            //we need to relativize against the content root, not the supplied root artifact dir
-            Path rootPath = Paths.get(cxt.getRoot().getParentFile().getPath());
-            Path filePath = Paths.get(cxt.getFile().getPath());
-            artifact.setArtifactRef(String.valueOf(rootPath.relativize(filePath)));
+            //we need to relativize against the content root if one exists, not the supplied root artifact dir
+            if (cxt.getRoot().getParentFile() != null) {
+                Path rootPath = Paths.get(cxt.getRoot().getParentFile().getPath());
+                Path filePath = Paths.get(cxt.getFile().getPath());
+                artifact.setArtifactRef(String.valueOf(rootPath.relativize(filePath)));
+            } else {
+                Path filePath = Paths.get(cxt.getFile().getPath());
+                artifact.setArtifactRef(String.valueOf(filePath));
+            }
+
             if (uri.getFragment() != null) {
                 artifact.getArtifactRef().setFragment(uri.getFragment());
             }
@@ -222,7 +226,7 @@ public class GeneralPackageDescriptionCreator
 
             for (Map.Entry<String, List<String>> entry : mapping
                     .getProperties().entrySet()) {
-                Set<String> valueSet = new HashSet<String>(entry.getValue());
+                Set<String> valueSet = new HashSet<>(entry.getValue());
                 artifact.setSimplePropertyValues(entry.getKey(), valueSet);
             }
             /*
@@ -230,11 +234,11 @@ public class GeneralPackageDescriptionCreator
              * URI fragment), we just need to use the relationship's target
              * file's URI as the relationship target, and we're done!.
              */
-            List<PackageRelationship> rels = new ArrayList<PackageRelationship>();
+            List<PackageRelationship> rels = new ArrayList<>();
             
             for (Map.Entry<String, Set<URI>> rel : mapping.getRelationships()
                     .entrySet()) {
-                Set<String> relTargets = new HashSet<String>();
+                Set<String> relTargets = new HashSet<>();
                 for (URI target : rel.getValue()) {
                     relTargets.add(target.toString());
                 }

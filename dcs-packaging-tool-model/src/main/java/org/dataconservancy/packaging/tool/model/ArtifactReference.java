@@ -38,7 +38,7 @@ public class ArtifactReference {
     private String refPath;
 
     public ArtifactReference(String refPath) {
-       this.refPath=refPath;
+       this.refPath = refPath;
     }
 
     /**
@@ -48,18 +48,30 @@ public class ArtifactReference {
      * @return A String representing the absolute path pointing to the artifact's File
      */
     public String getResolvedAbsoluteRefString(File contentRootFile) {
-        File absFile = new File(contentRootFile, getRefString());
-        return absFile.getPath();
+        String absolutePath;
+        if (contentRootFile == null) {
+            absolutePath = refPath;
+        } else {
+            absolutePath = new File(contentRootFile, getRefString()).getPath();
+        }
+        return absolutePath;
+
     }
 
     /**
      *
      * @param contentRootFile The Content Root directory. This is the parent of the
-     *                        package's root artifact
+     *                        package's root artifact. If null the path of the artifact will be returned
      * @return The Path pointing to the artifact's File
      */
     public Path getResolvedAbsoluteRefPath(File contentRootFile) {
-        return Paths.get(contentRootFile.getPath(), getRefString());
+        Path absolutePath;
+        if (contentRootFile == null) {
+            absolutePath = Paths.get(getRefString());
+        } else {
+            absolutePath = Paths.get(contentRootFile.getPath(), getRefString());
+        }
+        return absolutePath;
     }
 
     /**
@@ -101,15 +113,21 @@ public class ArtifactReference {
     /**
      * A convenience method to return just the last path component
      * plus any specifier
-     * @return
+     * @return The name of the file teh artifact represents
      */
     public String getRefName(){
         File refFile = new File(refPath);
-        if (fragment == null || fragment.isEmpty()){
-            return refFile.getName();
-        } else {
-            return refFile.getName() + "#" + fragment;
+        String refName = refFile.getName();
+
+        if (refName.isEmpty()) {
+            refName = refPath;
         }
+
+        if (fragment != null && !fragment.isEmpty()){
+            refName += "#" + fragment;
+        }
+
+        return refName;
     }
 
     @Override
