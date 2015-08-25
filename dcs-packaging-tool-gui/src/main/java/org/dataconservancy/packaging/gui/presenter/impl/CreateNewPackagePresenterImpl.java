@@ -25,9 +25,7 @@ import java.util.Map;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 
-import javafx.event.Event;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
@@ -48,8 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.stage.FileChooser;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.stage.DirectoryChooser;
 
@@ -106,148 +102,120 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
        
         //Handles the continue button in the footer being pressed. Validates that all required fields are present, sets the state on the controller,
         //and instructs the controller to move to the next page.
-        view.getContinueButton().setOnAction(new EventHandler<ActionEvent>() {
+        view.getContinueButton().setOnAction(arg0 -> {
+            try {
+                if (root_artifact_dir != null && root_artifact_dir.exists() &&
+                    root_artifact_dir.canRead()) {
 
-            @Override
-            public void handle(ActionEvent arg0) {
-                try {
-                    if (root_artifact_dir != null && root_artifact_dir.exists() &&
-                        root_artifact_dir.canRead()) {
-                        
-                        /* Insert properties, if any */
-                        for (Map.Entry<String, String> property : view.getPropertyValues().entrySet()) {
-                            ruleProperties.setProperty(property.getKey(), property.getValue());
-                        }
-                        //TODO: when we support multiple ontologies we will need to adjust the handling of the user's
-                        // choice of ontology identifier instead of hardcoded value here
-
-                        final PackageDescriptionServiceWorker packageDescriptionService = new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
-
-                        view.showProgressIndicatorPopUp();
-
-                        ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent event) {
-                                packageDescriptionService.cancel();
-                            }
-                        });
-
-                        controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
-                        controller.setContentRoot(content_dir);
-                        controller.setRootArtifactDir(root_artifact_dir);
-
-                        packageDescriptionService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-                            @Override
-                            public void handle(WorkerStateEvent event) {
-                                packageDescriptionService.reset();
-                                controller.getCrossPageProgressIndicatorPopUp().hide();
-                                controller.showHome(false);
-                            }
-                        });
-
-                        packageDescriptionService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-                            @Override
-                            public void handle(
-                                WorkerStateEvent workerStateEvent) {
-                                displayExceptionMessage(workerStateEvent.getSource().getException());
-                                view.getErrorMessage().setVisible(true);
-                                packageDescriptionService.reset();
-                                controller.getCrossPageProgressIndicatorPopUp().hide();
-                                controller.showHome(false);
-                            }
-                        });
-
-                        packageDescriptionService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-                            @Override
-                            public void handle(
-                                WorkerStateEvent workerStateEvent) {
-                                PackageDescription packageDescription = (PackageDescription) workerStateEvent.getSource().getValue();
-                                controller.setPackageDescription(packageDescription);
-                                controller.setPackageDescriptionFile(null);
-                                packageDescriptionService.reset();
-                                controller.goToNextPage();
-                            }
-                        });
-
-                        packageDescriptionService.start();
-
-                    } else if (root_artifact_dir != null &&
-                            (!root_artifact_dir.exists() ||
-                                 !root_artifact_dir.canRead())) {
-                        view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
-                        view.getErrorMessage().setVisible(true);
-                    } else if (controller.getPackageDescription() != null) {
-                        controller.goToNextPage();
-                    } else {
-                        view.getErrorMessage().setText(errors.get(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
-                        view.getErrorMessage().setVisible(true);
+                    /* Insert properties, if any */
+                    for (Map.Entry<String, String> property : view.getPropertyValues().entrySet()) {
+                        ruleProperties.setProperty(property.getKey(), property.getValue());
                     }
-                } catch (Exception e) {
-                    view.getErrorMessage().setText(messages.formatErrorCreatingNewPackage(e.getMessage()));
+                    //TODO: when we support multiple ontologies we will need to adjust the handling of the user's
+                    // choice of ontology identifier instead of hardcoded value here
+
+                    final PackageDescriptionServiceWorker packageDescriptionService = new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
+
+                    view.showProgressIndicatorPopUp();
+
+                    ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> packageDescriptionService.cancel());
+
+                    controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
+                    controller.setContentRoot(content_dir);
+                    controller.setRootArtifactDir(root_artifact_dir);
+
+                    packageDescriptionService.setOnCancelled(event -> {
+                        packageDescriptionService.reset();
+                        controller.getCrossPageProgressIndicatorPopUp().hide();
+                        controller.showHome(false);
+                    });
+
+                    packageDescriptionService.setOnFailed(workerStateEvent -> {
+                        displayExceptionMessage(workerStateEvent.getSource().getException());
+                        view.getErrorMessage().setVisible(true);
+                        packageDescriptionService.reset();
+                        controller.getCrossPageProgressIndicatorPopUp().hide();
+                        controller.showHome(false);
+                    });
+
+                    packageDescriptionService.setOnSucceeded(workerStateEvent -> {
+                        PackageDescription packageDescription = (PackageDescription) workerStateEvent.getSource().getValue();
+                        controller.setPackageDescription(packageDescription);
+                        controller.setPackageDescriptionFile(null);
+                        packageDescriptionService.reset();
+                        controller.goToNextPage();
+                    });
+
+                    packageDescriptionService.start();
+
+                } else if (root_artifact_dir != null &&
+                        (!root_artifact_dir.exists() ||
+                             !root_artifact_dir.canRead())) {
+                    view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
                     view.getErrorMessage().setVisible(true);
-                    log.error(e.getMessage());
+                } else if (controller.getPackageDescription() != null) {
+                    controller.goToNextPage();
+                } else {
+                    view.getErrorMessage().setText(errors.get(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
+                    view.getErrorMessage().setVisible(true);
                 }
+            } catch (Exception e) {
+                view.getErrorMessage().setText(messages.formatErrorCreatingNewPackage(e.getMessage()));
+                view.getErrorMessage().setVisible(true);
+                log.error(e.getMessage());
             }
         });
         
         //Handles the user pressing the button to choose a base directory to create a package from.
         view.getChooseContentDirectoryButton()
-                .setOnAction(new EventHandler<ActionEvent>() {
+                .setOnAction(event -> {
+                    if (directoryChooser.getInitialDirectory() != null &&
+                        !directoryChooser.getInitialDirectory().exists()) {
+                        directoryChooser.setInitialDirectory(null);
+                    }
 
-                    public void handle(ActionEvent event) {
-                        if (directoryChooser.getInitialDirectory() != null &&
-                            !directoryChooser.getInitialDirectory().exists()) {
-                            directoryChooser.setInitialDirectory(null);
-                        }
+                    File dir = controller.showOpenDirectoryDialog(directoryChooser);
 
-                        File dir = controller.showOpenDirectoryDialog(directoryChooser);
-
-                        if (dir != null) {
-                            root_artifact_dir = dir;
-                            content_dir = root_artifact_dir.getParentFile();
-                            view.getSelectedBaseDirectoryTextField().setText(root_artifact_dir.getPath());
-                            view.getSelectedPackageDescriptionTextField().setText("");
-                            //If the error message happens to be visible erase it.
-                            view.getErrorMessage().setVisible(false);
-                            directoryChooser.setInitialDirectory(dir);
-                        }
+                    if (dir != null) {
+                        root_artifact_dir = dir;
+                        content_dir = root_artifact_dir.getParentFile();
+                        view.getSelectedBaseDirectoryTextField().setText(root_artifact_dir.getPath());
+                        view.getSelectedPackageDescriptionTextField().setText("");
+                        //If the error message happens to be visible erase it.
+                        view.getErrorMessage().setVisible(false);
+                        directoryChooser.setInitialDirectory(dir);
                     }
                 });
         
         //Handles the user pressing a button to choose an existing package description. 
-        view.getChoosePackageDescriptionButton().setOnAction(new EventHandler<ActionEvent>() {
+        view.getChoosePackageDescriptionButton().setOnAction(arg0 -> {
+            File descriptionFile = controller.showOpenFileDialog(fileChooser);
 
-            @Override
-            public void handle(ActionEvent arg0) {
-                File descriptionFile = controller.showOpenFileDialog(fileChooser);
+            if (descriptionFile != null) {
+                try {
+                    FileInputStream fis = new FileInputStream(descriptionFile);
+                    PackageDescription description = packageDescriptionBuilder.deserialize(fis);
+                    //If the selected package description file is valid set it on the controller and remove the content directory if it was set.
+                    if (description != null) {
+                        //content_dir = null;
+                        controller.setPackageDescription(description);
+                        controller.setPackageDescriptionFile(descriptionFile);
+                        controller.setRootArtifactDir(null);
+                        controller.setContentRoot(null);
+                        content_dir = null;
+                        root_artifact_dir = null;
 
-                if (descriptionFile != null) {
-                    try {
-                        FileInputStream fis = new FileInputStream(descriptionFile);
-                        PackageDescription description = packageDescriptionBuilder.deserialize(fis);
-                        //If the selected package description file is valid set it on the controller and remove the content directory if it was set.
-                        if (description != null) {
-                            //content_dir = null;
-                            controller.setPackageDescription(description);
-                            controller.setPackageDescriptionFile(descriptionFile);
-                            controller.setRootArtifactDir(null);
-                            controller.setContentRoot(null);
-                            content_dir = null;
-                            root_artifact_dir = null;
-
-                            view.getErrorMessage().setVisible(false);
-                            view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
-                            view.getSelectedBaseDirectoryTextField().setText("");
-                            fileChooser.setInitialDirectory(descriptionFile.getParentFile());
-                        }
-                    } catch (FileNotFoundException | PackageToolException e) {
-                        view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
-                        view.getErrorMessage().setVisible(true);
-                        log.error(e.getMessage());
+                        view.getErrorMessage().setVisible(false);
+                        view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
+                        view.getSelectedBaseDirectoryTextField().setText("");
+                        fileChooser.setInitialDirectory(descriptionFile.getParentFile());
                     }
+                } catch (FileNotFoundException | PackageToolException e) {
+                    view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
+                    view.getErrorMessage().setVisible(true);
+                    log.error(e.getMessage());
                 }
             }
-
         });
 
     }
