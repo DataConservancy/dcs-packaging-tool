@@ -16,22 +16,18 @@
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.ExpectedException;
+
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath*:/test-applicationContext.xml"})
