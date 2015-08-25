@@ -15,24 +15,9 @@
  */
 package org.dataconservancy.packaging.gui.view.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -43,13 +28,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
-
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
@@ -58,12 +41,29 @@ import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.model.RelationshipGroup;
 import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
-import org.dataconservancy.packaging.gui.util.*;
+import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
+import org.dataconservancy.packaging.gui.util.DisciplinePropertyBox;
+import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
+import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.gui.util.RelationshipSelectionBox;
+import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
@@ -230,7 +230,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
         requiredLabel.setTextAlignment(TextAlignment.CENTER);
 
         propertiesBox.getChildren().add(requiredLabel);
-        List<String> sortedProperties = new ArrayList<String>();
+        List<String> sortedProperties = new ArrayList<>();
 
         //Get the property name key set and then create a sorted list from it.
         sortedProperties.addAll(properties.keySet());
@@ -266,20 +266,15 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
                         listener.changed(null, "n/a", "n/a");
 
-                        addNewButton.setOnAction(new EventHandler<ActionEvent>() {
+                        addNewButton.setOnAction(arg0 -> {
+                            VBox complexPropertyBox1 = createGroupPropertySection(artifact, property, properties.get(property), true, container);
+                            int buttonIndex = propertiesBox.getChildren().indexOf(addNewButton);
 
-                            @Override
-                            public void handle(ActionEvent arg0) {
-                                VBox complexPropertyBox = createGroupPropertySection(artifact, property, properties.get(property), true, container);
-                                int buttonIndex = propertiesBox.getChildren().indexOf(addNewButton);
+                            propertiesBox.getChildren().add(buttonIndex, complexPropertyBox1);
 
-                                propertiesBox.getChildren().add(buttonIndex, complexPropertyBox);
-
-                                addChangeListenerToSectionFields(complexPropertyBox, listener);
-                                addNewButton.setDisable(true);
-                                requestFocusForNewGroup(complexPropertyBox);
-                            }
-
+                            addChangeListenerToSectionFields(complexPropertyBox1, listener);
+                            addNewButton.setDisable(true);
+                            requestFocusForNewGroup(complexPropertyBox1);
                         });
                         Separator groupSeparator = new Separator();
                         propertiesBox.getChildren().add(groupSeparator);
@@ -291,7 +286,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
                     int minOccurances = packageOntologyService.getPropertyMinOccurrences(artifact, property, "");
                     boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, property);
 
-                    Set<StringProperty> fieldProperties = new HashSet<StringProperty>();
+                    Set<StringProperty> fieldProperties = new HashSet<>();
                     if (packageOntologyService.isDisciplineProperty(artifact, property)) {
                         propertiesBox.getChildren().add(new DisciplinePropertyBox(ontologyLabels.get(property), artifact.getSimplePropertyValues(property), maxOccurances, fieldProperties, minOccurances, systemGenerated, availableDisciplines));
                     } else {
@@ -325,7 +320,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
         final Map<String, String> properties = packageOntologyService.getProperties(artifact);
 
-        List<String> sortedProperties = new ArrayList<String>();
+        List<String> sortedProperties = new ArrayList<>();
 
         //Get the creator property set and then create a sorted list from it.
         sortedProperties.addAll(packageOntologyService.getCreatorProperties(artifact));
@@ -359,20 +354,15 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
                     listener.changed(null, "n/a", "n/a");
 
-                    addNewButton.setOnAction(new EventHandler<ActionEvent>() {
+                    addNewButton.setOnAction(arg0 -> {
+                        VBox complexPropertyBox1 = createGroupPropertySection(artifact, property, properties.get(property), true, container);
+                        int buttonIndex = propertiesBox.getChildren().indexOf(addNewButton);
 
-                        @Override
-                        public void handle(ActionEvent arg0) {
-                            VBox complexPropertyBox = createGroupPropertySection(artifact, property, properties.get(property), true, container);
-                            int buttonIndex = propertiesBox.getChildren().indexOf(addNewButton);
+                        propertiesBox.getChildren().add(buttonIndex, complexPropertyBox1);
 
-                            propertiesBox.getChildren().add(buttonIndex, complexPropertyBox);
-
-                            addChangeListenerToSectionFields(complexPropertyBox, listener);
-                            addNewButton.setDisable(true);
-                            requestFocusForNewGroup(complexPropertyBox);
-                        }
-
+                        addChangeListenerToSectionFields(complexPropertyBox1, listener);
+                        addNewButton.setDisable(true);
+                        requestFocusForNewGroup(complexPropertyBox1);
                     });
                 }
             } else {
@@ -381,7 +371,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
                 int minOccurances = packageOntologyService.getPropertyMinOccurrences(artifact, property, "");
                 boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, property);
 
-                Set<StringProperty> fields = new HashSet<StringProperty>();
+                Set<StringProperty> fields = new HashSet<>();
 
                 propertiesBox.getChildren().add(new TextPropertyBox(artifact, "", ontologyLabels.get(property), property, artifact.getSimplePropertyValues(property),
                         maxOccurances, fields, minOccurances, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
@@ -419,14 +409,14 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
         //If the artifact has the property and we're not adding an empty field add the sub property values
         if (artifact.getPropertyNames().contains(propertyName) && !empty) {
             for (PackageArtifact.PropertyValueGroup group : artifact.getPropertyValueGroups(propertyName)) {
-                Map<String, Set<StringProperty>> subPropertyFields = new HashMap<String, Set<StringProperty>>();
+                Map<String, Set<StringProperty>> subPropertyFields = new HashMap<>();
 
                 Label propertyNameLabel = new Label(ontologyLabels.get(propertyName));
                 propertyNameLabel.setPrefWidth(100);
                 propertyNameLabel.setWrapText(true);
                 complexPropertyBox.getChildren().add(propertyNameLabel);
 
-                List<String> sortedProperties = new ArrayList<String>();
+                List<String> sortedProperties = new ArrayList<>();
 
                 //Get the creator property set and then create a sorted list from it.
                 sortedProperties.addAll(packageOntologyService.getGroupPropertyNames(propertyType));
@@ -437,7 +427,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
                     int maxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, fieldName, propertyType);
                     int minOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, fieldName, propertyType);
                     boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, fieldName);
-                    Set<StringProperty> fields = new HashSet<StringProperty>();
+                    Set<StringProperty> fields = new HashSet<>();
                     complexPropertyBox.getChildren().add(new TextPropertyBox(artifact, propertyName, ontologyLabels.get(fieldName), fieldName, values,
                             maxOccurs, fields, minOccurs, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
                     subPropertyFields.put(fieldName, fields);
@@ -447,14 +437,14 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
             }
             //Otherwise just add the empty text fields for the possible property values.
         } else {
-            Map<String, Set<StringProperty>> subPropertyFields = new HashMap<String, Set<StringProperty>>();
+            Map<String, Set<StringProperty>> subPropertyFields = new HashMap<>();
 
             Label propertyNameLabel = new Label(ontologyLabels.get(propertyName));
             propertyNameLabel.setPrefWidth(100);
             propertyNameLabel.setWrapText(true);
             complexPropertyBox.getChildren().add(propertyNameLabel);
 
-            List<String> sortedProperties = new ArrayList<String>();
+            List<String> sortedProperties = new ArrayList<>();
 
             //Get the creator property set and then create a sorted list from it.
             sortedProperties.addAll(packageOntologyService.getGroupPropertyNames(propertyType));
@@ -466,7 +456,7 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
                 int maxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, fieldName, propertyType);
                 int minOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, fieldName, propertyType);
                 boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, fieldName);
-                Set<StringProperty> fields = new HashSet<StringProperty>();
+                Set<StringProperty> fields = new HashSet<>();
                 complexPropertyBox.getChildren().add(new TextPropertyBox(artifact, propertyName, ontologyLabels.get(fieldName), fieldName,
                         null, maxOccurs, fields, minOccurs, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
 
@@ -645,21 +635,16 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
         relationshipsBox.getChildren().add(addNewRelationshipButton);
 
-        addNewRelationshipButton.setOnAction(new EventHandler<ActionEvent>() {
+        addNewRelationshipButton.setOnAction(arg0 -> {
+            PackageDescriptionViewImpl.ArtifactRelationshipContainer container = new PackageDescriptionViewImpl.ArtifactRelationshipContainer();
+            artifactRelationshipFields.add(container);
+            VBox newRelationshipBox = new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener);
+            int buttonIndex = relationshipsBox.getChildren().indexOf(addNewRelationshipButton);
 
-            @Override
-            public void handle(ActionEvent arg0) {
-                PackageDescriptionViewImpl.ArtifactRelationshipContainer container = new PackageDescriptionViewImpl.ArtifactRelationshipContainer();
-                artifactRelationshipFields.add(container);
-                VBox newRelationshipBox = new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener);
-                int buttonIndex = relationshipsBox.getChildren().indexOf(addNewRelationshipButton);
+            relationshipsBox.getChildren().add(buttonIndex, newRelationshipBox);
 
-                relationshipsBox.getChildren().add(buttonIndex, newRelationshipBox);
-
-                addNewRelationshipButton.setDisable(true);
-                requestFocusForNewGroup(newRelationshipBox);
-            }
-
+            addNewRelationshipButton.setDisable(true);
+            requestFocusForNewGroup(newRelationshipBox);
         });
         return relationshipsBox;
     }
@@ -718,31 +703,27 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
     //Sorts properties in the order of single value required, multi value required, optional single value, optional multi value
     private void sortProperties(List<String> propertyNames, final PackageArtifact artifact, final String type) {
-        Collections.sort(propertyNames, new Comparator<String>() {
+        Collections.sort(propertyNames, (propertyOne, propertyTwo) -> {
 
-            @Override
-            public int compare(String propertyOne, String propertyTwo) {
+            int propertyOneMaxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, propertyOne, type);
+            int propertyOneMinOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, propertyOne, type);
 
-                int propertyOneMaxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, propertyOne, type);
-                int propertyOneMinOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, propertyOne, type);
+            int propertyTwoMaxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, propertyTwo, type);
+            int propertyTwoMinOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, propertyTwo, type);
 
-                int propertyTwoMaxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, propertyTwo, type);
-                int propertyTwoMinOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, propertyTwo, type);
+            if (propertyOneMinOccurs == propertyTwoMinOccurs && propertyOneMaxOccurs == propertyTwoMaxOccurs) {
+                return 0;
+            }
 
-                if (propertyOneMinOccurs == propertyTwoMinOccurs && propertyOneMaxOccurs == propertyTwoMaxOccurs) {
-                    return 0;
-                }
-
-                if (propertyOneMinOccurs == propertyTwoMinOccurs) {
-                    if (propertyOneMaxOccurs < propertyTwoMaxOccurs) {
-                        return -1;
-                    }
-                } else if (propertyOneMinOccurs > propertyTwoMinOccurs) {
+            if (propertyOneMinOccurs == propertyTwoMinOccurs) {
+                if (propertyOneMaxOccurs < propertyTwoMaxOccurs) {
                     return -1;
                 }
-
-                return 1;
+            } else if (propertyOneMinOccurs > propertyTwoMinOccurs) {
+                return -1;
             }
+
+            return 1;
         });
     }
 

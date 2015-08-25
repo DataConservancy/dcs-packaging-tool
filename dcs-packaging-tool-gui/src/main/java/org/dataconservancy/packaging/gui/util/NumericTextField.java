@@ -45,10 +45,6 @@ public class NumericTextField extends TextField
     private boolean validate(String text)
     {
         //Only allow numeric values or backspaces/deletes
-        if (text.matches("[0-9]") || text.equals(""))
-        {
-            return true;
-        }
-        return false;
+        return text.matches("[0-9]") || text.equals("");
     }
 }

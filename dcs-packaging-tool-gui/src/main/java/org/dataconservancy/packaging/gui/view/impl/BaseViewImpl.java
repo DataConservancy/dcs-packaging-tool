@@ -16,25 +16,24 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import javafx.stage.Popup;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
-import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.View;
-
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.scene.layout.HBox;
 
 /**
  * Base view that handles controls and view elements that are the same across all views.

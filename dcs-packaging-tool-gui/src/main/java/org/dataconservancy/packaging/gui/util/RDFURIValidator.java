@@ -17,9 +17,6 @@ package org.dataconservancy.packaging.gui.util;
 
 import org.dataconservancy.dcs.util.UriUtility;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 /**
  * Class which provide convenient method to validate a string for an RDF URI
  */

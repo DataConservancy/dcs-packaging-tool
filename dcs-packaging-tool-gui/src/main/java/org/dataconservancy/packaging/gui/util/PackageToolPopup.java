@@ -94,12 +94,7 @@ public class PackageToolPopup extends Stage implements CssConstants, EventHandle
     public void setOwner(final Window owner) {
         if (owner != null && getOwner() == null) {
             initOwner(owner);
-            owner.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent mouseEvent) {
-                    PackageToolPopup.this.hide();
-                }
-            });
+            owner.addEventFilter(MouseEvent.MOUSE_PRESSED, mouseEvent -> PackageToolPopup.this.hide());
         }
     }
     

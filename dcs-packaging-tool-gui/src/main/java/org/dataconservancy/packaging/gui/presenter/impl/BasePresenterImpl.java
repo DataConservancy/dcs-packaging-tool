@@ -24,9 +24,6 @@ import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.view.View;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-
 /**
  * Base class that controls event handlers for UI elements common to each screen. 
  * As well as gets and sets objects that are needed by each presenter.
@@ -46,32 +43,11 @@ public abstract class BasePresenterImpl implements Presenter {
     }
     
     protected void bindBaseElements() {
-        view.getHeaderViewAboutLink().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                view.showAboutPopup();
-            }
-            
-        });
+        view.getHeaderViewAboutLink().setOnAction(arg0 -> view.showAboutPopup());
         
-        view.getHeaderViewHelpLink().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                view.showHelpPopup();                
-            }
-            
-        });
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
         
-        view.getCancelLink().setOnAction( new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                getController().goToPreviousPage();                
-            }
-            
-        });
+        view.getCancelLink().setOnAction(arg0 -> getController().goToPreviousPage());
     }
 
     @Override

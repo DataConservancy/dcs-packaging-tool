@@ -18,15 +18,10 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
@@ -40,8 +35,14 @@ import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.Ar
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
 import org.dataconservancy.packaging.tool.model.DcsPackageDescriptionSpec.ArtifactType;
-import org.dataconservancy.packaging.tool.model.*;
+import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageArtifact.PropertyValueGroup;
+import org.dataconservancy.packaging.tool.model.PackageDescription;
+import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
+import org.dataconservancy.packaging.tool.model.PackageNode;
+import org.dataconservancy.packaging.tool.model.PackageOntologyException;
+import org.dataconservancy.packaging.tool.model.PackageRelationship;
+import org.dataconservancy.packaging.tool.model.PackageTree;
 import org.dataconservancy.packaging.validation.PackageValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -92,35 +97,29 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
         view.getErrorMessageLabel().setVisible(false);
         
-        worker.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
-                Throwable e = workerStateEvent.getSource().getException();
-                
-                view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
-                view.getErrorMessageLabel().setVisible(true);
-                log.error("Error processing package description", e);
-                
-                controller.getCrossPageProgressIndicatorPopUp().hide();
-                controller.showHome(false);
-                worker.reset();
-            }
+        worker.setOnFailed(workerStateEvent -> {
+            Throwable e = workerStateEvent.getSource().getException();
+
+            view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+            view.getErrorMessageLabel().setVisible(true);
+            log.error("Error processing package description", e);
+
+            controller.getCrossPageProgressIndicatorPopUp().hide();
+            controller.showHome(false);
+            worker.reset();
         });
         
-        worker.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
-                displayPackageTree();
-                
-                if (controller.getCrossPageProgressIndicatorPopUp() != null) {
-                    controller.getCrossPageProgressIndicatorPopUp().hide();
-                }
+        worker.setOnSucceeded(workerStateEvent -> {
+            displayPackageTree();
 
-                //Setup help content and then rebind the base class to this view.
-                view.setupHelp();
-                setView(view);
-                worker.reset();
+            if (controller.getCrossPageProgressIndicatorPopUp() != null) {
+                controller.getCrossPageProgressIndicatorPopUp().hide();
             }
+
+            //Setup help content and then rebind the base class to this view.
+            view.setupHelp();
+            setView(view);
+            worker.reset();
         });
 
         if (Platform.isFxApplicationThread()) {
@@ -138,121 +137,93 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     private void bind() {
 
         //Displays the file selector, and then saves the package description to the given file. 
-        view.getSaveButton().setOnAction(new EventHandler<ActionEvent>() {
+        view.getSaveButton().setOnAction(arg0 -> {
+            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
 
-            @Override
-            public void handle(ActionEvent arg0) {
-                packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
+            //Still check if it's null in case user hit cancel
+            if (packageDescriptionFile != null) {
+                controller.setPackageDescriptionFile(packageDescriptionFile);
 
-                //Still check if it's null in case user hit cancel
-                if (packageDescriptionFile != null) {
-                    controller.setPackageDescriptionFile(packageDescriptionFile);
-
-                    FileOutputStream stream = null;
-                    try{
-                        stream = new FileOutputStream(packageDescriptionFile);
-                    } catch (IOException e) {
-                        log.error(e.getMessage());
-                        view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
-                        view.getErrorMessageLabel().setVisible(true);
-                    }
-
-                    if (view.getErrorMessageLabel().isVisible()) {
-                        view.getErrorMessageLabel().setVisible(false);
-                    }
-                    
-                    //save the PackageDescription to the file
-                    trimInvalidProperties(packageDescription);
-                    packageDescriptionBuilder.serialize(packageDescription, stream);
+                FileOutputStream stream = null;
+                try{
+                    stream = new FileOutputStream(packageDescriptionFile);
+                } catch (IOException e) {
+                    log.error(e.getMessage());
+                    view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+                    view.getErrorMessageLabel().setVisible(true);
                 }
+
+                if (view.getErrorMessageLabel().isVisible()) {
+                    view.getErrorMessageLabel().setVisible(false);
+                }
+
+                //save the PackageDescription to the file
+                trimInvalidProperties(packageDescription);
+                packageDescriptionBuilder.serialize(packageDescription, stream);
             }
         });
         
         //Validates the package description, saves it, then moves on to the next page.
-        view.getContinueButton().setOnAction(new EventHandler<ActionEvent>() {
+        view.getContinueButton().setOnAction(arg0 -> {
+            //Perform simple validation to make sure the package description is valid.
+            try {
+                packageDescriptionValidator.validate(packageDescription);
+            } catch (PackageValidationException e1) {
+                //Gets the button that's used to dismiss validation error popup.
+                view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                    if (view.getWarningPopup() != null && view.getWarningPopup().isShowing()) {
+                        view.getWarningPopup().hide();
+                    }
+                });
+                view.showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), e1.getMessage(), false, false);
+                log.error(e1.getMessage());
+                return;
+            }
 
-            @Override
-            public void handle(ActionEvent arg0) {
-                //Perform simple validation to make sure the package description is valid. 
-                try {
-                    packageDescriptionValidator.validate(packageDescription);
-                } catch (PackageValidationException e1) {
-                    //Gets the button that's used to dismiss validation error popup.
-                    view.getWarningPopupPositiveButton().setOnAction(new EventHandler<ActionEvent>() {
+            //bring up a save file dialog box
+            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
 
-                        @Override
-                        public void handle(ActionEvent arg0) {
-                            if (view.getWarningPopup() != null && view.getWarningPopup().isShowing()) {
-                                view.getWarningPopup().hide();
-                            }
-                        }
-                    });
-                    view.showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), e1.getMessage(), false, false);
-                    log.error(e1.getMessage());
-                    return;
+            if (packageDescriptionFile != null) {
+
+                FileOutputStream stream = null;
+                try{
+                    stream = new FileOutputStream(packageDescriptionFile);
+                } catch (IOException e){
+                    log.error(e.getMessage());
+                    view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+                    view.getErrorMessageLabel().setVisible(true);
                 }
 
-                //bring up a save file dialog box
-                packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
+                view.getErrorMessageLabel().setVisible(false);
 
-                if (packageDescriptionFile != null) {
-                    
-                    FileOutputStream stream = null;
-                    try{
-                        stream = new FileOutputStream(packageDescriptionFile);
-                    } catch (IOException e){
-                        log.error(e.getMessage());
-                        view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
-                        view.getErrorMessageLabel().setVisible(true);
-                    }
-    
-                    view.getErrorMessageLabel().setVisible(false);
+                //save the PackageDescription to the file
 
-                    //save the PackageDescription to the file
+                trimInvalidProperties(packageDescription);
+                packageDescriptionBuilder.serialize(packageDescription, stream);
 
-                    trimInvalidProperties(packageDescription);
-                    packageDescriptionBuilder.serialize(packageDescription, stream);
-
-                    controller.setPackageDescriptionFile(packageDescriptionFile);
-                    controller.setOutputDirectory(packageDescriptionFile.getParentFile());
-                    controller.goToNextPage();
-                }                
+                controller.setPackageDescriptionFile(packageDescriptionFile);
+                controller.setOutputDirectory(packageDescriptionFile.getParentFile());
+                controller.goToNextPage();
             }
         });
         
         //Cancels the property popup, which closes the popup with out saving any changes.
-        view.getCancelPopupHyperlink().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
-                    view.getPackageArtifactPopup().hide();
-                }
+        view.getCancelPopupHyperlink().setOnAction(arg0 -> {
+            if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
+                view.getPackageArtifactPopup().hide();
             }
-            
         });
         
         //Saves any changes made in the package artifact property popup
-        view.getApplyPopupButton().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                saveCurrentArtifact();
-                if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
-                    view.getPackageArtifactPopup().hide();
-                }
+        view.getApplyPopupButton().setOnAction(arg0 -> {
+            saveCurrentArtifact();
+            if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
+                view.getPackageArtifactPopup().hide();
             }
-            
         });
 
         //Gets the button that's used to dismiss validation error popup.
-        view.getReenableWarningsButton().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
-            }
-        });
+        view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
     }
 
     private void saveCurrentArtifact() {
@@ -354,14 +325,11 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     protected TreeItem<PackageArtifact> buildTree(PackageNode pkg_node, boolean showIgnoredArtifacts) {
         final TreeItem<PackageArtifact> item = new TreeItem<>(pkg_node.getValue());
 
-        item.expandedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-                if (!oldValue && newValue) {
-                    expandedArtifacts.add(item.getValue().getId());
-                } else if (oldValue && !newValue) {
-                    expandedArtifacts.remove(item.getValue().getId());
-                }
+        item.expandedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue && newValue) {
+                expandedArtifacts.add(item.getValue().getId());
+            } else if (oldValue && !newValue) {
+                expandedArtifacts.remove(item.getValue().getId());
             }
         });
         for (PackageNode pkg_kid: pkg_node.getChildrenNodes()) {
@@ -671,33 +639,28 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     
     //Sorts the tree items in the provided list. The order of the list will be dataFiles, followed by metadata files, followed by collections, followed by data items
     private void sortChildren(ObservableList<TreeItem<PackageArtifact>> children) {
-        FXCollections.sort(children, new Comparator<TreeItem<PackageArtifact>>() {
+        FXCollections.sort(children, (o1, o2) -> {
 
-            @Override
-            public int compare(TreeItem<PackageArtifact> o1, TreeItem<PackageArtifact> o2) {
-                
-                PackageArtifact artifactOne = o1.getValue();
-                PackageArtifact artifactTwo = o2.getValue();
-                
-                if (artifactOne.getType().equalsIgnoreCase(artifactTwo.getType())) {
-                    return 0;
-                }
-                
-                if (artifactOne.getType().equalsIgnoreCase(ArtifactType.DataFile.name())) {
-                    return -1;
-                } else if (artifactOne.getType().equalsIgnoreCase(ArtifactType.MetadataFile.name())) {
-                    if (artifactTwo.getType().equalsIgnoreCase(ArtifactType.Collection.name()) 
-                            || artifactTwo.getType().equalsIgnoreCase(ArtifactType.DataItem.name())) {
-                        return -1;
-                    }
-                } else if (artifactOne.getType().equalsIgnoreCase(ArtifactType.Collection.name()) 
-                            && artifactTwo.getType().equalsIgnoreCase(ArtifactType.DataItem.name())) {
-                    return -1;
-                }
-                
-                return 1;
+            PackageArtifact artifactOne = o1.getValue();
+            PackageArtifact artifactTwo = o2.getValue();
+
+            if (artifactOne.getType().equalsIgnoreCase(artifactTwo.getType())) {
+                return 0;
             }
-            
+
+            if (artifactOne.getType().equalsIgnoreCase(ArtifactType.DataFile.name())) {
+                return -1;
+            } else if (artifactOne.getType().equalsIgnoreCase(ArtifactType.MetadataFile.name())) {
+                if (artifactTwo.getType().equalsIgnoreCase(ArtifactType.Collection.name())
+                        || artifactTwo.getType().equalsIgnoreCase(ArtifactType.DataItem.name())) {
+                    return -1;
+                }
+            } else if (artifactOne.getType().equalsIgnoreCase(ArtifactType.Collection.name())
+                        && artifactTwo.getType().equalsIgnoreCase(ArtifactType.DataItem.name())) {
+                return -1;
+            }
+
+            return 1;
         });
     }
     @Override

@@ -21,10 +21,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -38,7 +35,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.TooltipBuilder;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
@@ -179,29 +175,27 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
         //Toggles whether the full paths should be displayed in the package artifact tree. 
         fullPath = new CheckBox(labels.get(LabelKey.SHOW_FULL_PATHS));
-        fullPath.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            public void changed(ObservableValue<? extends Boolean> ov,
-                Boolean old_val, Boolean new_val) {
-                presenter.rebuildTreeView();
-            }
+        fullPath.selectedProperty().addListener((ov, old_val, new_val) -> {
+            presenter.rebuildTreeView();
         });
 
         showIgnored = new CheckBox(labels.get(LabelKey.SHOW_IGNORED));
         showIgnored.selectedProperty().setValue(true);
-        showIgnored.selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
-                presenter.rebuildTreeView();
-            }
+        showIgnored.selectedProperty().addListener((observableValue, aBoolean, aBoolean2) -> {
+            presenter.rebuildTreeView();
         });
 
         if(Platform.isFxApplicationThread()){
-            Tooltip t = TooltipBuilder.create().prefWidth(300).wrapText(true).text(labels.get(LabelKey.SHOW_FULL_PATHS_TIP)).build();
-              fullPath.setTooltip(t);
+            Tooltip t = new Tooltip(labels.get(LabelKey.SHOW_FULL_PATHS_TIP));
+            t.setPrefWidth(300);
+            t.setWrapText(true);
+            fullPath.setTooltip(t);
         }
         if(Platform.isFxApplicationThread()){
-            Tooltip t = TooltipBuilder.create().prefWidth(300).wrapText(true).text(labels.get(LabelKey.SHOW_IGNORED_TIP)).build();
-              showIgnored.setTooltip(t);
+            Tooltip t = new Tooltip(labels.get(LabelKey.SHOW_IGNORED_TIP));
+            t.setPrefWidth(300);
+            t.setWrapText(true);
+            showIgnored.setTooltip(t);
         }
 
         content.getChildren().add(fullPath);
@@ -215,12 +209,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         artifactTree = new TreeTableView<>();
 
         //disable column sorting in the view
-        artifactTree.setSortPolicy(
-                new Callback<TreeTableView<PackageArtifact>, Boolean>() {
-                    @Override public Boolean call(TreeTableView<PackageArtifact> treeTableView) {
-                        return false;
-                    }
-                });
+        artifactTree.setSortPolicy(treeTableView -> false);
 
         //set up the columns for the artifact, its type and the options control
         TreeTableColumn<PackageArtifact, Label> artifactColumn = new TreeTableColumn<>("Artifact");
@@ -257,22 +246,22 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 viewLabel.setText(labelText);
 
 
-                Tooltip t = TooltipBuilder.create().prefWidth(300).wrapText(true).text(viewLabel.getText()).build();
+                Tooltip t = new Tooltip(viewLabel.getText());
+                t.setPrefWidth(300);
+                t.setWrapText(true);
                 viewLabel.setTooltip(t);
 
-                return new ReadOnlyObjectWrapper(viewLabel);
+                return new ReadOnlyObjectWrapper<>(viewLabel);
             }
         });
 
-        typeColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, Label>, ObservableValue<Label>>() {
-            public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<PackageArtifact, Label> p) {
-                // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                String type = p.getValue().getValue().getType();
-                Label typeLabel = new Label(type);
-                typeLabel.setPrefWidth(typeColumn.getWidth());
-                return new ReadOnlyObjectWrapper<>(typeLabel);
-            }
+        typeColumn.setCellValueFactory(p -> {
+            // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
+            // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+            String type = p.getValue().getValue().getType();
+            Label typeLabel = new Label(type);
+            typeLabel.setPrefWidth(typeColumn.getWidth());
+            return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
         optionsColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, Label>, ObservableValue<Label>>() {
@@ -282,7 +271,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 PackageArtifact packageArtifact = p.getValue().getValue();
                 Label optionsLabel = new Label();
                 final ContextMenu contextMenu = new ContextMenu();
-                TreeItem treeItem = p.getValue();
+                TreeItem<PackageArtifact> treeItem = p.getValue();
                 ImageView image = new ImageView();
                 image.setFitHeight(20);
                 image.setFitWidth(20);
@@ -304,12 +293,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                             log.warn("Changing artifact " + packageArtifact.getArtifactRef() + " from " + oldType + " to " + packageArtifact.getType());
                             //Notify the user that we are changing types
                             showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_CHANGE_WARNING), messages.formatPackageDescriptionModificationWarning(packageArtifact.getArtifactRef().getRefString(), oldType, packageArtifact.getType()), false, false);
-                            getWarningPopupPositiveButton().setOnAction(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent actionEvent) {
-                                    getWarningPopup().hide();
-                                }
-                            });
+                            getWarningPopupPositiveButton().setOnAction(actionEvent -> getWarningPopup().hide());
                         }
                             contextMenu.getItems().addAll(createMenuItemList(treeItem, validTypes, optionsLabel));
                             optionsLabel.setContextMenu(contextMenu);
@@ -317,12 +301,9 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 }
 
                 //When the options label is clicked show the context menu.
-                optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, new EventHandler<javafx.scene.input.MouseEvent>(){
-                    @Override
-                    public void handle(javafx.scene.input.MouseEvent e) {
-                        if (e.getButton() == MouseButton.PRIMARY) {
-                            contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
-                        }
+                optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
+                    if (e.getButton() == MouseButton.PRIMARY) {
+                        contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
                     }
                 });
                 return new ReadOnlyObjectWrapper<>(optionsLabel);
@@ -421,14 +402,11 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         //Create a menu item that will show the package artifacts popup.
         MenuItem item = new MenuItem(labels.get(LabelKey.PROPERTIES_LABEL));
         itemList.add(item);
-        item.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                VBox detailsBox = new VBox();
-                detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
-                showArtifactDetailsPopup(packageArtifact, label);
-                artifactTree.getSelectionModel().select(treeItem);
-            }
+        item.setOnAction(actionEvent -> {
+            VBox detailsBox = new VBox();
+            detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
+            showArtifactDetailsPopup(packageArtifact, label);
+            artifactTree.getSelectionModel().select(treeItem);
         });
 
         //Create a menu item for each available artifact type.
@@ -452,32 +430,23 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                     item.setGraphic(invalidImage);
                 }
 
-                item.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent actionEvent) {
-                        boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
+                item.setOnAction(actionEvent -> {
+                    boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
-                        if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageArtifact.getType())) {
-                            showWarningPopup(errors.get(ErrorKey.PROPERTY_LOSS_WARNING), messages.formatInvalidPropertyWarning(type, formatInvalidProperties(invalidProperties)), true, true);
-                            getWarningPopupNegativeButton().setOnAction(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent actionEvent) {
-                                    getWarningPopup().hide();
-                                    preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
-                                }
-                            });
+                    if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageArtifact.getType())) {
+                        showWarningPopup(errors.get(ErrorKey.PROPERTY_LOSS_WARNING), messages.formatInvalidPropertyWarning(type, formatInvalidProperties(invalidProperties)), true, true);
+                        getWarningPopupNegativeButton().setOnAction(actionEvent1 -> {
+                            getWarningPopup().hide();
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
+                        });
 
-                            getWarningPopupPositiveButton().setOnAction(new EventHandler<ActionEvent>() {
-                                @Override
-                                public void handle(ActionEvent actionEvent) {
-                                    getWarningPopup().hide();
-                                    presenter.changeType(packageArtifact, type);
-                                    preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
-                                }
-                            });
-                        } else {
+                        getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
+                            getWarningPopup().hide();
                             presenter.changeType(packageArtifact, type);
-                        }
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
+                        });
+                    } else {
+                        presenter.changeType(packageArtifact, type);
                     }
                 });
             }
@@ -491,31 +460,19 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
             item = new MenuItem("Collapse up one level");
 
-            item.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent actionEvent) {
-                    showWarningPopup(errors.get(ErrorKey.ARTIFACT_LOSS_WARNING),
-                            errors.get(ErrorKey.ARTIFACT_LOSS_WARNING_MESSAGE), true, false);
+            item.setOnAction(actionEvent -> {
+                showWarningPopup(errors.get(ErrorKey.ARTIFACT_LOSS_WARNING),
+                        errors.get(ErrorKey.ARTIFACT_LOSS_WARNING_MESSAGE), true, false);
 
-                    getWarningPopupNegativeButton().setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent actionEvent) {
-                            getWarningPopup().hide();
-                        }
+                getWarningPopupNegativeButton().setOnAction(actionEvent1 -> getWarningPopup().hide());
 
-                    });
-
-                    getWarningPopupPositiveButton().setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent actionEvent) {
-                            getWarningPopup().hide();
-                            presenter.collapseParentArtifact(packageArtifact);
-                            TreeItem item = presenter.findItem(packageArtifact);
-                            presenter.displayPackageTree();
-                            item.setExpanded(true);
-                        }
-                    });
-                }
+                getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
+                    getWarningPopup().hide();
+                    presenter.collapseParentArtifact(packageArtifact);
+                    TreeItem item1 = presenter.findItem(packageArtifact);
+                    presenter.displayPackageTree();
+                    item1.setExpanded(true);
+                });
             });
             itemList.add(item);
             separator =  new SeparatorMenuItem();
@@ -533,12 +490,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         final CheckMenuItem ignoreCheck = new CheckMenuItem(labels.get(LabelKey.IGNORE_CHECKBOX));
         ignoreCheck.setSelected(treeItem.getValue().isIgnored());
 
-        ignoreCheck.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                toggleItemIgnore(treeItem, ignoreCheck.isSelected());
-            }
-        });
+        ignoreCheck.setOnAction(event -> toggleItemIgnore(treeItem, ignoreCheck.isSelected()));
 
         return ignoreCheck;
     }

@@ -21,11 +21,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -41,7 +45,11 @@ import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 /**
  * Creates a VBox that contains the controls for adding a relationship to an object.
@@ -118,7 +126,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         namespaceBox.getChildren().add(schemaLabel);
 
         //The combobox that allows for selecting a namespace.
-        final ComboBox<RelationshipGroup> namespaceComboBox = new ComboBox<RelationshipGroup>();
+        final ComboBox<RelationshipGroup> namespaceComboBox = new ComboBox<>();
         namespaceComboBox.setPrefWidth(300);
         namespaceComboBox.setCellFactory(relationshipGroupCellFactory);
         namespaceComboBox.setDisable(!editable.getValue());
@@ -150,7 +158,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
             if (availableGroups != null && !availableGroups.isEmpty() && startingRelationship == null) {
                 startingGroup = availableGroups.iterator().next();
             } else {
-                startingGroup = new RelationshipGroup("", "", "", new ArrayList<Relationship>());
+                startingGroup = new RelationshipGroup("", "", "", new ArrayList<>());
             }
         }
 
@@ -167,7 +175,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         relationshipDefinitionBox.getChildren().add(relationshipLabel);
 
         //Create a combobox to select or enter the relationship uri or name, this box selection is controlled by the namespace selection.
-        final ComboBox<Relationship> relationshipComboBox = new ComboBox<Relationship>();
+        final ComboBox<Relationship> relationshipComboBox = new ComboBox<>();
         relationshipComboBox.setEditable(true);
         relationshipComboBox.setMinWidth(300);
         relationshipComboBox.setDisable(!editable.getValue());
@@ -220,41 +228,38 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         requiresURILabel.setVisible(false);
 
         //Listens for changes to the relationship value and adjusts other fields accordingly.
-        relationshipComboBox.valueProperty().addListener(new ChangeListener<Relationship>() {
-            @Override
-            public void changed(ObservableValue<? extends Relationship> observableValue, Relationship relationship, Relationship newRelationship) {
-                if (newRelationship != null) {
-                    if (RDFURIValidator.isValid(newRelationship.getRelationshipUri()) || ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
-                            || ontologyService.getKnownRelationshipNames().contains(newRelationship.getRelationshipUri())) {
-                        requiresURILabel.setVisible(false);
-                        editable.setValue(!ontologyService.isRelationshipHierarchical(artifact, newRelationship.getLabel()));
+        relationshipComboBox.valueProperty().addListener((observableValue, relationship, newRelationship) -> {
+            if (newRelationship != null) {
+                if (RDFURIValidator.isValid(newRelationship.getRelationshipUri()) || ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
+                        || ontologyService.getKnownRelationshipNames().contains(newRelationship.getRelationshipUri())) {
+                    requiresURILabel.setVisible(false);
+                    editable.setValue(!ontologyService.isRelationshipHierarchical(artifact, newRelationship.getLabel()));
 
-                        requiresUri.setValue(newRelationship.requiresUri());
-                        //If the current relationship group contains the relationship that means it was selected from the list.
-                        if (namespaceComboBox.getValue().getRelationships().contains(newRelationship)) {
-                            requiresDisabled.setValue(true);
-                            requiresUri.setValue(newRelationship.requiresUri());
-                        } else {
-                            //If it's a known relationship disable checkbox and set it to true
-                            if (ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
-                                    || ontologyService.getKnownRelationshipNames().contains(newRelationship.getRelationshipUri())) {
-                                requiresDisabled.setValue(true);
-                                requiresUri.setValue(true);
-
-                            } else { //Otherwise the user typed it in so they can change it.
-                                requiresDisabled.setValue(false);
-                            }
-
-                            //Set the group to empty since it wasn't selected from a group.
-                            namespaceComboBox.setValue(new RelationshipGroup("", "", "", new ArrayList<Relationship>()));
-
-                        }
-                    } else {
-                        //If the relationship entered isn't valid or a known type, disable all other fields and display a warning.
-                        requiresURILabel.setVisible(true);
-                        editable.setValue(false);
+                    requiresUri.setValue(newRelationship.requiresUri());
+                    //If the current relationship group contains the relationship that means it was selected from the list.
+                    if (namespaceComboBox.getValue().getRelationships().contains(newRelationship)) {
                         requiresDisabled.setValue(true);
+                        requiresUri.setValue(newRelationship.requiresUri());
+                    } else {
+                        //If it's a known relationship disable checkbox and set it to true
+                        if (ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
+                                || ontologyService.getKnownRelationshipNames().contains(newRelationship.getRelationshipUri())) {
+                            requiresDisabled.setValue(true);
+                            requiresUri.setValue(true);
+
+                        } else { //Otherwise the user typed it in so they can change it.
+                            requiresDisabled.setValue(false);
+                        }
+
+                        //Set the group to empty since it wasn't selected from a group.
+                        namespaceComboBox.setValue(new RelationshipGroup("", "", "", new ArrayList<>()));
+
                     }
+                } else {
+                    //If the relationship entered isn't valid or a known type, disable all other fields and display a warning.
+                    requiresURILabel.setVisible(true);
+                    editable.setValue(false);
+                    requiresDisabled.setValue(true);
                 }
             }
         });
@@ -271,27 +276,24 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         getChildren().add(errorBox);
 
         //Set up the listener that will switch the values in the relationship box when the schema box changes.
-        namespaceComboBox.valueProperty().addListener(new ChangeListener<RelationshipGroup>() {
-            @Override
-            public void changed(ObservableValue<? extends RelationshipGroup> observableValue, RelationshipGroup oldValue, RelationshipGroup newGroup) {
-                if (newGroup != null) {
+        namespaceComboBox.valueProperty().addListener((observableValue, oldValue, newGroup) -> {
+            if (newGroup != null) {
 
-                    if (newGroup.getRelationships() != null && !newGroup.getRelationships().isEmpty()) {
-                        relationshipComboBox.getItems().clear();
-                        //TODO: This show/hide is a hack to work around a javafx2 bug where the combo box list isn't correctly measured on the first pass. If we upgrade to java 8 this should be removed.
-                        relationshipComboBox.show();
-                        relationshipComboBox.getItems().addAll(newGroup.getRelationships());
-                        relationshipComboBox.hide();
-                        relationshipComboBox.setValue(newGroup.getRelationships().iterator().next());
+                if (newGroup.getRelationships() != null && !newGroup.getRelationships().isEmpty()) {
+                    relationshipComboBox.getItems().clear();
+                    //TODO: This show/hide is a hack to work around a javafx2 bug where the combo box list isn't correctly measured on the first pass. If we upgrade to java 8 this should be removed.
+                    relationshipComboBox.show();
+                    relationshipComboBox.getItems().addAll(newGroup.getRelationships());
+                    relationshipComboBox.hide();
+                    relationshipComboBox.setValue(newGroup.getRelationships().iterator().next());
 
-                    } else {
-                        //The user typed in relationship so remove all the other relationships from the combo box.
-                        Relationship currentRelationship = relationshipComboBox.getValue();
-                        ListIterator<Relationship> iter = relationshipComboBox.getItems().listIterator();
-                        while(iter.hasNext()){
-                            if(iter.next().equals(currentRelationship)){
-                                iter.remove();
-                            }
+                } else {
+                    //The user typed in relationship so remove all the other relationships from the combo box.
+                    Relationship currentRelationship = relationshipComboBox.getValue();
+                    ListIterator<Relationship> iter = relationshipComboBox.getItems().listIterator();
+                    while(iter.hasNext()){
+                        if(iter.next().equals(currentRelationship)){
+                            iter.remove();
                         }
                     }
                 }
@@ -402,41 +404,36 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         }
         addNewButton.setDisable(empty);
 
-        addNewButton.setOnAction(new EventHandler<ActionEvent>() {
+        addNewButton.setOnAction(arg0 -> {
 
-            @Override
-            public void handle(ActionEvent arg0) {
+            final HBox singleItemInputBox1 = new HBox(15);
 
-                final HBox singleItemInputBox = new HBox(15);
+            Label typeLabel1 = new Label();
+            typeLabel1.textProperty().bind(targetType);
+            typeLabel1.setMaxWidth(100);
+            typeLabel1.setMinWidth(100);
+            singleItemInputBox1.getChildren().add(typeLabel1);
 
-                Label typeLabel = new Label();
-                typeLabel.textProperty().bind(targetType);
-                typeLabel.setMaxWidth(100);
-                typeLabel.setMinWidth(100);
-                singleItemInputBox.getChildren().add(typeLabel);
+            final Label userInputImageLabel = new Label();
 
-                final Label userInputImageLabel = new Label();
+            TextField relatedItem = new TextField();
+            //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
+            relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));
+            relatedItem.textProperty().addListener(targetChangeListener);
+            targetChangeListener.fieldAdded();
+            relatedItem.textProperty().addListener(addNewRelationshipListener);
+            addNewRelationshipListener.fieldAdded();
 
-                TextField relatedItem = new TextField();
-                //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
-                relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));
-                relatedItem.textProperty().addListener(targetChangeListener);
-                targetChangeListener.fieldAdded();
-                relatedItem.textProperty().addListener(addNewRelationshipListener);
-                addNewRelationshipListener.fieldAdded();
+            relatedItem.setPrefWidth(210);
+            relatedItem.setMaxWidth(210);
+            container.relationshipTargets.add(relatedItem.textProperty());
 
-                relatedItem.setPrefWidth(210);
-                relatedItem.setMaxWidth(210);
-                container.relationshipTargets.add(relatedItem.textProperty());
+            singleItemInputBox1.getChildren().add(relatedItem);
+            singleItemInputBox1.getChildren().add(userInputImageLabel);
 
-                singleItemInputBox.getChildren().add(relatedItem);
-                singleItemInputBox.getChildren().add(userInputImageLabel);
-
-                relatedItemsBox.getChildren().add(singleItemInputBox);
-                addNewButton.setDisable(true);
-                relatedItem.requestFocus();
-            }
-
+            relatedItemsBox.getChildren().add(singleItemInputBox1);
+            addNewButton.setDisable(true);
+            relatedItem.requestFocus();
         });
     }
 
@@ -542,17 +539,13 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
 
     private ChangeListener<String> getNewChangeListenerForRelatedItem(final Label errorMessageLabel) {
         //Add a listener for text entry in the definition box. If the user enters an definition that is hierarchical an error message will be displayed.
-        return new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable,
-                                String oldValue, String newValue) {
-                if (newValue == null || newValue.isEmpty() || !requiresUri.getValue()) {
-                    setLabelImage(errorMessageLabel, null);
-                } else if (RDFURIValidator.isValid(newValue)) {
-                    setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-                } else {
-                    setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-                }
+        return (observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty() || !requiresUri.getValue()) {
+                setLabelImage(errorMessageLabel, null);
+            } else if (RDFURIValidator.isValid(newValue)) {
+                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+            } else {
+                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
             }
         };
     }

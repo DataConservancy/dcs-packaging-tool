@@ -17,10 +17,6 @@ package org.dataconservancy.packaging.gui.util;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -79,13 +75,9 @@ public class DisciplinePropertyBox extends HBox {
             addNewButton.setDisable(!hasValue);
             getChildren().add(addNewButton);
 
-            addNewButton.setOnAction(new EventHandler<ActionEvent>() {
-
-                @Override
-                public void handle(ActionEvent arg0) {
+            addNewButton.setOnAction(arg0 -> {
                 VBox disciplineSelectors = createDisciplineSelectors(availableDisciplines, systemGenerated, listener, addNewButton, fields, "", "");
                 propertyValuesBox.getChildren().add(disciplineSelectors);
-                }
             });
         }
     }
@@ -107,7 +99,7 @@ public class DisciplinePropertyBox extends HBox {
                                            Button addNewButton, Set<StringProperty> fields, String disciplineGroup, String disciplineValue) {
         VBox disciplineSelectors = new VBox(8);
 
-        ComboBox<String> disciplineGroupBox = new ComboBox<String>();
+        ComboBox<String> disciplineGroupBox = new ComboBox<>();
         disciplineGroupBox.getItems().addAll(availableDisciplines.keySet());
 
         if ((disciplineGroup == null || disciplineGroup.isEmpty()) && !availableDisciplines.keySet().isEmpty()) {
@@ -123,7 +115,7 @@ public class DisciplinePropertyBox extends HBox {
 
         disciplineSelectors.getChildren().add(disciplineGroupBox);
 
-        final ComboBox<String> disciplineBox = new ComboBox<String>();
+        final ComboBox<String> disciplineBox = new ComboBox<>();
         List<String> startingGroup;
         if (disciplineGroup != null && !disciplineGroup.isEmpty()) {
             startingGroup = availableDisciplines.get(availableDisciplines.keySet().iterator().next());
@@ -139,13 +131,10 @@ public class DisciplinePropertyBox extends HBox {
         disciplineBox.valueProperty().addListener(listener);
         disciplineSelectors.getChildren().add(disciplineBox);
 
-        disciplineGroupBox.valueProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                disciplineBox.getItems().clear();
-                if (availableDisciplines.get(newValue) != null) {
-                    disciplineBox.getItems().addAll(availableDisciplines.get(newValue));
-                }
+        disciplineGroupBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+            disciplineBox.getItems().clear();
+            if (availableDisciplines.get(newValue) != null) {
+                disciplineBox.getItems().addAll(availableDisciplines.get(newValue));
             }
         });
 

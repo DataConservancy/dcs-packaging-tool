@@ -43,38 +43,25 @@ public class SwitchButton extends Label
         switchBtn.setPrefWidth(45);
         
         //When the button is pressed toggle the boolean state backing the button.
-        switchBtn.setOnAction(new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle(ActionEvent t)
-            {
-                switchedOn.set(!switchedOn.get());
-            }
-        });
+        switchBtn.setOnAction(t -> switchedOn.set(!switchedOn.get()));
 
         //Set the graphic of the label to be the button.
         setGraphic(switchBtn);
 
         //The listener for the boolean property backing the button. This is what actually performs the appearance of a toggle.
-        switchedOn.addListener(new ChangeListener<Boolean>()
-        {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> ov,
-                Boolean t, Boolean t1)
+        switchedOn.addListener((ov, t, t1) -> {
+            //If the button is "on" mode set the on text and the desired on appearance.
+            if (t1)
             {
-                //If the button is "on" mode set the on text and the desired on appearance.
-                if (t1)
-                {
-                    setText(onText);
-                    setStyle("-fx-background-color: #48A79C; -fx-text-fill:white; -fx-padding: 0px 0px 0px 4px; -fx-background-radius: 6 6 6 6; -fx-background-insets: 0px 2px 0px 0px;");
-                    setContentDisplay(ContentDisplay.RIGHT);
-                }
-                else //Otherwise set the button "off" mode
-                {
-                    setText(offText);
-                    setStyle("-fx-background-color: #EEEEDD; -fx-text-fill:black; -fx-padding: 0px 4px 0px 0px; -fx-background-radius: 6 6 6 6; -fx-background-insets: 0px 0px 0px 2px;");
-                    setContentDisplay(ContentDisplay.LEFT);
-                }
+                setText(onText);
+                setStyle("-fx-background-color: #48A79C; -fx-text-fill:white; -fx-padding: 0px 0px 0px 4px; -fx-background-radius: 6 6 6 6; -fx-background-insets: 0px 2px 0px 0px;");
+                setContentDisplay(ContentDisplay.RIGHT);
+            }
+            else //Otherwise set the button "off" mode
+            {
+                setText(offText);
+                setStyle("-fx-background-color: #EEEEDD; -fx-text-fill:black; -fx-padding: 0px 4px 0px 0px; -fx-background-radius: 6 6 6 6; -fx-background-insets: 0px 0px 0px 2px;");
+                setContentDisplay(ContentDisplay.LEFT);
             }
         });
 

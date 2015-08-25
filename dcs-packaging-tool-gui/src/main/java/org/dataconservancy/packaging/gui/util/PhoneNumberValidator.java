@@ -35,7 +35,7 @@ public class PhoneNumberValidator {
     public static boolean isValid(String phoneNumber) {
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        PhoneNumber numberProto = null;
+        PhoneNumber numberProto;
 
         try {
             if(phoneNumber.startsWith(genericExitPrefix)){

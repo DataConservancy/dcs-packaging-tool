@@ -15,14 +15,16 @@
  */
 package org.dataconservancy.packaging.gui.util;
 
-import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -96,16 +98,12 @@ public class TextPropertyBox extends VBox implements CssConstants {
             addNewButton.setDisable(!hasValue);
             propertyBox.getChildren().add(addNewButton);
 
-            addNewButton.setOnAction(new EventHandler<ActionEvent>() {
-
-                @Override
-                public void handle(ActionEvent arg0) {
-                    HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, labels, applyButtonValidationListener,
-                            artifact, complexPropertyName, propertyBox, messages, "");
-                    propertyValuesBox.getChildren().add(propertyEntryBox);
-                    addNewButton.setDisable(true);
-                    propertyEntryBox.getChildren().get(0).requestFocus();
-                }
+            addNewButton.setOnAction(arg0 -> {
+                HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, labels, applyButtonValidationListener,
+                        artifact, complexPropertyName, propertyBox, messages, "");
+                propertyValuesBox.getChildren().add(propertyEntryBox);
+                addNewButton.setDisable(true);
+                propertyEntryBox.getChildren().get(0).requestFocus();
             });
         }
 
@@ -143,49 +141,46 @@ public class TextPropertyBox extends VBox implements CssConstants {
 
             //The following code handles the growing of the text area to fit the text. It starts as 5 rows of text and is locked to never go below that size.
             //This code only handles changes when the box is already visible for handling when the box is first visible see above.
-            propertyField.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observableValue, String s, String newValue) {
+            propertyField.textProperty().addListener((observableValue, s, newValue) -> {
 
-                    //Account for the padding inside of the text area
-                    final int textAreaPaddingSize = 20;
+                //Account for the padding inside of the text area
+                final int textAreaPaddingSize = 20;
 
-                    // This code can only be executed after the window is shown, because it needs to be laid out to get sized, and for the stylesheet to be set:
+                // This code can only be executed after the window is shown, because it needs to be laid out to get sized, and for the stylesheet to be set:
 
-                    //Hide the vertical scroll bar, the scroll bar sometimes appears briefly when resizing, this prevents that.
-                    ScrollBar scrollBarv = (ScrollBar)propertyField.lookup(".scroll-bar:vertical");
-                    if (scrollBarv != null ) {
-                        scrollBarv.setDisable(true);
-                    }
+                //Hide the vertical scroll bar, the scroll bar sometimes appears briefly when resizing, this prevents that.
+                ScrollBar scrollBarv = (ScrollBar)propertyField.lookup(".scroll-bar:vertical");
+                if (scrollBarv != null ) {
+                    scrollBarv.setDisable(true);
+                }
 
-                    if (newValue.length() > 0) {
-                        // Perform a lookup for an element with a css class of "text"
-                        // This will give the Node that actually renders the text inside the
-                        // TextArea
-                        final Node text = propertyField.lookup(".text");
+                if (newValue.length() > 0) {
+                    // Perform a lookup for an element with a css class of "text"
+                    // This will give the Node that actually renders the text inside the
+                    // TextArea
+                    final Node text = propertyField.lookup(".text");
 
-                        //Text will be null if the view has text already when the pop up is being shown
-                        //TODO: In java 8 this can be avoided by calling applyCSS
-                        if (text != null) {
-                            //If the text area is now bigger then starting size increase the size to fit the text plus the space for padding.
-                            if (text.getBoundsInLocal().getHeight() + textAreaPaddingSize > startingTextHeight) {
+                    //Text will be null if the view has text already when the pop up is being shown
+                    //TODO: In java 8 this can be avoided by calling applyCSS
+                    if (text != null) {
+                        //If the text area is now bigger then starting size increase the size to fit the text plus the space for padding.
+                        if (text.getBoundsInLocal().getHeight() + textAreaPaddingSize > startingTextHeight) {
 
-                                propertyField.setPrefHeight(text.getBoundsInLocal().getHeight() + textAreaPaddingSize);
-                            } else { //Otherwise set to the minimum size, this needs to be checked everytime in case the user selects all the text and deletes it
-                                propertyField.setPrefHeight(startingTextHeight);
-                            }
-                        } else {
-                            //In the case where the text is set before the view is laid out we measure the text and then set the size to it.
-                            double textHeight = computeTextHeight(newValue, 170.0) + textAreaPaddingSize;
-                            if (textHeight + textAreaPaddingSize > startingTextHeight) {
-                                 propertyField.setPrefHeight(textHeight);
-                            } else {
-                                propertyField.setPrefHeight(startingTextHeight);
-                            }
+                            propertyField.setPrefHeight(text.getBoundsInLocal().getHeight() + textAreaPaddingSize);
+                        } else { //Otherwise set to the minimum size, this needs to be checked everytime in case the user selects all the text and deletes it
+                            propertyField.setPrefHeight(startingTextHeight);
                         }
                     } else {
-                        propertyField.setPrefHeight(startingTextHeight);
+                        //In the case where the text is set before the view is laid out we measure the text and then set the size to it.
+                        double textHeight = computeTextHeight(newValue, 170.0) + textAreaPaddingSize;
+                        if (textHeight + textAreaPaddingSize > startingTextHeight) {
+                             propertyField.setPrefHeight(textHeight);
+                        } else {
+                            propertyField.setPrefHeight(startingTextHeight);
+                        }
                     }
+                } else {
+                    propertyField.setPrefHeight(startingTextHeight);
                 }
             });
 

@@ -16,16 +16,6 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -35,8 +25,11 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.Toggle;
+import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
@@ -45,17 +38,26 @@ import org.dataconservancy.packaging.gui.view.PackageGenerationView;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
-import org.dataconservancy.packaging.tool.model.*;
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
+import org.dataconservancy.packaging.tool.model.BoremParameterNames;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageDescription;
+import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
+import org.dataconservancy.packaging.tool.model.ParametersBuildException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Toggle;
-import javafx.beans.value.ChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Node;
-import javafx.scene.paint.Color;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation for the screen that will handle generating the actual package. Controls the user selecting packaging options,
@@ -64,7 +66,6 @@ import javafx.scene.paint.Color;
  */
 public class PackageGenerationPresenterImpl extends BasePresenterImpl implements PackageGenerationPresenter {
     private PackageGenerationView view;
-    private File outputDirectory = null;
     private PackageGenerationService packageGenerationService;
     private PackageGenerationParametersBuilder packageGenerationParamsBuilder;
     private PackageDescriptionBuilder packageDescriptionBuilder;
@@ -105,225 +106,163 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             backgroundService = new BackgroundPackageService();
         }
 
-        backgroundService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent t) {
-                if (Platform.isFxApplicationThread()) {
-                    view.getProgressPopup().hide();
-                    view.showSuccessPopup();
-                    view.scrollToTop();
-                }
-                backgroundService.reset();
-            }
-        });
-
-        backgroundService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
-
+        backgroundService.setOnSucceeded(t -> {
+            if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().hide();
-                if (workerStateEvent.getSource().getMessage() == null ||
-                    workerStateEvent.getSource().getMessage().isEmpty()) {
-                    Throwable e = workerStateEvent.getSource().getException();
-                    view.getStatusLabel().setText(
-                        errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
-                            " " + e.getMessage());
-                } else {
-                    view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
-                }
-
-                view.getStatusLabel().setTextFill(Color.RED);
-                view.getStatusLabel().setVisible(true);
+                view.showSuccessPopup();
                 view.scrollToTop();
-                backgroundService.reset();
             }
+            backgroundService.reset();
         });
 
-        backgroundService.setOnCancelled(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent workerStateEvent) {
-                if (Platform.isFxApplicationThread()) {
-                    view.getProgressPopup().hide();
-                }
+        backgroundService.setOnFailed(workerStateEvent -> {
+
+            view.getProgressPopup().hide();
+            if (workerStateEvent.getSource().getMessage() == null ||
+                workerStateEvent.getSource().getMessage().isEmpty()) {
+                Throwable e = workerStateEvent.getSource().getException();
+                view.getStatusLabel().setText(
+                    errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
+                        " " + e.getMessage());
+            } else {
                 view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
-                view.getStatusLabel().setTextFill(Color.RED);
-                view.getStatusLabel().setVisible(true);
-                view.scrollToTop();
-                backgroundService.reset();
             }
+
+            view.getStatusLabel().setTextFill(Color.RED);
+            view.getStatusLabel().setVisible(true);
+            view.scrollToTop();
+            backgroundService.reset();
+        });
+
+        backgroundService.setOnCancelled(workerStateEvent -> {
+            if (Platform.isFxApplicationThread()) {
+                view.getProgressPopup().hide();
+            }
+            view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
+            view.getStatusLabel().setTextFill(Color.RED);
+            view.getStatusLabel().setVisible(true);
+            view.scrollToTop();
+            backgroundService.reset();
         });
 
         //Handles the user pressing the button to set an output directory where the package will be saved.
-        view.getSelectOutputDirectoryButton().setOnAction(new EventHandler<ActionEvent>() {
+        view.getSelectOutputDirectoryButton().setOnAction(arg0 -> {
+            File file = controller.showOpenDirectoryDialog(view.getOutputDirectoryChooser());
+            if (file != null) {
+                controller.setOutputDirectory(file);
+                view.getOutputDirectoryChooser().setInitialDirectory(controller.getOutputDirectory());
+                //Set the package location parameter based on the new output directory.
+                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getOutputDirectory().getAbsolutePath());
 
-            @Override
-            public void handle(ActionEvent arg0) {
-                File file = controller.showOpenDirectoryDialog(view.getOutputDirectoryChooser());
-                if (file != null) {
-                    controller.setOutputDirectory(file);
-                    view.getOutputDirectoryChooser().setInitialDirectory(controller.getOutputDirectory());
-                    //Set the package location parameter based on the new output directory.
-                    generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getOutputDirectory().getAbsolutePath());
-
-                    setOutputDirectory(true);
-                }
+                setOutputDirectory(true);
             }
-            
         });
 
         //Handles the user changing the package name
-        view.getPackageNameField().textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(
-                ObservableValue<? extends String> observableValue,
-                String oldVal, String newVal) {
-                setOutputDirectory(true);
-            }
+        view.getPackageNameField().textProperty().addListener((observableValue, oldVal, newVal) -> {
+            setOutputDirectory(true);
         });
         
         //Handles the user pressing the no thanks link on the create another package popup. This will take the user
         //back to the home screen. 
-        view.getNoThanksLink().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                if (view.getSuccessPopup() != null && view.getSuccessPopup().isShowing()) {
-                    view.getSuccessPopup().hide();
-                }
-                controller.showHome(true);
-            }            
+        view.getNoThanksLink().setOnAction(arg0 -> {
+            if (view.getSuccessPopup() != null && view.getSuccessPopup().isShowing()) {
+                view.getSuccessPopup().hide();
+            }
+            controller.showHome(true);
         });
         
         //Handles the user pressing the create another package button on the create another package popup. This will 
         //dismiss the popup and keep the user on the screen.
-        view.getCreateNewPackageButton().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                if (view.getSuccessPopup() != null && view.getSuccessPopup().isShowing()) {
-                    view.getSuccessPopup().hide();
-                }
-                //this will get reset later - need to make sure this is empty now
-                generationParams.removeParam(BoremParameterNames.PKG_ORE_REM);
+        view.getCreateNewPackageButton().setOnAction(arg0 -> {
+            if (view.getSuccessPopup() != null && view.getSuccessPopup().isShowing()) {
+                view.getSuccessPopup().hide();
             }
-            
+            //this will get reset later - need to make sure this is empty now
+            generationParams.removeParam(BoremParameterNames.PKG_ORE_REM);
         });
 
         // This listener is for choosing cancel when overwriting a package file, just closes the popup
-        view.getCancelFileOverwriteButton().setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent arg0) {
-                view.getFileOverwriteWarningPopup().hide();
-            }
-        });
+        view.getCancelFileOverwriteButton().setOnAction(arg0 -> view.getFileOverwriteWarningPopup().hide());
 
         // This listener is for choosing to overwrite a package file; closes the window and proceeds
-        view.getOkFileOverwriteButton().setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                view.getFileOverwriteWarningPopup().hide();
-                view.getStatusLabel().setVisible(false);
-                view.getProgressPopup().show();
-                backgroundService.setOverwriteFile(true);
-                backgroundService.execute();
-            }
+        view.getOkFileOverwriteButton().setOnAction(actionEvent -> {
+            view.getFileOverwriteWarningPopup().hide();
+            view.getStatusLabel().setVisible(false);
+            view.getProgressPopup().show();
+            backgroundService.setOverwriteFile(true);
+            backgroundService.execute();
         });
         
         //This listener changes what is shown in the output directory box when the archiving format is changed.
-        view.getArchiveToggleGroup().selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            
-            public void changed(ObservableValue<? extends Toggle> ov,
-                                    Toggle toggle, Toggle archiveToggle) {
-                if (archiveToggle != null) {
-                    setOutputDirectory(true);
+        view.getArchiveToggleGroup().selectedToggleProperty().addListener((ov, toggle, archiveToggle) -> {
+            if (archiveToggle != null) {
+                setOutputDirectory(true);
 
-                    //Set the parameter for the archive format.
-                    String archiveExtension = (String) archiveToggle.getUserData();
-                    generationParams.removeParam(GeneralParameterNames.ARCHIVING_FORMAT);
+                //Set the parameter for the archive format.
+                String archiveExtension = (String) archiveToggle.getUserData();
+                generationParams.removeParam(GeneralParameterNames.ARCHIVING_FORMAT);
 
-                    if (!archiveExtension.isEmpty()) {
-                        generationParams.addParam(GeneralParameterNames.ARCHIVING_FORMAT, archiveExtension);                                
+                if (!archiveExtension.isEmpty()) {
+                    generationParams.addParam(GeneralParameterNames.ARCHIVING_FORMAT, archiveExtension);
+                }
+
+                //when we select zip or exploded as our archiving format, we must select 'none' as our compression
+                if (archiveExtension.equals("zip") || archiveExtension.equals("exploded")){
+                    Toggle noCompressionToggle = getNoCompressionToggle();
+                    if(noCompressionToggle != null && noCompressionToggle != view.getCompressionToggleGroup().getSelectedToggle()) {
+                        view.getCompressionToggleGroup().selectToggle(noCompressionToggle);
                     }
-
-                    //when we select zip or exploded as our archiving format, we must select 'none' as our compression
-                    if (archiveExtension.equals("zip") || archiveExtension.equals("exploded")){
-                        Toggle noCompressionToggle = getNoCompressionToggle();
-                        if(noCompressionToggle != null && noCompressionToggle != view.getCompressionToggleGroup().getSelectedToggle()) {
-                            view.getCompressionToggleGroup().selectToggle(noCompressionToggle);
-                        }
-                    }
-                }                        
-             }
-        });
+                }
+            }
+         });
         
         //This listener changes what is shown in the output directory box when the compression format is changed.
-        view.getCompressionToggleGroup().selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-            
-            public void changed(ObservableValue<? extends Toggle> ov,
-                                    Toggle toggle, Toggle compressionToggle) {
-                if (compressionToggle != null) {
-                    setOutputDirectory(true);
-                    
-                    //Set the parameter for compression format.
-                    String compressionExtension = (String) compressionToggle.getUserData();
-                    generationParams.removeParam(GeneralParameterNames.COMPRESSION_FORMAT);
+        view.getCompressionToggleGroup().selectedToggleProperty().addListener((ov, toggle, compressionToggle) -> {
+            if (compressionToggle != null) {
+                setOutputDirectory(true);
 
-                    if (!compressionExtension.isEmpty()) {
-                        generationParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, compressionExtension);
-                    }
-                }                        
-             }
-        });
-        
-        view.getMd5CheckBox().selectedProperty().addListener(new ChangeListener<Boolean>() {
+                //Set the parameter for compression format.
+                String compressionExtension = (String) compressionToggle.getUserData();
+                generationParams.removeParam(GeneralParameterNames.COMPRESSION_FORMAT);
 
-            @Override
-            public void changed(ObservableValue<? extends Boolean> ov,
-                                Boolean oldValue,
-                                Boolean newValue) {
-                List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
-
-                if (newValue) {
-                    if (params != null && !params.isEmpty() && !params.contains("md5")) {
-                        params.add("md5");
-                    }
-                } else {
-                    if (params != null && !params.isEmpty()) {
-                        params.remove("md5");
-                    }
+                if (!compressionExtension.isEmpty()) {
+                    generationParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, compressionExtension);
                 }
             }
-            
-        });
+         });
         
-        view.getSHA1CheckBox().selectedProperty().addListener(new ChangeListener<Boolean>() {
+        view.getMd5CheckBox().selectedProperty().addListener((ov, oldValue, newValue) -> {
+            List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
 
-            @Override
-            public void changed(ObservableValue<? extends Boolean> ov,
-                                Boolean oldValue, Boolean newValue) {
-                List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
-
-                if (newValue) {
-                    if (params != null && !params.isEmpty() &&
-                        !params.contains("sha1")) {
-                        params.add("sha1");
-                    }
-                } else {
-                    if (params != null && !params.isEmpty()) {
-                        params.remove("sha1");
-                    }
+            if (newValue) {
+                if (params != null && !params.isEmpty() && !params.contains("md5")) {
+                    params.add("md5");
+                }
+            } else {
+                if (params != null && !params.isEmpty()) {
+                    params.remove("md5");
                 }
             }
+        });
+        
+        view.getSHA1CheckBox().selectedProperty().addListener((ov, oldValue, newValue) -> {
+            List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
 
+            if (newValue) {
+                if (params != null && !params.isEmpty() &&
+                    !params.contains("sha1")) {
+                    params.add("sha1");
+                }
+            } else {
+                if (params != null && !params.isEmpty()) {
+                    params.remove("sha1");
+                }
+            }
         });
 
         if (Platform.isFxApplicationThread()) {
-            ((ProgressDialogPopup) view.getProgressPopup()).setCancelEventHandler(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    backgroundService.cancel();
-                }
-            });
+            ((ProgressDialogPopup) view.getProgressPopup()).setCancelEventHandler(event -> backgroundService.cancel());
         }
 
         /*Handles when the continue button is pressed in the footer. 
@@ -331,17 +270,13 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         * If successful a popup is shown asking the user if they want to create another package, otherwise an error message is displayed informing the user what went wrong
         * and error is logged.
         */
-        view.getContinueButton().setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent arg0) {
-                view.getStatusLabel().setVisible(false);
-                if (Platform.isFxApplicationThread()) {
-                    view.getProgressPopup().show();
-                }
-                backgroundService.setOverwriteFile(false);
-                backgroundService.execute();
+        view.getContinueButton().setOnAction(arg0 -> {
+            view.getStatusLabel().setVisible(false);
+            if (Platform.isFxApplicationThread()) {
+                view.getProgressPopup().show();
             }
+            backgroundService.setOverwriteFile(false);
+            backgroundService.execute();
         });
     }
 
@@ -897,12 +832,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                                    cancel();
                                }
                            } else {
-                               Platform.runLater(new Runnable() {
-                                   @Override
-                                   public void run() {
-                                       view.getProgressPopup().hide();
-                                       view.showFileOverwriteWarningPopup();
-                                   }
+                               Platform.runLater(() -> {
+                                   view.getProgressPopup().hide();
+                                   view.showFileOverwriteWarningPopup();
                                });
                                cancel();
                            }
@@ -951,12 +883,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                    }
                } else {
 
-                   Platform.runLater(new Runnable() {
-                       @Override
-                       public void run() {
-                           view.getProgressPopup().hide();
-                           view.showFileOverwriteWarningPopup();
-                       }
+                   Platform.runLater(() -> {
+                       view.getProgressPopup().hide();
+                       view.showFileOverwriteWarningPopup();
                    });
                    worker.setState(Worker.State.CANCELLED);
                    cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));

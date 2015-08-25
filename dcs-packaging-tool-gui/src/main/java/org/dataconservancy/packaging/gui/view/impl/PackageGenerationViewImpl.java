@@ -19,16 +19,22 @@ package org.dataconservancy.packaging.gui.view.impl;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
-
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -40,7 +46,10 @@ import org.dataconservancy.packaging.gui.view.PackageGenerationView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -367,17 +376,13 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
     private ChangeListener<String> getNewChangeListenerForPhoneNumber(final Label errorMessageLabel) {
         //Add a listener for text entry in the phone number box
-        return new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable,
-                                String oldValue, String newValue) {
-                if (newValue == null || newValue.isEmpty()) {
-                    setLabelImage(errorMessageLabel, null);
-                } else if (PhoneNumberValidator.isValid(newValue)) {
-                    setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-                } else {
-                    setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-                }
+        return (observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty()) {
+                setLabelImage(errorMessageLabel, null);
+            } else if (PhoneNumberValidator.isValid(newValue)) {
+                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+            } else {
+                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
             }
         };
     }
