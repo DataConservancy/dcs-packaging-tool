@@ -21,12 +21,13 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import org.dataconservancy.packaging.gui.view.impl.PackageArtifactWindowBuilder;
 
 import java.util.List;
 
 /**
  * Class used to capture changes to simple properties, provides ability to determine if any fields are empty.
- * This code is used by the {@link org.dataconservancy.packaging.gui.view.impl.PackageArtifactPropertiesPopupBuilder} to determine
+ * This code is used by the {@link PackageArtifactWindowBuilder} to determine
  * when fields are empty in order to determine if add more fields buttons should be enabled or not.
  */
 public class SimplePropertyChangeListener implements ChangeListener<String> {

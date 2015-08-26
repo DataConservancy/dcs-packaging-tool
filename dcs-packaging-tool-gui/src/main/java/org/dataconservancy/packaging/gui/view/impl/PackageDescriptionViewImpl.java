@@ -21,7 +21,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -46,6 +45,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -131,7 +131,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Preferences preferences;
-    private PackageArtifactPropertiesPopupBuilder popupBuilder;
+    private PackageArtifactWindowBuilder popupBuilder;
 
     private static final String synthesizedArtifactMarker = " *";
 
@@ -155,6 +155,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         setCenter(content);
 
         artifactDetailsWindow = new Stage();
+        artifactDetailsWindow.setMinWidth(540);
+        artifactDetailsWindow.setMinHeight(500);
 
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
@@ -361,7 +363,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         //Instantiating metadata inheritance button map
         metadataInheritanceButtonMap = new HashMap<>();
 
-        popupBuilder = new PackageArtifactPropertiesPopupBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
+        popupBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
 
     @Override
@@ -559,17 +561,10 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         artifactPropertyFields = new HashMap<>();
         artifactRelationshipFields = new HashSet<>();
 
-        Node propertiesTabs = popupBuilder.buildArtifactPropertiesPopupSidePane(artifact, artifactPropertyFields,
-                        artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
-
-        BorderPane container = new BorderPane();
-        container.getStyleClass().add(CssConstants.ROOT_CLASS);
-
-        container.setPadding(new Insets(14));
-        container.setCenter(propertiesTabs);
+        Pane propertiesPane = popupBuilder.buildArtifactPropertiesLayout(artifact, artifactPropertyFields, artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
 
         artifactDetailsWindow.setTitle(artifact.getArtifactRef().getRefName() + " Properties");
-        artifactDetailsWindow.setScene(new Scene(container, 450, 450));
+        artifactDetailsWindow.setScene(new Scene(propertiesPane, 540, 500));
 
         if(!artifactDetailsWindow.isShowing()) {
             if (anchorNode != null) {
