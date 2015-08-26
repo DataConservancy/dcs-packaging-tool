@@ -22,8 +22,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
+import javafx.stage.WindowEvent;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.model.Relationship;
@@ -171,7 +173,8 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             } catch (PackageValidationException e1) {
                 //Gets the button that's used to dismiss validation error popup.
                 view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
-                    if (view.getWarningPopup() != null && view.getWarningPopup().isShowing()) {
+                    if (view.getWarningPopup() != null &&
+                        view.getWarningPopup().isShowing()) {
                         view.getWarningPopup().hide();
                     }
                 });
@@ -186,11 +189,13 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             if (packageDescriptionFile != null) {
 
                 FileOutputStream stream = null;
-                try{
+                try {
                     stream = new FileOutputStream(packageDescriptionFile);
-                } catch (IOException e){
+                } catch (IOException e) {
                     log.error(e.getMessage());
-                    view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+                    view.getErrorMessageLabel().setText(
+                        errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) +
+                            e.getMessage());
                     view.getErrorMessageLabel().setVisible(true);
                 }
 
@@ -209,16 +214,18 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         
         //Cancels the property popup, which closes the popup with out saving any changes.
         view.getCancelPopupHyperlink().setOnAction(arg0 -> {
-            if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
-                view.getPackageArtifactPopup().hide();
+            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
+                view.getArtifactDetailsWindow().hide();
             }
         });
+
+        view.getArtifactDetailsWindow().setOnCloseRequest(event -> saveCurrentArtifact());
         
         //Saves any changes made in the package artifact property popup
         view.getApplyPopupButton().setOnAction(arg0 -> {
             saveCurrentArtifact();
-            if (view.getPackageArtifactPopup() != null && view.getPackageArtifactPopup().isShowing()) {
-                view.getPackageArtifactPopup().hide();
+            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
+                view.getArtifactDetailsWindow().hide();
             }
         });
 
@@ -226,7 +233,8 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
     }
 
-    private void saveCurrentArtifact() {
+    @Override
+    public void saveCurrentArtifact() {
         if (view.getPopupArtifact() != null) {
             //First loop through all the properties in the popup
             for (String property : view.getArtifactPropertyFields().keySet()) {

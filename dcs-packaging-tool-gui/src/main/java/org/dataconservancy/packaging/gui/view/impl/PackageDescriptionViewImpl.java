@@ -21,10 +21,13 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
@@ -41,14 +44,17 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
@@ -84,7 +90,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     private Messages messages;
     private TreeTableView<PackageArtifact> artifactTree;
 
-    private PackageToolPopup artifactDetailsPopup;
+    private Stage artifactDetailsWindow;
     private PackageArtifact popupArtifact;
     private PackageOntologyService packageOntologyService;
 
@@ -148,6 +154,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         content.getStyleClass().add(PACKAGE_DESCRIPTION_VIEW_CLASS);
         setCenter(content);
 
+        artifactDetailsWindow = new Stage();
+
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
@@ -210,6 +218,13 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
         //disable column sorting in the view
         artifactTree.setSortPolicy(treeTableView -> false);
+
+        artifactTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (artifactDetailsWindow.isShowing()) {
+                presenter.saveCurrentArtifact();
+                showArtifactDetails(newValue.getValue(), null);
+            }
+        });
 
         //set up the columns for the artifact, its type and the options control
         TreeTableColumn<PackageArtifact, Label> artifactColumn = new TreeTableColumn<>("Artifact");
@@ -405,7 +420,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         item.setOnAction(actionEvent -> {
             VBox detailsBox = new VBox();
             detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
-            showArtifactDetailsPopup(packageArtifact, label);
+            showArtifactDetails(packageArtifact, label);
             artifactTree.getSelectionModel().select(treeItem);
         });
 
@@ -536,12 +551,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     }
 
     @Override
-    public PackageToolPopup getPackageArtifactPopup() {
-        return artifactDetailsPopup;
-    }
-    
-    @Override
-    public void showArtifactDetails(PackageArtifact artifact, double xValue, double yValue) {
+    public void showArtifactDetails(PackageArtifact artifact, Node anchorNode) {
 
         popupArtifact = artifact;
 
@@ -549,27 +559,38 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         artifactPropertyFields = new HashMap<>();
         artifactRelationshipFields = new HashSet<>();
 
+        Node propertiesTabs = popupBuilder.buildArtifactPropertiesPopupSidePane(artifact, artifactPropertyFields,
+                        artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
 
-        artifactDetailsPopup = popupBuilder.buildArtifactPropertiesPopup(artifact, artifactPropertyFields,
-                artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
-        artifactDetailsPopup.setOwner(getScene().getWindow());
-        artifactDetailsPopup.show(xValue, yValue);
+        BorderPane container = new BorderPane();
+        container.getStyleClass().add(CssConstants.ROOT_CLASS);
+
+        container.setPadding(new Insets(14));
+        container.setCenter(propertiesTabs);
+
+        artifactDetailsWindow.setTitle(artifact.getArtifactRef().getRefName() + " Properties");
+        artifactDetailsWindow.setScene(new Scene(container, 450, 450));
+
+        if(!artifactDetailsWindow.isShowing()) {
+            if (anchorNode != null) {
+                Point2D point = anchorNode.localToScene(0.0, 0.0);
+                double x = getScene().getWindow().getX() + point.getX();
+                double y = getScene().getWindow().getY() + point.getY();
+
+                //X and Y are now the location of the menu, offset slightly from that
+                x -= 600;
+                y -= 80;
+
+                artifactDetailsWindow.setX(x);
+                artifactDetailsWindow.setY(y);
+            }
+            artifactDetailsWindow.show();
+        }
     }
 
-    /*
-     * Calculates the location of the package artifact popup then displays it.
-     * @param artifact
-     * @param node The parent node the artifact should be anchored to.
-     */
-    private void showArtifactDetailsPopup(PackageArtifact artifact, Node node){
-        Point2D point = node.localToScene(0.0,  0.0);
-        double x = getScene().getWindow().getX() + point.getX();
-        double y = getScene().getWindow().getY() + point.getY();
-
-        //X and Y are now the location of the menu, offset slightly from that
-        x -= 600;
-        y -= 80;
-        showArtifactDetails(artifact, x, y);
+    @Override
+    public Stage getArtifactDetailsWindow() {
+        return artifactDetailsWindow;
     }
 
     @Override

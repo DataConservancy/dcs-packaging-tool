@@ -126,13 +126,31 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
 
         return artifactDetailsPopup;
     }
-    
+
+    public Node buildArtifactPropertiesPopupSidePane(PackageArtifact artifact, Map<String, PackageDescriptionViewImpl.ArtifactPropertyContainer> artifactPropertyFields,
+                Set<PackageDescriptionViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields, Map<String, CheckBox> metadataInheritanceButtonMap,
+                PackageDescriptionPresenter packageDescriptionPresenter, PackageOntologyService packageOntologyService) {
+
+        this.artifactPropertyFields = artifactPropertyFields;
+        this.artifactRelationshipFields = artifactRelationshipFields;
+
+        if (artifactDetailsPopup == null) {
+            artifactDetailsPopup = new PackageToolPopup();
+        }
+
+        this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
+        this.presenter = packageDescriptionPresenter;
+        this.packageOntologyService = packageOntologyService;
+
+        return createArtifactDetailsPopup(artifact);
+    }
+
     /*
      * Creates an artifact details popup. This popup's content is a tabbed view, with a tab for general properties,
      * creator properties, and relationships.
      * @param artifact
      */
-    private void createArtifactDetailsPopup(PackageArtifact artifact) {
+    private Node createArtifactDetailsPopup(PackageArtifact artifact) {
 
         artifactDetailsPopup.setTitleText(artifact.getArtifactRef().getRefString());
 
@@ -209,6 +227,8 @@ public class PackageArtifactPropertiesPopupBuilder implements  CssConstants {
         popupControls.getChildren().add(applyPopupButton);
 
         artifactDetailsPopup.setFooter(popupControls);
+
+        return propertiesPopup;
     }
 
     /*

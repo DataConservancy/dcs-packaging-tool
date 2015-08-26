@@ -16,11 +16,12 @@
 
 package org.dataconservancy.packaging.gui.view;
 
-import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
+import javafx.scene.Node;
 import javafx.scene.control.TreeTableView;
+import javafx.stage.Stage;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactPropertyContainer;
@@ -54,18 +55,17 @@ public interface PackageDescriptionView extends View<PackageDescriptionPresenter
     public TreeTableView<PackageArtifact> getArtifactTreeView();
 
     /**
-     * Returns the tabbed popup that displays the artifact properties and relationships. 
-     * @return the tabbed popup
+     * Retrieves the stage that represents the window used for the editing package artifacts.
+     * @return the stage that shows the artifact properties edit screen
      */
-    public PackageToolPopup getPackageArtifactPopup();
+    public Stage getArtifactDetailsWindow();
     
     /**
-     * Displays the artifact details popup. 
+     * Displays the artifact details window.
      * @param artifact  the Artifact
-     * @param xValue  the x-value
-     * @param yValue  the y-value
+     * @param anchorNode The scene object the artifact details window should initially anchor too
      */
-    public void showArtifactDetails(PackageArtifact artifact, double xValue, double yValue);
+    public void showArtifactDetails(PackageArtifact artifact, Node anchorNode);
 
     /**
      * Gets the file chooser that's used for saving the pacakge description file. 

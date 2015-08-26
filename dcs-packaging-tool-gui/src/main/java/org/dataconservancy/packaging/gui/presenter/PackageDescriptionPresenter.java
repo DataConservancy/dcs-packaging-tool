@@ -126,4 +126,9 @@ public interface PackageDescriptionPresenter extends Presenter {
      * @return True if the artifact can be attached to a grandparent, false otherwise
      */
     boolean canCollapseParentArtifact(PackageArtifact packageArtifact);
+
+    /**
+     * Saves the artifact that's currently being displayed in the properties window.
+     */
+    void saveCurrentArtifact();
 }

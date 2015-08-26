@@ -15,22 +15,15 @@
  */
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
-
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Help;
-import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
-import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.view.HeaderView;
-import org.dataconservancy.packaging.gui.view.PackageDescriptionView;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactPropertyContainer;
-import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactRelationshipContainer;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
@@ -50,9 +43,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -530,199 +530,6 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         invalidProperties = presenter.findInvalidProperties(emptyCollection, dataitem1.getType());
         assertNotNull(invalidProperties);
         assertTrue(invalidProperties.isEmpty());
-    }
-
-
-    /**
-     * Tests that a mock popup is successfully generated.
-     * @throws IOException
-     */
-    @Test
-    public void testGeneratePopup() throws IOException {
-        
-        PackageDescriptionView view = new PackageDescriptionView() {
-
-            private PackageToolPopup detailsPopup;
-            
-            @Override
-            public void setPresenter(PackageDescriptionPresenter presenter) {
-                
-            }
-
-            @Override
-            public Node asNode() {
-                return null;
-            }
-
-            @Override
-            public TreeItem<PackageArtifact> getRoot() {
-                return null;
-            }
-
-            @Override
-            public TreeTableView<PackageArtifact> getArtifactTreeView() {
-                return null;
-            }
-
-            @Override
-            public PackageToolPopup getPackageArtifactPopup() {
-                return detailsPopup;
-            }
-
-            @Override
-            public void showArtifactDetails(PackageArtifact artifact,
-                                            double xValue,
-                                            double yValue) {
-                detailsPopup = mock(PackageToolPopup.class);
-                
-            }
-
-            @Override
-            public Button getContinueButton() {
-                return null;
-            }
-
-            @Override
-            public Hyperlink getCancelLink() {
-                return null;
-            }
-
-            @Override
-            public Label getPackageNameLabel() {
-                return null;
-            }
-
-            @Override
-            public FileChooser getPackageDescriptionFileChooser() {
-                return null;
-            }
-
-            @Override
-            public CheckBox getFullPathCheckBox() {
-                return null;
-            }
-
-            @Override
-            public Hyperlink getCancelPopupHyperlink() {
-                return null;
-            }
-
-            @Override
-            public Button getApplyPopupButton() {
-                return null;
-            }
-
-            @Override
-            public Map<String, ArtifactPropertyContainer> getArtifactPropertyFields() {
-                return new HashMap<>();
-            }
-
-            @Override
-            public PackageArtifact getPopupArtifact() {
-                return null;
-            }
-
-            @Override
-            public PackageToolPopup getWarningPopup() {
-                return null;
-            }
-
-            @Override
-            public void showWarningPopup(String title, String errorMessage, boolean allowNegative, boolean allowFutureHide) {
-                // Default method body
-
-            }
-
-
-            @Override
-            public Button getWarningPopupPositiveButton() {
-                return null;
-            }
-
-            @Override
-            public Button getWarningPopupNegativeButton() {
-                // Default method body
-                return null;
-            }
-
-            @Override
-            public CheckBox getHideFutureWarningPopupCheckbox() {
-                // Default method body
-                return null;
-            }
-
-            @Override
-            public Button getSaveButton() {
-                return null;
-            }
-
-            @Override
-            public void showHelpPopup() {                
-            }
-
-            @Override
-            public void showAboutPopup() {                
-            }
-
-            @Override
-            public void setHelpPopupContent(Node content) {                
-            }
-
-            @Override
-            public void setAboutPopupContent(Node content) {                
-            }
-
-            @Override
-            public Hyperlink getHeaderViewAboutLink() {
-                return null;
-            }
-
-            @Override
-            public Hyperlink getHeaderViewHelpLink() {
-                return null;
-            }
-
-            @Override
-            public void setHeaderView(HeaderView headerView) {                
-            }
-
-            @Override
-            public Set<ArtifactRelationshipContainer> getArtifactRelationshipFields() {
-                return null;
-            }
-
-            @Override
-            public Label getErrorMessageLabel() {
-                return null;
-            }
-
-            @Override
-            public CheckBox getShowIgnored() {
-                return null;
-            }
-
-            @Override
-            public Map<String, CheckBox> getInheritMetadataCheckBoxMap() {
-                return null;
-            }
-
-            @Override
-            public Button getReenableWarningsButton() {
-                return null;
-            }
-
-            @Override
-            public void setupHelp() {
-            }
-
-            @Override
-            public void setHelp(Help help) {
-            }
-            
-        };
-        
-        view.showArtifactDetails(new PackageArtifact(), 100, 100);
-        assertNotNull(view.getPackageArtifactPopup());
     }
 
     @Test
