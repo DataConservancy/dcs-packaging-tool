@@ -22,7 +22,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -43,7 +42,6 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -54,7 +52,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
-import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
@@ -91,6 +88,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     private TreeTableView<PackageArtifact> artifactTree;
 
     private Stage artifactDetailsWindow;
+    private Scene artifactDetailsScene;
     private PackageArtifact popupArtifact;
     private PackageOntologyService packageOntologyService;
 
@@ -131,7 +129,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Preferences preferences;
-    private PackageArtifactWindowBuilder popupBuilder;
+    private PackageArtifactWindowBuilder windowBuilder;
 
     private static final String synthesizedArtifactMarker = " *";
 
@@ -363,7 +361,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         //Instantiating metadata inheritance button map
         metadataInheritanceButtonMap = new HashMap<>();
 
-        popupBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
+        windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
 
     @Override
@@ -561,10 +559,15 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         artifactPropertyFields = new HashMap<>();
         artifactRelationshipFields = new HashSet<>();
 
-        Pane propertiesPane = popupBuilder.buildArtifactPropertiesLayout(artifact, artifactPropertyFields, artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
+        Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(artifact, artifactPropertyFields, artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
 
+        if (artifactDetailsScene == null) {
+            artifactDetailsScene = new Scene(propertiesPane, 540, 500);
+        } else {
+            artifactDetailsScene.setRoot(propertiesPane);
+        }
         artifactDetailsWindow.setTitle(artifact.getArtifactRef().getRefName() + " Properties");
-        artifactDetailsWindow.setScene(new Scene(propertiesPane, 540, 500));
+        artifactDetailsWindow.setScene(artifactDetailsScene);
 
         if(!artifactDetailsWindow.isShowing()) {
             if (anchorNode != null) {
