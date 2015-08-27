@@ -152,9 +152,11 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         content.getStyleClass().add(PACKAGE_DESCRIPTION_VIEW_CLASS);
         setCenter(content);
 
-        artifactDetailsWindow = new Stage();
-        artifactDetailsWindow.setMinWidth(540);
-        artifactDetailsWindow.setMinHeight(500);
+        if (Platform.isFxApplicationThread()) {
+            artifactDetailsWindow = new Stage();
+            artifactDetailsWindow.setMinWidth(540);
+            artifactDetailsWindow.setMinHeight(500);
+        }
 
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
@@ -220,7 +222,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         artifactTree.setSortPolicy(treeTableView -> false);
 
         artifactTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (artifactDetailsWindow.isShowing()) {
+            if (artifactDetailsWindow != null && artifactDetailsWindow.isShowing()) {
                 presenter.saveCurrentArtifact();
                 showArtifactDetails(newValue.getValue(), null);
             }
@@ -553,36 +555,40 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     @Override
     public void showArtifactDetails(PackageArtifact artifact, Node anchorNode) {
 
-        popupArtifact = artifact;
+        if (artifactDetailsWindow != null) {
+            popupArtifact = artifact;
 
-        //Initialize the containers that are used to hold the text fields.
-        artifactPropertyFields = new HashMap<>();
-        artifactRelationshipFields = new HashSet<>();
+            //Initialize the containers that are used to hold the text fields.
+            artifactPropertyFields = new HashMap<>();
+            artifactRelationshipFields = new HashSet<>();
 
-        Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(artifact, artifactPropertyFields, artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
+            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(artifact, artifactPropertyFields, artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
 
-        if (artifactDetailsScene == null) {
-            artifactDetailsScene = new Scene(propertiesPane, 540, 500);
-        } else {
-            artifactDetailsScene.setRoot(propertiesPane);
-        }
-        artifactDetailsWindow.setTitle(artifact.getArtifactRef().getRefName() + " Properties");
-        artifactDetailsWindow.setScene(artifactDetailsScene);
-
-        if(!artifactDetailsWindow.isShowing()) {
-            if (anchorNode != null) {
-                Point2D point = anchorNode.localToScene(0.0, 0.0);
-                double x = getScene().getWindow().getX() + point.getX();
-                double y = getScene().getWindow().getY() + point.getY();
-
-                //X and Y are now the location of the menu, offset slightly from that
-                x -= 600;
-                y -= 80;
-
-                artifactDetailsWindow.setX(x);
-                artifactDetailsWindow.setY(y);
+            if (artifactDetailsScene == null) {
+                artifactDetailsScene = new Scene(propertiesPane, 540, 500);
+            } else {
+                artifactDetailsScene.setRoot(propertiesPane);
             }
-            artifactDetailsWindow.show();
+
+            artifactDetailsWindow.setTitle(
+                artifact.getArtifactRef().getRefName() + " Properties");
+            artifactDetailsWindow.setScene(artifactDetailsScene);
+
+            if (!artifactDetailsWindow.isShowing()) {
+                if (anchorNode != null) {
+                    Point2D point = anchorNode.localToScene(0.0, 0.0);
+                    double x = getScene().getWindow().getX() + point.getX();
+                    double y = getScene().getWindow().getY() + point.getY();
+
+                    //X and Y are now the location of the menu, offset slightly from that
+                    x -= 600;
+                    y -= 80;
+
+                    artifactDetailsWindow.setX(x);
+                    artifactDetailsWindow.setY(y);
+                }
+                artifactDetailsWindow.show();
+            }
         }
     }
 

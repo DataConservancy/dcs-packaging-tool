@@ -219,7 +219,9 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             }
         });
 
-        view.getArtifactDetailsWindow().setOnCloseRequest(event -> saveCurrentArtifact());
+        if (view.getArtifactDetailsWindow() != null) {
+            view.getArtifactDetailsWindow().setOnCloseRequest(event -> saveCurrentArtifact());
+        }
         
         //Saves any changes made in the package artifact property popup
         view.getApplyPopupButton().setOnAction(arg0 -> {
