@@ -14,20 +14,23 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <!-- $Id$ $URL$ -->
-
+  <!-- ======================================================== -->
+  <!-- Data Conservancy Shared Utilities Parent POM =========== -->
+  <!-- ======================================================== -->
+  
   <modelVersion>4.0.0</modelVersion>
+   
+  <name>Data Conservancy Shared Utilties Parent POM</name>
+  <description>Shared Utility Code for various DCS modules</description>
+  
   <groupId>org.dataconservancy.shared</groupId>
   <artifactId>dcs-shared-util</artifactId>
-  <packaging>jar</packaging>
-  <name>dcs-shared-util</name>
-  <description>Shared Utility Code for various DCS modules</description>
   <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
   <parent>
     <groupId>org.dataconservancy</groupId>
@@ -35,19 +38,11 @@
     <version>1.1.2-SNAPSHOT</version>
   </parent>
 
-  <!-- PROPERTIES -->
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
-
-
-    <!-- PROFILES -->
-
-
-  <!-- BUILD -->
+  <!-- Build  ===================================================== -->
+  
   <build>
+    
+    <!-- Plugin Management  ======================================= -->
 
     <pluginManagement>
 
@@ -68,7 +63,6 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.5</version>
         </plugin>
 
         <plugin>
@@ -101,6 +95,8 @@
 
     </pluginManagement>
 
+    <!-- Plugins  ================================================= -->
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -136,32 +132,39 @@
 
   </build>
 
-
-  <!-- DEPENDENCIES -->
+  <!-- Dependencies  ============================================== -->
+  
   <dependencies>
+    
+    <!-- POM Dependencies  ======================================== -->
+    
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>apache-jena-libs</artifactId>
       <type>pom</type>
     </dependency>
+    
+    <!-- Compile Dependencies ===================================== -->
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>${dcs.project.commonsio.version}</version>
+      <scope>compile</scope>
     </dependency>
 
-  <!-- Compile Dependencies -->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
@@ -169,8 +172,9 @@
     </dependency>
 
     <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -192,12 +196,12 @@
     </dependency>
 
     <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <scope>compile</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>compile</scope>
     </dependency>
 
-    <!-- Runtime Dependencies ========================================= -->
+    <!-- Runtime Dependencies ===================================== -->
 
     <!-- Despite what dependency:analyze says, this artifact is needed -->
     <dependency>
@@ -213,7 +217,7 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Test Dependencies -->
+    <!-- Test Dependencies ======================================== -->
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -235,6 +239,8 @@
 
   </dependencies>
 
+  <!-- SCM ======================================================== -->
+  
   <scm>
     <connection>scm:git:https://github.com/DataConservancy/dcs.git</connection>
     <developerConnection>scm:git:https://github.com/DataConservancy/dcs.git</developerConnection>
