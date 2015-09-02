@@ -121,7 +121,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         //Create a box for the namespace selection elements
         final HBox namespaceBox = new HBox(15);
         Label schemaLabel = new Label(labels.get(Labels.LabelKey.NAMESPACE_LABEL));
-        schemaLabel.setPrefWidth(100);
+        schemaLabel.setMinWidth(100);
         schemaLabel.setWrapText(true);
         namespaceBox.getChildren().add(schemaLabel);
 
@@ -170,14 +170,14 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         //Create a box for the actual namespace definition.
         HBox relationshipDefinitionBox = new HBox(15);
         Label relationshipLabel = new Label(labels.get(Labels.LabelKey.RELATIONSHIP_LABEL));
-        relationshipLabel.setPrefWidth(100);
+        relationshipLabel.setMinWidth(100);
         relationshipLabel.setWrapText(true);
         relationshipDefinitionBox.getChildren().add(relationshipLabel);
 
         //Create a combobox to select or enter the relationship uri or name, this box selection is controlled by the namespace selection.
         final ComboBox<Relationship> relationshipComboBox = new ComboBox<>();
         relationshipComboBox.setEditable(true);
-        relationshipComboBox.setMinWidth(300);
+        relationshipComboBox.setPrefWidth(800);
         relationshipComboBox.setDisable(!editable.getValue());
         relationshipComboBox.setCellFactory(relationshipCellFactory);
         relationshipComboBox.getEditor().textProperty().addListener(addNewRelationshipListener);
@@ -354,8 +354,8 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
             TextField relatedItem = new TextField();
             //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
             relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));
-            relatedItem.setPrefWidth(210);
-            relatedItem.setMaxWidth(210);
+            relatedItem.setPrefWidth(800);
+            relatedItem.setMinWidth(260);
 
             relatedItem.textProperty().addListener(targetChangeListener);
             relatedItem.textProperty().addListener(addNewRelationshipListener);
@@ -424,8 +424,8 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
             relatedItem.textProperty().addListener(addNewRelationshipListener);
             addNewRelationshipListener.fieldAdded();
 
-            relatedItem.setPrefWidth(210);
-            relatedItem.setMaxWidth(210);
+            relatedItem.setPrefWidth(800);
+            relatedItem.setMinWidth(300);
             container.relationshipTargets.add(relatedItem.textProperty());
 
             singleItemInputBox1.getChildren().add(relatedItem);

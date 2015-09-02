@@ -32,6 +32,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
@@ -118,6 +119,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         this.labels = labels;
         
         contentScrollPane = new ScrollPane();
+        contentScrollPane.setFitToWidth(true);
         VBox content = new VBox();
 
         //Set up the text for the controls in the footer.
@@ -134,7 +136,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         statusLabel = new Label();
         statusLabel.setVisible(false);
         statusLabel.setWrapText(true);
-        statusLabel.setMaxWidth(600);
+        //statusLabel.setMaxWidth(600);
         status.getChildren().add(statusLabel);
         status.setAlignment(Pos.TOP_CENTER);
 
@@ -158,8 +160,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         ComboBox<String> externalProjectIdComboBox = new ComboBox<>();
         externalProjectIdComboBox.getItems().addAll(loadAvailableProjects());
-        externalProjectIdComboBox.setPrefWidth(240);
-        externalProjectIdComboBox.setMaxWidth(350);
+        externalProjectIdComboBox.setPrefWidth(600);
         externalProjectIdComboBox.setEditable(true);
 
         externalProjectIdProperty = new SimpleStringProperty();
@@ -260,7 +261,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         packageNameField = new TextField();
         packageNameField.setPrefWidth(240);
-        packageNameField.setMaxWidth(350);
+        //packageNameField.setMaxWidth(350);
         packageNameEntryFields.getChildren().add(packageNameField);
 
         content.getChildren().add(packageNameEntryFields);
@@ -288,19 +289,19 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         HBox directoryBox = new HBox();
         directoryBox.setAlignment(Pos.CENTER_LEFT);
-        directoryBox.setMaxWidth(350);
+        //directoryBox.setMaxWidth(350);
         directoryBox.setMinWidth(350);
         directoryBox.getStyleClass().add(DIRECTORY_BOX);
 
         currentOutputDirectoryTextField = new TextField();
-        currentOutputDirectoryTextField.setMaxWidth(340);
+        //currentOutputDirectoryTextField.setMaxWidth(340);
         currentOutputDirectoryTextField.setMinWidth(340);
         currentOutputDirectoryTextField.setEditable(false);
         currentOutputDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
         directoryBox.getChildren().add(currentOutputDirectoryTextField);
-
+        directoryBox.setHgrow(currentOutputDirectoryTextField, Priority.ALWAYS);
         directorySelectionBox.getChildren().add(directoryBox);
-
+        directorySelectionBox.setHgrow(directoryBox, Priority.ALWAYS);
         selectOutputDirectoryButton = new Button(labels.get(LabelKey.BROWSEDIR_BUTTON));
         directorySelectionBox.getChildren().add(selectOutputDirectoryButton);
 
@@ -318,7 +319,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         contactLabel.getStyleClass().add(SECTION_LABEL);
         contactFields.getChildren().add(contactLabel);
         
-        HBox firstRowContactFields = new HBox(80);
+        HBox firstRowContactFields = new HBox(60);
         VBox nameEntryFields = new VBox(4);
 
         nameEntryFields.setAlignment(Pos.TOP_LEFT);
@@ -327,7 +328,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         nameEntryFields.getChildren().add(nameLabel);
         
         contactNameTextField = new TextField();
-        contactNameTextField.setPrefWidth(240);
+        contactNameTextField.setPrefWidth(300);
         nameEntryFields.getChildren().add(contactNameTextField);
         firstRowContactFields.getChildren().add(nameEntryFields);
         
@@ -338,10 +339,9 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         emailEntryFields.getChildren().add(emailLabel);
         
         contactEmailTextField = new TextField();
-        contactEmailTextField.setPrefWidth(240);
+        contactEmailTextField.setPrefWidth(300);
         emailEntryFields.getChildren().add(contactEmailTextField);
         firstRowContactFields.getChildren().add(emailEntryFields);
-        
         contactFields.getChildren().add(firstRowContactFields);
         
         VBox phoneEntryFields = new VBox(4);
@@ -351,7 +351,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         phoneEntryFields.getChildren().add(phoneLabel);
         
         contactPhoneTextField = new TextField();
-        contactPhoneTextField.setMaxWidth(240);
+        //contactPhoneTextField.setMaxWidth(240);
         Label inputVerificationLabel = new Label();
         contactPhoneTextField.textProperty().addListener(getNewChangeListenerForPhoneNumber(inputVerificationLabel));
         phoneEntryFields.getChildren().add(contactPhoneTextField);
@@ -361,6 +361,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         inputVerificationBox.getChildren().add(inputVerificationLabel);
         phoneEntryFields.getChildren().add(inputVerificationBox);
         contactFields.getChildren().add(phoneEntryFields);
+        //inputVerificationBox.setHgrow(contactPhoneTextField, Priority.ALWAYS);
         
         content.getChildren().add(contactFields);
         

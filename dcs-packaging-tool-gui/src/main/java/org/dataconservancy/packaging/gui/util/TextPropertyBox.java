@@ -26,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -92,7 +93,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
         }
 
         propertyBox.getChildren().add(propertyValuesBox);
-
+        propertyBox.setHgrow(propertyValuesBox, Priority.ALWAYS);
         //If the ontology allows for more than one value on a property add a button to add more fields.
         if (maxOccurs > 1) {
             addNewButton.setDisable(!hasValue);
@@ -223,7 +224,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
             propertyField.getStyleClass().add(UNEDITABLE_PROPERTY_VALUE);
         }
         propertyEntryBox.getChildren().add(propertyField);
-
+        propertyEntryBox.setHgrow(propertyField, Priority.ALWAYS);
         final Label userInputImageLabel = new Label();
         userInputImageLabel.setPrefWidth(18);
 

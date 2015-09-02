@@ -91,7 +91,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         
         HBox baseDirectorySelector = new HBox(6);
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);
-        baseDirectorySelector.setMaxWidth(420);
+        baseDirectorySelector.setPrefWidth(420);
         
         chooseBaseDirectoryButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
         chooseBaseDirectoryButton.setMinWidth(60);
@@ -118,7 +118,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         
         HBox packageDescriptionSelector = new HBox(6);
         packageDescriptionSelector.getStyleClass().add(DIRECTORY_BOX);
-        packageDescriptionSelector.setMaxWidth(420);
+        packageDescriptionSelector.setPrefWidth(420);
         
         choosePackageDescriptionButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
         choosePackageDescriptionButton.setMinWidth(60);

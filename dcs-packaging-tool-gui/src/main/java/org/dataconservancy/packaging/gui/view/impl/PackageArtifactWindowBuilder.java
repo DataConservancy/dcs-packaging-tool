@@ -32,6 +32,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
@@ -160,6 +161,7 @@ public class PackageArtifactWindowBuilder implements  CssConstants {
         generalPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         generalPane.setContent(createGeneralTab(artifact));
         generalPane.setMinWidth(500);
+        generalPane.setFitToWidth(true);
         generalTab.setContent(generalPane);
         
         propertiesPopup.getTabs().add(generalTab);
@@ -173,6 +175,7 @@ public class PackageArtifactWindowBuilder implements  CssConstants {
         creatorPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         creatorPane.setContent(createCreatorTab(artifact));
         creatorPane.setMinWidth(500);
+        creatorPane.setFitToWidth(true);
         creatorTab.setText(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_CREATOR));
         creatorTab.setContent(creatorPane);
         
@@ -189,6 +192,7 @@ public class PackageArtifactWindowBuilder implements  CssConstants {
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         relationshipPane.setContent(createRelationshipTab(artifact));
         relationshipPane.setMinWidth(500);
+        relationshipPane.setFitToWidth(true);
         relationshipTab.setContent(relationshipPane);
         propertiesPopup.getTabs().add(relationshipTab);
 
@@ -201,6 +205,7 @@ public class PackageArtifactWindowBuilder implements  CssConstants {
         inheritancePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         inheritancePane.setContent(createInheritanceTab(artifact));
         inheritancePane.setMinWidth(500);
+        inheritancePane.setFitToWidth(true);
         inheritanceTab.setContent(inheritancePane);
         propertiesPopup.getTabs().add(inheritanceTab);
 
@@ -613,7 +618,7 @@ public class PackageArtifactWindowBuilder implements  CssConstants {
         relationshipsBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
         //If there aren't any existing relationships add an empty relationship box
 
-        //add advice explaining that heirarchical relationships are not modifiable
+        //add advice explaining that hierarchical relationships are not modifiable
         Label hierarchicalAdviceLabel = new Label(labels.get(Labels.LabelKey.HIERARCHICAL_ADVICE_LABEL));
         hierarchicalAdviceLabel.setAlignment(Pos.TOP_LEFT);
 
