@@ -91,16 +91,16 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         
         HBox baseDirectorySelector = new HBox(6);
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);
-        baseDirectorySelector.setPrefWidth(420);
+        baseDirectorySelector.setPrefWidth(1600);
         
         chooseBaseDirectoryButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
-        chooseBaseDirectoryButton.setMinWidth(60);
+        chooseBaseDirectoryButton.setMinWidth(80);
         baseDirectorySelector.getChildren().add(chooseBaseDirectoryButton);
         
         currentBaseDirectory = new TextField();
         currentBaseDirectory.setEditable(false);
         currentBaseDirectory.getStyleClass().add(INVISBILE_TEXT_FIELD);
-        currentBaseDirectory.setPrefWidth(320);
+        currentBaseDirectory.setPrefWidth(1600);
         baseDirectorySelector.getChildren().add(currentBaseDirectory);
         baseDirectorySelectionFields.getChildren().add(baseDirectorySelector);
        
@@ -118,15 +118,15 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         
         HBox packageDescriptionSelector = new HBox(6);
         packageDescriptionSelector.getStyleClass().add(DIRECTORY_BOX);
-        packageDescriptionSelector.setPrefWidth(420);
+        packageDescriptionSelector.setPrefWidth(1600);
         
         choosePackageDescriptionButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
-        choosePackageDescriptionButton.setMinWidth(60);
+        choosePackageDescriptionButton.setMinWidth(80);
         packageDescriptionSelector.getChildren().add(choosePackageDescriptionButton);
         
         currentPackageDescription = new TextField();
         currentPackageDescription.setMinWidth(100);
-        currentPackageDescription.setPrefWidth(320);
+        currentPackageDescription.setPrefWidth(1600);
         currentPackageDescription.getStyleClass().add(INVISBILE_TEXT_FIELD);
         currentPackageDescription.setEditable(false);
         packageDescriptionSelector.getChildren().add(currentPackageDescription);
