@@ -51,4 +51,5 @@ public interface CssConstants {
     public static final String BOLD_TEXT_CLASS = "BoldText";
     public static final String PACKAGE_DESCRIPTION_ROW_IGNORE = "PackageDescriptionView-IgnoreRow";
     public static final String UNEDITABLE_PROPERTY_VALUE = "UneditablePropertyValue";
+    public static final String PROPERTY_TEXT_AREA = "PopertyTextArea";
 }

@@ -25,6 +25,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -93,7 +95,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
         }
 
         propertyBox.getChildren().add(propertyValuesBox);
-        propertyBox.setHgrow(propertyValuesBox, Priority.ALWAYS);
+        HBox.setHgrow(propertyValuesBox, Priority.ALWAYS);
         //If the ontology allows for more than one value on a property add a button to add more fields.
         if (maxOccurs > 1) {
             addNewButton.setDisable(!hasValue);
@@ -106,6 +108,10 @@ public class TextPropertyBox extends VBox implements CssConstants {
                 addNewButton.setDisable(true);
                 propertyEntryBox.getChildren().get(0).requestFocus();
             });
+        } else { //hack to make spacing look better when resizing window
+            addNewButton.setDisable(true);
+            addNewButton.setVisible(false);
+            propertyBox.getChildren().add(addNewButton);
         }
 
         getChildren().add(propertyBox);
@@ -135,8 +141,11 @@ public class TextPropertyBox extends VBox implements CssConstants {
                                         HBox propertyBox, Messages messages, String value) {
 
         HBox propertyEntryBox = new HBox(2);
-        final TextArea propertyField = new TextArea();
+
+        TextInputControl propertyControl;
+
         if (packageOntologyService.propertySupportsMultipleLines(artifact, propertyName)) {
+            final TextArea propertyField = new TextArea();
             propertyField.setPrefRowCount(5);
             propertyField.setWrapText(true);
 
@@ -184,10 +193,10 @@ public class TextPropertyBox extends VBox implements CssConstants {
                     propertyField.setPrefHeight(startingTextHeight);
                 }
             });
-
+            propertyControl = propertyField;
         } else {
-            propertyField.setPrefRowCount(1);
-            propertyField.setWrapText(false);
+            TextField propertyField = new TextField();
+            propertyControl = propertyField;
         }
 
         StringProperty propertyValue = new SimpleStringProperty();
@@ -199,32 +208,32 @@ public class TextPropertyBox extends VBox implements CssConstants {
             //Add any UI formatting that needs to be done to the field.
             String formattedValue = formatPropertyValue(propertyName, unFormattedValue, packageOntologyService);
             if (formattedValue.equals(unFormattedValue)) {
-                propertyValue.bind(propertyField.textProperty());
+                propertyValue.bind(propertyControl.textProperty());
             } else {
                 propertyValue.setValue(unFormattedValue);
             }
 
-            propertyField.setText(formattedValue);
+            propertyControl.setText(formattedValue);
 
         } else {
-            propertyValue.bind(propertyField.textProperty());
+            propertyValue.bind(propertyControl.textProperty());
         }
 
-        propertyField.textProperty().addListener(addNewListener);
+        propertyControl.textProperty().addListener(addNewListener);
         //addNewListener.fieldAdded();
 
         fields.add(propertyValue);
-        propertyField.setPrefWidth(250);
-        propertyField.setEditable(!systemGenerated);
+        propertyControl.setPrefWidth(250);
+        propertyControl.setEditable(!systemGenerated);
         if (packageOntologyService.isDateProperty(null, propertyName)) {
-            propertyField.setPromptText(labels.get(Labels.LabelKey.UTC_HINT));
+            propertyControl.setPromptText(labels.get(Labels.LabelKey.UTC_HINT));
         }
 
-        if(!propertyField.isEditable()){
-            propertyField.getStyleClass().add(UNEDITABLE_PROPERTY_VALUE);
+        if(!propertyControl.isEditable()){
+            propertyControl.getStyleClass().add(UNEDITABLE_PROPERTY_VALUE);
         }
-        propertyEntryBox.getChildren().add(propertyField);
-        propertyEntryBox.setHgrow(propertyField, Priority.ALWAYS);
+        propertyEntryBox.getChildren().add(propertyControl);
+        HBox.setHgrow(propertyControl, Priority.ALWAYS);
         final Label userInputImageLabel = new Label();
         userInputImageLabel.setPrefWidth(18);
 

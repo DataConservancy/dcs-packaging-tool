@@ -299,9 +299,9 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         currentOutputDirectoryTextField.setEditable(false);
         currentOutputDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
         directoryBox.getChildren().add(currentOutputDirectoryTextField);
-        directoryBox.setHgrow(currentOutputDirectoryTextField, Priority.ALWAYS);
+        HBox.setHgrow(currentOutputDirectoryTextField, Priority.ALWAYS);
         directorySelectionBox.getChildren().add(directoryBox);
-        directorySelectionBox.setHgrow(directoryBox, Priority.ALWAYS);
+        HBox.setHgrow(directoryBox, Priority.ALWAYS);
         selectOutputDirectoryButton = new Button(labels.get(LabelKey.BROWSEDIR_BUTTON));
         directorySelectionBox.getChildren().add(selectOutputDirectoryButton);
 

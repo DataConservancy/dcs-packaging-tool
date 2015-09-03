@@ -427,6 +427,15 @@
 	-fx-strikethrough: false;
 }
 
+.PropertyTextArea .scroll-bar:vertical:disabled {
+    -fx-opacity: 0;
+}
+
+.PropertyTextArea .scroll-bar:horizontal:disabled {
+    -fx-opacity: 0;
+}
+
+}
 */
 .UneditablePropertyValue {
      -fx-border-width: 0;
