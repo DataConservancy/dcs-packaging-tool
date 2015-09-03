@@ -127,7 +127,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
 
         //The combobox that allows for selecting a namespace.
         final ComboBox<RelationshipGroup> namespaceComboBox = new ComboBox<>();
-        namespaceComboBox.setPrefWidth(300);
+        namespaceComboBox.setPrefWidth(800);
         namespaceComboBox.setCellFactory(relationshipGroupCellFactory);
         namespaceComboBox.setDisable(!editable.getValue());
 
@@ -327,7 +327,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         getChildren().add(requiresURICheckBox);
 
         final VBox relatedItemsBox = new VBox(3);
-        relatedItemsBox.setPrefWidth(270);
+        relatedItemsBox.setPrefWidth(800);
 
         Label relatedToLabel = new Label(labels.get(Labels.LabelKey.RELATIONSHIP_TARGET_LABEL));
         relatedItemsBox.getChildren().add(relatedToLabel);
@@ -382,8 +382,8 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
                 relatedItemTextField.textProperty().addListener(targetChangeListener);
                 relatedItemTextField.textProperty().addListener(addNewRelationshipListener);
 
-                relatedItemTextField.setPrefWidth(210);
-                relatedItemTextField.setMaxWidth(210);
+                relatedItemTextField.setPrefWidth(800);
+                //relatedItemTextField.setMaxWidth(210);
 
                 relatedItemTextField.editableProperty().bind(editable);
                 singleItemInputBox.getChildren().add(relatedItemTextField);

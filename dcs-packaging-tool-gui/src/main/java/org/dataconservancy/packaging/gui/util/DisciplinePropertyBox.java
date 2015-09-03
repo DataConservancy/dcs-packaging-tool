@@ -43,7 +43,7 @@ public class DisciplinePropertyBox extends HBox {
         }
 
         Label propertyNameLabel = new Label(propertyLabel);
-        propertyNameLabel.setPrefWidth(84);
+        propertyNameLabel.setMinWidth(84);
         propertyNameLabel.setWrapText(true);
         getChildren().add(propertyNameLabel);
         boolean hasValue = false;
@@ -110,7 +110,7 @@ public class DisciplinePropertyBox extends HBox {
             disciplineGroupBox.setValue(disciplineGroup);
         }
 
-        disciplineGroupBox.setPrefWidth(250);
+        disciplineGroupBox.setPrefWidth(800);
         disciplineGroupBox.setDisable(systemGenerated);
 
         disciplineSelectors.getChildren().add(disciplineGroupBox);
@@ -126,7 +126,7 @@ public class DisciplinePropertyBox extends HBox {
             disciplineBox.setValue(disciplineValue);
         }
 
-        disciplineBox.setPrefWidth(250);
+        disciplineBox.setPrefWidth(800);
         disciplineBox.setDisable(systemGenerated);
         disciplineBox.valueProperty().addListener(listener);
         disciplineSelectors.getChildren().add(disciplineBox);
