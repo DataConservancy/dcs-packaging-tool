@@ -142,16 +142,16 @@ public class TextPropertyBox extends VBox implements CssConstants {
 
         HBox propertyEntryBox = new HBox(2);
 
-        TextInputControl propertyControl;
+        final TextInputControl propertyControl;
 
         if (packageOntologyService.propertySupportsMultipleLines(artifact, propertyName)) {
-            final TextArea propertyField = new TextArea();
-            propertyField.setPrefRowCount(5);
-            propertyField.setWrapText(true);
 
+            propertyControl = ControlFactory.createControl(ControlType.TEXT_AREA, null);
+            ((TextArea)propertyControl).setPrefRowCount(5);
+            ((TextArea)propertyControl).setWrapText(true);
             //The following code handles the growing of the text area to fit the text. It starts as 5 rows of text and is locked to never go below that size.
             //This code only handles changes when the box is already visible for handling when the box is first visible see above.
-            propertyField.textProperty().addListener((observableValue, s, newValue) -> {
+            propertyControl.textProperty().addListener((observableValue, s, newValue) -> {
 
                 //Account for the padding inside of the text area
                 final int textAreaPaddingSize = 20;
@@ -159,7 +159,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
                 // This code can only be executed after the window is shown, because it needs to be laid out to get sized, and for the stylesheet to be set:
 
                 //Hide the vertical scroll bar, the scroll bar sometimes appears briefly when resizing, this prevents that.
-                ScrollBar scrollBarv = (ScrollBar)propertyField.lookup(".scroll-bar:vertical");
+                ScrollBar scrollBarv = (ScrollBar)propertyControl.lookup(".scroll-bar:vertical");
                 if (scrollBarv != null ) {
                     scrollBarv.setDisable(true);
                 }
@@ -168,7 +168,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
                     // Perform a lookup for an element with a css class of "text"
                     // This will give the Node that actually renders the text inside the
                     // TextArea
-                    final Node text = propertyField.lookup(".text");
+                    final Node text = propertyControl.lookup(".text");
 
                     //Text will be null if the view has text already when the pop up is being shown
                     //TODO: In java 8 this can be avoided by calling applyCSS
@@ -176,27 +176,26 @@ public class TextPropertyBox extends VBox implements CssConstants {
                         //If the text area is now bigger then starting size increase the size to fit the text plus the space for padding.
                         if (text.getBoundsInLocal().getHeight() + textAreaPaddingSize > startingTextHeight) {
 
-                            propertyField.setPrefHeight(text.getBoundsInLocal().getHeight() + textAreaPaddingSize);
+                            propertyControl.setPrefHeight(text.getBoundsInLocal().getHeight() + textAreaPaddingSize);
                         } else { //Otherwise set to the minimum size, this needs to be checked everytime in case the user selects all the text and deletes it
-                            propertyField.setPrefHeight(startingTextHeight);
+                            propertyControl.setPrefHeight(startingTextHeight);
                         }
                     } else {
                         //In the case where the text is set before the view is laid out we measure the text and then set the size to it.
                         double textHeight = computeTextHeight(newValue, 170.0) + textAreaPaddingSize;
                         if (textHeight + textAreaPaddingSize > startingTextHeight) {
-                             propertyField.setPrefHeight(textHeight);
+                             propertyControl.setPrefHeight(textHeight);
                         } else {
-                            propertyField.setPrefHeight(startingTextHeight);
+                            propertyControl.setPrefHeight(startingTextHeight);
                         }
                     }
                 } else {
-                    propertyField.setPrefHeight(startingTextHeight);
+                    propertyControl.setPrefHeight(startingTextHeight);
                 }
             });
-            propertyControl = propertyField;
+
         } else {
-            TextField propertyField = new TextField();
-            propertyControl = propertyField;
+            propertyControl = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         }
 
         StringProperty propertyValue = new SimpleStringProperty();

@@ -65,7 +65,7 @@ public interface CreateNewPackageView extends View<CreateNewPackagePresenter> {
      * is not editable.
      * @return The text field for displaying hte selected package description.
      */
-    public TextField getSelectedPackageDescriptionTextField();    
+    public TextField getSelectedPackageDescriptionTextField();
     
     /**
      * This brings up input fields for defining any properties (such as project ID) to use during package description creation.

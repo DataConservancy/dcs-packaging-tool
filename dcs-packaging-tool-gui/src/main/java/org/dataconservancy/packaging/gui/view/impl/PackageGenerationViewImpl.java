@@ -40,6 +40,8 @@ import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
+import org.dataconservancy.packaging.gui.util.ControlFactory;
+import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.PhoneNumberValidator;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
@@ -62,7 +64,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     //Controls for setting the package name and output directory
     private TextField packageNameField;
     private DirectoryChooser outputDirectoryChooser;
-    private TextField currentOutputDirectoryTextField;    
+    private TextField currentOutputDirectoryTextField;
     private Button selectOutputDirectoryButton;
     
     private Label statusLabel;
@@ -160,7 +162,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         ComboBox<String> externalProjectIdComboBox = new ComboBox<>();
         externalProjectIdComboBox.getItems().addAll(loadAvailableProjects());
-        externalProjectIdComboBox.setPrefWidth(600);
+        externalProjectIdComboBox.setPrefWidth(1600);
         externalProjectIdComboBox.setEditable(true);
 
         externalProjectIdProperty = new SimpleStringProperty();
@@ -259,7 +261,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
         packageNameEntryFields.getChildren().add(packageNameLabel);
 
-        packageNameField = new TextField();
+        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         packageNameField.setPrefWidth(240);
         //packageNameField.setMaxWidth(350);
         packageNameEntryFields.getChildren().add(packageNameField);
@@ -272,7 +274,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label externalIdentifierLabel = new Label(labels.get(LabelKey.EXTERNAL_IDENTIFIER_LABEL_KEY) + "*");
         externalIdentifierBox.getChildren().add(externalIdentifierLabel);
 
-        externalIdentifierTextField = new TextField();
+        externalIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         externalIdentifierTextField.setPrefWidth(300);
         externalIdentifierBox.getChildren().add(externalIdentifierTextField);
         content.getChildren().add(externalIdentifierBox);
@@ -293,7 +295,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         directoryBox.setMinWidth(350);
         directoryBox.getStyleClass().add(DIRECTORY_BOX);
 
-        currentOutputDirectoryTextField = new TextField();
+        currentOutputDirectoryTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         //currentOutputDirectoryTextField.setMaxWidth(340);
         currentOutputDirectoryTextField.setMinWidth(340);
         currentOutputDirectoryTextField.setEditable(false);

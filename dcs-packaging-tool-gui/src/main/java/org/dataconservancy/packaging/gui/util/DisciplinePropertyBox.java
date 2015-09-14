@@ -110,7 +110,7 @@ public class DisciplinePropertyBox extends HBox {
             disciplineGroupBox.setValue(disciplineGroup);
         }
 
-        disciplineGroupBox.setPrefWidth(800);
+        disciplineGroupBox.setPrefWidth(ControlFactory.textPrefWidth);
         disciplineGroupBox.setDisable(systemGenerated);
 
         disciplineSelectors.getChildren().add(disciplineGroupBox);
@@ -126,7 +126,7 @@ public class DisciplinePropertyBox extends HBox {
             disciplineBox.setValue(disciplineValue);
         }
 
-        disciplineBox.setPrefWidth(800);
+        disciplineBox.setPrefWidth(ControlFactory.textPrefWidth);
         disciplineBox.setDisable(systemGenerated);
         disciplineBox.valueProperty().addListener(listener);
         disciplineSelectors.getChildren().add(disciplineBox);

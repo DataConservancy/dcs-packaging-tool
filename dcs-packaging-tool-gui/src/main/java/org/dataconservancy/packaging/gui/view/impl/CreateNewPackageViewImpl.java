@@ -32,6 +32,8 @@ import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
+import org.dataconservancy.packaging.gui.util.ControlFactory;
+import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
@@ -91,16 +93,16 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         
         HBox baseDirectorySelector = new HBox(6);
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);
-        baseDirectorySelector.setPrefWidth(1600);
+        baseDirectorySelector.setPrefWidth(ControlFactory.textPrefWidth);
         
         chooseBaseDirectoryButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
         chooseBaseDirectoryButton.setMinWidth(80);
         baseDirectorySelector.getChildren().add(chooseBaseDirectoryButton);
         
-        currentBaseDirectory = new TextField();
+        //currentBaseDirectory = new TextField();
+        currentBaseDirectory = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, "");
         currentBaseDirectory.setEditable(false);
         currentBaseDirectory.getStyleClass().add(INVISBILE_TEXT_FIELD);
-        currentBaseDirectory.setPrefWidth(1600);
         baseDirectorySelector.getChildren().add(currentBaseDirectory);
         baseDirectorySelectionFields.getChildren().add(baseDirectorySelector);
        
@@ -118,15 +120,14 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         
         HBox packageDescriptionSelector = new HBox(6);
         packageDescriptionSelector.getStyleClass().add(DIRECTORY_BOX);
-        packageDescriptionSelector.setPrefWidth(1600);
+        packageDescriptionSelector.setPrefWidth(ControlFactory.textPrefWidth);
         
         choosePackageDescriptionButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
         choosePackageDescriptionButton.setMinWidth(80);
         packageDescriptionSelector.getChildren().add(choosePackageDescriptionButton);
         
-        currentPackageDescription = new TextField();
+        currentPackageDescription = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, "");
         currentPackageDescription.setMinWidth(100);
-        currentPackageDescription.setPrefWidth(1600);
         currentPackageDescription.getStyleClass().add(INVISBILE_TEXT_FIELD);
         currentPackageDescription.setEditable(false);
         packageDescriptionSelector.getChildren().add(currentPackageDescription);
