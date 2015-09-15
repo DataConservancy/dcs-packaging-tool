@@ -1,12 +1,11 @@
 package org.dataconservancy.packaging.gui.util;
 
-import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
+
 
 
 /**
@@ -32,7 +31,7 @@ public class ControlFactory {
         final Control control;
         switch (type) {
             case COMBO_BOX:
-                 control = new ComboBox<>();
+                control = new ComboBox<>();
                 ((ComboBox)control).setEditable(false);
                 control.setPrefWidth(textPrefWidth);
                 break;
