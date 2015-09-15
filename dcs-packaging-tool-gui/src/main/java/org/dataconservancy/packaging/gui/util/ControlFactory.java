@@ -10,7 +10,7 @@ import javafx.scene.input.MouseEvent;
 
 
 /**
- * A class to create Control objects for the Package Tool GUI. The main purpose of this is to provide resizing ang tooltip
+ * A class to create Control objects for the Package Tool GUI. The main purpose of this is to provide resizing and tooltip
  * functionality for various input controls.
  */
 public class ControlFactory {
@@ -19,7 +19,7 @@ public class ControlFactory {
     // the window. this property is public so it can be used in other classes.
 
     /**
-     * This method creates various types of Controls for the GUI, setting various properties etc. as approriate for the
+     * This method creates various types of Controls for the GUI, setting various properties etc. as appropriate for the
      * type of control created.
      * @param type the ControlType of the control to be created
      * @param initialValue the initial text value for a text input control, ignored if not applicable
@@ -41,16 +41,13 @@ public class ControlFactory {
                 control = new ComboBox<>();
                 ((ComboBox)control).setEditable(true);
                 control.setPrefWidth(textPrefWidth);
-                control.setOnMouseEntered(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        String text = ((ComboBox) control).getEditor().getText();
-                        if (!text.isEmpty()) {
-                            if (control.getTooltip() == null) {
-                                control.setTooltip(new Tooltip(text));
-                            } else {
-                                control.getTooltip().setText(text);
-                            }
+                control.setOnMouseEntered(event -> {
+                    String text = ((ComboBox) control).getEditor().getText();
+                    if (!text.isEmpty()) {
+                        if (control.getTooltip() == null) {
+                            control.setTooltip(new Tooltip(text));
+                        } else {
+                            control.getTooltip().setText(text);
                         }
                     }
                 });
@@ -64,16 +61,13 @@ public class ControlFactory {
             case TEXT_FIELD:
                 control = initialValue == null ? new TextField() : new TextField(initialValue);
                 control.setPrefWidth(textPrefWidth);
-                control.setOnMouseEntered(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        String text = ((TextField)control).getText();
-                        if (!text.isEmpty()) {
-                            if (control.getTooltip() == null) {
-                                control.setTooltip(new Tooltip(text));
-                            } else {
-                                control.getTooltip().setText(text);
-                            }
+                control.setOnMouseEntered(event -> {
+                    String text = ((TextField)control).getText();
+                    if (!text.isEmpty()) {
+                        if (control.getTooltip() == null) {
+                            control.setTooltip(new Tooltip(text));
+                        } else {
+                            control.getTooltip().setText(text);
                         }
                     }
                 });
