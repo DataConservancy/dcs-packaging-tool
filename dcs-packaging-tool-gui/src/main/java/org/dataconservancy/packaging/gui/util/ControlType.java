@@ -1,7 +1,7 @@
 package org.dataconservancy.packaging.gui.util;
 
 /**
- * Created by jrm on 9/11/15.
+ * An enum of types of Control objects that we create in the ControlFactory
  */
 public enum ControlType {
         COMBO_BOX,
