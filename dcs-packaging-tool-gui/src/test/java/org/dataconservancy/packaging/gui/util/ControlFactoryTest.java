@@ -1,8 +1,8 @@
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,30 +13,34 @@ public class ControlFactoryTest {
 
     @Test
     public void testCreateTextAreaNoText(){
-        TextInputControl control = ControlFactory.createControl(ControlType.TEXT_AREA, null);
+        Control control = ControlFactory.createControl(ControlType.TEXT_AREA, null);
         Assert.assertTrue(control instanceof TextArea);
+        Assert.assertTrue(ControlFactory.textPrefWidth == control.getPrefWidth());
     }
 
     @Test
     public void testCreateTextAreaWithText(){
-        TextInputControl control = ControlFactory.createControl(ControlType.TEXT_AREA, "Text Area");
+        Control control = ControlFactory.createControl(ControlType.TEXT_AREA, "Text Area");
         Assert.assertTrue(control instanceof TextArea);
+        Assert.assertTrue(ControlFactory.textPrefWidth == control.getPrefWidth());
     }
 
     @Test
     public void testCreateTextFieldNoText(){
-        TextInputControl control = ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        Control control = ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         Assert.assertTrue(control instanceof TextField);
+        Assert.assertTrue(ControlFactory.textPrefWidth == control.getPrefWidth());
     }
 
     @Test
     public void testCreateTextFieldWithText(){
-        TextInputControl control = ControlFactory.createControl(ControlType.TEXT_FIELD, "Text Area");
+        Control control = ControlFactory.createControl(ControlType.TEXT_FIELD, "Text Area");
         Assert.assertTrue(control instanceof TextField);
+        Assert.assertTrue(ControlFactory.textPrefWidth == control.getPrefWidth());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testBadCreate(){
-         TextInputControl control = ControlFactory.createControl(null, "Text Area");
+         Control control = ControlFactory.createControl(null, "Text Area");
     }
 }

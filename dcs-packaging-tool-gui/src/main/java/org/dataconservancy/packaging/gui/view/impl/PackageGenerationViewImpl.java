@@ -160,10 +160,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label externalProjectIdLabel = new Label(labels.get(LabelKey.EXTERNAL_PROJECT_LABEL));
         externalProjectIdBox.getChildren().add(externalProjectIdLabel);
 
-        ComboBox<String> externalProjectIdComboBox = new ComboBox<>();
+        ComboBox<String> externalProjectIdComboBox = (ComboBox) ControlFactory.createControl(ControlType.EDITABLE_COMBO_BOX, null);
         externalProjectIdComboBox.getItems().addAll(loadAvailableProjects());
-        externalProjectIdComboBox.setPrefWidth(1600);
-        externalProjectIdComboBox.setEditable(true);
 
         externalProjectIdProperty = new SimpleStringProperty();
         externalProjectIdComboBox.valueProperty().bindBidirectional(externalProjectIdProperty);
@@ -296,7 +294,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         directoryBox.getStyleClass().add(DIRECTORY_BOX);
 
         currentOutputDirectoryTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        //currentOutputDirectoryTextField.setMaxWidth(340);
         currentOutputDirectoryTextField.setMinWidth(340);
         currentOutputDirectoryTextField.setEditable(false);
         currentOutputDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
@@ -321,7 +318,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         contactLabel.getStyleClass().add(SECTION_LABEL);
         contactFields.getChildren().add(contactLabel);
         
-        HBox firstRowContactFields = new HBox(60);
+        HBox secondRowContactFields = new HBox(60);
         VBox nameEntryFields = new VBox(4);
 
         nameEntryFields.setAlignment(Pos.TOP_LEFT);
@@ -329,10 +326,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label nameLabel = new Label(labels.get(LabelKey.NAME_LABEL) + "*");
         nameEntryFields.getChildren().add(nameLabel);
         
-        contactNameTextField = new TextField();
-        contactNameTextField.setPrefWidth(300);
+        contactNameTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         nameEntryFields.getChildren().add(contactNameTextField);
-        firstRowContactFields.getChildren().add(nameEntryFields);
         
         VBox emailEntryFields = new VBox(4);
         emailEntryFields.setAlignment(Pos.TOP_LEFT);
@@ -340,11 +335,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label emailLabel = new Label(labels.get(LabelKey.EMAIL_LABEL) + "*");
         emailEntryFields.getChildren().add(emailLabel);
         
-        contactEmailTextField = new TextField();
-        contactEmailTextField.setPrefWidth(300);
-        emailEntryFields.getChildren().add(contactEmailTextField);
-        firstRowContactFields.getChildren().add(emailEntryFields);
-        contactFields.getChildren().add(firstRowContactFields);
+        contactEmailTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        emailEntryFields.getChildren().add(contactEmailTextField);;
         
         VBox phoneEntryFields = new VBox(4);
         phoneEntryFields.setAlignment(Pos.TOP_LEFT);
@@ -352,8 +344,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label phoneLabel = new Label(labels.get(LabelKey.PHONE_LABEL) + "*");
         phoneEntryFields.getChildren().add(phoneLabel);
         
-        contactPhoneTextField = new TextField();
-        //contactPhoneTextField.setMaxWidth(240);
+        contactPhoneTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         Label inputVerificationLabel = new Label();
         contactPhoneTextField.textProperty().addListener(getNewChangeListenerForPhoneNumber(inputVerificationLabel));
         phoneEntryFields.getChildren().add(contactPhoneTextField);
@@ -362,9 +353,13 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         inputVerificationBox.getChildren().add(contactPhoneTextField);
         inputVerificationBox.getChildren().add(inputVerificationLabel);
         phoneEntryFields.getChildren().add(inputVerificationBox);
-        contactFields.getChildren().add(phoneEntryFields);
-        //inputVerificationBox.setHgrow(contactPhoneTextField, Priority.ALWAYS);
-        
+
+        //position the contact fields
+        contactFields.getChildren().add(nameEntryFields);
+        secondRowContactFields.getChildren().add(emailEntryFields);
+        secondRowContactFields.getChildren().add(phoneEntryFields);
+        contactFields.getChildren().add(secondRowContactFields);
+
         content.getChildren().add(contactFields);
         
         //PopupControls

@@ -146,7 +146,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
 
         if (packageOntologyService.propertySupportsMultipleLines(artifact, propertyName)) {
 
-            propertyControl = ControlFactory.createControl(ControlType.TEXT_AREA, null);
+            propertyControl = (TextArea) ControlFactory.createControl(ControlType.TEXT_AREA, null);
             ((TextArea)propertyControl).setPrefRowCount(5);
             ((TextArea)propertyControl).setWrapText(true);
             //The following code handles the growing of the text area to fit the text. It starts as 5 rows of text and is locked to never go below that size.
