@@ -20,6 +20,8 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
+import org.dataconservancy.packaging.tool.model.ipm.ComparisonNode;
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public class DomainProfileServiceImpl implements DomainProfileService {
@@ -113,7 +115,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         // Check type
-
+        
         if (!parent_constraint.getNodeTypes().contains(nodetypemap.get(parent.getNodeType()))) {
             return false;
         }
@@ -138,11 +140,29 @@ public class DomainProfileServiceImpl implements DomainProfileService {
                 return false;
             }
         }
+        
 
         return true;
     }
 
+    
+    private boolean meets_file_requirements(Node node, NodeType type) {
+        type.getFileAssociationRequirement();
+        
+        type.getDirectoryAssociationRequirement();
+        
+        // TODO
+        
+        return true;
+    }
+    
     private boolean is_valid_type(Node node, NodeType type) {
+        if (!meets_file_requirements(node, type)) {
+            return false;
+        }
+        
+        // Parent must meet one constraint
+        
         for (NodeConstraint c : type.getParentConstraints()) {
             if (meets_parent_constraint(node, node.getParent(), c)) {
                 return true;
@@ -154,10 +174,14 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     private List<NodeType> get_valid_types_ordered_by_preference(Node node) {
         List<NodeType> result = new ArrayList<>();
-
-        // TODO Order by preference somehow...
-
+        
         for (NodeType nt : profile.getNodeTypes()) {
+            
+            // Order by preference
+            
+            nt.getPreferredCountOfChildrenWithFiles();
+            
+            
             if (is_valid_type(node, nt)) {
                 result.add(nt);
             }
@@ -181,7 +205,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         NodeType nt = nodetypemap.get(node.getNodeType());
 
         if (node.getDomainObject() == null) {
-            objstore.updateObject(nt);
+            objstore.updateObject(node.getDomainObject(), nt);
         } else {
             node.setDomainObject(objstore.createObject(nt));
         }
@@ -227,6 +251,9 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         // TODO Gather file info here
         node.setFileInfo(null);
 
+        // TODO Ignore hidden files
+        
+        
         if (Files.isRegularFile(path)) {
 
         } else if (Files.isDirectory(path)) {
@@ -276,5 +303,29 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         // nodetypemap.get(node.getNodeType()).getInheritableProperties();
 
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public boolean checkFileInfoIsAccessible(Node node) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void updateFileInfo(Node node, FileInfo info) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public ComparisonNode compareTree(Node existingTree, Node comparisonTree) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void mergeTree(Node existingTree, ComparisonNode comparisonTree) {
+        // TODO Auto-generated method stub
+        
     }
 }
