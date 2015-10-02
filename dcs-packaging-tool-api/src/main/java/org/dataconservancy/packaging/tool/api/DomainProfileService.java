@@ -63,12 +63,13 @@ public interface DomainProfileService {
      * Check that all the properties on a node satisfy constraints for that node
      * type.
      * 
-     * @param node The node whose properties are going to be valided.
+     * @param node The node whose properties are going to be validated.
      * @return valid or invalid
      */
     boolean validateProperties(Node node);
 
     /**
+     * @param node The node whose property constraints are going to be retrieved.
      * @return Constraints on node properties.
      */
     List<PropertyConstraint> getPropertyConstraints(Node node);
