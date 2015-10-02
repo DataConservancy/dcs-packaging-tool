@@ -8,12 +8,12 @@ import java.net.URI;
  */
 public interface StructuralRelation {
     /**
-     * @return Predicate used to indicate child has a parent or null.
+     * @return Predicate used to indicate child has a parent or null for no such predicate.
      */
     public URI getHasParentPredicate();
 
     /**
-     * @return Predicate used to indicate parent has a child or null.
+     * @return Predicate used to indicate parent has a child or null for no such predicate.
      */
     public URI getHasChildPredicate();
 }

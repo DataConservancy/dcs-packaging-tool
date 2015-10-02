@@ -34,12 +34,12 @@ public interface FileInfo {
     long getSize();
 
     /**
-     * @return Whether or a file is being described.
+     * @return Whether or not a file is being described.
      */
     boolean isFile();
 
     /**
-     * @return Whether or a file is being described.
+     * @return Whether or not a directory is being described.
      */
     boolean isDirectory();
 

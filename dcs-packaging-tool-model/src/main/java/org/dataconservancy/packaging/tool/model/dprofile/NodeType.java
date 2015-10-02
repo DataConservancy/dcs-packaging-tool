@@ -4,23 +4,22 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-
-//Need way to indicate that hasMetadata matches isMetadataFor
-
 /**
  * The type of a node explains how to map a node to a domain object.
- *
+ * 
+ * Note that the type of a node depends solely on its parent constraints and
+ * file association requirements.
  */
 public interface NodeType extends HasDescription {
     /**
      * @return Unique identifier of this node type.
      */
     URI getIdentifier();
-    
+
     /**
      * @return The types of the corresponding domain object
      */
-   List<URI> getDomainTypes();
+    List<URI> getDomainTypes();
 
     /**
      * The parent node must meet at least one of these constraints.
@@ -57,11 +56,22 @@ public interface NodeType extends HasDescription {
      */
     Map<PropertyType, URI> getSuppliedProperties();
 
-    // TODO Some hints about file/directory mapping... Must think about how this
-    // happens... BOREM?
+    /**
+     * @return Requirement about association with a regular file.
+     */
+    Requirement getFileAssociationRequirement();
 
     /**
-     * @return Node must be associated with data.
+     * @return Requirement about association with a directory.
      */
-    boolean mustHaveData();
+    Requirement getDirectoryAssociationRequirement();
+
+    /**
+     * A node is more likely to be assigned to a node type if the preferences of
+     * the node type are met.
+     * 
+     * @return Preferred number of children with file association or null for no
+     *         preference.
+     */
+    CardinalityConstraint getPreferredCountOfChildrenWithFiles();
 }

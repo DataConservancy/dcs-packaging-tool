@@ -1,9 +1,9 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
 /**
- * Represents a transform of a node.
+ * Represents a transform of a node.Each transform has a source, a result,
+ * possibly an action, and a description.
  * 
- * Each transform has a source, a result, possibly an action, and a description.
  * A node having the characteristics of the source node may be transformed to
  * the result. The modification may be the type of the node or the predicates
  * connecting the node to its parent. The action may be inserting a parent node
