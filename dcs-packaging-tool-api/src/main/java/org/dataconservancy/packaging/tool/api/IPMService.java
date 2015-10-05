@@ -1,8 +1,9 @@
 package org.dataconservancy.packaging.tool.api;
 
 import java.nio.file.Path;
+import java.util.Map;
 
-import org.dataconservancy.packaging.tool.model.ipm.ComparisonNode;
+import org.dataconservancy.packaging.tool.api.support.NodeComparisonStatus;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public interface IPMService {
@@ -34,14 +35,14 @@ public interface IPMService {
      * Compares the three provided under the existing tree root node with the tree under the comparison tree root node.
      * @param existingTree The root node of the existing tree to compare.
      * @param comparisonTree The root node of the new tree to compare against the existing tree.
-     * @return The root node of the of the tree showing the results of the comparison.
+     * @return A map of nodes and their status after comparison.
      */
-    ComparisonNode compareTree(Node existingTree, Node comparisonTree);
+    Map<Node, NodeComparisonStatus> compareTree(Node existingTree, Node comparisonTree);
 
     /**
      * Merges the provided comparison tree into the existing tree.
      * @param existingTree The existing tree that will receive the results of the merge.
-     * @param comparisonTree The comparison tree to merge into the existing tree.
+     * @param comparisonResult A map of the comparison result to apply to the existing tree.
      */
-    void mergeTree(Node existingTree, ComparisonNode comparisonTree);
+    void mergeTree(Node existingTree, Map<Node, NodeComparisonStatus> comparisonResult);
 }

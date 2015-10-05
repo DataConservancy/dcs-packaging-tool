@@ -20,7 +20,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
-import org.dataconservancy.packaging.tool.model.ipm.ComparisonNode;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -313,18 +312,6 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public void updateFileInfo(Node node, FileInfo info) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public ComparisonNode compareTree(Node existingTree, Node comparisonTree) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void mergeTree(Node existingTree, ComparisonNode comparisonTree) {
         // TODO Auto-generated method stub
         
     }
