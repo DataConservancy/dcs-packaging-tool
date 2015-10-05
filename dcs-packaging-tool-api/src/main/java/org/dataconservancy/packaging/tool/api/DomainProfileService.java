@@ -1,6 +1,5 @@
 package org.dataconservancy.packaging.tool.api;
 
-import java.nio.file.Path;
 import java.util.List;
 
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
@@ -8,7 +7,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
-import org.dataconservancy.packaging.tool.model.ipm.ComparisonNode;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -75,24 +73,6 @@ public interface DomainProfileService {
     List<PropertyConstraint> getPropertyConstraints(Node node);
 
     /**
-     * Format property value as a string according to its type and hint.
-     * 
-     * @param value The value of the property to format.
-     * @return Formatted property value
-     */
-    String formatPropertyValue(PropertyValue value);
-
-    /**
-     * Attempt to parse a string into a property value according to its type and
-     * hint.
-     * 
-     * @param type The type of the property that's going to be parsed.
-     * @param value The value of the property to be parsed.
-     * @return value on success and null on failure
-     */
-    PropertyValue parsePropertyValue(PropertyType type, String value);
-
-    /**
      * Transform a node. The tree must be valid before a transform and will be
      * valid after.
      * 
@@ -133,30 +113,6 @@ public interface DomainProfileService {
     boolean assignNodeTypes(Node node);
 
     /**
-     * Create a tree from the file system. The tree has file data associated
-     * with it, but does not have types assigned to nodes.
-     * 
-     * @param path The path on the file system to create a node tree from.
-     * @return root of tree
-     */
-    Node createTreeFromFileSystem(Path path);
-
-    /**
-     * Change the ignored status of a node. This may cause the types of other
-     * nodes to change.
-     * 
-     * If a node is marked as ignored, all descendants are also marked as
-     * ignored.
-     * 
-     * If a node is marked as not ignored, all descendants and ancestors are
-     * also marked as not ignored.
-     * 
-     * @param node The node to change the ignored status for.
-     * @param status The new status of the node.
-     */
-    void ignoreNode(Node node, boolean status);
-
-    /**
      * Checks that the file backing the node is accessible on the file system.
      * Note that this method makes no assertion that the file or folder pointed to was the original one, just that something exists
      * at the file location stored in the nodes file info.
@@ -182,19 +138,4 @@ public interface DomainProfileService {
      * @param node The node to propagate properties to from it's parent.
      */
     void propagateInheritedProperties(Node node);
-
-    /**
-     * Compares the three provided under the existing tree root node with the tree under the comparison tree root node.
-     * @param existingTree The root node of the existing tree to compare.
-     * @param comparisonTree The root node of the new tree to compare against the existing tree.
-     * @return The root node of the of the tree showing the results of the comparison.
-     */
-    ComparisonNode compareTree(Node existingTree, Node comparisonTree);
-
-    /**
-     * Merges the provided comparison tree into the existing tree.
-     * @param existingTree The existing tree that will recieve the results of the merge.
-     * @param comparisonTree The comparison tree to merge into the existing tree.
-     */
-    void mergeTree(Node existingTree, ComparisonNode comparisonTree);
 }
