@@ -11,7 +11,7 @@ public interface CardinalityConstraint {
     int getMinimum();
     
     /**
-     * @return Maximum number of required occurences or -1 for unbounded.
+     * @return Maximum number of required occurrences or -1 for unbounded.
      */
     int getMaximum();
 }

@@ -8,7 +8,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 
 /**
- * Maintain a set of domain objects described by a domainm profile and allow
+ * Maintain a set of domain objects described by a domain profile and allow
  * their properties to be manipulated.
  */
 public interface DomainProfileObjectStore {
