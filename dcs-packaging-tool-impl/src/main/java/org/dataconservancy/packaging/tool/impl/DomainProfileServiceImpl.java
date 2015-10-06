@@ -80,18 +80,6 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
-    public String formatPropertyValue(PropertyValue value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PropertyValue parsePropertyValue(PropertyType type, String value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public void transformNode(Node node, NodeTransform trans) {
         // TODO Auto-generated method stub
     }
@@ -232,71 +220,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         return false;
     }
-
-    @Override
-    public Node createTreeFromFileSystem(Path path) {
-        return create_tree(null, path);
-    }
-
-    private Node create_tree(Node parent, Path path) {
-        Node node = null;
-
-        if (parent != null) {
-            parent.addChild(node);
-        }
-
-        node.setIdentifier(URI.create("urn:uuid:" + UUID.randomUUID()));
-
-        // TODO Gather file info here
-        node.setFileInfo(null);
-
-        // TODO Ignore hidden files
-        
-        
-        if (Files.isRegularFile(path)) {
-
-        } else if (Files.isDirectory(path)) {
-            try {
-                Files.list(path).forEach(child_path -> create_tree(node, child_path));
-            } catch (IOException e) {
-                // TODO
-                throw new RuntimeException(e);
-            }
-        } else {
-            // TODO
-        }
-
-        return node;
-    }
-
-    @Override
-    public void ignoreNode(Node node, boolean status) {
-        if (node.isIgnored() == status) {
-            return;
-        }
-
-        if (node.isIgnored()) {
-            node.setIgnored(false);
-
-            // Unignore ancestors
-            for (Node n = node; n != null && n.isIgnored(); n = n.getParent()) {
-                n.setIgnored(false);
-            }
-
-            // Unignore descendants
-            for (Node child : node.getChildren()) {
-                ignoreNode(child, false);
-            }
-        } else {
-            node.setIgnored(true);
-
-            // Ignore descendants
-            for (Node child : node.getChildren()) {
-                ignoreNode(child, true);
-            }
-        }
-    }
-
+    
     @Override
     public void propagateInheritedProperties(Node node) {
         // nodetypemap.get(node.getNodeType()).getInheritableProperties();
