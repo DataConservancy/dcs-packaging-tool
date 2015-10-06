@@ -65,11 +65,15 @@ public class DisciplineLoadingService {
 
         try {
             InputStream mapFileStream = null;
-            if( filePath.startsWith("classpath") )
+            if(filePath.startsWith("classpath:"))
             {
-                mapFileStream = DisciplineLoadingService.class.getResourceAsStream("/" + filePath.substring(10));
+                String path = filePath.substring("classpath:".length());
+                if(!path.startsWith("/")){
+                    path = "/" + path;
+                }
+                mapFileStream = DisciplineLoadingService.class.getResourceAsStream(path);
                 if (mapFileStream == null) {
-                    log.error("Error reading discipline file. Couldn't find classpath file: " + filePath.substring(10));
+                    log.error("Error reading discipline file. Couldn't find classpath file: " + path);
                 }
             }
             else
