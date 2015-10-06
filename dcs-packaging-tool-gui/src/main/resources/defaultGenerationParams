@@ -1,5 +1,0 @@
-Package-Format-Id = BOREM
-BagIt-Profile-Identifier = http://dataconservancy.org/formats/data-conservancy-pkg-0.9
-Checksum-Algs = md5
-Archiving-Format = tar
-Compression-Format = gz

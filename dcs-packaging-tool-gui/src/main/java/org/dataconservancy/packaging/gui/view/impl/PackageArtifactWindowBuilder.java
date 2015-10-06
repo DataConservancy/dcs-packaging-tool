@@ -746,8 +746,12 @@ public class PackageArtifactWindowBuilder implements  CssConstants {
     private void loadAvailableRelationships(String relationshipsPath) {
 
         if (relationshipsPath != null && !relationshipsPath.isEmpty()) {
-            if (relationshipsPath.startsWith("classpath")) {
-                InputStream fileStream = PackageArtifactWindowBuilder.class.getResourceAsStream(relationshipsPath.substring("classpath:".length()));
+            if (relationshipsPath.startsWith("classpath:")) {
+                String path = relationshipsPath.substring("classpath:".length());
+                if(!path.startsWith("/")){
+                    path = "/" + path;
+                }
+                InputStream fileStream = PackageArtifactWindowBuilder.class.getResourceAsStream(path);
                 if (fileStream != null) {
                     availableRelationshipGroups = RelationshipGroupJSONBuilder.deserialize(fileStream);
                 } else {

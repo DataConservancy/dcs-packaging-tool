@@ -75,9 +75,12 @@
 
   <!-- BASIC CONFIGURATION/RESOURCE RELATED BEANS -->
   <bean id="configuration" class="org.dataconservancy.packaging.gui.Configuration">
-    <!--<property name="ontologyFile" value="${ontology.file}" />-->
-    <property name="packageGenerationParamsFile" value="${generationParams.file}"/>
+    <property name="ontologyFile" value="${ontology.file}"/>
     <property name="packageFilenameIllegalCharacters" value="${packageFilename.illegalCharacters}"/>
+    <property name="configurationDirectory" value="${configuration.dir}"/>
+    <property name="availableProjectsFile"  value="${availableProjectsFile}"/>
+    <property name="disciplineMapFile" value="${disciplineMapFile}" />
+    <property name="packageGenerationParametersFile" value="${packageGenerationParametersFile}"/>
   </bean>
 
   <bean id="labels" class="org.dataconservancy.packaging.gui.Labels">
@@ -151,7 +154,7 @@
     <constructor-arg ref="ontologyLabels"/>
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
-    <constructor-arg ref="disciplineService"/>
+  <!--  <constructor-arg ref="disciplineService"/>  -->
     <property name="packageOntologyService" ref="packageOntologyService"/>
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
@@ -237,8 +240,8 @@
   </bean>
 
   <!--  Discipline Service  -->
-  <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
+ <!--  <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
     <constructor-arg value="${disciplines.file}"/>
-  </bean>
+  </bean>  -->
 
 </beans>

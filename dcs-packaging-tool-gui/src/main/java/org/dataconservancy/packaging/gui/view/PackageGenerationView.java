@@ -179,4 +179,6 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      * Scrolls the view back to the top of the window.
      */
     void scrollToTop();
+
+    void loadAvailableProjects(String availableProjectsFilePath);
 }

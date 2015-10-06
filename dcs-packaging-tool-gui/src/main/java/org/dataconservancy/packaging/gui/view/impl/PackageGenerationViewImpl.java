@@ -40,6 +40,7 @@ import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
+import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
@@ -50,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -116,6 +118,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
     private ScrollPane contentScrollPane;
 
+    private ComboBox<String> externalProjectIdComboBox;
+
     public PackageGenerationViewImpl(Labels labels) {
         super(labels);
         this.labels = labels;
@@ -160,8 +164,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         Label externalProjectIdLabel = new Label(labels.get(LabelKey.EXTERNAL_PROJECT_LABEL));
         externalProjectIdBox.getChildren().add(externalProjectIdLabel);
 
-        ComboBox<String> externalProjectIdComboBox = (ComboBox) ControlFactory.createControl(ControlType.EDITABLE_COMBO_BOX, null);
-        externalProjectIdComboBox.getItems().addAll(loadAvailableProjects());
+        externalProjectIdComboBox = (ComboBox) ControlFactory.createControl(ControlType.EDITABLE_COMBO_BOX, null);
+
 
         externalProjectIdProperty = new SimpleStringProperty();
         externalProjectIdComboBox.valueProperty().bindBidirectional(externalProjectIdProperty);
@@ -605,10 +609,19 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         setHelpPopupContent(helpText);         
     }
 
-    private List<String> loadAvailableProjects() {
+    public void loadAvailableProjects(String availableProjectsFilePath) {
         List<String> projects = new ArrayList<>();
         try {
-            InputStream fileStream = PackageGenerationViewImpl.class.getResourceAsStream("/availableProjects");
+            InputStream fileStream;
+            if(availableProjectsFilePath.startsWith("classpath:")) {
+                String path = availableProjectsFilePath.substring("classpath:".length());
+                if (!path.startsWith("/")){
+                    path = "/" + path;
+                }
+                fileStream = PackageGenerationViewImpl.class.getResourceAsStream(path);
+            } else {
+                fileStream = new FileInputStream(availableProjectsFilePath);
+            }
             if (fileStream != null) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(fileStream));
                 String line;
@@ -625,6 +638,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
             log.error("Error loading available projects.");
         }
 
-        return projects;
+        externalProjectIdComboBox.getItems().addAll(projects);
     }
 }

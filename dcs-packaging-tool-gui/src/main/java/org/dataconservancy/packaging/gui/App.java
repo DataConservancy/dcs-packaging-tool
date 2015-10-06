@@ -46,17 +46,17 @@ public class App extends Application {
     }
 
     public void start(Stage stage) throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] {"classpath*:org/dataconservancy/config/applicationContext.xml",
-        "classpath*:applicationContext.xml"});
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"classpath*:org/dataconservancy/config/applicationContext.xml",
+                "classpath*:applicationContext.xml"});
 
         // min supported size is 800x600
         stage.setMinWidth(800);
         stage.setMinHeight(550);
-        Factory factory = (Factory)context.getBean("factory");
+        Factory factory = (Factory) context.getBean("factory");
         factory.setStage(stage);
 
         Font.loadFont(App.class.getResource("/fonts/OpenSans-Regular.ttf").toExternalForm(), 14);
-        
+
         Configuration config = factory.getConfiguration();
         CmdLineParser parser = new CmdLineParser(config);
 
@@ -68,14 +68,29 @@ public class App extends Application {
             Platform.exit();
             return;
         }
-        
-        //Check if the package generation parameters file was found in the home directory 
-        if (!getParameters().getRaw().contains("-gp") && !getParameters().getRaw().contains("--genparams")) {
-            File userParamsFile = new File(System.getProperty("user.home"), ".packageToolParams");
-            if (userParamsFile.exists()) {
-                config.setPackageGenerationParamsFile(userParamsFile.getPath());
-            }
+
+        String configFile;
+
+        //Check if the package generation parameters file was found in the user config directory,
+        //If not, use the default package generation parameters file
+        if (!getParameters().getRaw().contains("-p") && !getParameters().getRaw().contains("--generation-params")) {
+            configFile = config.getPackageGenerationParametersFile();
+            config.setPackageGenerationParameters(config.resolveConfigurationFile(configFile));
         }
+
+        //Check if an available projects file was found in the user config directory.
+        //If not, use the default available projects file.
+        if (!getParameters().getRaw().contains("-xp") && !getParameters().getRaw().contains("--external-projects")) {
+            configFile = config.getAvailableProjectsFile();
+            config.setAvailableProjects(config.resolveConfigurationFile(configFile));
+        }
+
+        //Check if a discipline map file was found in the user config directory.
+        //If not, use the default discipline map file.
+         if (!getParameters().getRaw().contains("-d") && !getParameters().getRaw().contains("--disciplines")) {
+             configFile = config.getDisciplineMapFile();
+             config.setDisciplineMap(config.resolveConfigurationFile(configFile));
+         }
 
         Controller controller = factory.getController();
 

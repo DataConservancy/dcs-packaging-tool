@@ -22,8 +22,10 @@ import java.util.Set;
 import javafx.scene.Node;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;
+import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.gui.view.impl.PackageArtifactWindowBuilder;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactPropertyContainer;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactRelationshipContainer;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
@@ -161,4 +163,6 @@ public interface PackageDescriptionView extends View<PackageDescriptionPresenter
      * @return The button to reenable warnings
      */
     public Button getReenableWarningsButton();
+
+    public void setupWindowBuilder(String disciplinePath);
 }

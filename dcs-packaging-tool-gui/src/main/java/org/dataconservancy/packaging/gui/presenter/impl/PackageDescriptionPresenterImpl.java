@@ -85,6 +85,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
         packageDescription = null;
         expandedArtifacts = new HashSet<>();
         view.setPresenter(this);
+
         bind();
     }
 
@@ -94,6 +95,8 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
     }
 
     public Node display() {
+        String disciplinePath = controller.getFactory().getConfiguration().getDisciplineMap();
+        view.setupWindowBuilder(disciplinePath);
         final PackageArtifactTreeServiceWorker worker =
                 new PackageArtifactTreeServiceWorker();
 

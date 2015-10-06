@@ -91,8 +91,12 @@ public class Help {
         File helpFile = null;
         
         try {
-            if (filePath.startsWith("classpath")) {
-                InputStream fileStream = PackageGenerationPresenterImpl.class.getResourceAsStream("/" + filePath.substring(10));
+            if (filePath.startsWith("classpath:")) {
+                String path = filePath.substring("classpath:".length());
+                if(!path.startsWith("/")){
+                    path = "/" + path;
+                }
+                InputStream fileStream = PackageGenerationPresenterImpl.class.getResourceAsStream(path);
                 
                 if (fileStream != null) { 
                     helpText = IOUtils.toString(fileStream, "UTF-8");

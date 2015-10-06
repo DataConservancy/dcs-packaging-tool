@@ -92,7 +92,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         view.getCurrentOutputDirectoryTextField().setText("");
         generationParams = null;
         loadPackageGenerationParams();
-        
+        view.loadAvailableProjects(controller.getAvailableProjects());
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);
@@ -361,7 +361,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         
         //If the file is null attempt to load the built in resource file.
         if (generationParams == null) {
-            InputStream fileStream = PackageGenerationPresenterImpl.class.getResourceAsStream("/defaultGenerationParams");
+            InputStream fileStream = PackageGenerationPresenterImpl.class.getResourceAsStream("/packageGenerationParameters");
             if (fileStream != null) {
                 try {
                     generationParams = packageGenerationParamsBuilder.buildParameters(fileStream);
@@ -370,7 +370,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
             }
             else {
-                log.error("Error reading default params files. Couldn't find classpath file: /defaultGenerationParams");
+                log.error("Error reading default params files. Couldn't find classpath file: /packageGenerationParameters");
             }
         }
         

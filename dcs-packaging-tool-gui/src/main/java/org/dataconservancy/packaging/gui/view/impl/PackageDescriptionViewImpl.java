@@ -133,14 +133,17 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
     private static final String synthesizedArtifactMarker = " *";
 
+    private String availableRelationshipsPath;
+
     public PackageDescriptionViewImpl(final Labels labels, final Errors errors, final Messages messages, final OntologyLabels ontologyLabels,
-                                      final InternalProperties internalProperties, final String availableRelationshipsPath, DisciplineLoadingService disciplineService) {
+                                      final InternalProperties internalProperties, final String availableRelationshipsPath) {
         super(labels);
         this.labels = labels;        
         this.errors = errors;
         this.messages = messages;
         this.ontologyLabels = ontologyLabels;
         this.internalProperties = internalProperties;
+        this.availableRelationshipsPath = availableRelationshipsPath;
 
         //Sets the text of the footer controls.
         getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -363,7 +366,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         //Instantiating metadata inheritance button map
         metadataInheritanceButtonMap = new HashMap<>();
 
-        windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
+       // windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
 
     @Override
@@ -778,5 +781,11 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         helpText.setWrapText(true);
         helpText.setTextAlignment(TextAlignment.CENTER);
         setHelpPopupContent(helpText);         
+    }
+
+    @Override
+    public void setupWindowBuilder(String disciplineFilePath){
+        DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
+        windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
 }

@@ -193,13 +193,13 @@ public class PackageGenerationApp {
             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PARAM_BUILD_EXCEPTION, e);
         }
 
-        File userParamsFile = new File(System.getProperty("user.home"), ".packageToolParams");
+        File userParamsFile = new File(System.getProperty("user.home"), "packageGenerationParams");
         if (userParamsFile.exists()) {
             try {
                 PackageGenerationParameters homeParams =
                         parametersBuilder.buildParameters(new FileInputStream(userParamsFile));
 
-                System.err.println("Overriding generation parameters with values from standard '.packageToolParams'");
+                System.err.println("Overriding generation parameters with values from standard 'packageGenerationParams'");
                 useDefaults = false;
                 updateCompression(homeParams);
                 packageParams.overrideParams(homeParams);

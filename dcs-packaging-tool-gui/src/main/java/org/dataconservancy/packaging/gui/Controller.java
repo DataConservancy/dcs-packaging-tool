@@ -31,6 +31,7 @@ import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
+import sun.security.x509.AVA;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -46,6 +47,7 @@ public class Controller {
     private File outputDirectory;
     private String packageGenerationParams;
     private String packageFilenameIllegalCharacters;
+    private String availableProjects;
     private String buildNumber;
     private String buildRevision;
     private String buildTimeStamp;
@@ -65,8 +67,9 @@ public class Controller {
     public void setFactory(Factory factory) { this.factory = factory; }
 
     public void startApp() {
-        packageGenerationParams = factory.getConfiguration().getPackageGenerationParamsFile();
+        packageGenerationParams = factory.getConfiguration().getPackageGenerationParameters();
         packageFilenameIllegalCharacters = factory.getConfiguration().getPackageFilenameIllegalCharacters();
+        availableProjects = factory.getConfiguration().getAvailableProjects();
         showHome(true);
     }
     
@@ -378,7 +381,11 @@ public class Controller {
     public String getPackageFilenameIllegalCharacters() { return packageFilenameIllegalCharacters; }
 
     public void setPackageFilenameIllegalCharacters(String illegalCharacters) { this.packageFilenameIllegalCharacters = illegalCharacters;}
-    
+
+    public String getAvailableProjects() { return availableProjects; }
+
+    public void setAvailableProjects(String availableProjects) { this.availableProjects = availableProjects; }
+
     public void setBuildNumber(String buildNumberString) {
         this.buildNumber = buildNumberString;
     }
