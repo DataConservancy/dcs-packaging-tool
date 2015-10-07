@@ -92,6 +92,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.dataconservancy.shared</groupId>
+      <artifactId>dcs-shared-util</artifactId>
+    </dependency>
+
   </dependencies>
   
 </project>
