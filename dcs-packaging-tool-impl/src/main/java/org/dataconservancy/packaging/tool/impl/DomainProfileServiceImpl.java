@@ -1,14 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
@@ -16,26 +9,18 @@ import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
-import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public class DomainProfileServiceImpl implements DomainProfileService {
     private final DomainProfile profile;
     private final DomainProfileObjectStore objstore;
-    private final Map<URI, NodeType> nodetypemap;
 
     public DomainProfileServiceImpl(DomainProfile profile, DomainProfileObjectStore objstore) {
         this.profile = profile;
         this.objstore = objstore;
-        this.nodetypemap = new HashMap<>();
-
-        for (NodeType nt : profile.getNodeTypes()) {
-            nodetypemap.put(nt.getIdentifier(), nt);
-        }
     }
 
     @Override
@@ -59,24 +44,14 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
-    public List<PropertyValue> getProperties(Node node) {
-        return objstore.getProperties(node.getDomainObject());
-    }
-
-    @Override
-    public List<PropertyValue> getProperties(Node node, PropertyType type) {
+    public List<PropertyValue> getProperties(Node node, NodeType type) {
         return objstore.getProperties(node.getDomainObject(), type);
     }
 
     @Override
-    public boolean validateProperties(Node node) {
+    public boolean validateProperties(Node node, NodeType type) {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    @Override
-    public List<PropertyConstraint> getPropertyConstraints(Node node) {
-        return nodetypemap.get(node.getNodeType()).getPropertyConstraints();
     }
 
     @Override
@@ -91,7 +66,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
-    public boolean validateTree(Node root, boolean check_properties) {
+    public boolean validateTree(Node root) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -103,7 +78,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         // Check type
         
-        if (!parent_constraint.getNodeTypes().contains(nodetypemap.get(parent.getNodeType()))) {
+        if (!parent_constraint.getNodeTypes().contains(parent.getNodeType())) {
             return false;
         }
 
@@ -189,7 +164,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private void update_domain_objects(Node node) {
-        NodeType nt = nodetypemap.get(node.getNodeType());
+        NodeType nt = node.getNodeType();
 
         if (node.getDomainObject() == null) {
             objstore.updateObject(node.getDomainObject(), nt);
@@ -207,7 +182,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     private boolean assign_node_types(Node node) {
         next: for (NodeType nt : get_valid_types_ordered_by_preference(node)) {
-            node.setNodeType(nt.getIdentifier());
+            node.setNodeType(nt);
 
             for (Node child : node.getChildren()) {
                 if (!assign_node_types(child)) {
@@ -226,17 +201,5 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         // nodetypemap.get(node.getNodeType()).getInheritableProperties();
 
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean checkFileInfoIsAccessible(Node node) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void updateFileInfo(Node node, FileInfo info) {
-        // TODO Auto-generated method stub
-        
     }
 }

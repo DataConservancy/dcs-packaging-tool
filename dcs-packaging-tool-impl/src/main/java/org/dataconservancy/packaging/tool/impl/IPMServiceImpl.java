@@ -87,4 +87,12 @@ public class IPMServiceImpl implements IPMService {
         // TODO Auto-generated method stub
         return null;
     }
+    
+
+    @Override
+    public boolean checkFileInfoIsAccessible(Node node) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }
