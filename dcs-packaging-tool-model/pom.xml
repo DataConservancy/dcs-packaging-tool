@@ -97,6 +97,12 @@
       <artifactId>dcs-shared-util</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
   
 </project>
