@@ -1,15 +1,20 @@
 package org.dataconservancy.packaging.tool.model.ipm;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dataconservancy.dcs.model.Checksum;
+import org.dataconservancy.dcs.model.DetectedFormat;
+import org.dataconservancy.dcs.util.ChecksumGeneratorVerifier;
+import org.dataconservancy.dcs.util.ContentDetectionService;
 
 /**
  * Information about a file or directory.
@@ -18,20 +23,37 @@ public class FileInfo {
 
     private URI location;
     private String name;
-    private List<URI> formats;
-    private Map<String, Checksum> checksums;
+    private List<String> formats;
+    private Map<String, String> checksums;
     private BasicFileAttributes fileAttributes;
 
     public FileInfo(Path path) {
         location = path.toUri();
         name = path.getFileName().toString();
+        checksums = new HashMap<>();
+        formats = new ArrayList<>();
 
         try {
             fileAttributes = Files.readAttributes(path, BasicFileAttributes.class);
+            InputStream md5Fis = Files.newInputStream(path);
+            String md5Checksum = ChecksumGeneratorVerifier.generateMD5checksum(md5Fis);
+            checksums.put("MD5", md5Checksum);
+            md5Fis.close();
+
+            InputStream sha1Fis = Files.newInputStream(path);
+            String sha1Checksum = ChecksumGeneratorVerifier.generateSHA1checksum(sha1Fis);
+            checksums.put("SHA1", sha1Checksum);
+            sha1Fis.close();
+
+            List<DetectedFormat> fileFormats = ContentDetectionService.getInstance().detectFormats(path.toFile());
+            for (DetectedFormat format : fileFormats) {
+                formats.add(createFormatURIString(format));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     /**
      * @return Location of file or directory.
      */
@@ -44,12 +66,8 @@ public class FileInfo {
      * @return Checksum in known format of the file or null if directory.
      */
     public String getChecksum(String algorithm) {
-        String value = null;
-        Checksum checksum = checksums.get(algorithm);
-        if (checksum != null) {
-            value = checksum.getValue();
-        }
-        return value;
+        algorithm = algorithm.toUpperCase();
+        return checksums.get(algorithm);
     }
 
     /**
@@ -62,7 +80,7 @@ public class FileInfo {
     /**
      * @return List of formats for the file.
      */
-    List<URI> getFormats() {
+    List<String> getFormats() {
         return formats;
     }
 
@@ -124,6 +142,23 @@ public class FileInfo {
         }
 
         return modifiedTime;
+    }
+
+    /**
+     * Converts format id from the DcsFormat objects into formatURI string with qualifying namespace. Only applicable
+     * to pronom format identifier at this point.
+     * @param format the DetectedFormat object
+     * @return a formatURI string with qualifying namespace
+     */
+    private String createFormatURIString(DetectedFormat format) {
+        String formatString = "";
+        if (format.getId() != null && !format.getId().isEmpty()) {
+            formatString = "info:pronom/" + format.getId();
+        } else if (format.getMimeType() != null && !format.getMimeType().isEmpty()) {
+            formatString = format.getMimeType();
+        }
+
+        return formatString;
     }
 
     @Override
