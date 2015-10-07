@@ -27,9 +27,12 @@ public class Node {
     private boolean ignored;
     private List<NodeType> subTypes;
 
-    public Node(URI identifier, NodeType nodeType) {
+    /**
+     * Identifier is required to be unique for each node.
+     * @param identifier A unique identifier representing the node
+     */
+    public Node(URI identifier) {
         this.identifier = identifier;
-        this.nodeType = nodeType;
     }
 
     /**
@@ -201,61 +204,28 @@ public class Node {
         return parent == null;
     }
 
+    /**
+     * Nodes are considered equal if their identifiers are equal.
+     */
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
+
         if (!(o instanceof Node)) {
             return false;
         }
 
         Node node = (Node) o;
 
-        if (ignored != node.ignored) {
-            return false;
-        }
         if (identifier != null ? !identifier.equals(node.identifier) :
             node.identifier != null) {
             return false;
         }
-        if (parent != null ? !parent.equals(node.parent) :
-            node.parent != null) {
-            return false;
-        }
-        if (children != null ? !children.equals(node.children) :
-            node.children != null) {
-            return false;
-        }
-        if (domainObject != null ? !domainObject.equals(node.domainObject) :
-            node.domainObject != null) {
-            return false;
-        }
-        if (fileInfo != null ? !fileInfo.equals(node.fileInfo) :
-            node.fileInfo != null) {
-            return false;
-        }
-        if (nodeType != null ? !nodeType.equals(node.nodeType) :
-            node.nodeType != null) {
-            return false;
-        }
-        return !(
-            subTypes != null ? !subTypes.equals(node.subTypes) :
-                node.subTypes != null);
 
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = identifier != null ? identifier.hashCode() : 0;
-        result = 31 * result + (parent != null ? parent.hashCode() : 0);
-        result = 31 * result + (children != null ? children.hashCode() : 0);
-        result =
-            31 * result + (domainObject != null ? domainObject.hashCode() : 0);
-        result = 31 * result + (fileInfo != null ? fileInfo.hashCode() : 0);
-        result = 31 * result + (nodeType != null ? nodeType.hashCode() : 0);
-        result = 31 * result + (ignored ? 1 : 0);
-        result = 31 * result + (subTypes != null ? subTypes.hashCode() : 0);
-        return result;
+        return identifier != null ? identifier.hashCode() : 0;
     }
 }
