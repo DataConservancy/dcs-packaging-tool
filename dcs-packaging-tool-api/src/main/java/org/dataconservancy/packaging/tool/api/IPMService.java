@@ -45,4 +45,13 @@ public interface IPMService {
      * @param comparisonResult A map of the comparison result to apply to the existing tree.
      */
     void mergeTree(Node existingTree, Map<Node, NodeComparisonStatus> comparisonResult);
+    
+    /**
+     * Checks that the file backing the node is accessible on the file system.
+     * Note that this method makes no assertion that the file or folder pointed to was the original one, just that something exists
+     * at the file location stored in the nodes file info.
+     * @param node The node to check if it's file info file location is still accessible.
+     * @return true if the file is accessible false otherwise.
+     */
+    boolean checkFileInfoIsAccessible(Node node);
 }

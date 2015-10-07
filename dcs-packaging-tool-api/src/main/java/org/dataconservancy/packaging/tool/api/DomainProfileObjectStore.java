@@ -54,16 +54,10 @@ public interface DomainProfileObjectStore {
 
     /**
      * @param object The identifier of an object.
-     * @return All properties of an object known about by the domain profile.
+     * @param type The node type which the object corresponds to.
+     * @return All properties of an object specified by a node type.
      */
-    List<PropertyValue> getProperties(URI object);
-
-    /**
-     * @param object The identifier of an object.
-     * @param type The type of property to retrieve.
-     * @return All properties of a object of a certain type.
-     */
-    List<PropertyValue> getProperties(URI object, PropertyType type);
+    List<PropertyValue> getProperties(URI object, NodeType type);
 
     /**
      * Check for the existence of a relationship.
@@ -74,5 +68,4 @@ public interface DomainProfileObjectStore {
      * @return Whether or not the relationship exists.
      */
     boolean hasRelationship(URI subject, URI predicate, URI object);
-
 }
