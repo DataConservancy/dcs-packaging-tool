@@ -30,24 +30,27 @@ public class FileInfo {
     public FileInfo(Path path) {
         location = path.toUri();
         name = path.getFileName().toString();
-        checksums = new HashMap<>();
-        formats = new ArrayList<>();
 
         try {
             fileAttributes = Files.readAttributes(path, BasicFileAttributes.class);
-            InputStream md5Fis = Files.newInputStream(path);
-            String md5Checksum = ChecksumGeneratorVerifier.generateMD5checksum(md5Fis);
-            checksums.put("MD5", md5Checksum);
-            md5Fis.close();
+            if (fileAttributes.isRegularFile()) {
+                checksums = new HashMap<>();
+                formats = new ArrayList<>();
 
-            InputStream sha1Fis = Files.newInputStream(path);
-            String sha1Checksum = ChecksumGeneratorVerifier.generateSHA1checksum(sha1Fis);
-            checksums.put("SHA1", sha1Checksum);
-            sha1Fis.close();
+                InputStream md5Fis = Files.newInputStream(path);
+                String md5Checksum = ChecksumGeneratorVerifier.generateMD5checksum(md5Fis);
+                checksums.put("MD5", md5Checksum);
+                md5Fis.close();
 
-            List<DetectedFormat> fileFormats = ContentDetectionService.getInstance().detectFormats(path.toFile());
-            for (DetectedFormat format : fileFormats) {
-                formats.add(createFormatURIString(format));
+                InputStream sha1Fis = Files.newInputStream(path);
+                String sha1Checksum = ChecksumGeneratorVerifier.generateSHA1checksum(sha1Fis);
+                checksums.put("SHA1", sha1Checksum);
+                sha1Fis.close();
+
+                List<DetectedFormat> fileFormats = ContentDetectionService.getInstance().detectFormats(path.toFile());
+                for (DetectedFormat format : fileFormats) {
+                    formats.add(createFormatURIString(format));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,7 +70,11 @@ public class FileInfo {
      */
     public String getChecksum(String algorithm) {
         algorithm = algorithm.toUpperCase();
-        return checksums.get(algorithm);
+        String value = null;
+        if (checksums != null) {
+            value = checksums.get(algorithm);
+        }
+        return value;
     }
 
     /**
@@ -172,10 +179,12 @@ public class FileInfo {
 
         FileInfo fileInfo = (FileInfo) o;
 
-        if (!location.equals(fileInfo.location)) {
+        if (location != null ? !location.equals(fileInfo.location) :
+            fileInfo.location != null) {
             return false;
         }
-        if (!name.equals(fileInfo.name)) {
+        if (name != null ? !name.equals(fileInfo.name) :
+            fileInfo.name != null) {
             return false;
         }
         if (formats != null ? !formats.equals(fileInfo.formats) :
@@ -194,12 +203,11 @@ public class FileInfo {
 
     @Override
     public int hashCode() {
-        int result = location.hashCode();
-        result = 31 * result + name.hashCode();
+        int result = location != null ? location.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (formats != null ? formats.hashCode() : 0);
         result = 31 * result + (checksums != null ? checksums.hashCode() : 0);
-        result = 31 * result +
-            (fileAttributes != null ? fileAttributes.hashCode() : 0);
+        result = 31 * result + (fileAttributes != null ? fileAttributes.hashCode() : 0);
         return result;
     }
 }
