@@ -1,6 +1,9 @@
 package org.dataconservancy.packaging.tool.model.ipm;
 
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,106 +16,242 @@ import java.util.List;
  * 
  * 
  */
-public interface Node {
+public class Node {
+
+    private URI identifier;
+    private Node parent;
+    private List<Node> children;
+    private URI domainObject;
+    private FileInfo fileInfo;
+    private NodeType nodeType;
+    private boolean ignored;
+    private List<NodeType> subTypes;
+
+    public Node(URI identifier, NodeType nodeType) {
+        this.identifier = identifier;
+        this.nodeType = nodeType;
+    }
+
     /**
      * @return Unique identifier of the node in the tree.
      */
-    URI getIdentifier();
+    public URI getIdentifier() {
+        return identifier;
+    }
 
     /**
      * Set unique identifier of the node in the tree.
      * 
-     * @param id
+     * @param id the new identifier for the node
      */
-    void setIdentifier(URI id);
+    public void setIdentifier(URI id) {
+        this.identifier = id;
+    }
 
     /**
-     * @return Parent node or null if node is root.
+     * @return Parent node or null if node has no parent.
      */
-    Node getParent();
+    public Node getParent() {
+        return parent;
+    }
 
     /**
      * Set the parent node.
      * 
-     * @param parent
+     * @param parent The new parent of the node.
      */
-    void setParent(Node parent);
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
 
     /**
-     * @return Children of node as a list that should not be modified.
+     * @return Children of node as a list that should not be modified, or null if no children have been added.
      */
-    List<Node> getChildren();
+    public List<Node> getChildren() {
+        return children;
+    }
 
     /**
      * Add a child node. The parent of the child node will be set to this node.
      * 
-     * @param node
+     * @param node The new child to add to the node.
      */
-    void addChild(Node node);
+    public void addChild(Node node) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+
+        children.add(node);
+    }
 
     /**
      * Remove a child node.
      * 
-     * @param node
+     * @param node The child node to remove from the node.
      */
-    void removeChild(Node node);
+    public void removeChild(Node node) {
+        if (children != null) {
+            children.remove(node);
+        }
+    }
 
     /**
      * @return Identifier of domain object associated with node.
      */
-    URI getDomainObject();
+    public URI getDomainObject() {
+        return domainObject;
+    }
 
     /**
      * Set identifier of domain object associated with node.
      * 
-     * @param id
+     * @param id The id of the domain object corresponding to this node.
      */
-    void setDomainObject(URI id);
+    public void setDomainObject(URI id) {
+        this.domainObject = id;
+    }
 
     /**
      * @return Information about the file associated with the node.
      */
-
-    FileInfo getFileInfo();
+    public FileInfo getFileInfo() {
+        return fileInfo;
+    }
 
     /**
      * Set information about file associated with node.
      * 
-     * @param info
+     * @param info The FileInfo associated with this node.
      */
-    void setFileInfo(FileInfo info);
+   public void setFileInfo(FileInfo info) {
+       this.fileInfo = info;
+   }
 
     /**
-     * @return Type of the node.
+     * @return The primary(structural) type of the node.
      */
-    URI getNodeType();
+    public NodeType getNodeType() {
+        return nodeType;
+    }
 
     /**
      * Set the type of the node.
      * 
-     * @param type
+     * @param type The node type object that represents the primary(structural) node type.
      */
-    void setNodeType(URI type);
+    public void setNodeType(NodeType type) {
+        this.nodeType = type;
+    }
+
+    /**
+     * Add a new sub type to the node. This type will not affect the structural type of the node.
+     * @param subNodeType The node type to add to the node.
+     */
+    public void addSubNodeType(NodeType subNodeType) {
+        if (subTypes == null) {
+            subTypes = new ArrayList<>();
+        }
+
+        subTypes.add(subNodeType);
+    }
+
+    /**
+     * Sets the sub types to the node. These types will not affect the structural type of the node.
+     * @param subNodeTypes The node types to add to the node.
+     */
+    public void setSubNodeTypes(List<NodeType> subNodeTypes) {
+        this.subTypes = subNodeTypes;
+    }
+
+    /**
+     * Gets the sub types of the node. These will not include the primary type for the node that affects the tree structure.
+     * @return A list of node types that represent the sub types on the node, or null if no sub types have been set.
+     */
+    public List<NodeType> getSubNodeTypes() {
+        return subTypes;
+    }
 
     /**
      * @return Ignored status.
      */
-    boolean isIgnored();
+    public boolean isIgnored() {
+        return ignored;
+    }
 
     /**
      * Set ignored status.
      * 
-     * @param status
+     * @param status The new ignored status of the node.
      */
-    void setIgnored(boolean status);
+    public void setIgnored(boolean status) {
+        this.ignored = status;
+    }
 
     /**
      * @return Whether or not the node is a leaf.
      */
-    boolean isLeaf();
+    public boolean isLeaf() {
+        return children == null || children.isEmpty();
+    }
 
     /**
      * @return Whether or not node is the root of the tree.
      */
-    boolean isRoot();
+    public boolean isRoot() {
+        return parent == null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Node)) {
+            return false;
+        }
+
+        Node node = (Node) o;
+
+        if (ignored != node.ignored) {
+            return false;
+        }
+        if (!identifier.equals(node.identifier)) {
+            return false;
+        }
+        if (parent != null ? !parent.equals(node.parent) :
+            node.parent != null) {
+            return false;
+        }
+        if (children != null ? !children.equals(node.children) :
+            node.children != null) {
+            return false;
+        }
+        if (subTypes != null ? !subTypes.equals(node.subTypes) :
+            node.subTypes != null) {
+            return false;
+        }
+        if (domainObject != null ? !domainObject.equals(node.domainObject) :
+            node.domainObject != null) {
+            return false;
+        }
+        if (fileInfo != null ? !fileInfo.equals(node.fileInfo) :
+            node.fileInfo != null) {
+            return false;
+        }
+        return nodeType.equals(node.nodeType);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = identifier.hashCode();
+        result = 31 * result + (parent != null ? parent.hashCode() : 0);
+        result = 31 * result + (children != null ? children.hashCode() : 0);
+        result = 31 * result + (subTypes != null ? subTypes.hashCode() : 0);
+        result = 31 * result + (domainObject != null ? domainObject.hashCode() : 0);
+        result = 31 * result + (fileInfo != null ? fileInfo.hashCode() : 0);
+        result = 31 * result + nodeType.hashCode();
+        result = 31 * result + (ignored ? 1 : 0);
+        return result;
+    }
 }
