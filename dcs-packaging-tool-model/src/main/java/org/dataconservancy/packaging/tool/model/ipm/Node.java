@@ -215,7 +215,8 @@ public class Node {
         if (ignored != node.ignored) {
             return false;
         }
-        if (!identifier.equals(node.identifier)) {
+        if (identifier != null ? !identifier.equals(node.identifier) :
+            node.identifier != null) {
             return false;
         }
         if (parent != null ? !parent.equals(node.parent) :
@@ -226,10 +227,6 @@ public class Node {
             node.children != null) {
             return false;
         }
-        if (subTypes != null ? !subTypes.equals(node.subTypes) :
-            node.subTypes != null) {
-            return false;
-        }
         if (domainObject != null ? !domainObject.equals(node.domainObject) :
             node.domainObject != null) {
             return false;
@@ -238,20 +235,27 @@ public class Node {
             node.fileInfo != null) {
             return false;
         }
-        return nodeType.equals(node.nodeType);
+        if (nodeType != null ? !nodeType.equals(node.nodeType) :
+            node.nodeType != null) {
+            return false;
+        }
+        return !(
+            subTypes != null ? !subTypes.equals(node.subTypes) :
+                node.subTypes != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = identifier.hashCode();
+        int result = identifier != null ? identifier.hashCode() : 0;
         result = 31 * result + (parent != null ? parent.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
-        result = 31 * result + (subTypes != null ? subTypes.hashCode() : 0);
-        result = 31 * result + (domainObject != null ? domainObject.hashCode() : 0);
+        result =
+            31 * result + (domainObject != null ? domainObject.hashCode() : 0);
         result = 31 * result + (fileInfo != null ? fileInfo.hashCode() : 0);
-        result = 31 * result + nodeType.hashCode();
+        result = 31 * result + (nodeType != null ? nodeType.hashCode() : 0);
         result = 31 * result + (ignored ? 1 : 0);
+        result = 31 * result + (subTypes != null ? subTypes.hashCode() : 0);
         return result;
     }
 }
