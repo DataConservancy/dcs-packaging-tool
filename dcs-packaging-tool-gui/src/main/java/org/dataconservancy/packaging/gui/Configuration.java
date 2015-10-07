@@ -21,13 +21,16 @@ import org.kohsuke.args4j.Option;
 import java.io.File;
 
 /**
- * This class is responsible for getters and setters for various configuration parameters, as well as file resolution for
- * configuration files. Parameters which may be specified on the command line are jandled here. When configuration files
+ * This class is responsible for getters and setters for various configuration parameters, as well as path resolution for
+ * configuration files. Parameters which may be specified on the command line are handled here. When configuration files
  * may be obtained from the command line, the user's configuration directory or the default configuration location in the
  * jar file, we resolve the file location in that order: if the command line option exists we set the configuration file
- * location to the value given to the command line parameter; if nopt we look in the user's configuration directory
+ * location to the value given to the command line parameter; if not we look in the user's configuration directory
  * ${user.home}/.dataconservancy for the file; if that does not exist we get the default configuration file. In any case,
  * the file name must be the one defined in the config_defaults.properties file for that parameter.
+ *
+ * Existence of command line values for configuration files is checked in the App class - this class is consulted if the
+ * command line parameter is absent.
  */
 public class Configuration {
 
