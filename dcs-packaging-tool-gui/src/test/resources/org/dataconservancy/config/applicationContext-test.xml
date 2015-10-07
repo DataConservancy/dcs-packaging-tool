@@ -124,9 +124,9 @@
   </bean>
 
   <!--  Discipline Service  -->
-  <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
+ <!-- <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
     <constructor-arg value="${disciplines.file}"/>
-  </bean>
+  </bean>  -->
 
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">

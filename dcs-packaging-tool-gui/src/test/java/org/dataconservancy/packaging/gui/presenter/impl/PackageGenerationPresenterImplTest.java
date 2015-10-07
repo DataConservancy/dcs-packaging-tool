@@ -99,6 +99,9 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
             @Override
             public File getPackageDescriptionFile() { return fakePDFile; }
+
+            @Override
+            public String getAvailableProjects() { return "MOO"; }
         };
 
         PackageDescriptionBuilder builder = new PackageDescriptionBuilder() {

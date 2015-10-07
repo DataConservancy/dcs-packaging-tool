@@ -20,7 +20,9 @@ import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
+import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
+import org.dataconservancy.packaging.gui.Factory;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
@@ -88,10 +90,6 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
     @Autowired
     @Qualifier("packageOntologyService")
     private PackageOntologyService packageOntologyService;
-
-    @Autowired
-    @Qualifier("disciplineService")
-    private DisciplineLoadingService disciplineLoadingService;
 
     private Controller controller;
 
@@ -260,6 +258,15 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         goToNextPage = false;
         PackageDescriptionBuilder builder = mock(PackageDescriptionBuilder.class);
         PackageDescriptionValidator validator = mock(PackageDescriptionValidator.class);
+
+        Configuration configuration = new Configuration() {
+            @Override
+            public String getDisciplineMap(){ return "MOO";}
+
+        };
+
+        Factory factory = new Factory();
+        factory.setConfiguration(configuration);
         
         controller = new Controller() {
             @Override
@@ -280,10 +287,13 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
                     throw new RuntimeException(e);
                 }
             }
+
         };
+
+        controller.setFactory(factory);
         
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
-        view = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships", disciplineLoadingService);
+        view = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
         view.setPackageOntologyService(packageOntologyService);
         
         HeaderView headerView = new HeaderViewImpl(labels);

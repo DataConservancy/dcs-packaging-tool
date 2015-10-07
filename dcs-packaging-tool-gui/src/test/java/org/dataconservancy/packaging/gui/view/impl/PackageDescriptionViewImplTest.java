@@ -67,10 +67,6 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
     private PackageArtifact project;
 
     @Autowired
-    @Qualifier("disciplineService")
-    private DisciplineLoadingService disciplineLoadingService;
-
-    @Autowired
     @Qualifier("packageOntologyService")
     private PackageOntologyService packageOntologyService;
 
@@ -202,7 +198,7 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
     }
     @Before
     public void setup() {
-        view = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships", disciplineLoadingService);
+        view = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
         HeaderView headerView = new HeaderViewImpl(labels);
         view.setPackageOntologyService(packageOntologyService);
 
