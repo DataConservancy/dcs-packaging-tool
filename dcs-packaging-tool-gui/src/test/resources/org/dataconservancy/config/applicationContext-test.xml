@@ -123,11 +123,6 @@
     <property name="creatorPropertiesByString" value="${ontology.creatorProperties}"/>
   </bean>
 
-  <!--  Discipline Service  -->
- <!-- <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
-    <constructor-arg value="${disciplines.file}"/>
-  </bean>  -->
-
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
     <property name="labels" ref="labels" />

@@ -20,6 +20,15 @@ import org.kohsuke.args4j.Option;
 
 import java.io.File;
 
+/**
+ * This class is responsible for getters and setters for various configuration parameters, as well as file resolution for
+ * configuration files. Parameters which may be specified on the command line are jandled here. When configuration files
+ * may be obtained from the command line, the user's configuration directory or the default configuration location in the
+ * jar file, we resolve the file location in that order: if the command line option exists we set the configuration file
+ * location to the value given to the command line parameter; if nopt we look in the user's configuration directory
+ * ${user.home}/.dataconservancy for the file; if that does not exist we get the default configuration file. In any case,
+ * the file name must be the one defined in the config_defaults.properties file for that parameter.
+ */
 public class Configuration {
 
     private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
@@ -117,6 +126,13 @@ public class Configuration {
         return availableProjectsFile;
     }
 
+    /**
+     *  This method locates the default configuration with the supplied file name, in the user's configuration directory.
+     *  This directory is hard-coded in the userConfDirectory field above.
+     * @param fileName the name of the file to be found. These names are specified in the
+     *                              config_defaults.properties file and set on the  *File fields.
+     * @return
+     */
     private String locateUserConfigFile(String fileName) {
         File confFile = new File(userConfDirectory, fileName);
         if (confFile.exists()) {
@@ -126,6 +142,13 @@ public class Configuration {
         }
     }
 
+    /**
+     * This method locates the default configuration with the supplied file name, in the configuration directory.
+     * The configuration directory is specified in the  config_defaults.properties file.
+     * @param fileName the name of the file to be found. These names are specified in the
+     *                              config_defaults.properties file and set on the  *File fields.
+     * @return the default configuration path
+     */
     private String locateDefaultConfigFile(String fileName) {
         if (configurationDirectory.startsWith("classpath:")) {
             if (configurationDirectory.endsWith("/")) {
@@ -139,6 +162,15 @@ public class Configuration {
         }
     }
 
+    /**
+     *  This method looks for files with this name in the user's config directory and in the default configuration directory.
+     *  The method returns the user's file if found, else it returns the default file.
+     *
+     * @param configurationFileName The name of the configuration file to be resolved. These names are specified in the
+     *                              config_defaults.properties file and set on the  *File fields.
+     *
+     * @return  the resolved configuration.file
+     */
     public String resolveConfigurationFile(String configurationFileName){
         String userFile = locateUserConfigFile(configurationFileName);
         String defaultFile = locateDefaultConfigFile(configurationFileName);

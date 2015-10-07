@@ -239,9 +239,4 @@
     <property name="buildRevision" value="${build.revision}"/>
   </bean>
 
-  <!--  Discipline Service  -->
- <!--  <bean id="disciplineService" class="org.dataconservancy.dcs.util.DisciplineLoadingService">
-    <constructor-arg value="${disciplines.file}"/>
-  </bean>  -->
-
 </beans>
