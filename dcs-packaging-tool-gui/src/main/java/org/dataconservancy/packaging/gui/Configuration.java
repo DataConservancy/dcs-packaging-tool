@@ -26,8 +26,8 @@ import java.io.File;
  * may be obtained from the command line, the user's configuration directory or the default configuration location in the
  * jar file, we resolve the file location in that order: if the command line option exists we set the configuration file
  * location to the value given to the command line parameter; if not we look in the user's configuration directory
- * ${user.home}/.dataconservancy for the file; if that does not exist we get the default configuration file. In any case,
- * the file name must be the one defined in the config_defaults.properties file for that parameter.
+ * ${user.home}/.dataconservancy for the file; if that does not exist we get the default configuration file. The file in
+ * the user's configuration directory must have the file name defined in the config_defaults.properties file for that parameter.
  *
  * Existence of command line values for configuration files is checked in the App class - this class is consulted if the
  * command line parameter is absent.
