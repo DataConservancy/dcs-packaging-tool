@@ -2,13 +2,10 @@ package org.dataconservancy.packaging.tool.api;
 
 import java.util.List;
 
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
-import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
@@ -16,11 +13,6 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
  * profile.
  */
 public interface DomainProfileService {
-    /**
-     * @return Domain profile used by service.
-     */
-    DomainProfile getDomainProfile();
-
     /**
      * Add a property to a node.
      * 
