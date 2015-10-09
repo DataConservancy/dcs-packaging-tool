@@ -37,8 +37,8 @@ public class FileInfoTest {
         File tmpFile = tmpFolder.newFile("testFile");
         FileInfo info = new FileInfo(tmpFile.toPath());
 
-        assertNotNull(info.getChecksum("SHA1"));
-        assertNotNull(info.getChecksum("MD5"));
+        assertNotNull(info.getChecksum(FileInfo.Algorithm.SHA1));
+        assertNotNull(info.getChecksum(FileInfo.Algorithm.MD5));
     }
 
     /**
@@ -50,8 +50,8 @@ public class FileInfoTest {
         File tmpFile = tmpFolder.newFolder("testFolder");
         FileInfo info = new FileInfo(tmpFile.toPath());
 
-        assertNull(info.getChecksum("SHA1"));
-        assertNull(info.getChecksum("MD5"));
+        assertNull(info.getChecksum(FileInfo.Algorithm.SHA1));
+        assertNull(info.getChecksum(FileInfo.Algorithm.MD5));
     }
 
     /**

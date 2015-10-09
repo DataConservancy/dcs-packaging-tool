@@ -21,10 +21,15 @@ import org.dataconservancy.dcs.util.ContentDetectionService;
  */
 public class FileInfo {
 
+    public enum Algorithm {
+        SHA1,
+        MD5
+    }
+
     private URI location;
     private String name;
     private List<String> formats;
-    private Map<String, String> checksums;
+    private Map<Algorithm, String> checksums;
     private BasicFileAttributes fileAttributes;
 
     public FileInfo(Path path) {
@@ -39,12 +44,12 @@ public class FileInfo {
 
                 InputStream md5Fis = Files.newInputStream(path);
                 String md5Checksum = ChecksumGeneratorVerifier.generateMD5checksum(md5Fis);
-                checksums.put("MD5", md5Checksum);
+                checksums.put(Algorithm.MD5, md5Checksum);
                 md5Fis.close();
 
                 InputStream sha1Fis = Files.newInputStream(path);
                 String sha1Checksum = ChecksumGeneratorVerifier.generateSHA1checksum(sha1Fis);
-                checksums.put("SHA1", sha1Checksum);
+                checksums.put(Algorithm.SHA1, sha1Checksum);
                 sha1Fis.close();
 
                 List<DetectedFormat> fileFormats = ContentDetectionService.getInstance().detectFormats(path.toFile());
@@ -65,11 +70,10 @@ public class FileInfo {
     }
 
     /**
-     * @param algorithm Either MD5 or SHA1
+     * @param algorithm The algorithm of the checksum either MD5 or SHA1
      * @return Checksum in known format of the file or null if directory.
      */
-    public String getChecksum(String algorithm) {
-        algorithm = algorithm.toUpperCase();
+    public String getChecksum(Algorithm algorithm) {
         String value = null;
         if (checksums != null) {
             value = checksums.get(algorithm);
