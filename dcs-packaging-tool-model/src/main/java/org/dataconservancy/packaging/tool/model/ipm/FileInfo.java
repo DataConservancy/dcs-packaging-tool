@@ -87,7 +87,7 @@ public class FileInfo {
     /**
      * @return List of formats for the file.
      */
-    List<String> getFormats() {
+    public List<String> getFormats() {
         return formats;
     }
 
@@ -106,7 +106,7 @@ public class FileInfo {
     /**
      * @return Whether or not a file is being described.
      */
-    boolean isFile() {
+    public boolean isFile() {
         boolean isFile = false;
         if (fileAttributes != null) {
             isFile = fileAttributes.isRegularFile();
@@ -118,7 +118,7 @@ public class FileInfo {
     /**
      * @return Whether or not a directory is being described.
      */
-    boolean isDirectory() {
+    public boolean isDirectory() {
         boolean isDirectory = false;
         if (fileAttributes != null) {
             isDirectory = fileAttributes.isDirectory();
@@ -130,7 +130,7 @@ public class FileInfo {
     /**
      * @return Creation time of file.
      */
-    FileTime getCreationTime() {
+    public FileTime getCreationTime() {
         FileTime creationTime = null;
         if (fileAttributes != null) {
             creationTime = fileAttributes.creationTime();
@@ -142,7 +142,7 @@ public class FileInfo {
     /**
      * @return Last modification time of file.
      */
-    FileTime getLastModifiedTime() {
+    public FileTime getLastModifiedTime() {
         FileTime modifiedTime = null;
         if (fileAttributes != null) {
             modifiedTime = fileAttributes.lastModifiedTime();
