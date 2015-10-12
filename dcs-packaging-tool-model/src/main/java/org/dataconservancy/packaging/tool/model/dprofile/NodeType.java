@@ -131,7 +131,7 @@ public class NodeType extends AbstractDescribedObject {
     /**
      * @param parent_constraints The parent constraints to set.
      */
-    public void setParent_constraints(List<NodeConstraint> parent_constraints) {
+    public void setParentConstraints(List<NodeConstraint> parent_constraints) {
         this.parent_constraints = parent_constraints;
     }
 
