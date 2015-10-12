@@ -2,6 +2,7 @@ package org.dataconservancy.packaging.tool.api;
 
 import java.util.List;
 
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
@@ -13,6 +14,13 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
  * profile.
  */
 public interface DomainProfileService {
+
+    /**
+     * Returns the domain profile currently used by the service.
+     * @return The domain profile currently used by the service.
+     */
+    DomainProfile getDomainProfile();
+
     /**
      * Add a property to a node.
      * 
