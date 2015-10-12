@@ -45,7 +45,7 @@ public class IpmRdfTransformServiceTest {
     private NodeType subTypeOne;
     private NodeType subTypeTwo;
 
-    private foo transformService;
+    private IpmRdfTransformService transformService;
 
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
@@ -87,7 +87,7 @@ public class IpmRdfTransformServiceTest {
             return null;
         }).when(profileStore).getNodeType(any(URI.class));
 
-        transformService = new foo();
+        transformService = new IpmRdfTransformService();
         transformService.setDomainProfileStore(profileStore);
 
         root = new Node(new URI("bag://node/1"));
@@ -132,59 +132,59 @@ public class IpmRdfTransformServiceTest {
     @Test
     public void testToRDF() throws RDFTransformException {
         Model rootModel = transformService.transformToRDF(root);
-        List<Resource> descriptionResource = rootModel.listResourcesWithProperty(RDF.type, foo.IPM_NODE_TYPE).toList();
+        List<Resource> descriptionResource = rootModel.listResourcesWithProperty(RDF.type, IpmRdfTransformService.IPM_NODE_TYPE).toList();
         assertEquals(3, descriptionResource.size());
 
-        List<Resource> rootResources = rootModel.listResourcesWithProperty(foo.IS_ROOT).toList();
+        List<Resource> rootResources = rootModel.listResourcesWithProperty(IpmRdfTransformService.IS_ROOT).toList();
         assertEquals(1, rootResources.size());
 
         Resource rootResource = rootResources.get(0);
         assertEquals(1, rootResource.listProperties(PackageResourceMapConstants.HAS_ID).toList().size());
-        assertEquals(1, rootResource.listProperties(foo.HAS_NODE_TYPE).toList().size());
-        assertEquals(1, rootResource.listProperties(foo.HAS_SUB_TYPE).toList().size());
+        assertEquals(1, rootResource.listProperties(IpmRdfTransformService.HAS_NODE_TYPE).toList().size());
+        assertEquals(1, rootResource.listProperties(IpmRdfTransformService.HAS_SUB_TYPE).toList().size());
 
-        assertEquals(1, rootResource.listProperties(foo.IS_ROOT).toList().size());
-        assertEquals(0, rootResource.listProperties(foo.HAS_PARENT).toList().size());
+        assertEquals(1, rootResource.listProperties(IpmRdfTransformService.IS_ROOT).toList().size());
+        assertEquals(0, rootResource.listProperties(IpmRdfTransformService.HAS_PARENT).toList().size());
 
-        List<RDFNode> rootFileInfo = rootModel.listObjectsOfProperty(rootResource, foo.HAS_FILE_INFO).toList();
+        List<RDFNode> rootFileInfo = rootModel.listObjectsOfProperty(rootResource, IpmRdfTransformService.HAS_FILE_INFO).toList();
         assertEquals(1, rootFileInfo.size());
 
         Resource rootFileInfoResource = rootFileInfo.get(0).asResource();
         assertEquals(1, rootFileInfoResource.listProperties(PackageResourceMapConstants.HAS_NAME).toList().size());
-        assertEquals(1, rootFileInfoResource.listProperties(foo.HAS_LOCATION).toList().size());
-        assertEquals(1, rootFileInfoResource.listProperties(foo.HAS_SIZE).toList().size());
-        assertEquals(0, rootFileInfoResource.listProperties(foo.HAS_FORMAT).toList().size());
-        assertEquals(0, rootFileInfoResource.listProperties(foo.HAS_SHA1_CHECKSUM).toList().size());
-        assertEquals(0, rootFileInfoResource.listProperties(foo.HAS_MD5_CHECKSUM).toList().size());
-        assertTrue(rootFileInfoResource.hasLiteral(foo.IS_DIRECTORY, true));
-        assertTrue(rootFileInfoResource.hasLiteral(foo.IS_BYTE_STREAM, false));
+        assertEquals(1, rootFileInfoResource.listProperties(IpmRdfTransformService.HAS_LOCATION).toList().size());
+        assertEquals(1, rootFileInfoResource.listProperties(IpmRdfTransformService.HAS_SIZE).toList().size());
+        assertEquals(0, rootFileInfoResource.listProperties(IpmRdfTransformService.HAS_FORMAT).toList().size());
+        assertEquals(0, rootFileInfoResource.listProperties(IpmRdfTransformService.HAS_SHA1_CHECKSUM).toList().size());
+        assertEquals(0, rootFileInfoResource.listProperties(IpmRdfTransformService.HAS_MD5_CHECKSUM).toList().size());
+        assertTrue(rootFileInfoResource.hasLiteral(IpmRdfTransformService.IS_DIRECTORY, true));
+        assertTrue(rootFileInfoResource.hasLiteral(IpmRdfTransformService.IS_BYTE_STREAM, false));
 
-        List<RDFNode> rootChildren = rootModel.listObjectsOfProperty(rootResource, foo.HAS_CHILD).toList();
+        List<RDFNode> rootChildren = rootModel.listObjectsOfProperty(rootResource, IpmRdfTransformService.HAS_CHILD).toList();
         assertEquals(2, rootChildren.size());
 
         for (RDFNode child : rootChildren) {
             Resource childResource = child.asResource();
             assertEquals(1, childResource.listProperties(PackageResourceMapConstants.HAS_ID).toList().size());
-            assertEquals(1, childResource.listProperties(foo.HAS_NODE_TYPE).toList().size());
-            assertEquals(1, childResource.listProperties(foo.HAS_SUB_TYPE).toList().size());
+            assertEquals(1, childResource.listProperties(IpmRdfTransformService.HAS_NODE_TYPE).toList().size());
+            assertEquals(1, childResource.listProperties(IpmRdfTransformService.HAS_SUB_TYPE).toList().size());
 
-            assertEquals(0, childResource.listProperties(foo.IS_ROOT).toList().size());
-            assertEquals(1, childResource.listProperties(foo.HAS_PARENT).toList().size());
+            assertEquals(0, childResource.listProperties(IpmRdfTransformService.IS_ROOT).toList().size());
+            assertEquals(1, childResource.listProperties(IpmRdfTransformService.HAS_PARENT).toList().size());
 
-            List<RDFNode> childFileInfo = rootModel.listObjectsOfProperty(childResource, foo.HAS_FILE_INFO).toList();
+            List<RDFNode> childFileInfo = rootModel.listObjectsOfProperty(childResource, IpmRdfTransformService.HAS_FILE_INFO).toList();
             assertEquals(1, childFileInfo.size());
 
             Resource childFileInfoResource = childFileInfo.get(0).asResource();
             assertEquals(1, childFileInfoResource.listProperties(PackageResourceMapConstants.HAS_NAME).toList().size());
-            assertEquals(1, childFileInfoResource.listProperties(foo.HAS_LOCATION).toList().size());
-            assertEquals(1, childFileInfoResource.listProperties(foo.HAS_SIZE).toList().size());
-            assertEquals(1, childFileInfoResource.listProperties(foo.HAS_FORMAT).toList().size());
-            assertEquals(1, childFileInfoResource.listProperties(foo.HAS_SHA1_CHECKSUM).toList().size());
-            assertEquals(1, childFileInfoResource.listProperties(foo.HAS_MD5_CHECKSUM).toList().size());
-            assertTrue(childFileInfoResource.hasLiteral(foo.IS_DIRECTORY, false));
-            assertTrue(childFileInfoResource.hasLiteral(foo.IS_BYTE_STREAM, true));
+            assertEquals(1, childFileInfoResource.listProperties(IpmRdfTransformService.HAS_LOCATION).toList().size());
+            assertEquals(1, childFileInfoResource.listProperties(IpmRdfTransformService.HAS_SIZE).toList().size());
+            assertEquals(1, childFileInfoResource.listProperties(IpmRdfTransformService.HAS_FORMAT).toList().size());
+            assertEquals(1, childFileInfoResource.listProperties(IpmRdfTransformService.HAS_SHA1_CHECKSUM).toList().size());
+            assertEquals(1, childFileInfoResource.listProperties(IpmRdfTransformService.HAS_MD5_CHECKSUM).toList().size());
+            assertTrue(childFileInfoResource.hasLiteral(IpmRdfTransformService.IS_DIRECTORY, false));
+            assertTrue(childFileInfoResource.hasLiteral(IpmRdfTransformService.IS_BYTE_STREAM, true));
 
-            List<RDFNode> children = rootModel.listObjectsOfProperty(childResource, foo.HAS_CHILD).toList();
+            List<RDFNode> children = rootModel.listObjectsOfProperty(childResource, IpmRdfTransformService.HAS_CHILD).toList();
             assertEquals(0, children.size());
         }
 
