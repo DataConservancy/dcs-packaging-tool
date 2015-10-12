@@ -10,7 +10,7 @@ public class PropertyConstraint extends CardinalityConstraint {
     /**
      * @return Required property type
      */
-    PropertyType getPropertyType() {
+    public PropertyType getPropertyType() {
         return type;
     }
 
