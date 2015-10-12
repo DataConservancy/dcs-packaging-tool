@@ -8,6 +8,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.FileAttribute;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
