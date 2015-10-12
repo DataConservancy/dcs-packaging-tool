@@ -41,6 +41,7 @@ import java.util.Set;
 
 import net.lingala.zip4j.core.ZipFile;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreator;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
@@ -370,6 +371,7 @@ public class GeneralPackageDescriptionCreatorTest {
             Files.createSymbolicLink(link, subdir.toPath());
         } catch (UnsupportedOperationException e) {
             /* Nothing we can do if the system doesn't support symlinks */
+            FileUtils.deleteDirectory(tempDir);
             return;
         }
 
@@ -378,6 +380,8 @@ public class GeneralPackageDescriptionCreatorTest {
             Assert.fail("Expected symbolic link cycle to cause an exception");
         } catch (PackageDescriptionCreatorException e) {
             /* Expected */
+            // clean up just in case other tests create the same dirs/files
+            FileUtils.deleteDirectory(tempDir);
         }
 
     }
@@ -398,8 +402,13 @@ public class GeneralPackageDescriptionCreatorTest {
                 Assert.fail("Expected a non-readable directory to cause an exception");
             } catch (PackageDescriptionCreatorException e) {
                 /* Expected */
+                // clean up just in case other tests create the same dirs/files. Can't use
+                // FileUtils due to readable false
+                subdir.delete();
+                tempDir.delete();
             }
         }
+
     }
 
     /* Verify that DataItem+DataFile files are sane (DC-1717) */

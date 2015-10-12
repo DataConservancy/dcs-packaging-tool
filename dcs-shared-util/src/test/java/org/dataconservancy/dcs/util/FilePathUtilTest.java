@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.dcs.util;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -90,29 +91,31 @@ public class FilePathUtilTest {
      * Tests that if a file is already the relative it's unchanged by the relativize method.
      */
     @Test
-    public void testRelativizeAlreadyRelativeFile() {
+    public void testRelativizeAlreadyRelativeFile() throws IOException {
         final String expectedPath = File.separator + "test" + File.separator + "file.txt";
         final File relativeFile = new File("/test/file.txt");
         final File directory = tmpFolder.newFolder("test");
-        directory.deleteOnExit();
         final String resultPath = FilePathUtil.relativizePath(directory.getPath(), relativeFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(directory);
     }
 
     /**
      * Tests that if a file is absolute it's made relative.
      */
     @Test
-    public void testRelativizeAbsoluteFile() {
+    public void testRelativizeAbsoluteFile() throws IOException {
         final String expectedPath = "relative" + File.separator + "file.txt";
         final File directory = tmpFolder.newFolder("test");
-        directory.deleteOnExit();
 
         final File relativeFile = new File(directory, "/relative/file.txt");
         final String resultPath = FilePathUtil.relativizePath(directory.getPath(), relativeFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(directory);
     }
 
     /**
@@ -123,12 +126,12 @@ public class FilePathUtilTest {
         final File testFile = new File("foo", "test.file");
         final String expectedPath = testFile.getPath();
         final File directory = tmpFolder.newFolder("test");
-        directory.deleteOnExit();
-        testFile.deleteOnExit();
 
         final String resultPath = FilePathUtil.relativizePath(directory.getPath(), testFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(directory);
     }
 
     /**
@@ -143,10 +146,8 @@ public class FilePathUtilTest {
      * Test that if the base file is null the original file is returned.
      */
     @Test
-    public void testRelativizeNullBaseFile() {
+    public void testRelativizeNullBaseFile() throws IOException {
         final String expectedPath = "relative" + File.separator + "file.txt";
-        final File directory = tmpFolder.newFolder("test");
-        directory.deleteOnExit();
 
         final File relativeFile = new File("relative/file.txt");
         final String resultPath = FilePathUtil.relativizePath(null, relativeFile);
@@ -543,22 +544,28 @@ public class FilePathUtilTest {
      */
     @Test
     public void testAbsolutizeNullBaseFile() throws IOException {
-        assertNull(FilePathUtil.absolutize(null, tmpFolder.newFile("test")));
+        File testFile = tmpFolder.newFile("test");
+        assertNull(FilePathUtil.absolutize(null, testFile));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteQuietly(testFile);
     }
 
     /**
      * Tests that null is returned if the file to absolutize is null
      */
     @Test
-    public void testAbsolutizeNullFile() {
-        assertNull(FilePathUtil.absolutize(tmpFolder.newFolder("test"), null));
+    public void testAbsolutizeNullFile() throws IOException {
+        File testFolder = tmpFolder.newFolder("test");
+        assertNull(FilePathUtil.absolutize(testFolder, null));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(testFolder);
     }
 
     /**
      * Tests that if the file is already absolute absolutize returns the same file.
      */
     @Test
-    public void testAbsolutizeAlreadyAbsoluteFile() {
+    public void testAbsolutizeAlreadyAbsoluteFile() throws IOException {
         final File testDir = tmpFolder.newFolder("absolute");
         final File testFile = new File(testDir, "testFile");
 
@@ -566,19 +573,23 @@ public class FilePathUtilTest {
 
         assertTrue("Expected: " + testFile.getPath() + " but was: " +
                        returnedFile.getPath(), testFile.getPath().equalsIgnoreCase(returnedFile.getPath()));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(testDir);
     }
 
     /**
      * Tests that a file is correctly made absolute by prepending the base directory to it.
      */
     @Test
-    public void testAbsolutizeFile() {
+    public void testAbsolutizeFile() throws IOException {
         final File testDir = tmpFolder.newFolder("absolute");
         final File testFile = new File("testFile");
         final String expectedPath = testDir.getPath() + File.separator + testFile.getPath();
         File returnedFile = FilePathUtil.absolutize(testDir, testFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + returnedFile.getPath(), expectedPath.equalsIgnoreCase(returnedFile.getPath()));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(testDir);
     }
 
     /**
@@ -676,9 +687,11 @@ public class FilePathUtilTest {
     }
 
     @Test
-    public void testIllegalCharacterDetectedInPath(){
+    public void testIllegalCharacterDetectedInPath() throws IOException {
         final File testFile = tmpFolder.newFolder("badFileName:oops");
         Assert.assertFalse(FilePathUtil.hasValidFilePath(testFile));
+        // clean up just in case other tests create the same dirs/files
+        FileUtils.deleteDirectory(testFile);
     }
 
     /**

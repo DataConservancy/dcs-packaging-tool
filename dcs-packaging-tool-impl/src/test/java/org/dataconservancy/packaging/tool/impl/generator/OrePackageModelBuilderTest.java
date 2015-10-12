@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
@@ -450,7 +451,7 @@ public class OrePackageModelBuilderTest {
     }
 
     @Test(expected = Exception.class)
-    public void badPropertyTest() {
+    public void badPropertyTest() throws IOException {
         OrePackageModelBuilder builder = new OrePackageModelBuilder();
         PackageAssembler assembler =
                 new FunctionalAssemblerMock(tmpfolder.newFolder("clover"));

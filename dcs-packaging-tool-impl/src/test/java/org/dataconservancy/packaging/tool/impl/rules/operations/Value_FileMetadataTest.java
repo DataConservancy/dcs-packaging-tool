@@ -43,7 +43,7 @@ public class Value_FileMetadataTest {
 
     /* Verifies that the fileType of a directory is Directory */
     @Test
-    public void fileTypeDirectoryTest() {
+    public void fileTypeDirectoryTest() throws IOException {
         Value_FileMetadata metadata = new Value_FileMetadata();
         metadata.setSpecifier(FileAttribute.fileType.toString());
 

@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.tool.impl;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,7 +55,7 @@ public class PackageDescriptionValidatorTest {
     
 
     @BeforeClass
-    public static void setup() {
+    public static void setup() throws IOException {
         TMP_DIR = tmpfolder.newFolder("test");
     }
     
