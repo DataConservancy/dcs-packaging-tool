@@ -30,10 +30,7 @@ public class FileInfo {
     private String name;
     private List<String> formats;
     private Map<Algorithm, String> checksums;
-    private long size;
-    private FileTime creationTime;
-    private FileTime lastModifiedTime;
-    private boolean isRegularFile;
+    private BasicFileAttributes fileAttributes;
 
     /**
      * Default constructor that should be used in most cases. Will read the file at the path location and load the necessary file attributes.
@@ -44,12 +41,7 @@ public class FileInfo {
         name = path.getFileName().toString();
 
         try {
-            BasicFileAttributes fileAttributes = Files.readAttributes(path, BasicFileAttributes.class);
-            isRegularFile = fileAttributes.isRegularFile();
-            size = fileAttributes.size();
-            creationTime = fileAttributes.creationTime();
-            lastModifiedTime = fileAttributes.lastModifiedTime();
-
+            fileAttributes = Files.readAttributes(path, BasicFileAttributes.class);
             if (fileAttributes.isRegularFile()) {
                 checksums = new HashMap<>();
                 formats = new ArrayList<>();
@@ -83,11 +75,7 @@ public class FileInfo {
         location = path.toUri();
         name = path.getFileName().toString();
 
-        isRegularFile = fileAttributes.isRegularFile();
-        size = fileAttributes.size();
-        creationTime = fileAttributes.creationTime();
-        lastModifiedTime = fileAttributes.lastModifiedTime();
-
+        this.fileAttributes = fileAttributes;
         this.formats = formats;
         this.checksums = checksums;
     }
@@ -129,6 +117,11 @@ public class FileInfo {
      * @return Size of the file or -1 if directory.
      */
     public long getSize() {
+        long size = -1;
+        if (fileAttributes != null) {
+            size = fileAttributes.size();
+        }
+
         return size;
     }
 
@@ -136,20 +129,35 @@ public class FileInfo {
      * @return Whether or not a file is being described.
      */
     public boolean isFile() {
-        return isRegularFile;
+        boolean isFile = false;
+        if (fileAttributes != null) {
+            isFile = fileAttributes.isRegularFile();
+        }
+
+        return isFile;
     }
 
     /**
      * @return Whether or not a directory is being described.
      */
     public boolean isDirectory() {
-        return !isRegularFile;
+        boolean isDirectory = false;
+        if (fileAttributes != null) {
+            isDirectory = fileAttributes.isDirectory();
+        }
+
+        return isDirectory;
     }
 
     /**
      * @return Creation time of file.
      */
     public FileTime getCreationTime() {
+        FileTime creationTime = null;
+        if (fileAttributes != null) {
+            creationTime = fileAttributes.creationTime();
+        }
+
         return creationTime;
     }
 
@@ -157,7 +165,12 @@ public class FileInfo {
      * @return Last modification time of file.
      */
     public FileTime getLastModifiedTime() {
-        return lastModifiedTime;
+        FileTime modifiedTime = null;
+        if (fileAttributes != null) {
+            modifiedTime = fileAttributes.lastModifiedTime();
+        }
+
+        return modifiedTime;
     }
 
     /**
@@ -188,12 +201,6 @@ public class FileInfo {
 
         FileInfo fileInfo = (FileInfo) o;
 
-        if (size != fileInfo.size) {
-            return false;
-        }
-        if (isRegularFile != fileInfo.isRegularFile) {
-            return false;
-        }
         if (location != null ? !location.equals(fileInfo.location) :
             fileInfo.location != null) {
             return false;
@@ -210,13 +217,8 @@ public class FileInfo {
             fileInfo.checksums != null) {
             return false;
         }
-        if (creationTime != null ? !creationTime.equals(fileInfo.creationTime) :
-            fileInfo.creationTime != null) {
-            return false;
-        }
-        return !(lastModifiedTime !=
-                     null ? !lastModifiedTime.equals(fileInfo.lastModifiedTime) :
-                     fileInfo.lastModifiedTime != null);
+
+        return true;
 
     }
 
@@ -226,12 +228,6 @@ public class FileInfo {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (formats != null ? formats.hashCode() : 0);
         result = 31 * result + (checksums != null ? checksums.hashCode() : 0);
-        result = 31 * result + (int) (size ^ (size >>> 32));
-        result =
-            31 * result + (creationTime != null ? creationTime.hashCode() : 0);
-        result = 31 * result +
-            (lastModifiedTime != null ? lastModifiedTime.hashCode() : 0);
-        result = 31 * result + (isRegularFile ? 1 : 0);
         return result;
     }
 }
