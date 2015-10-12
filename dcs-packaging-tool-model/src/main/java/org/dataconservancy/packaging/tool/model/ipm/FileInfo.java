@@ -32,6 +32,10 @@ public class FileInfo {
     private Map<Algorithm, String> checksums;
     private BasicFileAttributes fileAttributes;
 
+    /**
+     * Default constructor that should be used in most cases. Will read the file at the path location and load the necessary file attributes.
+     * @param path The path to the file.
+     */
     public FileInfo(Path path) {
         location = path.toUri();
         name = path.getFileName().toString();
@@ -60,6 +64,20 @@ public class FileInfo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Constructor to use when loading existing file information.
+     * @param path The path of the File info
+     * @param fileAttributes The basic file attibutes of the file.
+     */
+    public FileInfo(Path path, BasicFileAttributes fileAttributes, List<String> formats, Map<Algorithm, String> checksums) {
+        location = path.toUri();
+        name = path.getFileName().toString();
+
+        this.fileAttributes = fileAttributes;
+        this.formats = formats;
+        this.checksums = checksums;
     }
 
     /**
