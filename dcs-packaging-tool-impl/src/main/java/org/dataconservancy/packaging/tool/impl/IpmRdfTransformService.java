@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class IpmRdfTransformService implements PackageResourceMapConstants  {
 
-    public static final String DC_IPM_NS_URI = "http://www.dataconservancy.org/internal-package-model";
+    public static final String DC_IPM_NS_URI = "http://www.dataconservancy.org/internal-package-model/";
     public static final Resource IPM_NODE_TYPE = ResourceFactory.createResource(DC_IPM_NS_URI + "IPMNode");
     public static final Resource FILE_INFO_TYPE = ResourceFactory.createResource(DC_IPM_NS_URI + "FileInfo");
     public static final Property HAS_PARENT = ResourceFactory.createProperty(DC_IPM_NS_URI, "hasParent");
