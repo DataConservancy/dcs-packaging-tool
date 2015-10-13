@@ -18,7 +18,7 @@ public class NodeType extends AbstractDescribedObject {
     private List<PropertyConstraint> property_constraints;
     private List<PropertyType> inheritable_properties;
     private List<PropertyValue> default_property_values;
-    private Map<PropertyType, URI> supplied_properties;
+    private Map<PropertyType, SuppliedProperty> supplied_properties;
     private Requirement file_req;
     private Requirement dir_req;
     private CardinalityConstraint child_file_constraint;
@@ -85,7 +85,7 @@ public class NodeType extends AbstractDescribedObject {
      * 
      * @return Mapping of property types to system identifiers.
      */
-    public Map<PropertyType, URI> getSuppliedProperties() {
+    public Map<PropertyType, SuppliedProperty> getSuppliedProperties() {
         return supplied_properties;
     }
 
@@ -159,7 +159,7 @@ public class NodeType extends AbstractDescribedObject {
     /**
      * @param supplied_properties The supplied_properties to set.
      */
-    public void setSuppliedProperties(Map<PropertyType, URI> supplied_properties) {
+    public void setSuppliedProperties(Map<PropertyType, SuppliedProperty> supplied_properties) {
         this.supplied_properties = supplied_properties;
     }
 
