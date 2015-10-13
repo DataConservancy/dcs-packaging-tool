@@ -23,6 +23,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -94,12 +95,10 @@ public class FilePathUtilTest {
     public void testRelativizeAlreadyRelativeFile() throws IOException {
         final String expectedPath = File.separator + "test" + File.separator + "file.txt";
         final File relativeFile = new File("/test/file.txt");
-        final File directory = tmpFolder.newFolder("test");
+        final File directory = tmpFolder.newFolder(UUID.randomUUID().toString());
         final String resultPath = FilePathUtil.relativizePath(directory.getPath(), relativeFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(directory);
     }
 
     /**
@@ -108,14 +107,12 @@ public class FilePathUtilTest {
     @Test
     public void testRelativizeAbsoluteFile() throws IOException {
         final String expectedPath = "relative" + File.separator + "file.txt";
-        final File directory = tmpFolder.newFolder("test");
+        final File directory = tmpFolder.newFolder(UUID.randomUUID().toString());
 
         final File relativeFile = new File(directory, "/relative/file.txt");
         final String resultPath = FilePathUtil.relativizePath(directory.getPath(), relativeFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(directory);
     }
 
     /**
@@ -125,13 +122,11 @@ public class FilePathUtilTest {
     public void testRelativizeFileNotUnderBasePath() throws IOException {
         final File testFile = new File("foo", "test.file");
         final String expectedPath = testFile.getPath();
-        final File directory = tmpFolder.newFolder("test");
+        final File directory = tmpFolder.newFolder(UUID.randomUUID().toString());
 
         final String resultPath = FilePathUtil.relativizePath(directory.getPath(), testFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + resultPath, expectedPath.equalsIgnoreCase(resultPath));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(directory);
     }
 
     /**
@@ -544,10 +539,8 @@ public class FilePathUtilTest {
      */
     @Test
     public void testAbsolutizeNullBaseFile() throws IOException {
-        File testFile = tmpFolder.newFile("test");
+        File testFile = tmpFolder.newFile(UUID.randomUUID().toString());
         assertNull(FilePathUtil.absolutize(null, testFile));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteQuietly(testFile);
     }
 
     /**
@@ -555,10 +548,8 @@ public class FilePathUtilTest {
      */
     @Test
     public void testAbsolutizeNullFile() throws IOException {
-        File testFolder = tmpFolder.newFolder("test");
+        File testFolder = tmpFolder.newFolder(UUID.randomUUID().toString());
         assertNull(FilePathUtil.absolutize(testFolder, null));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(testFolder);
     }
 
     /**
@@ -566,15 +557,13 @@ public class FilePathUtilTest {
      */
     @Test
     public void testAbsolutizeAlreadyAbsoluteFile() throws IOException {
-        final File testDir = tmpFolder.newFolder("absolute");
+        final File testDir = tmpFolder.newFolder(UUID.randomUUID().toString());
         final File testFile = new File(testDir, "testFile");
 
         File returnedFile = FilePathUtil.absolutize(testDir, testFile);
 
         assertTrue("Expected: " + testFile.getPath() + " but was: " +
                        returnedFile.getPath(), testFile.getPath().equalsIgnoreCase(returnedFile.getPath()));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(testDir);
     }
 
     /**
@@ -582,14 +571,12 @@ public class FilePathUtilTest {
      */
     @Test
     public void testAbsolutizeFile() throws IOException {
-        final File testDir = tmpFolder.newFolder("absolute");
+        final File testDir = tmpFolder.newFolder(UUID.randomUUID().toString());
         final File testFile = new File("testFile");
         final String expectedPath = testDir.getPath() + File.separator + testFile.getPath();
         File returnedFile = FilePathUtil.absolutize(testDir, testFile);
 
         assertTrue("Expected: " + expectedPath + " but was: " + returnedFile.getPath(), expectedPath.equalsIgnoreCase(returnedFile.getPath()));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(testDir);
     }
 
     /**
@@ -690,8 +677,6 @@ public class FilePathUtilTest {
     public void testIllegalCharacterDetectedInPath() throws IOException {
         final File testFile = tmpFolder.newFolder("badFileName:oops");
         Assert.assertFalse(FilePathUtil.hasValidFilePath(testFile));
-        // clean up just in case other tests create the same dirs/files
-        FileUtils.deleteDirectory(testFile);
     }
 
     /**

@@ -32,12 +32,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import net.lingala.zip4j.core.ZipFile;
 
@@ -359,7 +354,7 @@ public class GeneralPackageDescriptionCreatorTest {
     /* Verify that symlink cycles can be detected */
     @Test
     public void simLinkCycleTest() throws Exception {
-        File tempDir = tmpfolder.newFolder("moo");
+        File tempDir = tmpfolder.newFolder(UUID.randomUUID().toString());
 
         File subdir = new File(tempDir, "cow");
         subdir.mkdir();
@@ -371,7 +366,6 @@ public class GeneralPackageDescriptionCreatorTest {
             Files.createSymbolicLink(link, subdir.toPath());
         } catch (UnsupportedOperationException e) {
             /* Nothing we can do if the system doesn't support symlinks */
-            FileUtils.deleteDirectory(tempDir);
             return;
         }
 
@@ -380,8 +374,6 @@ public class GeneralPackageDescriptionCreatorTest {
             Assert.fail("Expected symbolic link cycle to cause an exception");
         } catch (PackageDescriptionCreatorException e) {
             /* Expected */
-            // clean up just in case other tests create the same dirs/files
-            FileUtils.deleteDirectory(tempDir);
         }
 
     }
@@ -390,7 +382,7 @@ public class GeneralPackageDescriptionCreatorTest {
     //TODO: These setReadable false tests don't work on windows for now the test only runs if that operation succeeded.
     @Test
     public void nonreadableFileTest() throws Exception {
-        File tempDir = tmpfolder.newFolder("moo");
+        File tempDir = tmpfolder.newFolder(UUID.randomUUID().toString());
 
         File subdir = new File(tempDir, "cow");
         subdir.mkdir();
@@ -402,10 +394,6 @@ public class GeneralPackageDescriptionCreatorTest {
                 Assert.fail("Expected a non-readable directory to cause an exception");
             } catch (PackageDescriptionCreatorException e) {
                 /* Expected */
-                // clean up just in case other tests create the same dirs/files. Can't use
-                // FileUtils due to readable false
-                subdir.delete();
-                tempDir.delete();
             }
         }
 
