@@ -10,7 +10,7 @@ public class CardinalityConstraint {
     /**
      * @return Minimum number of required occurrences.
      */
-    int getMinimum() {
+    public int getMinimum() {
         return min;
     }
 
@@ -24,7 +24,7 @@ public class CardinalityConstraint {
     /**
      * @return Maximum number of required occurrences or -1 for unbounded.
      */
-    int getMaximum() {
+    public int getMaximum() {
         return max;
     }
 
