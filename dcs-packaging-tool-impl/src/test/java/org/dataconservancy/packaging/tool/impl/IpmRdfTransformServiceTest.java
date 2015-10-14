@@ -1,8 +1,10 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.PackageResourceMapConstants;
@@ -35,6 +37,8 @@ public class IpmRdfTransformServiceTest {
 
     private final String subTypeOneId = "http://dataconservancy.org/bo/Collection";
     private final String subTypeTwoId = "http://foo.org/interview";
+    private final String subTypeThreeId = "http://foo.org/photo";
+    private final String subTypeFourId = "http://foo.org/text";
 
     private Node root;
     private Node childOne;
@@ -44,6 +48,8 @@ public class IpmRdfTransformServiceTest {
     private NodeType childType;
     private NodeType subTypeOne;
     private NodeType subTypeTwo;
+    private NodeType subTypeThree;
+    private NodeType subTypeFour;
 
     private IpmRdfTransformService transformService;
 
@@ -71,6 +77,12 @@ public class IpmRdfTransformServiceTest {
         subTypeTwo = new NodeType();
         subTypeTwo.setIdentifier(new URI(subTypeTwoId));
 
+        subTypeThree = new NodeType();
+        subTypeThree.setIdentifier(new URI(subTypeThreeId));
+
+        subTypeFour = new NodeType();
+        subTypeFour.setIdentifier(new URI(subTypeFourId));
+
         doAnswer(invocation -> {
             URI uri = (URI) invocation.getArguments()[0];
             switch (uri.toString()) {
@@ -82,6 +94,10 @@ public class IpmRdfTransformServiceTest {
                     return subTypeOne;
                 case subTypeTwoId:
                     return subTypeTwo;
+                case subTypeThreeId:
+                    return subTypeThree;
+                case subTypeFourId:
+                    return subTypeFour;
             }
 
             return null;
@@ -98,6 +114,8 @@ public class IpmRdfTransformServiceTest {
         FileInfo rootFileInfo = new FileInfo(rootFolder.toPath());
         root.setFileInfo(rootFileInfo);
         root.addSubNodeType(subTypeOne);
+        root.addSubNodeType(subTypeThree);
+        root.addSubNodeType(subTypeFour);
         root.setIgnored(false);
 
         childOne = new Node(new URI("bag://node/2"));
@@ -141,7 +159,7 @@ public class IpmRdfTransformServiceTest {
         Resource rootResource = rootResources.get(0);
         assertEquals(1, rootResource.listProperties(PackageResourceMapConstants.HAS_ID).toList().size());
         assertEquals(1, rootResource.listProperties(IpmRdfTransformService.HAS_NODE_TYPE).toList().size());
-        assertEquals(1, rootResource.listProperties(IpmRdfTransformService.HAS_SUB_TYPE).toList().size());
+        assertEquals(3, rootResource.listProperties(IpmRdfTransformService.HAS_SUB_TYPE).toList().size());
 
         assertEquals(1, rootResource.listProperties(IpmRdfTransformService.IS_ROOT).toList().size());
         assertEquals(0, rootResource.listProperties(IpmRdfTransformService.HAS_PARENT).toList().size());
@@ -159,11 +177,16 @@ public class IpmRdfTransformServiceTest {
         assertTrue(rootFileInfoResource.hasLiteral(IpmRdfTransformService.IS_DIRECTORY, true));
         assertTrue(rootFileInfoResource.hasLiteral(IpmRdfTransformService.IS_BYTE_STREAM, false));
 
-        List<RDFNode> rootChildren = rootModel.listObjectsOfProperty(rootResource, IpmRdfTransformService.HAS_CHILD).toList();
-        assertEquals(2, rootChildren.size());
+        List<RDFNode> rootChild = rootModel.listObjectsOfProperty(rootResource, IpmRdfTransformService.HAS_CHILD).toList();
 
-        for (RDFNode child : rootChildren) {
-            Resource childResource = child.asResource();
+        //Should get one result that is head of the list
+        assertEquals(1, rootChild.size());
+        RDFList childList = rootChild.get(0).as(RDFList.class);
+        assertEquals(2, childList.size());
+
+        ExtendedIterator<RDFNode> children = childList.iterator();
+        while ( children.hasNext() ) {
+            Resource childResource = children.next().asResource();
             assertEquals(1, childResource.listProperties(PackageResourceMapConstants.HAS_ID).toList().size());
             assertEquals(1, childResource.listProperties(IpmRdfTransformService.HAS_NODE_TYPE).toList().size());
             assertEquals(1, childResource.listProperties(IpmRdfTransformService.HAS_SUB_TYPE).toList().size());
@@ -184,8 +207,8 @@ public class IpmRdfTransformServiceTest {
             assertTrue(childFileInfoResource.hasLiteral(IpmRdfTransformService.IS_DIRECTORY, false));
             assertTrue(childFileInfoResource.hasLiteral(IpmRdfTransformService.IS_BYTE_STREAM, true));
 
-            List<RDFNode> children = rootModel.listObjectsOfProperty(childResource, IpmRdfTransformService.HAS_CHILD).toList();
-            assertEquals(0, children.size());
+            List<RDFNode> grandChildren = rootModel.listObjectsOfProperty(childResource, IpmRdfTransformService.HAS_CHILD).toList();
+            assertEquals(0, grandChildren.size());
         }
 
     }
@@ -204,8 +227,7 @@ public class IpmRdfTransformServiceTest {
         assertEquals(2, returnedNode.getChildren().size());
 
         assertEquals(rootType, returnedNode.getNodeType());
-        assertEquals(1, returnedNode.getSubNodeTypes().size());
-        assertEquals(subTypeOne, returnedNode.getSubNodeTypes().get(0));
+        assertEquals(3, returnedNode.getSubNodeTypes().size());
 
         assertEquals(root.getFileInfo(), returnedNode.getFileInfo());
 

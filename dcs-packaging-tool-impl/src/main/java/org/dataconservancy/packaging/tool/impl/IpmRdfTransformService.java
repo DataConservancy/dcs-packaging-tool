@@ -3,11 +3,13 @@ package org.dataconservancy.packaging.tool.impl;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.PackageResourceMapConstants;
@@ -94,19 +96,24 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         }
 
         if (node.getChildren() != null) {
+            ArrayList<RDFNode> childNodes = new ArrayList<>();
             for (Node child : node.getChildren()) {
                 List<Resource> childList = nodeModel.listResourcesWithProperty(HAS_ID, child.getIdentifier().toString()).toList();
                 //If the node isn't returned by the search create the child
                 if (childList == null || childList.isEmpty()) {
-                    nodeResource.addProperty(HAS_CHILD, createNodeResource(nodeModel, child));
+                    Resource childResource = createNodeResource(nodeModel, child);
+                    childNodes.add(childResource);
                 } else {
                     if (childList.size() > 1) {
                         throw new RDFTransformException("Expected there to be only one node resource with id: " + child.getIdentifier());
                     } else {
-                        nodeResource.addProperty(HAS_CHILD, childList.get(0));
+                        childNodes.add(childList.get(0));
                     }
                 }
             }
+
+            RDFNode[] nodeArray = new RDFNode[childNodes.size()];
+            nodeResource.addProperty(HAS_CHILD, nodeModel.createList(childNodes.toArray(nodeArray)));
         }
 
         nodeResource.addLiteral(IS_IGNORED, node.isIgnored());
@@ -193,7 +200,13 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
             }
 
             if (nodeResource.hasProperty(HAS_CHILD)) {
-                for (RDFNode child : model.listObjectsOfProperty(nodeResource, HAS_CHILD).toList()) {
+                List<RDFNode> rootChild = model.listObjectsOfProperty(nodeResource, IpmRdfTransformService.HAS_CHILD).toList();
+
+                RDFList childList = rootChild.get(0).as(RDFList.class);
+
+                ExtendedIterator<RDFNode> children = childList.iterator();
+                while ( children.hasNext() ) {
+                    RDFNode child = children.next().asResource();
                     if (!child.isResource()) {
                         throw new RDFTransformException("Expected child node to be a resource");
                     }
