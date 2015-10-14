@@ -73,6 +73,7 @@ public class FarmDomainProfile extends DomainProfile {
         farm_node_type.setPropertyConstraints(Arrays.asList());
         farm_node_type.setDefaultPropertyValues(Arrays.asList());
         farm_node_type.setParentConstraints(Arrays.asList());
+        farm_node_type.setDomainProfile(this);
 
         barn_node_type.setIdentifier(URI.create("fdp:barn"));
         barn_node_type.setLabel("Barn");
@@ -81,6 +82,7 @@ public class FarmDomainProfile extends DomainProfile {
         farm_node_type.setPropertyConstraints(Arrays.asList());
         farm_node_type.setDefaultPropertyValues(Arrays.asList());
         barn_node_type.setParentConstraints(Arrays.asList());
+        barn_node_type.setDomainProfile(this);
 
         cow_node_type.setIdentifier(URI.create("fdp:cow"));
         cow_node_type.setLabel("Cow");
@@ -90,7 +92,8 @@ public class FarmDomainProfile extends DomainProfile {
         cow_node_type.setDefaultPropertyValues(Arrays.asList(cow_species));
         cow_node_type.setParentConstraints(Arrays.asList());
         cow_node_type.setFileAssocationRequirement(Requirement.MUST);
-        
+        cow_node_type.setDomainProfile(this);
+
         setIdentifier(URI.create("http://example.com/farm"));
         setLabel("Farm");
         setDescription("Vocabulary for describing a farm");
