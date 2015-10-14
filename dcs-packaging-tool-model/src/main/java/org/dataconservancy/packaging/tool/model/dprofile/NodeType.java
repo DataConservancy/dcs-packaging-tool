@@ -184,6 +184,14 @@ public class NodeType extends AbstractDescribedObject {
         this.child_file_constraint = child_file_constraint;
     }
 
+    /**
+     * Sets the DomainProfile that this NodeType belongs to.
+     * @param profile The DomainProfile this NodeType corresponds to.
+     */
+    public void setDomainProfile(DomainProfile profile) {
+        this.profile = profile;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
