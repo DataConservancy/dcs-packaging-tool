@@ -28,11 +28,27 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
+     * Sets the NodeType of the transform source.
+     * @param sourceNodeType The NodeType of the transform source.
+     */
+    public void setSourceNodeType(NodeType sourceNodeType) {
+        this.source_type = sourceNodeType;
+    }
+
+    /**
      * @return Required constraint on source parent. May be null to indicate no
      *         constraint.
      */
     public NodeConstraint getSourceParentConstraint() {
         return source_parent_constraint;
+    }
+
+    /**
+     * Sets the NodeConstraint of the source parent.
+     * @param sourceParentConstraint The NodeConstraint on the source parent.
+     */
+    public void setSourceParentConstraint(NodeConstraint sourceParentConstraint) {
+        this.source_parent_constraint = sourceParentConstraint;
     }
 
     /**
@@ -44,6 +60,14 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
+     * Sets the NodeConstraint of the source grandparent.
+     * @param sourceGrandparentConstraint The NodeConstraint on the source grandparent.
+     */
+    public void setSourceGrandparentConstraint(NodeConstraint sourceGrandparentConstraint) {
+        this.source_grandparent_constraint = sourceGrandparentConstraint;
+    }
+
+    /**
      * @return Constraint that must be obeyed by every child.
      */
     public NodeConstraint getSourceChildConstraint() {
@@ -51,10 +75,26 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
+     * Sets the NodeConstraint of the source child.
+     * @param childConstraint The NodeConstraint of the source child.
+     */
+    public void setSourceChildConstraint(NodeConstraint childConstraint) {
+        this.source_child_constraint = childConstraint;
+    }
+
+    /**
      * @return Node type of resulting node. May be null to indicate no change.
      */
     public NodeType getResultNodeType() {
         return result_node_type;
+    }
+
+    /**
+     * Sets the NodeType of the result of transform .
+     * @param resultNodeType The NodeType of the result of the transform.
+     */
+    public void setResultNodeType(NodeType resultNodeType) {
+        this.result_node_type = resultNodeType;
     }
 
     /**
@@ -69,10 +109,26 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
+     * Sets the NodeConstraint on the parent of the result.
+     * @param resultParentConstraint The NodeConstraint for the parent of the result of the transform.
+     */
+    public void setResultParentConstraint(NodeConstraint resultParentConstraint) {
+        this.result_parent_constraint = resultParentConstraint;
+    }
+
+    /**
      * @return Whether or not result node has new parent inserted.
      */
     public boolean insertParent() {
         return insert_parent;
+    }
+
+    /**
+     * Sets whether a parent node will be inserted as a result of the transform.
+     * @param insertParent Boolean flag on whether or not a parent node should be inserted.
+     */
+    public void setInsertParent(boolean insertParent) {
+        this.insert_parent = insertParent;
     }
 
     /**
@@ -86,6 +142,14 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
+     * Sets whether as a result of the transform the node should be moved to it's grandparent.
+     * @param moveResultToGrandParent Boolean flag on whether or not a node should be moved to it's grandparent as a result of the transform.
+     */
+    public void setMoveResultToGrandParent(boolean moveResultToGrandParent) {
+        this.move_result_grandparent = moveResultToGrandParent;
+    }
+
+    /**
      * If the source node is moved and the original parent of the source node
      * has no children, remove it.
      * 
@@ -93,6 +157,14 @@ public class NodeTransform extends AbstractDescribedObject {
      */
     public boolean removeEmptyParent() {
         return remove_empty_parent;
+    }
+
+    /**
+     * Sets if the parent becomes empty as a result of the transform it should be removed.
+     * @param removeEmptyParent A boolean flag that states whether empty parents should be removed as a result of the transform.
+     */
+    public void setRemoveEmptyParent(boolean removeEmptyParent) {
+        this.remove_empty_parent = removeEmptyParent;
     }
 
     @Override
