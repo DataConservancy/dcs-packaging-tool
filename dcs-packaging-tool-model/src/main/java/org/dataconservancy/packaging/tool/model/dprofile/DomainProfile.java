@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.net.URI;
 import java.util.List;
 
@@ -163,29 +165,28 @@ public class DomainProfile extends AbstractDescribedObject {
         if (node_transforms == null) {
             if (other.node_transforms != null)
                 return false;
-        } else if (!node_transforms.equals(other.node_transforms))
+        } else if (other.node_transforms == null || !CollectionUtils.isEqualCollection(node_transforms, other.node_transforms))
             return false;
         if (node_types == null) {
             if (other.node_types != null)
                 return false;
-        } else if (!node_types.equals(other.node_types))
+        } else if (other.node_types == null || !CollectionUtils.isEqualCollection(node_types, other.node_types))
             return false;
         if (prop_categories == null) {
             if (other.prop_categories != null)
                 return false;
-        } else if (!prop_categories.equals(other.prop_categories))
+        } else if (other.prop_categories == null || !CollectionUtils.isEqualCollection(prop_categories, other.prop_categories))
             return false;
         if (prop_types == null) {
             if (other.prop_types != null)
                 return false;
-        } else if (!prop_types.equals(other.prop_types))
+        } else if (other.prop_types == null || !CollectionUtils.isEqualCollection(prop_types, other.prop_types))
             return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "DomainProfile [id=" + id + ", domain_id=" + domain_id + ", node_types=" + node_types + ", prop_types="
-                + prop_types + ", prop_categories=" + prop_categories + ", node_transforms=" + node_transforms + "]";
+        return "DomainProfile [id=" + id + ", domain_id=" + domain_id + "]";
     }
 }
