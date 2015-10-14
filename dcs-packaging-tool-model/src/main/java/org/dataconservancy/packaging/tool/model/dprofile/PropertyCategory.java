@@ -18,7 +18,7 @@ public class PropertyCategory extends AbstractDescribedObject {
     /**
      * @return Property types in category.
      */
-    List<PropertyType> getPropertyTypes() {
+    public List<PropertyType> getPropertyTypes() {
         return types;
     }
 
