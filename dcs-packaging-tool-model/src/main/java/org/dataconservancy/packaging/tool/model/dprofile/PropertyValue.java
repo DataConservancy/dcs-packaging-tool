@@ -98,7 +98,7 @@ public class PropertyValue {
      * @param type
      *            The type to set.
      */
-    public void setPropertyTypeType(PropertyType type) {
+    public void setPropertyType(PropertyType type) {
         this.type = type;
     }
 
