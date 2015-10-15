@@ -85,6 +85,7 @@ public class Node {
         }
 
         children.add(node);
+        node.setParent(this);
     }
 
     /**
