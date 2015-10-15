@@ -68,7 +68,7 @@ public class NodeConstraint {
     /**
      * @param struct_rels The structural relationships to set
      */
-    public void setStruct_rels(List<StructuralRelation> struct_rels) {
+    public void setStructuralRelations(List<StructuralRelation> struct_rels) {
         this.struct_rels = struct_rels;
     }
 
