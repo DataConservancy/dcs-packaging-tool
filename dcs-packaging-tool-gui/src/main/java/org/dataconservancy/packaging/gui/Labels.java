@@ -123,7 +123,10 @@ public class Labels {
         SHOW_FULL_PATHS_TIP("showfullpaths.tip"),
         SHOW_IGNORED("showignored.label"),
         SHOW_IGNORED_TIP("showignored.tip"),
-        CONTENT_DIRECTORY_LABEL("contentdirectory.label");
+        CONTENT_DIRECTORY_LABEL("contentdirectory.label"),
+        CREATE_NEW_PACKAGE("createnewpackage.label"),
+        OPEN_EXISTING_PACKAGE("openexistingpackage.label");
+
 
         private String property;
 

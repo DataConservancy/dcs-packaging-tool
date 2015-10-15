@@ -44,6 +44,8 @@ public class Factory {
     private Stage stage;
     private Controller controller;
 
+    private HomepageView homepageView;
+    private HomepagePresenter homepagePresenter;
     private CreateNewPackageView createNewPackageView;
     private CreateNewPackagePresenter createNewPackagePresenter;
     private PackageDescriptionValidator packageDescriptionValidator;
@@ -94,6 +96,14 @@ public class Factory {
 
     public Controller getController() { return controller; }
     public void setController(Controller controller) { this.controller = controller; }
+
+    public HomepageView getHomepageView() { return homepageView; }
+
+    public void setHomepageView(HomepageView homepageView) { this.homepageView = homepageView; }
+
+    public HomepagePresenter getHomepagePresenter() { return homepagePresenter; }
+
+    public void setHomepagePresenter(HomepagePresenter homepagePresenter) { this.homepagePresenter = homepagePresenter; }
 
     public CreateNewPackageView getCreateNewPackageView() { return createNewPackageView; }
     public void setCreateNewPackageView(CreateNewPackageView view) { this.createNewPackageView = view; }

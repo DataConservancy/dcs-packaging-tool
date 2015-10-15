@@ -22,7 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import org.dataconservancy.packaging.gui.Controller.Page;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -60,6 +60,8 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
         for (Page page : Page.values()) {
             Label pageLabel = new Label(labels.get(page.getLabelKey()));
             switch (page) {
+                case HOMEPAGE:
+                    break;
                 case CREATE_NEW_PACKAGE:
                     locationBar.getChildren().add(pageLabel);
                     pageLabel.getStyleClass().add(PAGE_ONE_SELECTED);
@@ -85,6 +87,8 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
     public void highlightNextPage(int nextPosition) {
         switch (nextPosition) {
             case 10:
+                // Don't show the location bar in the homepage
+                locationBar.setVisible(false);
             case 11:
                 //Remove the old selection, occurs on cancel or finish
                 locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);

@@ -79,7 +79,7 @@ public class Controller {
      */
     public void showHome(boolean clear) {
         container.setTop((VBox)factory.getHeaderView());
-        currentPage = Page.CREATE_NEW_PACKAGE;
+        currentPage = Page.HOMEPAGE;
         packageDescription = null;
         packageDescriptionFile = null;
         contentRoot = null;
@@ -95,10 +95,18 @@ public class Controller {
      * Method to clear stale information from the presenters.
      */
     private void clearPresenters() {
+        factory.getHomepagePresenter().clear();
         factory.getCreateNewPackagePresenter().clear();
         factory.getContentDirectoryPresenter().clear();
         factory.getPackageDescriptionPresenter().clear();
         factory.getPackageGenerationPresenter().clear();
+    }
+
+    /**
+     * Switch to homepage
+     */
+    private void showHomepage() {
+        show(factory.getHomepagePresenter());
     }
 
     /**
@@ -209,92 +217,14 @@ public class Controller {
         return locks.get(exclusive);
     }
     
-    /** 
-     * A simple enumeration that is used to control flow in the application. There is an entry for each page in the application.
-     * Each page contains it's order in the application as well as a title. 
-     */
-    //TODO: This enum is getting a bit unwieldy as enum at this point, and may need to be converted to a separate class -BMB
-    public enum Page {
-
-        //Positions must be in numerical order of there appearance in the workflow but don't need to be sequential
-        //Space is left between pages to allow for the future addition of more screens
-        CREATE_NEW_PACKAGE(10, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-        SELECT_CONTENT_DIRECTORY(11, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-        DEFINE_RELATIONSHIPS(20, Labels.LabelKey.DEFINE_RELATIONSHIPS_PAGE),
-        GENERATE_PACKAGE(30, Labels.LabelKey.GENERATE_PACKAGE_PAGE);
-        
-        private int position;
-        private Labels.LabelKey labelKey;
-        
-        Page(int position, Labels.LabelKey label) {
-            this.position = position;
-            this.labelKey = label;
-        }
-        
-        /**
-         * Returns the position of the page in the application.
-         * @return  the position of the page
-         */
-        public int getPosition() {
-            return position;
-        }
-
-        /**
-         * Static method to get the page that corresponds to a specific position.
-         * Note: This method is required because the pages are not zero indexed, or sequential so you can't simply access or loop through to find the correct page based on position.
-         * @param position The position to retrieve the page for.
-         * @return The page corresponding to the given position or null if none exist.
-         */
-        public static Page getPageByPosition(int position) {
-            switch (position) {
-                case 10:
-                    return CREATE_NEW_PACKAGE;
-                case 11:
-                    return SELECT_CONTENT_DIRECTORY;
-                case 20:
-                    return DEFINE_RELATIONSHIPS;
-                case 30:
-                    return GENERATE_PACKAGE;
-            }
-
-            return null;
-        }
-        /**
-         * Returns the label key to get the title of the page.
-         * @return  the label key to get the title of the page
-         */
-        public Labels.LabelKey getLabelKey() {
-            return labelKey;
-        }
-
-        /**
-         * Determines if the page is valid to be shown, this is for conditional pages such as the the SELECT_CONTENT_DIRECTORY page.
-         * For most pages this method will default to true since they're always valid to be shown.
-         * @param controller The controller instance that's checking for page validity
-         * @return True if the page should be shown, false if not
-         */
-        //TODO: I was hoping to make this a parameter of the enum but getting that to work proved to be beyond my java foo. So this method exists instead. -BMB
-        public boolean isValidPage(Controller controller) {
-            switch(this) {
-                case SELECT_CONTENT_DIRECTORY:
-                    if (controller.getPackageDescriptionFile() == null) {
-                        return false;
-                    }
-                    break;
-            }
-
-            return true;
-        }
-    }
-    
     //Advances the application to the next page. Or redisplays the current page if it's the last page.
     public void goToNextPage() {
         Page nextPage = currentPage;
         int currentPosition = currentPage.getPosition();
         int nextPosition = Integer.MAX_VALUE;
         for (Page pages : Page.values()) {
-            if (pages.position > currentPosition && pages.position < nextPosition && pages.isValidPage(this)) {
-                nextPosition = pages.position;
+            if (pages.getPosition() > currentPosition && pages.getPosition() < nextPosition && pages.isValidPage(this)) {
+                nextPosition = pages.getPosition();
             }
         }
         
@@ -317,6 +247,11 @@ public class Controller {
             showPage();
         }
     }
+
+    public void goToPage(Page page) {
+        currentPage = page;
+        showPage();
+    }
     
     /**
      * Shows the current page, a tells the presenter if it should clear it's information. 
@@ -324,6 +259,9 @@ public class Controller {
     private void showPage() {
         factory.getHeaderView().highlightNextPage(currentPage.getPosition());
         switch (currentPage) {
+            case HOMEPAGE:
+                showHomepage();
+                break;
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
                 break;
@@ -341,7 +279,7 @@ public class Controller {
                 break;
         }
     }
-    
+
     public void setPackageDescription(PackageDescription description) {
         this.packageDescription = description;
     }

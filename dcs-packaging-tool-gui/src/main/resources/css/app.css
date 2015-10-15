@@ -442,3 +442,27 @@
      -fx-padding: 0;
      -fx-background-color: transparent;
 }
+
+.HomepageView {
+	-fx-padding: 240 250 0 250;
+	-webkit-fx-border: solid;
+	-moz-fx-border: solid;
+	-ms-fx-border: solid;
+	-o-fx-border: solid;
+	fx-border: solid;
+	-fx-border-radius: 3px;
+}
+
+.HomepageView .button {
+	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+	-fx-border-radius: 6px;
+	-fx-border-width: 1;
+	-fx-border-color: #008330;
+	-fx-font-weight: bold;
+	-fx-text-fill: #ffffff;
+	-fx-pref-height: 28px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+	1, 0.0, 1, 1);
+	-fx-cursor: hand;
+}
+

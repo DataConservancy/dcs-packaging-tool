@@ -135,6 +135,12 @@
   </bean>
 
   <!-- VIEWS -->
+  <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
+    <constructor-arg ref="labels" />
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>
+  </bean>
+
   <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
     <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
@@ -171,6 +177,12 @@
   </bean>
 
   <!-- PRESENTERS -->
+  <bean id="homepagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.HomepagePresenterImpl">
+    <constructor-arg ref="homepageView" />
+    <property name="controller" ref="controller" />
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
   <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
     <constructor-arg ref="createNewPackageView" />
     <property name="controller" ref="controller" />
@@ -216,11 +228,13 @@
     <property name="labels" ref="labels" />
     <property name="configuration" ref="configuration" />
 
+    <property name="homepageView" ref="homepageView" />
     <property name="createNewPackageView" ref="createNewPackageView" />
     <property name="packageGenerationView" ref="packageGenerationView" />
     <property name="packageDescriptionView" ref="packageDescriptionView" />
     <property name="contentDirectoryView" ref="contentDirectoryView" />
 
+    <property name="homepagePresenter" ref="homepagePresenter" />
     <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
     <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
