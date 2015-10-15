@@ -24,11 +24,6 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
-    public DomainProfile getDomainProfile() {
-        return profile;
-    }
-
-    @Override
     public void addProperty(Node node, PropertyValue value) {
         objstore.addProperty(node.getDomainObject(), value);
     }
@@ -77,7 +72,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         // Check type
-        
+
         if (!parent_constraint.getNodeTypes().contains(parent.getNodeType())) {
             return false;
         }
@@ -102,29 +97,27 @@ public class DomainProfileServiceImpl implements DomainProfileService {
                 return false;
             }
         }
-        
 
         return true;
     }
 
-    
     private boolean meets_file_requirements(Node node, NodeType type) {
         type.getFileAssociationRequirement();
-        
+
         type.getDirectoryAssociationRequirement();
-        
+
         // TODO
-        
+
         return true;
     }
-    
+
     private boolean is_valid_type(Node node, NodeType type) {
         if (!meets_file_requirements(node, type)) {
             return false;
         }
-        
+
         // Parent must meet one constraint
-        
+
         for (NodeConstraint c : type.getParentConstraints()) {
             if (meets_parent_constraint(node, node.getParent(), c)) {
                 return true;
@@ -136,14 +129,13 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     private List<NodeType> get_valid_types_ordered_by_preference(Node node) {
         List<NodeType> result = new ArrayList<>();
-        
+
         for (NodeType nt : profile.getNodeTypes()) {
-            
+
             // Order by preference
-            
+
             nt.getPreferredCountOfChildrenWithFiles();
-            
-            
+
             if (is_valid_type(node, nt)) {
                 result.add(nt);
             }
@@ -164,26 +156,25 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private void update_domain_objects(Node node) {
-        NodeType nt = node.getNodeType();
+        objstore.updateObject(node);
 
-        if (node.getDomainObject() == null) {
-            objstore.updateObject(node.getDomainObject(), nt);
-        } else {
-            node.setDomainObject(objstore.createObject(nt));
+        if (node.isLeaf()) {
+            return;
         }
-
+        
         for (Node child : node.getChildren()) {
             update_domain_objects(child);
         }
     }
 
-    // TODO If there are hundreds of thousands of nodes with many types, this
-    // recursive approach may be problematic.
-
     private boolean assign_node_types(Node node) {
         next: for (NodeType nt : get_valid_types_ordered_by_preference(node)) {
             node.setNodeType(nt);
 
+            if (node.isLeaf()) {
+                continue;
+            }
+            
             for (Node child : node.getChildren()) {
                 if (!assign_node_types(child)) {
                     continue next;
@@ -195,7 +186,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         return false;
     }
-    
+
     @Override
     public void propagateInheritedProperties(Node node) {
         // nodetypemap.get(node.getNodeType()).getInheritableProperties();
