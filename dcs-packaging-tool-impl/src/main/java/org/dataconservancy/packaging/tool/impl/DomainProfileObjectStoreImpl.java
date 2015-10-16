@@ -2,10 +2,10 @@ package org.dataconservancy.packaging.tool.impl;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
@@ -24,6 +24,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Implement store for domain objects on top of Jena model.
@@ -89,8 +90,6 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     private void create_parent_relations(Node node) {
-        System.err.println("Create parent relations for: " + node.getIdentifier());
-
         Node parent_node = node.getParent();
 
         if (parent_node == null) {
@@ -186,7 +185,13 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     @Override
     public void removeProperty(URI object, PropertyValue value) {
-        model.remove(as_statement(object, value.getPropertyType().getDomainPredicate(), object));
+        RDFNode rdf_value = as_rdf_node(value);
+        
+        if (rdf_value.isAnon()) {
+            throw new IllegalArgumentException("Complex properties can only be removed by type.");
+        } else {
+            model.remove(as_statement(object, value.getPropertyType().getDomainPredicate(), rdf_value));
+        }
     }
 
     @Override
@@ -241,6 +246,14 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     private Statement as_statement(URI subject, URI predicate, URI object) {
         return model.createStatement(as_resource(subject), as_property(predicate), as_resource(object));
     }
+    
+    private Statement as_statement(URI subject, URI predicate, RDFNode node) {
+        return model.createStatement(as_resource(subject), as_property(predicate), node);
+    }
+
+    private DateTime as_date_time(XSDDateTime dt) {
+        return ISODateTimeFormat.dateTimeParser().parseDateTime(dt.toString());
+    }
 
     private RDFNode as_rdf_node(PropertyValue value) {
         PropertyType type = value.getPropertyType();
@@ -249,8 +262,8 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         case COMPLEX:
             Resource res = model.createResource();
 
-            for (PropertyType subtype : type.getPropertySubTypes()) {
-                res.addProperty(as_property(subtype.getDomainPredicate()), as_rdf_node(value));
+            for (PropertyValue subval : value.getComplexValue()) {
+                res.addProperty(as_property(subval.getPropertyType().getDomainPredicate()), as_rdf_node(subval));
             }
 
             return res;
@@ -287,11 +300,11 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
             value.setComplexValue(subvalues);
             return value;
         case DATE_TIME:
-            if (rdfnode.isLiteral() && rdfnode.asLiteral().getValue() instanceof GregorianCalendar) {
-                GregorianCalendar cal = GregorianCalendar.class.cast(rdfnode.asLiteral().getValue());
+            if (rdfnode.isLiteral() && rdfnode.asLiteral().getValue() instanceof XSDDateTime) {
+                XSDDateTime dt = XSDDateTime.class.cast(rdfnode.asLiteral().getValue());
 
-                if (cal != null) {
-                    value.setDateTimeValue(new DateTime(cal));
+                if (dt != null) {
+                    value.setDateTimeValue(as_date_time(dt));
                 }
             }
 

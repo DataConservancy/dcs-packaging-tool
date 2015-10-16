@@ -1,8 +1,11 @@
 package org.dataconservancy.packaging.tool.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -13,9 +16,11 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +43,105 @@ public class DomainProfileObjectStoreImplTest {
         test_update_object(ipmtree.getRoot());
 
         // TODO spot checks on known objects...
+    }
+
+    @Test
+    public void testAddStringProperty() {
+        URI test_object = URI.create("test:moo");
+
+        PropertyType type = profile.getTitlePropertyType();
+        PropertyValue val = new PropertyValue(type);
+        val.setStringValue("Jim the cow");
+
+        store.addProperty(test_object, val);
+
+        assertTrue(has_property(test_object, val));
+    }
+    
+    @Test
+    public void testAddLongProperty() {
+        URI test_object = URI.create("test:jimfoot");
+
+        PropertyType type = profile.getSizePropertyType();
+        PropertyValue val = new PropertyValue(type);
+        val.setLongValue(32);
+
+        store.addProperty(test_object, val);
+
+        assertTrue(has_property(test_object, val));
+    }
+    
+    @Test
+    public void testAddDateTimeProperty() {
+        URI test_object = URI.create("test:jimlunch");
+
+        PropertyType type = profile.getCreatedProperty();
+        PropertyValue val = new PropertyValue(type);
+        val.setDateTimeValue(new DateTime(100000000));
+
+        store.addProperty(test_object, val);
+        
+        assertTrue(has_property(test_object, val));
+    }
+    
+    @Test
+    public void testAddComplexProperty() {
+        URI test_object = URI.create("test:farmcontactinfo");
+
+        PropertyType type = profile.getPersonProperty();
+        PropertyValue val = new PropertyValue(type);
+        
+        List<PropertyValue> subvals = new ArrayList<>();
+        PropertyValue name_val = new PropertyValue(profile.getNameProperty());
+        name_val.setStringValue("Jim Moocow Farmer");        
+        PropertyValue mbox_val = new PropertyValue(profile.getMboxProperty());
+        mbox_val.setStringValue("moo@moo.moo");
+        subvals.add(name_val);
+        subvals.add(mbox_val);
+        
+        val.setComplexValue(subvals);
+
+        store.addProperty(test_object, val);
+        
+        assertTrue(has_property(test_object, val));
+    }
+
+    @Test
+    public void testRemoveSimplePropertyByValue() {
+        URI test_object = URI.create("test:jimfoot");
+
+        PropertyType type = profile.getSizePropertyType();
+        PropertyValue val = new PropertyValue(type);
+        val.setLongValue(32);
+
+        store.addProperty(test_object, val);
+        assertTrue(has_property(test_object, val));
+        
+        store.removeProperty(test_object, val);
+        
+        assertFalse(has_property(test_object, val));
+    }
+    
+    @Test
+    public void testRemoveSimplePropertyByType() {
+        URI test_object = URI.create("test:jimfeet");
+
+        PropertyType type = profile.getSizePropertyType();
+        PropertyValue val1 = new PropertyValue(type);
+        val1.setLongValue(32);
+        PropertyValue val2 = new PropertyValue(type);
+        val2.setLongValue(42);
+
+        store.addProperty(test_object, val1);
+        store.addProperty(test_object, val2);
+        
+        assertTrue(has_property(test_object, val1));
+        assertTrue(has_property(test_object, val2));
+        
+        store.removeProperty(test_object, profile.getSizePropertyType());
+        
+        assertFalse(has_property(test_object, val1));
+        assertFalse(has_property(test_object, val2));
     }
 
     private void test_update_object(Node node) {
