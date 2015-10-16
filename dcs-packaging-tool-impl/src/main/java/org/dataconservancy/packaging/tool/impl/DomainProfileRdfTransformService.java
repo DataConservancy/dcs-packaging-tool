@@ -286,16 +286,12 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         constraintResource.addLiteral(MATCHES_ANY, constraint.matchesAny());
         constraintResource.addLiteral(MATCHES_NONE, constraint.matchesNone());
 
-        if (constraint.getNodeTypes() != null && !constraint.getNodeTypes().isEmpty()) {
-            for (NodeType type : constraint.getNodeTypes()) {
-                constraintResource.addProperty(HAS_NODE_TYPE, transformToRdf(model, type, domainProfileResource));
-            }
+        if (constraint.getNodeType() != null) {
+            constraintResource.addProperty(HAS_NODE_TYPE, transformToRdf(model, constraint.getNodeType(), domainProfileResource));
         }
 
-        if (constraint.getStructuralRelations() != null && !constraint.getStructuralRelations().isEmpty()) {
-            for (StructuralRelation relation : constraint.getStructuralRelations()) {
-                constraintResource.addProperty(HAS_STRUCTURAL_RELATION, transformToRdf(model, relation));
-            }
+        if (constraint.getStructuralRelation() != null) {
+            constraintResource.addProperty(HAS_STRUCTURAL_RELATION, transformToRdf(model, constraint.getStructuralRelation()));
         }
 
         return constraintResource;
@@ -760,27 +756,13 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             constraint.setMatchesNone(getLiteral(resource, MATCHES_NONE).getBoolean());
         }
 
-        List<NodeType> nodeTypes = new ArrayList<>();
-        for (RDFNode nodeTypeNode : model.listObjectsOfProperty(resource, HAS_NODE_TYPE).toList()) {
-            if (!nodeTypeNode.isResource()) {
-                throw new RDFTransformException(
-                    "Expected node " + nodeTypeNode + " to be resource");
-            }
-
-            nodeTypes.add(transformToNodeType(nodeTypeNode.asResource(), profile, model));
+        if (resource.hasProperty(HAS_NODE_TYPE)) {
+            constraint.setNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_NODE_TYPE), profile, model));
         }
-        constraint.setNodeTypes(nodeTypes);
 
-        List<StructuralRelation> structuralRelations = new ArrayList<>();
-        for (RDFNode nodeTypeNode : model.listObjectsOfProperty(resource, HAS_STRUCTURAL_RELATION).toList()) {
-            if (!nodeTypeNode.isResource()) {
-                throw new RDFTransformException(
-                    "Expected node " + nodeTypeNode + " to be resource");
-            }
-
-            structuralRelations.add(transformToStructuralRelation(nodeTypeNode.asResource()));
+        if (resource.hasProperty(HAS_STRUCTURAL_RELATION)) {
+            constraint.setStructuralRelation(transformToStructuralRelation(resource.getPropertyResourceValue(HAS_STRUCTURAL_RELATION)));
         }
-        constraint.setStructuralRelations(structuralRelations);
 
         return constraint;
     }
