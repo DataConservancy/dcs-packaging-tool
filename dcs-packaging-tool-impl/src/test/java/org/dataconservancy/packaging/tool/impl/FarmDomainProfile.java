@@ -33,6 +33,13 @@ public class FarmDomainProfile extends DomainProfile {
     private NodeType feed_node_type;
     private NodeType stockpile_node_type;
     private NodeType media_node_type;
+    private PropertyType title_property_type;
+    private PropertyType size_property_type;
+    private PropertyType created_property_type;
+    private PropertyType person_property_type;
+    private PropertyType name_property_type;
+    private PropertyType mbox_property_type;
+    
 
     public FarmDomainProfile() {
         farm_node_type = new NodeType();
@@ -52,13 +59,30 @@ public class FarmDomainProfile extends DomainProfile {
         breed.setPropertyValueType(PropertyValueType.STRING);
         breed.setDomainPredicate(URI.create("farm:breed"));
 
-        PropertyType title = new PropertyType();
-        title.setPropertyValueType(PropertyValueType.STRING);
-        title.setDomainPredicate(URI.create("dc:title"));
+        title_property_type = new PropertyType();
+        title_property_type.setPropertyValueType(PropertyValueType.STRING);
+        title_property_type.setDomainPredicate(URI.create("dc:title"));
 
-        PropertyType size = new PropertyType();
-        size.setPropertyValueType(PropertyValueType.LONG);
-        size.setDomainPredicate(URI.create("premis:fileSize"));
+        size_property_type = new PropertyType();
+        size_property_type.setPropertyValueType(PropertyValueType.LONG);
+        size_property_type.setDomainPredicate(URI.create("premis:fileSize"));
+        
+        created_property_type = new PropertyType();
+        created_property_type.setPropertyValueType(PropertyValueType.DATE_TIME);
+        created_property_type.setDomainPredicate(URI.create("dcterms:created"));
+        
+        name_property_type = new PropertyType();
+        name_property_type.setPropertyValueType(PropertyValueType.STRING);
+        name_property_type.setDomainPredicate(URI.create("foaf:name"));
+        
+        mbox_property_type = new PropertyType();
+        mbox_property_type.setPropertyValueType(PropertyValueType.STRING);
+        mbox_property_type.setDomainPredicate(URI.create("foaf:mbox"));
+
+        person_property_type = new PropertyType();
+        person_property_type.setPropertyValueType(PropertyValueType.COMPLEX);
+        person_property_type.setDomainPredicate(URI.create("foaf:person"));
+        person_property_type.setPropertySubTypes(Arrays.asList(name_property_type, mbox_property_type));        
 
         PropertyType species = new PropertyType();
         species.setPropertyValueType(PropertyValueType.STRING);
@@ -80,12 +104,12 @@ public class FarmDomainProfile extends DomainProfile {
         species_constraint.setMax(1);
         
         PropertyConstraint size_constraint = new PropertyConstraint();
-        species_constraint.setPropertyType(size);
+        species_constraint.setPropertyType(size_property_type);
         species_constraint.setMin(1);
         species_constraint.setMax(1);
 
         PropertyConstraint title_constraint = new PropertyConstraint();
-        title_constraint.setPropertyType(title);
+        title_constraint.setPropertyType(title_property_type);
         title_constraint.setMin(1);
         title_constraint.setMax(-1);
 
@@ -165,7 +189,7 @@ public class FarmDomainProfile extends DomainProfile {
         cow_node_type.setDomainProfile(this);
 
         Map<PropertyType, SuppliedProperty> supplied_media_properties = new HashMap<>();
-        supplied_media_properties.put(size, SuppliedProperty.FILE_SIZE);
+        supplied_media_properties.put(size_property_type, SuppliedProperty.FILE_SIZE);
 
         media_node_type.setIdentifier(URI.create("fdp:media"));
         media_node_type.setLabel("Media");
@@ -182,7 +206,7 @@ public class FarmDomainProfile extends DomainProfile {
         setLabel("Farm");
         setDescription("Vocabulary for describing a farm");
         setNodeTypes(Arrays.asList(farm_node_type, cow_node_type, barn_node_type, media_node_type));
-        setPropertyTypes(Arrays.asList(species, weight, title, breed, size));
+        setPropertyTypes(Arrays.asList(species, weight, title_property_type, breed, size_property_type));
 
         PropertyCategory saleCategory = new PropertyCategory();
         saleCategory.setPropertyTypes(Arrays.asList(weight, breed));
@@ -242,4 +266,28 @@ public class FarmDomainProfile extends DomainProfile {
     public NodeType getTroughNodeType() { return trough_node_type; }
 
     public NodeType getStockpileNodeType() { return stockpile_node_type; }
+    
+    public PropertyType getTitlePropertyType() {
+        return title_property_type;
+    }
+    
+    public PropertyType getSizePropertyType() {
+        return size_property_type;
+    }
+
+    public PropertyType getCreatedProperty() {
+        return created_property_type;
+    }
+    
+    public PropertyType getPersonProperty() {
+        return person_property_type;
+    }
+    
+    public PropertyType getNameProperty() {
+        return name_property_type;
+    }
+    
+    public PropertyType getMboxProperty() {
+        return mbox_property_type;
+    }
 }
