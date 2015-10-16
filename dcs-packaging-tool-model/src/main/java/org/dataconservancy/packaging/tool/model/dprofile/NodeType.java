@@ -204,7 +204,7 @@ public class NodeType extends AbstractDescribedObject {
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((inheritable_properties == null) ? 0 : inheritable_properties.hashCode());
         result = prime * result + ((parent_constraints == null) ? 0 : parent_constraints.hashCode());
-        result = prime * result + ((profile == null) ? 0 : profile.hashCode());
+        result = prime * result + ((profile == null || profile.getIdentifier() == null) ? 0 : profile.getIdentifier().hashCode());
         result = prime * result + ((property_constraints == null) ? 0 : property_constraints.hashCode());
         result = prime * result + ((supplied_properties == null) ? 0 : supplied_properties.hashCode());
         return result;
@@ -268,7 +268,10 @@ public class NodeType extends AbstractDescribedObject {
         if (profile == null) {
             if (other.profile != null)
                 return false;
-        } else if (!profile.equals(other.profile))
+        } else if (profile.getIdentifier() == null) {
+            if (other.profile.getIdentifier() != null)
+                return  false;
+        } else if (other.profile == null || other.profile.getIdentifier() == null || !profile.getIdentifier().equals(other.profile.getIdentifier()))
             return false;
         if (property_constraints == null) {
             if (other.property_constraints != null)
