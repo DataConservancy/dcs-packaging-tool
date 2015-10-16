@@ -46,7 +46,8 @@ public interface DomainProfileObjectStore {
     void addProperty(URI object, PropertyValue value);
 
     /**
-     * Remove a particular property from a object.
+     * Remove a particular property from a object. Complex properties may not be
+     * removed this way.
      * 
      * @param object
      *            The identifier of the object to modify.
