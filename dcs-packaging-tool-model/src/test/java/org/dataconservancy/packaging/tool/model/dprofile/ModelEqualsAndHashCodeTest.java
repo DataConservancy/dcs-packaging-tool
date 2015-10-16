@@ -28,7 +28,7 @@ public class ModelEqualsAndHashCodeTest {
     public void DomainProfileTest() {
         EqualsVerifier
                 .forClass(DomainProfile.class)
-                .allFieldsShouldBeUsed().withRedefinedSuperclass()
+                .withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();
     }

@@ -118,6 +118,10 @@ public class DomainProfile extends AbstractDescribedObject {
         this.node_transforms = node_transforms;
     }
 
+    /**
+     * Generates a hashcode for the DomainProfile node types are excluded from the hashcode to eliminate recursive issues.
+     * @return The hashcode of this DomainProfile object.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -125,20 +129,24 @@ public class DomainProfile extends AbstractDescribedObject {
         result = prime * result + ((domain_id == null) ? 0 : domain_id.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((node_transforms == null) ? 0 : node_transforms.hashCode());
-        result = prime * result + ((node_types == null) ? 0 : node_types.hashCode());
         result = prime * result + ((prop_categories == null) ? 0 : prop_categories.hashCode());
         result = prime * result + ((prop_types == null) ? 0 : prop_types.hashCode());
         return result;
     }
     
     /**
-     * @param other 
+     * @param other Object to check for comparison
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {
         return (other instanceof DomainProfile);
     }
 
+    /**
+     * Tests equality node types are not considered for equality in the profile to eliminate recursive issues.
+     * @param obj The object to compare for equality
+     * @return True if equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -166,11 +174,6 @@ public class DomainProfile extends AbstractDescribedObject {
             if (other.node_transforms != null)
                 return false;
         } else if (other.node_transforms == null || !CollectionUtils.isEqualCollection(node_transforms, other.node_transforms))
-            return false;
-        if (node_types == null) {
-            if (other.node_types != null)
-                return false;
-        } else if (other.node_types == null || !CollectionUtils.isEqualCollection(node_types, other.node_types))
             return false;
         if (prop_categories == null) {
             if (other.prop_categories != null)
