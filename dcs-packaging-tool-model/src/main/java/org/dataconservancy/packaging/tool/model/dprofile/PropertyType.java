@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.net.URI;
 import java.util.List;
 
@@ -155,7 +157,7 @@ public class PropertyType extends AbstractDescribedObject {
         if (allowed_values == null) {
             if (other.allowed_values != null)
                 return false;
-        } else if (!allowed_values.equals(other.allowed_values))
+        } else if (other.allowed_values == null || !CollectionUtils.isEqualCollection(allowed_values, other.allowed_values))
             return false;
         if (category == null) {
             if (other.category != null)
@@ -172,7 +174,7 @@ public class PropertyType extends AbstractDescribedObject {
         if (subtypes == null) {
             if (other.subtypes != null)
                 return false;
-        } else if (!subtypes.equals(other.subtypes))
+        } else if (other.subtypes == null || !CollectionUtils.isEqualCollection(subtypes, other.subtypes))
             return false;
         if (value_hint != other.value_hint)
             return false;

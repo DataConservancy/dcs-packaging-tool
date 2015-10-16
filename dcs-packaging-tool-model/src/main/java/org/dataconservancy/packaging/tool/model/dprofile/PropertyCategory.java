@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.List;
 
 /**
@@ -54,7 +56,7 @@ public class PropertyCategory extends AbstractDescribedObject {
         if (types == null) {
             if (other.types != null)
                 return false;
-        } else if (!types.equals(other.types))
+        } else if (other.types == null || !CollectionUtils.isEqualCollection(types, other.types))
             return false;
         return true;
     }
