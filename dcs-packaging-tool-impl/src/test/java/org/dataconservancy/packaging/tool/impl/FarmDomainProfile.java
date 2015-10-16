@@ -95,8 +95,8 @@ public class FarmDomainProfile extends DomainProfile {
         StructuralRelation has_part_rel = new StructuralRelation(URI.create("dcterms:isPartOf"), URI.create("dcterms:hasPart"));
         
         NodeConstraint barn_parent_constraint = new NodeConstraint();
-        barn_parent_constraint.setNodeTypes(Arrays.asList(farm_node_type));
-        barn_parent_constraint.setStructuralRelations(Arrays.asList(has_part_rel));
+        barn_parent_constraint.setNodeType(farm_node_type);
+        barn_parent_constraint.setStructuralRelation(has_part_rel);
         
         barn_node_type.setIdentifier(URI.create("fdp:barn"));
         barn_node_type.setLabel("Barn");

@@ -90,7 +90,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     private void create_parent_relations(Node node) {
         System.err.println("Create parent relations for: " + node.getIdentifier());
-        
+
         Node parent_node = node.getParent();
 
         if (parent_node == null) {
@@ -101,7 +101,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         if (node.getNodeType().getParentConstraints() == null || node.getNodeType().getParentConstraints().isEmpty()) {
             return;
         }
-        
+
         NodeConstraint nc = find_parent_constraint(node.getNodeType(), parent_node.getNodeType());
 
         if (nc == null) {
@@ -113,16 +113,22 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         Resource object = as_resource(node.getDomainObject());
         Resource parent = as_resource(parent_node.getDomainObject());
 
-        for (StructuralRelation rel : nc.getStructuralRelations()) {
-            object.addProperty(as_property(rel.getHasParentPredicate()), parent);
-            parent.addProperty(as_property(rel.getHasChildPredicate()), object);
-            break;
+        StructuralRelation rel = nc.getStructuralRelation();
+
+        if (rel != null) {
+            if (rel.getHasParentPredicate() != null) {
+                object.addProperty(as_property(rel.getHasParentPredicate()), parent);
+            }
+
+            if (rel.getHasChildPredicate() != null) {
+                parent.addProperty(as_property(rel.getHasChildPredicate()), object);
+            }
         }
     }
 
     private NodeConstraint find_parent_constraint(NodeType type, NodeType parent_type) {
         for (NodeConstraint nc : type.getParentConstraints()) {
-            if (nc.getNodeTypes().contains(parent_type)) {
+            if (nc.getNodeType().getIdentifier().equals(parent_type.getIdentifier())) {
                 return nc;
             }
         }

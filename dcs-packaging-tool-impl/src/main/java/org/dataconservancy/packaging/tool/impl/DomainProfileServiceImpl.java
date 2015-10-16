@@ -73,7 +73,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         // Check type
 
-        if (!parent_constraint.getNodeTypes().contains(parent.getNodeType())) {
+        if (!parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier())) {
             return false;
         }
 
@@ -81,19 +81,13 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         // predicates
 
         if (node.getDomainObject() != null && parent.getDomainObject() != null) {
-            boolean found_pred = false;
-
-            for (StructuralRelation rel : parent_constraint.getStructuralRelations()) {
-                if (objstore.hasRelationship(node.getDomainObject(), rel.getHasParentPredicate(),
-                        parent.getDomainObject())
-                        && objstore.hasRelationship(parent.getDomainObject(), rel.getHasChildPredicate(),
-                                node.getDomainObject())) {
-                    found_pred = true;
-                    break;
-                }
-            }
-
-            if (!found_pred) {
+            StructuralRelation rel = parent_constraint.getStructuralRelation();
+            
+            if (objstore.hasRelationship(node.getDomainObject(), rel.getHasParentPredicate(), parent.getDomainObject())
+                    && objstore.hasRelationship(parent.getDomainObject(), rel.getHasChildPredicate(),
+                            node.getDomainObject())) {
+                return true;
+            } else {
                 return false;
             }
         }
@@ -161,7 +155,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (node.isLeaf()) {
             return;
         }
-        
+
         for (Node child : node.getChildren()) {
             update_domain_objects(child);
         }
@@ -174,7 +168,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             if (node.isLeaf()) {
                 continue;
             }
-            
+
             for (Node child : node.getChildren()) {
                 if (!assign_node_types(child)) {
                     continue next;

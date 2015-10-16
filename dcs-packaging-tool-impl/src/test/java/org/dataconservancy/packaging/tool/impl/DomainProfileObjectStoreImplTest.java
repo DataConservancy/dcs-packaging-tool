@@ -36,17 +36,17 @@ public class DomainProfileObjectStoreImplTest {
     @Test
     public void testUpdateObject() {
         test_update_object(ipmtree.getRoot());
-        
+
         // TODO spot checks on known objects...
     }
 
     private void test_update_object(Node node) {
         System.err.println("Node: " + node.getIdentifier());
-        
+
         store.updateObject(node);
 
         System.err.println("Domain object: " + node.getDomainObject());
-        
+
         check_properties(node.getDomainObject(), node.getNodeType());
 
         if (node.getSubNodeTypes() != null) {
@@ -60,7 +60,7 @@ public class DomainProfileObjectStoreImplTest {
         if (node.isLeaf()) {
             return;
         }
-        
+
         for (Node child : node.getChildren()) {
             test_update_object(child);
         }
@@ -93,8 +93,9 @@ public class DomainProfileObjectStoreImplTest {
         }
     }
 
-    // Check that relationships between node and parent domain objects meet constraints of node.
-    
+    // Check that relationships between node and parent domain objects meet
+    // constraints of node.
+
     private void check_parent_relations(Node node) {
         Node parent_node = node.getParent();
 
@@ -109,17 +110,11 @@ public class DomainProfileObjectStoreImplTest {
 
         if (node.getNodeType().getParentConstraints() != null && !node.getNodeType().getParentConstraints().isEmpty()) {
             for (NodeConstraint nc : node.getNodeType().getParentConstraints()) {
-                if (nc.getNodeTypes() != null && nc.getNodeTypes().contains(parent_type)) {
-                    if (nc.getStructuralRelations() != null) {
-                        for (StructuralRelation rel : nc.getStructuralRelations()) {
-                            if (has_statement(id, rel.getHasParentPredicate(), parent_id)
-                                    && has_statement(parent_id, rel.getHasChildPredicate(), id)) {
-                                return;
-                            }
-                        }
+                if (nc.getNodeType() != null && nc.getNodeType().getIdentifier().equals(parent_type.getIdentifier())) {
+                    StructuralRelation rel = nc.getStructuralRelation();
 
-                        assertTrue("No relationships found between node and parent " + id, false);
-                    }
+                    assertTrue(has_statement(id, rel.getHasParentPredicate(), parent_id));
+                    assertTrue(has_statement(parent_id, rel.getHasChildPredicate(), id));
 
                     return;
                 }

@@ -1,15 +1,13 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
-import java.util.List;
-
 /**
  * A node constraint represents requirements on a node.
  */
 public class NodeConstraint {
     private boolean matches_any;
     private boolean matches_none;
-    private List<NodeType> node_types;
-    private List<StructuralRelation> struct_rels;
+    private NodeType node_type;
+    private StructuralRelation struct_rel;
     
     /**
      * @return Whether or not the constraint matches any node.
@@ -30,8 +28,8 @@ public class NodeConstraint {
      * 
      * @return The constrained node must have one of these types.
      */
-    public List<NodeType> getNodeTypes() {
-        return node_types;
+    public NodeType getNodeType() {
+        return node_type;
     }
 
     /**
@@ -40,8 +38,8 @@ public class NodeConstraint {
      * @return The constrained node must be in at least one of these
      *         relationships.
      */
-    public List<StructuralRelation> getStructuralRelations() {
-        return struct_rels;
+    public StructuralRelation getStructuralRelation() {
+        return struct_rel;
     }
 
     /**
@@ -59,17 +57,17 @@ public class NodeConstraint {
     }
 
     /**
-     * @param node_types The node_types to set.
+     * @param node_type The node type to set.
      */
-    public void setNodeTypes(List<NodeType> node_types) {
-        this.node_types = node_types;
+    public void setNodeType(NodeType node_type) {
+        this.node_type = node_type;
     }
 
     /**
-     * @param struct_rels The structural relationships to set
+     * @param struct_rel The structural relationship to set.
      */
-    public void setStructuralRelations(List<StructuralRelation> struct_rels) {
-        this.struct_rels = struct_rels;
+    public void setStructuralRelation(StructuralRelation struct_rel) {
+        this.struct_rel = struct_rel;
     }
 
     @Override
@@ -78,8 +76,8 @@ public class NodeConstraint {
         int result = 1;
         result = prime * result + (matches_any ? 1231 : 1237);
         result = prime * result + (matches_none ? 1231 : 1237);
-        result = prime * result + ((node_types == null) ? 0 : node_types.hashCode());
-        result = prime * result + ((struct_rels == null) ? 0 : struct_rels.hashCode());
+        result = prime * result + ((node_type == null) ? 0 : node_type.hashCode());
+        result = prime * result + ((struct_rel == null) ? 0 : struct_rel.hashCode());
         return result;
     }
 
@@ -96,15 +94,15 @@ public class NodeConstraint {
             return false;
         if (matches_none != other.matches_none)
             return false;
-        if (node_types == null) {
-            if (other.node_types != null)
+        if (node_type == null) {
+            if (other.node_type != null)
                 return false;
-        } else if (!node_types.equals(other.node_types))
+        } else if (!node_type.equals(other.node_type))
             return false;
-        if (struct_rels == null) {
-            if (other.struct_rels != null)
+        if (struct_rel == null) {
+            if (other.struct_rel != null)
                 return false;
-        } else if (!struct_rels.equals(other.struct_rels))
+        } else if (!struct_rel.equals(other.struct_rel))
             return false;
         return true;
     }
@@ -112,6 +110,6 @@ public class NodeConstraint {
     @Override
     public String toString() {
         return "NodeConstraint [matches_any=" + matches_any + ", matches_none=" + matches_none + ", node_types="
-                + node_types + ", struct_rels=" + struct_rels + "]";
+                + node_type + ", struct_rels=" + struct_rel + "]";
     }
 }
