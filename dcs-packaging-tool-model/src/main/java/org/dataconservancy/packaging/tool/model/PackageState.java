@@ -51,15 +51,18 @@ public class PackageState {
      * Package serialization/generation information
      */
     private File outputDirectory;
-    private PackageGenerationParameters packageGenerationParams;
 
-    //Tool metadata
-    private String buildNumber;
-    private String buildRevision;
-    private String buildTimeStamp;
+    /**
+     * Metadata about the tools used to create this package
+     */
+    private ApplicationVersion creationToolVersion;
 
     public PackageState() {
         packageMetadataList = new ArrayList<>();
+    }
+    public PackageState(ApplicationVersion appVersion) {
+        packageMetadataList = new ArrayList<>();
+        this.creationToolVersion = appVersion;
     }
 
     /**
@@ -72,55 +75,6 @@ public class PackageState {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
-    }
-
-    /**
-     * The timestamp of when the packaging tool was built.
-     * @return
-     */
-    public String getBuildTimeStamp() {
-        return buildTimeStamp;
-    }
-
-    public void setBuildTimeStamp(String buildTimeStamp) {
-        this.buildTimeStamp = buildTimeStamp;
-    }
-
-    /**
-     * The revision of code from which the packaging tool was built
-     * @return
-     */
-    public String getBuildRevision() {
-        return buildRevision;
-    }
-
-    public void setBuildRevision(String buildRevision) {
-        this.buildRevision = buildRevision;
-    }
-
-    /**
-     * The number of the build that produced the packaging tool.
-     * @return
-     */
-    public String getBuildNumber() {
-        return buildNumber;
-    }
-
-    public void setBuildNumber(String buildNumber) {
-        this.buildNumber = buildNumber;
-    }
-
-    /**
-     * The collection of default parameters used in serializing/generating the package, such as checksum algoritm,
-     * serialization format, etc.
-     * @return
-     */
-    public PackageGenerationParameters getPackageGenerationParams() {
-        return packageGenerationParams;
-    }
-
-    public void setPackageGenerationParams(PackageGenerationParameters packageGenerationParams) {
-        this.packageGenerationParams = packageGenerationParams;
     }
 
     /**
@@ -147,6 +101,14 @@ public class PackageState {
         this.packageMetadataList = packageMetadataList;
     }
 
+    public ApplicationVersion getCreationToolVersion() {
+        return creationToolVersion;
+    }
+
+    public void setCreationToolVersion(ApplicationVersion creationToolVersion) {
+        this.creationToolVersion = creationToolVersion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -154,14 +116,9 @@ public class PackageState {
 
         PackageState that = (PackageState) o;
 
-        if (buildNumber != null ? !buildNumber.equals(that.buildNumber) : that.buildNumber != null) return false;
-        if (buildRevision != null ? !buildRevision.equals(that.buildRevision) : that.buildRevision != null)
-            return false;
-        if (buildTimeStamp != null ? !buildTimeStamp.equals(that.buildTimeStamp) : that.buildTimeStamp != null)
+        if (creationToolVersion != null ? !creationToolVersion.equals(that.creationToolVersion) : that.creationToolVersion != null)
             return false;
         if (outputDirectory != null ? !outputDirectory.equals(that.outputDirectory) : that.outputDirectory != null)
-            return false;
-        if (packageGenerationParams != null ? !packageGenerationParams.equals(that.packageGenerationParams) : that.packageGenerationParams != null)
             return false;
         if (packageMetadataList != null ? !packageMetadataList.equals(that.packageMetadataList) : that.packageMetadataList != null)
             return false;
@@ -175,10 +132,7 @@ public class PackageState {
         int result = packageName != null ? packageName.hashCode() : 0;
         result = 31 * result + (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
         result = 31 * result + (outputDirectory != null ? outputDirectory.hashCode() : 0);
-        result = 31 * result + (packageGenerationParams != null ? packageGenerationParams.hashCode() : 0);
-        result = 31 * result + (buildNumber != null ? buildNumber.hashCode() : 0);
-        result = 31 * result + (buildRevision != null ? buildRevision.hashCode() : 0);
-        result = 31 * result + (buildTimeStamp != null ? buildTimeStamp.hashCode() : 0);
+        result = 31 * result + (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;
     }
 }

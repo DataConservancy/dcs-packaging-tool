@@ -23,7 +23,7 @@ public class PackageStateTest {
     @Test
     public void PackageStateVerifier() {
         EqualsVerifier
-                .forClass(PackageMetadata.class).allFieldsShouldBeUsed()
+                .forClass(PackageState.class).allFieldsShouldBeUsed()
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();
     }
