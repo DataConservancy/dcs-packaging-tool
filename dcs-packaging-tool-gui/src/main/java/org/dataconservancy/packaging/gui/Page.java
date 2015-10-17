@@ -24,27 +24,19 @@ public enum Page {
 
     //Positions must be in numerical order of there appearance in the workflow but don't need to be sequential
     //Space is left between pages to allow for the future addition of more screens
-    HOMEPAGE(10, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-    CREATE_NEW_PACKAGE(11, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-    SELECT_CONTENT_DIRECTORY(12, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-    DEFINE_RELATIONSHIPS(20, Labels.LabelKey.DEFINE_RELATIONSHIPS_PAGE),
-    GENERATE_PACKAGE(30, Labels.LabelKey.GENERATE_PACKAGE_PAGE);
+    HOMEPAGE(Labels.LabelKey.HOMEPAGE_PAGE),
+    NEW_PACKAGE_METADATA(Labels.LabelKey.CREATE_PACKAGE_PAGE),
+    CREATE_NEW_PACKAGE(Labels.LabelKey.CREATE_PACKAGE_PAGE),
+    SELECT_CONTENT_DIRECTORY(Labels.LabelKey.CREATE_PACKAGE_PAGE),
+    DEFINE_RELATIONSHIPS(Labels.LabelKey.DEFINE_RELATIONSHIPS_PAGE),
+    GENERATE_PACKAGE(Labels.LabelKey.GENERATE_PACKAGE_PAGE),
+    SELECT_PACKAGE_DIRECTORY(Labels.LabelKey.CREATE_PACKAGE_PAGE),
+    EXISTING_PACKAGE_METADATA(Labels.LabelKey.CREATE_PACKAGE_PAGE);
 
-    private int position;
     private Labels.LabelKey labelKey;
 
-    Page(int position, Labels.LabelKey label) {
-        this.position = position;
+    Page(Labels.LabelKey label) {
         this.labelKey = label;
-    }
-
-    /**
-     * Returns the position of the page in the application.
-     *
-     * @return the position of the page
-     */
-    public int getPosition() {
-        return position;
     }
 
     /**

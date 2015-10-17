@@ -267,11 +267,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         factory.setConfiguration(configuration);
         
         controller = new Controller() {
-            @Override
-            public void goToNextPage() {
-                goToNextPage = true;
-            }
-            
+
             @Override
             public PackageDescription getPackageDescription() {
                 return description;

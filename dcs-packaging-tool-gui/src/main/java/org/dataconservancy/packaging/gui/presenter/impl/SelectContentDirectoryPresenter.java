@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.scene.Node;
 import javafx.stage.DirectoryChooser;
 import org.dataconservancy.packaging.gui.Errors;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.SelectContentDirectoryView;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class SelectContentDirectoryPresenter extends BasePresenterImpl
                     content_dir.canRead()) {
                     controller.setContentRoot(content_dir);
                     controller.setRootArtifactDir(root_artifact_dir);
-                    controller.goToNextPage();
+                    controller.goToNextPage(Page.DEFINE_RELATIONSHIPS);
                 } else if (content_dir != null && (!content_dir.exists() || !content_dir.canRead()) ||
                     root_artifact_dir != null &&
                         (!root_artifact_dir.exists() || !root_artifact_dir.canRead())) {

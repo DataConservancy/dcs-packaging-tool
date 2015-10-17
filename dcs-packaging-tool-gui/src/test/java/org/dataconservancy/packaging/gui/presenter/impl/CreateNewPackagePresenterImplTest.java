@@ -101,11 +101,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 }
 
                 @Override
-                public void goToNextPage() {
-                    showNextPage = true;
-                }
-
-                @Override
                 public void setPackageDescription(PackageDescription desc) {
                     description = desc;
                 }

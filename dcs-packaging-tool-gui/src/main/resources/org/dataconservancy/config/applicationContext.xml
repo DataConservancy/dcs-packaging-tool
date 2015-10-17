@@ -141,6 +141,12 @@
     <property name="help" ref="help"/>
   </bean>
 
+  <bean id="packageMetadataView" class="org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl">
+    <constructor-arg ref="labels" />
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>
+  </bean>
+
   <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
     <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
@@ -214,6 +220,15 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
+  <bean id="packageMetadataPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageMetadataPresenterImpl">
+    <constructor-arg ref="packageMetadataView"/>
+    <property name="controller" ref="controller"/>
+    <property name="packageGenerationParametersBuilder" ref="propertiesConfigurationParametersBuilder"/>
+    <property name="messages" ref="messages"/>
+    <property name="errors" ref="errors"/>
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
   <bean id="contentDirectoryPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter">
     <constructor-arg ref="contentDirectoryView"/>
     <property name="controller" ref="controller" />
@@ -229,12 +244,14 @@
     <property name="configuration" ref="configuration" />
 
     <property name="homepageView" ref="homepageView" />
+    <property name="packageMetadataView" ref="packageMetadataView" />
     <property name="createNewPackageView" ref="createNewPackageView" />
     <property name="packageGenerationView" ref="packageGenerationView" />
     <property name="packageDescriptionView" ref="packageDescriptionView" />
     <property name="contentDirectoryView" ref="contentDirectoryView" />
 
     <property name="homepagePresenter" ref="homepagePresenter" />
+    <property name="packageMetadataPresenter" ref="packageMetadataPresenter" />
     <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
     <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />

@@ -122,7 +122,22 @@ public class Controller {
      * Switch to homepage
      */
     private void showHomepage() {
+        previousPages.clear();
         show(factory.getHomepagePresenter());
+    }
+
+    /**
+     * Switch to package metadata
+     */
+    private void showPackageMetadata(boolean newPackage) {
+        if (newPackage) {
+            // show empty package metadata page
+            show(factory.getPackageMetadataPresenter());
+        }
+        else {
+            // show filled in package metadata page.
+            show(factory.getPackageMetadataPresenter());
+        }
     }
 
     /**
@@ -136,6 +151,14 @@ public class Controller {
      * Switch to the screen for selecting a content directory.
      */
     public void showSelectContentDirectory() {
+        show(factory.getContentDirectoryPresenter());
+    }
+
+    /**
+     * Switch to the screen for selecting a package directory.
+     */
+    public void showSelectPackageDirectory() {
+        //show(factory.getPackageDirectoryPresenter());
         show(factory.getContentDirectoryPresenter());
     }
 
@@ -234,7 +257,12 @@ public class Controller {
     }
     
     //Advances the application to the next page. Or redisplays the current page if it's the last page.
-    public void goToNextPage() {
+    public void goToNextPage(Page nextPage) {
+        previousPages.push(currentPage);
+        currentPage = nextPage;
+        showPage();
+
+        /*
         Page nextPage = currentPage;
         int currentPosition = currentPage.getPosition();
         int nextPosition = Integer.MAX_VALUE;
@@ -254,6 +282,7 @@ public class Controller {
         previousPages.push(currentPage);
         currentPage = nextPage;
         showPage();
+        */
     }
     
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
@@ -264,19 +293,17 @@ public class Controller {
         }
     }
 
-    public void goToPage(Page page) {
-        currentPage = page;
-        showPage();
-    }
-    
     /**
      * Shows the current page, a tells the presenter if it should clear it's information. 
      */
     private void showPage() {
-        factory.getHeaderView().highlightNextPage(currentPage.getPosition());
+        factory.getHeaderView().highlightNextPage(currentPage);
         switch (currentPage) {
             case HOMEPAGE:
                 showHomepage();
+                break;
+            case NEW_PACKAGE_METADATA:
+                showPackageMetadata(true);
                 break;
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
@@ -289,6 +316,12 @@ public class Controller {
                 break;
             case SELECT_CONTENT_DIRECTORY:
                 showSelectContentDirectory();
+                break;
+            case SELECT_PACKAGE_DIRECTORY:
+                showSelectPackageDirectory();
+                break;
+            case EXISTING_PACKAGE_METADATA:
+                showPackageMetadata(false);
                 break;
             default:
                 //There is no next page do nothing

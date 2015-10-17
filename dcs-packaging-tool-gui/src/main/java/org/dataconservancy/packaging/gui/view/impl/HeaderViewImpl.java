@@ -84,12 +84,14 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
     }
     
     @Override
-    public void highlightNextPage(int nextPosition) {
-        switch (nextPosition) {
-            case 10:
+    public void highlightNextPage(Page page) {
+        switch (page) {
+            case HOMEPAGE:
                 // Don't show the location bar in the homepage
                 locationBar.setVisible(false);
-            case 11:
+                break;
+            case NEW_PACKAGE_METADATA:
+                locationBar.setVisible(true);
                 //Remove the old selection, occurs on cancel or finish
                 locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
                 locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
@@ -102,7 +104,22 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                 locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
                 locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
                 break;
-            case 20:
+            case CREATE_NEW_PACKAGE:
+                locationBar.setVisible(true);
+                //Remove the old selection, occurs on cancel or finish
+                locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
+                locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
+
+                //This happens if cancel was selected
+                locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
+                locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
+
+                //Select the new page
+                locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
+                locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
+                break;
+            case DEFINE_RELATIONSHIPS:
+                locationBar.setVisible(true);
                 //Remove the old selection
                 locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_SELECTED);
                 locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_UNSELECTED);
@@ -115,7 +132,8 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                 locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_UNSELECTED);
                 locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_SELECTED);
                 break;
-            case 30:
+            case GENERATE_PACKAGE:
+                locationBar.setVisible(true);
                 //Remove the old selection
                 locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
                 locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);

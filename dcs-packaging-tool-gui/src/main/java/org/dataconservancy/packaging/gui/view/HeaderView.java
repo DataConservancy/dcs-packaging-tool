@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui.view;
 
 import javafx.scene.control.Hyperlink;
+import org.dataconservancy.packaging.gui.Page;
 
 /**
  * The HeaderView appears at the top of every page, and indicates the position in the application as well as providing the 
@@ -26,7 +27,7 @@ public interface HeaderView {
      * Highlights the correct segment of the location bar in the header.
      * @param nextPosition The next page to be highlighted, will automatically remove old highlights
      */
-    public void highlightNextPage(int nextPosition);
+    public void highlightNextPage(Page page);
     
     /**
      * Gets the hyperlink that will show a popup containing help information when pressed.

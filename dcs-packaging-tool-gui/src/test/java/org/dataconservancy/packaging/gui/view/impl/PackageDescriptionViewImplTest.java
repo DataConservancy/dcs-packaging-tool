@@ -208,8 +208,6 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
         PackageDescriptionBuilder builder = mock(PackageDescriptionBuilder.class);
         PackageDescriptionValidator validator = mock(PackageDescriptionValidator.class);
         Controller controller = new Controller() {
-            @Override
-            public void goToNextPage() { }
 
             @Override
             public PackageDescription getPackageDescription() {

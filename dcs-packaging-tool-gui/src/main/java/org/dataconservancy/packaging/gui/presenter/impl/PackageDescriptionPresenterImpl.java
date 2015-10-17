@@ -28,6 +28,7 @@ import javafx.scene.control.TreeItem;
 import javafx.stage.WindowEvent;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.util.RDFURIValidator;
@@ -211,7 +212,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
                 controller.setPackageDescriptionFile(packageDescriptionFile);
                 controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
-                controller.goToNextPage();
+                controller.goToNextPage(Page.GENERATE_PACKAGE);
             }
         });
         

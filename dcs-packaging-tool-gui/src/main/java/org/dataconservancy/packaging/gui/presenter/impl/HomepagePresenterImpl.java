@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,10 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
-import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.HomepagePresenter;
 import org.dataconservancy.packaging.gui.view.HomepageView;
-import org.dataconservancy.packaging.gui.view.View;
 
 /**
  * The implementation for the presenter that will handle the homepage button actions
@@ -42,13 +38,8 @@ public class HomepagePresenterImpl extends BasePresenterImpl implements Homepage
     }
 
     private void bind() {
-        view.getCreateNewPackageButton().setOnAction(arg0 -> {
-            getController().goToPage(Page.CREATE_NEW_PACKAGE);
-        });
-
-        view.getOpenExistingPackageButton().setOnAction(arg0 -> {
-            System.out.println("Whoopsie!! this page doesn't exist yet");
-        });
+        view.getCreateNewPackageButton().setOnAction(arg0 -> getController().goToNextPage(Page.NEW_PACKAGE_METADATA));
+        view.getOpenExistingPackageButton().setOnAction(arg0 -> getController().goToNextPage(Page.SELECT_PACKAGE_DIRECTORY));
     }
 
     @Override

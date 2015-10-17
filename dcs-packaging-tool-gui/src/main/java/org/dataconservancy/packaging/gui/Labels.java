@@ -125,7 +125,10 @@ public class Labels {
         SHOW_IGNORED_TIP("showignored.tip"),
         CONTENT_DIRECTORY_LABEL("contentdirectory.label"),
         CREATE_NEW_PACKAGE("createnewpackage.label"),
-        OPEN_EXISTING_PACKAGE("openexistingpackage.label");
+        OPEN_EXISTING_PACKAGE("openexistingpackage.label"),
+        HOMEPAGE_PAGE("homepage.page"),
+        SELECT_DOMAIN_PROFILE_LABEL("selectdomainprofile.label"),
+        ADD_BUTTON("add.button");
 
 
         private String property;

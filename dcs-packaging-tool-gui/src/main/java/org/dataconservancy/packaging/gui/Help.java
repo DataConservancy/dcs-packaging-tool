@@ -37,6 +37,7 @@ public class Help {
     public enum HelpKey {
 
         HOMEPAGE_HELP("homepage.help"),
+        PACKAGE_METADATA_HELP("packagemetadata.help"),
         PACKAGE_GENERATION_HELP("packagegeneration.help"), 
         CREATE_NEW_PACKAGE_HELP("createnewpackage.help"), 
         PACKAGE_DESCRIPTION_HELP("packagedescription.help");

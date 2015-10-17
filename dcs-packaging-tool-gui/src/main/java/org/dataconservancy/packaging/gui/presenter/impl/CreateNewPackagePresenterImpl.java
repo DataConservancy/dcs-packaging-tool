@@ -27,6 +27,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
@@ -143,7 +144,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         controller.setPackageDescription(packageDescription);
                         controller.setPackageDescriptionFile(null);
                         packageDescriptionService.reset();
-                        controller.goToNextPage();
+                        controller.goToNextPage(Page.DEFINE_RELATIONSHIPS);
                     });
 
                     packageDescriptionService.start();
@@ -154,7 +155,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
                     view.getErrorMessage().setVisible(true);
                 } else if (controller.getPackageDescription() != null) {
-                    controller.goToNextPage();
+                    controller.goToNextPage(Page.DEFINE_RELATIONSHIPS);
                 } else {
                     view.getErrorMessage().setText(errors.get(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
                     view.getErrorMessage().setVisible(true);

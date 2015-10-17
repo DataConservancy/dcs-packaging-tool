@@ -61,7 +61,9 @@ public class Factory {
     private HeaderView headerView;
     private SelectContentDirectoryPresenter contentDirectoryPresenter;
     private SelectContentDirectoryView contentDirectoryView;
-    
+    private PackageMetadataPresenter packageMetadataPresenter;
+    private PackageMetadataView packageMetadataView;
+
     private Labels labels;
     private Messages messages;
 
@@ -149,4 +151,20 @@ public class Factory {
 
     public SelectContentDirectoryView getContentDirectoryView() { return contentDirectoryView; }
     public void setContentDirectoryView(SelectContentDirectoryView contentDirectoryView) { this.contentDirectoryView = contentDirectoryView; }
+
+    public PackageMetadataPresenter getPackageMetadataPresenter() {
+        return packageMetadataPresenter;
+    }
+
+    public void setPackageMetadataPresenter(PackageMetadataPresenter packageMetadataPresenter) {
+        this.packageMetadataPresenter = packageMetadataPresenter;
+    }
+
+    public PackageMetadataView getPackageMetadataView() {
+        return packageMetadataView;
+    }
+
+    public void setPackageMetadataView(PackageMetadataView packageMetadataView) {
+        this.packageMetadataView = packageMetadataView;
+    }
 }
