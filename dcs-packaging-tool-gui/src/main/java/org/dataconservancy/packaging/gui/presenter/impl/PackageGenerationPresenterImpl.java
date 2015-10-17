@@ -149,10 +149,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         view.getSelectOutputDirectoryButton().setOnAction(arg0 -> {
             File file = controller.showOpenDirectoryDialog(view.getOutputDirectoryChooser());
             if (file != null) {
-                controller.setOutputDirectory(file);
-                view.getOutputDirectoryChooser().setInitialDirectory(controller.getOutputDirectory());
+                controller.getPackageState().setOutputDirectory(file);
+                view.getOutputDirectoryChooser().setInitialDirectory(controller.getPackageState().getOutputDirectory());
                 //Set the package location parameter based on the new output directory.
-                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getOutputDirectory().getAbsolutePath());
+                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getPackageState().getOutputDirectory().getAbsolutePath());
 
                 setOutputDirectory(true);
             }
@@ -345,7 +345,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     }
 
     private void loadPackageGenerationParams() {
-        String paramFilePath = controller.getPackageGenerationParamsFilePath();
+        String paramFilePath = controller.getDefaultPackageGenerationParametersFilePath();
         if (paramFilePath != null && !paramFilePath.isEmpty()) {
             File paramFile = new File(paramFilePath);
             if (paramFile.exists()) {
@@ -473,8 +473,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION).isEmpty()) {
-            if (controller.getOutputDirectory() != null) {
-                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getOutputDirectory().getAbsolutePath());
+            if (controller.getPackageState().getOutputDirectory() != null) {
+                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getPackageState().getOutputDirectory().getAbsolutePath());
             }
         }
         
@@ -594,12 +594,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 if (!outputDirectory.exists()) {
                     if (!outputDirectory.mkdirs()) {
                         // If the directory could not be created, reset outputDirectory, and display a warning
-                        controller.setOutputDirectory(null);
+                        controller.getPackageState().setOutputDirectory(null);
                         view.getStatusLabel().setText(errors.get(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR));
                         view.getStatusLabel().setTextFill(Color.RED);
                         view.getStatusLabel().setVisible(true);
                     } else {
-                        controller.setOutputDirectory(outputDirectory);
+                        controller.getPackageState().setOutputDirectory(outputDirectory);
                     }
                 }
             }
@@ -631,8 +631,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         File packageFile;
-        if (controller.getOutputDirectory() != null) {
-            packageFile = new File(controller.getOutputDirectory(), packageName);
+        if (controller.getPackageState().getOutputDirectory() != null) {
+            packageFile = new File(controller.getPackageState().getOutputDirectory(), packageName);
         } else {
             packageFile = new File ("./", packageName);
         }
@@ -649,10 +649,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         String errorText = "";
         boolean hasPackageName = (getPackageName() != null && !getPackageName().isEmpty());
 
-        if (!hasPackageName || controller.getOutputDirectory() == null) {
+        if (!hasPackageName || controller.getPackageState().getOutputDirectory() == null) {
             if (hasPackageName) {
                 errorText = errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING);
-            } else if (controller.getOutputDirectory() != null) {
+            } else if (controller.getPackageState().getOutputDirectory() != null) {
                 errorText = errors.get(ErrorKey.PACKAGE_NAME_MISSING);
             } else {
                 errorText = errors.get(ErrorKey.OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING);
@@ -665,7 +665,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         if (errorText.isEmpty()) {
-            currentOutput = controller.getOutputDirectory().getAbsolutePath() + File.separator + getPackageName();
+            currentOutput = controller.getPackageState().getOutputDirectory().getAbsolutePath() + File.separator + getPackageName();
 
             if (view.getArchiveToggleGroup().getSelectedToggle() != null && !view.getArchiveToggleGroup().getSelectedToggle().getUserData().equals("exploded")) {
                 currentOutput += "." + view.getArchiveToggleGroup().getSelectedToggle().getUserData();
@@ -821,7 +821,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
                        File packageFile = getPackageFile();
 
-                       if (controller.getOutputDirectory() == null) {
+                       if (controller.getPackageState().getOutputDirectory() == null) {
                            updateMessage(errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING));
                            cancel();
                        } else {
@@ -868,7 +868,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
             File packageFile = getPackageFile();
 
-            if (controller.getOutputDirectory() == null) {
+            if (controller.getPackageState().getOutputDirectory() == null) {
 
                 worker.setMessage(errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING));
                 worker.setState(Worker.State.CANCELLED);

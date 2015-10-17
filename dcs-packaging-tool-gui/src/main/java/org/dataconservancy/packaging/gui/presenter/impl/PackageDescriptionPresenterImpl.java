@@ -210,7 +210,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
                 packageDescriptionBuilder.serialize(packageDescription, stream);
 
                 controller.setPackageDescriptionFile(packageDescriptionFile);
-                controller.setOutputDirectory(packageDescriptionFile.getParentFile());
+                controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
                 controller.goToNextPage();
             }
         });

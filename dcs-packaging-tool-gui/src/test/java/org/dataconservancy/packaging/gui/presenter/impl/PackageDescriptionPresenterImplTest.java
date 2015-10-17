@@ -28,11 +28,8 @@ import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
-import org.dataconservancy.packaging.tool.model.PackageArtifact;
+import org.dataconservancy.packaging.tool.model.*;
 import org.dataconservancy.packaging.tool.model.PackageArtifact.PropertyValueGroup;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
-import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.ontologies.DcsBoPackageOntology;
 import org.junit.Before;
 import org.junit.Rule;
@@ -255,6 +252,7 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
     
     @Before
     public void setup() throws IOException {
+
         goToNextPage = false;
         PackageDescriptionBuilder builder = mock(PackageDescriptionBuilder.class);
         PackageDescriptionValidator validator = mock(PackageDescriptionValidator.class);
@@ -291,12 +289,15 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         };
 
         controller.setFactory(factory);
-        
+        controller.setPackageState(new PackageState());
+
+
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
         view = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
         view.setPackageOntologyService(packageOntologyService);
         
         HeaderView headerView = new HeaderViewImpl(labels);
+        //factory.setHeaderView(headerView);
         view.setHeaderView(headerView);
         view.setHelp(help);
         
@@ -311,6 +312,8 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         description = new PackageDescription();
         description.setPackageOntologyIdentifier("test");
         description.setPackageArtifacts(setupPackageArtifacts());
+
+
     }
 
     /**

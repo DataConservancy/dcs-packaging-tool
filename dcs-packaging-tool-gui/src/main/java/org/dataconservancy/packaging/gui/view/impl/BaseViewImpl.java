@@ -228,15 +228,15 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
 
             HBox buildRow = new HBox(30);
             buildRow.setAlignment(Pos.CENTER);
-            Label buildNumberLabel = new Label(labels.get(LabelKey.BUILD_NUMBER_LABEL) + " " + presenter.getController().getBuildNumber());
+            Label buildNumberLabel = new Label(labels.get(LabelKey.BUILD_NUMBER_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildNumber());
             buildRow.getChildren().add(buildNumberLabel);
 
-            Label buildRevisionLabel = new Label(labels.get(LabelKey.BUILD_REVISION_LABEL) + " " + presenter.getController().getBuildRevision());
+            Label buildRevisionLabel = new Label(labels.get(LabelKey.BUILD_REVISION_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildRevision());
             buildRow.getChildren().add(buildRevisionLabel);
 
             versionFooter.getChildren().add(buildRow);
 
-            String timeStampString = labels.get(LabelKey.BUILD_TIMESTAMP_LABEL) + " " + presenter.getController().getBuildTimeStamp();
+            String timeStampString = labels.get(LabelKey.BUILD_TIMESTAMP_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildTimeStamp();
             Label timeStampLabel = new Label(timeStampString);
             versionFooter.getChildren().add(timeStampLabel);
 

@@ -248,9 +248,9 @@
 
   <bean id="controller" class="org.dataconservancy.packaging.gui.Controller">
     <property name="factory" ref="factory" />
-    <property name="buildNumber" value="${build.number}"/>
-    <property name="buildTimeStamp" value="${build.timeStamp}"/>
-    <property name="buildRevision" value="${build.revision}"/>
+    <property name="toolBuildNumber" value="${build.number}"/>
+    <property name="toolBuildTimestamp" value="${build.timeStamp}"/>
+    <property name="toolBuildRevision" value="${build.revision}"/>
   </bean>
 
 </beans>
