@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
-import sun.security.x509.AVA;
+import org.dataconservancy.packaging.tool.model.PackageState;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -39,19 +40,31 @@ import sun.security.x509.AVA;
 public class Controller {
     private BorderPane container;
     private Factory factory;
-    private Page currentPage;
+
+    /**
+     * Package-scope metadata
+     */
+    //TODO: these fields can be removed once PackageState contains IPM nodes and other object currently in the domain profile branch.
     private PackageDescription packageDescription;
     private File packageDescriptionFile;
     private File contentRoot;
     private File rootArtifactDir;
-    private File outputDirectory;
-    private String packageGenerationParams;
+    //END TODO
+    private PackageState packageState;
+
+    /**
+     * Application-scope metadata
+     */
+    private String defaultPackageGenerationParametersFilePath;
     private String packageFilenameIllegalCharacters;
     private String availableProjects;
-    private String buildNumber;
-    private String buildRevision;
-    private String buildTimeStamp;
+    private ApplicationVersion toolVersion;
+
+    /**
+     * Flow-control fields
+     */
     private PackageToolPopup crossPageProgressIndicatorPopUp;
+    private Page currentPage;
     private Stack<Page> previousPages;
     
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
@@ -61,13 +74,14 @@ public class Controller {
         this.container = new BorderPane();
         container.getStyleClass().add(CssConstants.ROOT_CLASS);
         previousPages = new Stack<>();
+        toolVersion = new ApplicationVersion();
     }
 
     public Factory getFactory() { return factory; }
     public void setFactory(Factory factory) { this.factory = factory; }
 
     public void startApp() {
-        packageGenerationParams = factory.getConfiguration().getPackageGenerationParameters();
+        defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
         packageFilenameIllegalCharacters = factory.getConfiguration().getPackageFilenameIllegalCharacters();
         availableProjects = factory.getConfiguration().getAvailableProjects();
         showHome(true);
@@ -84,6 +98,8 @@ public class Controller {
         packageDescriptionFile = null;
         contentRoot = null;
         rootArtifactDir = null;
+        packageState = new PackageState(this.toolVersion);
+
 
         if (clear) {
             clearPresenters();
@@ -341,7 +357,8 @@ public class Controller {
                 break;
         }
     }
-    
+
+
     public void setPackageDescription(PackageDescription description) {
         this.packageDescription = description;
     }
@@ -370,14 +387,6 @@ public class Controller {
 
     public void setRootArtifactDir(File rootArtifactDir) { this.rootArtifactDir = rootArtifactDir; }
 
-    public File getOutputDirectory() { return outputDirectory; }
-
-    public void setOutputDirectory(File outputDirectory) { this.outputDirectory = outputDirectory; }
-    
-    public String getPackageGenerationParamsFilePath() {
-        return packageGenerationParams;
-    }
-
     public String getPackageFilenameIllegalCharacters() { return packageFilenameIllegalCharacters; }
 
     public void setPackageFilenameIllegalCharacters(String illegalCharacters) { this.packageFilenameIllegalCharacters = illegalCharacters;}
@@ -386,28 +395,12 @@ public class Controller {
 
     public void setAvailableProjects(String availableProjects) { this.availableProjects = availableProjects; }
 
-    public void setBuildNumber(String buildNumberString) {
-        this.buildNumber = buildNumberString;
+    public PackageState getPackageState() {
+        return packageState;
     }
-    
-    public String getBuildNumber() {
-        return buildNumber;
-    }
-    
-    public void setBuildRevision(String buildRevision) {
-        this.buildRevision = buildRevision;
-    }
-    
-    public String getBuildRevision() {
-        return buildRevision;
-    }
-    
-    public void setBuildTimeStamp(String timeStamp) {
-        this.buildTimeStamp = timeStamp;
-    }
-    
-    public String getBuildTimeStamp() {
-        return buildTimeStamp;
+
+    public void setPackageState(PackageState packageState) {
+        this.packageState = packageState;
     }
 
     public PackageToolPopup getCrossPageProgressIndicatorPopUp() {
@@ -416,5 +409,19 @@ public class Controller {
 
     public void setCrossPageProgressIndicatorPopUp(PackageToolPopup crossPageProgressIndicatorPopUp) {
         this.crossPageProgressIndicatorPopUp = crossPageProgressIndicatorPopUp;
+    }
+
+    public void setToolBuildNumber(String buildNumber) {
+        toolVersion.setBuildNumber(buildNumber);
+    }
+    public void setToolBuildRevision(String buildRevision) {
+        toolVersion.setBuildRevision(buildRevision);
+    }
+    public void setToolBuildTimestamp(String buildTimestamp) {
+        toolVersion.setBuildTimeStamp(buildTimestamp);
+    }
+
+    public String getDefaultPackageGenerationParametersFilePath () {
+        return defaultPackageGenerationParametersFilePath;
     }
 }

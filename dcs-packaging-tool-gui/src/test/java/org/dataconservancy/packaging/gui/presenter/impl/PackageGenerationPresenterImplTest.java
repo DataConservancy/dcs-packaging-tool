@@ -103,6 +103,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
             @Override
             public String getAvailableProjects() { return "MOO"; }
         };
+        controller.setPackageState(new PackageState());
 
         PackageDescriptionBuilder builder = new PackageDescriptionBuilder() {
 
@@ -166,7 +167,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testBuilderExceptions() throws IOException {
-
         presenter.setPackageGenerationParametersBuilder(new PackageGenerationParametersBuilder() {
 
             @Override
