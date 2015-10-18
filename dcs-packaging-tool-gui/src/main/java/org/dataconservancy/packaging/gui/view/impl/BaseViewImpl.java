@@ -82,10 +82,12 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         saveButton = new Button();
         saveButton.setVisible(false);
         saveButton.setPrefWidth(7*rem);
+        saveButton.getStyleClass().add(CLICKABLE);
         footerControls.getChildren().add(saveButton);
         
         continueButton = new Button();  
         continueButton.setPrefWidth(10*rem);
+        continueButton.getStyleClass().add(CLICKABLE);
         footerControls.getChildren().add(continueButton);
         
         footerView.setRight(footerControls);

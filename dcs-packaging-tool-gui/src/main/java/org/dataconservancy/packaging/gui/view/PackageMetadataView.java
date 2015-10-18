@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui.view;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -43,7 +44,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      *
      * @return list view of domain profiles
      */
-    ListView<String> getDomainProfilesListView();
+    ComboBox<String> getDomainProfilesComboBox();
 
     /**
      * A button that adds the selected profile

@@ -148,8 +148,10 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         content.getChildren().add(status);
 
+        /*
         Label requiredLabel = new Label(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
         content.getChildren().add(requiredLabel);
+        */
         
         //Create a section for setting the packaging options.
         VBox packagingSection = new VBox(16);
@@ -157,6 +159,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         packagingOptionsLabel.getStyleClass().add(SECTION_LABEL);
         packagingSection.getChildren().add(packagingOptionsLabel);
 
+        /*
         //Add the controls for setting the external project id.
         VBox externalProjectIdBox = new VBox(4);
         externalProjectIdBox.setAlignment(Pos.TOP_LEFT);
@@ -172,6 +175,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         externalProjectIdBox.getChildren().add(externalProjectIdComboBox);
         packagingSection.getChildren().add(externalProjectIdBox);
+        */
 
         HBox packagingOptions = new HBox(80);
         packagingOptions.setAlignment(Pos.TOP_LEFT);
@@ -256,31 +260,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         content.getChildren().add(packagingSection);
 
-        // Sets up the controls and label for the package name
-        VBox packageNameEntryFields = new VBox(4);
-        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
-
-        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
-        packageNameEntryFields.getChildren().add(packageNameLabel);
-
-        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        packageNameField.setPrefWidth(240);
-        //packageNameField.setMaxWidth(350);
-        packageNameEntryFields.getChildren().add(packageNameField);
-
-        content.getChildren().add(packageNameEntryFields);
-
-        VBox externalIdentifierBox = new VBox(4);
-        externalIdentifierBox.setAlignment(Pos.CENTER_LEFT);
-
-        Label externalIdentifierLabel = new Label(labels.get(LabelKey.EXTERNAL_IDENTIFIER_LABEL_KEY) + "*");
-        externalIdentifierBox.getChildren().add(externalIdentifierLabel);
-
-        externalIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        externalIdentifierTextField.setPrefWidth(300);
-        externalIdentifierBox.getChildren().add(externalIdentifierTextField);
-        content.getChildren().add(externalIdentifierBox);
-
         //Sets up the controls for selecting an output directory.
         VBox outputDirectoryBox = new VBox(4);
         outputDirectoryBox.setAlignment(Pos.CENTER_LEFT);
@@ -314,6 +293,34 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         outputDirectoryChooser.setTitle(labels.get(LabelKey.OUTPUT_DIRECTORY_CHOOSER_KEY));
 
         content.getChildren().add(outputDirectoryBox);
+
+        /*
+        // Sets up the controls and label for the package name
+        VBox packageNameEntryFields = new VBox(4);
+        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
+
+        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
+        packageNameEntryFields.getChildren().add(packageNameLabel);
+
+        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        packageNameField.setPrefWidth(240);
+        //packageNameField.setMaxWidth(350);
+        packageNameEntryFields.getChildren().add(packageNameField);
+
+        content.getChildren().add(packageNameEntryFields);
+
+        VBox externalIdentifierBox = new VBox(4);
+        externalIdentifierBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label externalIdentifierLabel = new Label(labels.get(LabelKey.EXTERNAL_IDENTIFIER_LABEL_KEY) + "*");
+        externalIdentifierBox.getChildren().add(externalIdentifierLabel);
+
+        externalIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        externalIdentifierTextField.setPrefWidth(300);
+        externalIdentifierBox.getChildren().add(externalIdentifierTextField);
+        content.getChildren().add(externalIdentifierBox);
+
+
 
         //Create the controls for supplying contact information. 
         //Create a vbox that displays the label for email entry and the text entry box.
@@ -365,6 +372,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         contactFields.getChildren().add(secondRowContactFields);
 
         content.getChildren().add(contactFields);
+        */
         
         //PopupControls
         noThanksLink = new Hyperlink(labels.get(LabelKey.NO_THANKS_LINK));

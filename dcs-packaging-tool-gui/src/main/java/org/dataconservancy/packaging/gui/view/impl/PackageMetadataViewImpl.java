@@ -23,7 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -57,7 +56,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     //The value of the combobox domain profiles
     private ComboBox<String> domainProfilesComboBox;
     private Button addDomainProfileButton;
-    private VBox domainProfileVBox;
+    private VBox domainProfileRemovableLabelVBox;
     private List<String> domainProfileLabelsList = new ArrayList<>();
 
     private Labels labels;
@@ -111,6 +110,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
         topContent.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
+        bottomContent.getStyleClass().add(PACKAGE_DESCRIPTION_VIEW_CLASS);
         contentScrollPane.setContent(content);
         setCenter(contentScrollPane);
 
@@ -132,7 +132,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         topRow.getChildren().add(packageNameEntryFields);
 
-        domainProfileVBox = new VBox(4);
+        VBox domainProfileVBox = new VBox(4);
 
         Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL) + "*");
         domainProfileVBox.getChildren().add(domainProfileLabel);
@@ -143,11 +143,16 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
         addDomainProfileButton.setPrefHeight(28);
+        addDomainProfileButton.getStyleClass().add(CLICKABLE);
+
+        domainProfileRemovableLabelVBox = new VBox(4);
+        domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
 
         domainProfileAndButton.getChildren().add(domainProfilesComboBox);
         domainProfileAndButton.getChildren().add(addDomainProfileButton);
 
         domainProfileVBox.getChildren().add(domainProfileAndButton);
+        domainProfileVBox.getChildren().add(domainProfileRemovableLabelVBox);
 
         topRow.getChildren().add(domainProfileVBox);
 
@@ -204,7 +209,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         VBox secondRowRightColumn = new VBox(10);
 
         VBox keywordsVBox = new VBox(4);
-        VBox.setMargin(keywordsVBox, new Insets(30, 0, 0, 0));
+        VBox.setMargin(keywordsVBox, new Insets(29, 0, 0, 0));
         Label keywordLabel = new Label(labels.get(LabelKey.KEYWORD_LABEL));
         keywordTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         keywordTextField.setPromptText("Insert keyword and press enter to add");
@@ -281,12 +286,12 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         rightsUriVBox.getStyleClass().add(VBOX_BORDER);
         bottomVBox.getChildren().add(rightsUriVBox);
 
-        Label bagSizeLabel = new Label(labels.get(LabelKey.BAG_SIZE_LABEL));
+        Label bagSizeLabel = new Label(labels.get(LabelKey.BAG_SIZE_LABEL) + "*");
         bottomVBox.getChildren().add(bagSizeLabel);
         bagSizeTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         bottomVBox.getChildren().add(bagSizeTextField);
 
-        Label baggingDateLabel = new Label(labels.get(LabelKey.BAGGING_DATE_LABEL));
+        Label baggingDateLabel = new Label(labels.get(LabelKey.BAGGING_DATE_LABEL) + "*");
         bottomVBox.getChildren().add(baggingDateLabel);
         baggingDateDatePicker = new DatePicker();
         baggingDateDatePicker.setEditable(false);
@@ -331,13 +336,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public ListView<String> getDomainProfilesListView() {
-        return null;
+    public ComboBox<String> getDomainProfilesComboBox() {
+        return domainProfilesComboBox;
     }
 
     @Override
     public Button getAddDomainProfileButton() {
-        return null;
+        return addDomainProfileButton;
     }
 
     @Override
@@ -461,9 +466,9 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     @Override
     public void addDomainProfileRemovableLabel(String domainProfileName) {
-        RemovableLabel removableLabel = new RemovableLabel(domainProfileName, domainProfileLabelsList, domainProfileVBox);
+        RemovableLabel removableLabel = new RemovableLabel(domainProfileName, domainProfileLabelsList, domainProfileRemovableLabelVBox);
         domainProfileLabelsList.add(domainProfileName);
-        domainProfileVBox.getChildren().add(removableLabel);
+        domainProfileRemovableLabelVBox.getChildren().add(removableLabel);
     }
 
     @Override
@@ -494,30 +499,30 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     @Override
     public void clearAllFields() {
-         packageNameField.clear();
-         domainProfileVBox.getChildren().clear();
-         domainProfileLabelsList.clear();
-         contactEmailTextField.clear();
-         contactNameTextField.clear();
-         contactPhoneTextField.clear();
-         keywordTextField.clear();
-         keywordsList.clear();
-         keywordsRemovalLabelVBox.getChildren().clear();
-         externalIdentifierTextField.clear();
-         externalDescriptionTextArea.clear();
-         internalSenderIdentifierTextField.clear();
-         internalSenderIdentifiersList.clear();
-         internalSenderIdsVBox.getChildren().clear();
-         internalSenderDescriptionTextArea.clear();
-         sourceOrganizationTextField.clear();
-         organizationAddressTextField.clear();
-         bagCountTextField.clear();
-         bagGroupIdentifierTextField.clear();
-         rightsTextField.clear();
-         rightsUriTextField.clear();
-         rightsUriVBox.getChildren().clear();
-         rightsUriList.clear();
-         bagSizeTextField.clear();
+        packageNameField.clear();
+        domainProfileRemovableLabelVBox.getChildren().clear();
+        domainProfileLabelsList.clear();
+        contactEmailTextField.clear();
+        contactNameTextField.clear();
+        contactPhoneTextField.clear();
+        keywordTextField.clear();
+        keywordsList.clear();
+        keywordsRemovalLabelVBox.getChildren().clear();
+        externalIdentifierTextField.clear();
+        externalDescriptionTextArea.clear();
+        internalSenderIdentifierTextField.clear();
+        internalSenderIdentifiersList.clear();
+        internalSenderIdsVBox.getChildren().clear();
+        internalSenderDescriptionTextArea.clear();
+        sourceOrganizationTextField.clear();
+        organizationAddressTextField.clear();
+        bagCountTextField.clear();
+        bagGroupIdentifierTextField.clear();
+        rightsTextField.clear();
+        rightsUriTextField.clear();
+        rightsUriVBox.getChildren().clear();
+        rightsUriList.clear();
+        bagSizeTextField.clear();
     }
 
 }

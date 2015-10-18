@@ -89,10 +89,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     public Node display() {
         //Clear out any values from the previous run
         view.getStatusLabel().setText("");
-        view.getCurrentOutputDirectoryTextField().setText("");
+        //view.getCurrentOutputDirectoryTextField().setText("");
         generationParams = null;
-        loadPackageGenerationParams();
-        view.loadAvailableProjects(controller.getAvailableProjects());
+        //loadPackageGenerationParams();
+        //view.loadAvailableProjects(controller.getAvailableProjects());
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);
@@ -158,10 +158,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
         });
 
+        /*
         //Handles the user changing the package name
         view.getPackageNameField().textProperty().addListener((observableValue, oldVal, newVal) -> {
             setOutputDirectory(true);
         });
+        */
         
         //Handles the user pressing the no thanks link on the create another package popup. This will take the user
         //back to the home screen. 
@@ -609,7 +611,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     }
 
     private String getPackageName() {
-        return view.getPackageNameField().getText();
+        return getController().getPackageState().getPackageName();
     }
 
     private File getPackageFile() {
@@ -697,7 +699,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             view.getStatusLabel().setVisible(true);
         }
 
-        view.getCurrentOutputDirectoryTextField().setText(currentOutput);
+       // view.getCurrentOutputDirectoryTextField().setText(currentOutput);
     }
 
 

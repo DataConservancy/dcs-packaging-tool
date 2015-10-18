@@ -25,6 +25,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Toggle;
@@ -59,7 +60,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -103,6 +107,22 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             fillInMissingParams();
             getController().goToNextPage(Page.CREATE_NEW_PACKAGE);
         });
+
+        view.getKeywordTextField().setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                view.addKeywordRemovableLabel(view.getKeywordTextField().getText());
+                view.getKeywordTextField().clear();
+            }
+        });
+
+        // FIXME: The profile names should come from an actual service
+        view.loadDomainProfileNames(Arrays.asList("Eloka", "Custom Profile", "Custom Profile 2"));
+        view.getAddDomainProfileButton().setOnAction(event -> {
+            view.addDomainProfileRemovableLabel(view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem());
+            view.showBottomContent(true);
+        });
+
     }
 
     private void loadPackageGenerationParams() {
@@ -144,7 +164,37 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         updateSingleParam(BagItParameterNames.CONTACT_EMAIL, view.getContactEmailTextField().getText());
         updateSingleParam(BagItParameterNames.CONTACT_PHONE, view.getContactPhoneTextField().getText());
         updateSingleParam(GeneralParameterNames.PACKAGE_NAME, view.getPackageNameField().getText());
+        getController().getPackageState().setPackageName(view.getPackageNameField().getText());
         updateSingleParam(BagItParameterNames.EXTERNAL_IDENTIFIER, view.getExternalIdentifierTextField().getText());
+        updateSingleParam(BagItParameterNames.EXTERNAL_DESCRIPTION, view.getExternalDescriptionTextArea().getText());
+        updateSingleParam(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER, getSemiColonSeparatedValues(view.getInternalIdentifiersList()));
+        updateSingleParam(BagItParameterNames.INTERNAL_SENDER_DESCRIPTION, view.getInternalSenderDescriptionTextArea().getText());
+        updateSingleParam(BagItParameterNames.SOURCE_ORG, view.getSourceOrganizationTextField().getText());
+        updateSingleParam(BagItParameterNames.ORG_ADDRESS, view.getOrganizationAddressTextField().getText());
+        updateSingleParam(BagItParameterNames.BAG_COUNT, view.getBagCountTextField().getText());
+        updateSingleParam(BagItParameterNames.BAG_GROUP_ID, view.getBagGroupIdentifierTextField().getText());
+        // TODO: rights and rights uri?
+        if (view.getBaggingDateDatePicker().getValue() != null) {
+            updateSingleParam(BagItParameterNames.BAGGING_DATE, view.getBaggingDateDatePicker().getValue().format(DateTimeFormatter.ofPattern("MM-dd-yyyy")));
+        }
+        updateSingleParam(BagItParameterNames.BAG_SIZE, view.getBagSizeTextField().getText());
+
+    }
+
+    /**
+     * Appends the string values in list separated by a semicolon
+     * FIXME: This may need to be done some other way.
+     * @param values
+     * @return semicolon separated string
+     */
+    private String getSemiColonSeparatedValues(List<String> values) {
+        StringBuilder sb = new StringBuilder();
+
+        for (String value : values) {
+            sb.append(value).append(";");
+        }
+
+        return sb.toString();
     }
 
     private void updateSingleParam(String key, String value) {
