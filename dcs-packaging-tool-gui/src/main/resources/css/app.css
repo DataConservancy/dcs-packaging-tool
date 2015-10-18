@@ -470,3 +470,14 @@
 	-fx-cursor: hand;
 }
 
+.VBoxBorder {
+	-fx-border-color: #888888;
+	-fx-background-color: white;
+	-fx-border-width: 1px;
+	-fx-border-radius: 2px;
+	-fx-padding: 10;
+	-fx-spacing: 8;
+	-fx-min-height: 100px;
+}
+
+

@@ -66,6 +66,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         this.labels = labels;
         
         getContinueButton().setText(labels.get(LabelKey.CONTINUE_BUTTON));
+        getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
         content = new VBox();
         content.setSpacing(32);
@@ -107,7 +108,8 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         baseDirectorySelectionFields.getChildren().add(baseDirectorySelector);
        
         packageSelectionFields.getChildren().add(baseDirectorySelectionFields);   
-        
+
+        /*
         Label orLabel = new Label(labels.get(LabelKey.OR_LABEL));
         packageSelectionFields.getChildren().add(orLabel);
         
@@ -134,6 +136,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         packageDescriptionSelectionFields.getChildren().add(packageDescriptionSelector);
        
         packageSelectionFields.getChildren().add(packageDescriptionSelectionFields);
+        */
         
         content.getChildren().add(packageSelectionFields);        
     }

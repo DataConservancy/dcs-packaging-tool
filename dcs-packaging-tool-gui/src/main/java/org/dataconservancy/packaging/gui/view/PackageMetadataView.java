@@ -16,22 +16,12 @@
 
 package org.dataconservancy.packaging.gui.view;
 
-import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
-import javafx.stage.DirectoryChooser;
-import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
-import org.dataconservancy.packaging.gui.util.PackageToolPopup;
-import org.dataconservancy.packaging.gui.util.RemovableLabel;
 
 import java.util.List;
 
@@ -63,11 +53,11 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     Button getAddDomainProfileButton();
 
     /**
-     * A label that is used to display messages to the user, mostly used for displaying error messages.
+     * The list of domain profiles currently selected.
      *
-     * @return a   label that is used to display messages to the user
+     * @return the list of domain profiles user has selected.
      */
-    Label getStatusLabel();
+    List<String> getDomainProfileLabelsList();
 
     /**
      * Gets the contact information text field, that will be supplied in the bag.
@@ -102,7 +92,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      *
      * @return The table with the keywords.
      */
-    List<RemovableLabel> getKeywordsRemovableLabels();
+    List<String> getKeywordsList();
 
     /**
      * Gets the text field for setting the external identifier if there is one.
@@ -137,7 +127,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      *
      * @return The table with the keywords.
      */
-    List<RemovableLabel> getInternalIdentifierRemovableLabels();
+    List<String> getInternalIdentifiersList();
 
     /**
      * Gets the text field for setting the source organization.
@@ -182,6 +172,13 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     TextField getRightsUriTextField();
 
     /**
+     * Gets the list of rights uri
+     *
+     * @return The list of rights uris.
+     */
+    List<String> getRightsUriList();
+
+    /**
      * Gets the date picker for setting the bagging date.
      *
      * @return The date picker for entering bagging date.
@@ -200,5 +197,53 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      */
     void scrollToTop();
 
+    /**
+     * Load the current domain profiles for the user to select
+     *
+     * @param domainProfileNames
+     */
     void loadDomainProfileNames(List<String> domainProfileNames);
+
+    /**
+     * Add the selected domain profile as a removable label
+     *
+     * @param domainProfile
+     */
+    void addDomainProfileRemovableLabel(String domainProfile);
+
+    /**
+     * Add the keyword as a removable label
+     *
+     * @param keyword
+     */
+    void addKeywordRemovableLabel(String keyword);
+
+    /**
+     * Add the id as a removable label
+     *
+     * @param id
+     */
+    void addInternalSenderIdentifierRemovableLabel(String id);
+
+    /**
+     * Add the rights uri as a removable label
+     *
+     * @param rightsUri
+     */
+    void addRightsUriRemovableLabel(String rightsUri);
+
+    /**
+     * Determines whether to show the package metadata section or not
+     *
+     * @param show
+     */
+    void showBottomContent(boolean show);
+
+    /**
+     * Clears all the fields
+     *
+     */
+    void clearAllFields();
+
+
 }

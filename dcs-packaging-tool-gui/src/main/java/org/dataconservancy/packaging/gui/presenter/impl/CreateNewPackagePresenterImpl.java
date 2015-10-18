@@ -181,13 +181,14 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         root_artifact_dir = dir;
                         content_dir = root_artifact_dir.getParentFile();
                         view.getSelectedBaseDirectoryTextField().setText(root_artifact_dir.getPath());
-                        view.getSelectedPackageDescriptionTextField().setText("");
+                        //view.getSelectedPackageDescriptionTextField().setText("");
                         //If the error message happens to be visible erase it.
                         view.getErrorMessage().setVisible(false);
                         directoryChooser.setInitialDirectory(dir);
                     }
                 });
-        
+
+        /*
         //Handles the user pressing a button to choose an existing package description. 
         view.getChoosePackageDescriptionButton().setOnAction(arg0 -> {
             File descriptionFile = controller.showOpenFileDialog(fileChooser);
@@ -218,13 +219,14 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 }
             }
         });
+        */
 
     }
 
     @Override
     public void clear() {
         view.getSelectedBaseDirectoryTextField().setText("");
-        view.getSelectedPackageDescriptionTextField().setText("");
+        //view.getSelectedPackageDescriptionTextField().setText("");
         view.getErrorMessage().setText("");
 
         content_dir = null;

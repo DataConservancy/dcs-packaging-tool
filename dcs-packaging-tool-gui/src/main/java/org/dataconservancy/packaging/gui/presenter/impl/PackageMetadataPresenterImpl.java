@@ -32,6 +32,7 @@ import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
@@ -81,12 +82,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     @Override
     public void clear() {
-        //This presenter has no information to clear
+        view.clearAllFields();
     }
 
     public Node display() {
         //Clear out any values from the previous run
-        view.getStatusLabel().setText("");
         generationParams = null;
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
@@ -97,7 +97,12 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     }
 
     private void bind() {
-
+        view.getContinueButton().setOnAction(event -> {
+            loadPackageGenerationParams();
+            updateParamsFromForm();
+            fillInMissingParams();
+            getController().goToNextPage(Page.CREATE_NEW_PACKAGE);
+        });
     }
 
     private void loadPackageGenerationParams() {
@@ -130,11 +135,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         }
         
-        //As an absolute fall back if the parameters can't be loaded from anywhere set them in the code.
-        if (generationParams == null) {
-            loadDefaultParams();            
-        }
-        
+
         setViewToDefaults();
     }
 
@@ -144,7 +145,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         updateSingleParam(BagItParameterNames.CONTACT_PHONE, view.getContactPhoneTextField().getText());
         updateSingleParam(GeneralParameterNames.PACKAGE_NAME, view.getPackageNameField().getText());
         updateSingleParam(BagItParameterNames.EXTERNAL_IDENTIFIER, view.getExternalIdentifierTextField().getText());
-        updateSingleParam(BagItParameterNames.PKG_BAG_DIR, view.getPackageNameField().getText());
     }
 
     private void updateSingleParam(String key, String value) {
@@ -233,18 +233,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 generationParams.getParam(BagItParameterNames.BAG_GROUP_ID).isEmpty()) {
             generationParams.addParam(BagItParameterNames.BAG_GROUP_ID, "none");            
         }
-    }
-    
-    /**
-     * This method is a last resort to load default parameters in code, if none of the file options could be loaded. 
-     */
-    private void loadDefaultParams() {
-        
-        view.getStatusLabel().setText(errors.get(ErrorKey.PARAM_LOADING_ERROR));
-        view.getStatusLabel().setTextFill(Color.BLACK);
-        view.getStatusLabel().setVisible(true);
-        
-
     }
     
     private void setViewToDefaults() {

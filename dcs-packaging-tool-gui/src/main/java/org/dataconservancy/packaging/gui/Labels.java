@@ -128,8 +128,20 @@ public class Labels {
         OPEN_EXISTING_PACKAGE("openexistingpackage.label"),
         HOMEPAGE_PAGE("homepage.page"),
         SELECT_DOMAIN_PROFILE_LABEL("selectdomainprofile.label"),
-        ADD_BUTTON("add.button");
-
+        ADD_BUTTON("add.button"),
+        KEYWORD_LABEL("keyword.label"),
+        EXTERNAL_DESCRIPTION_LABEL("externaldescritption.label"),
+        INTERNAL_SENDER_IDENTIFIER_LABEL("internalsenderidentifier.label"),
+        INTERNAL_DESCRIPTION_LABEL("internaldescritption.label"),
+        SOURCE_ORGANIZATION_LABEL("sourceorganization.label"),
+        ORGANIZATION_ADDRESS_LABEL("organizatoinaddress.label"),
+        BAG_COUNT_LABEL("bagcount.label"),
+        BAG_GROUP_IDENTIFIER_LABEL("baggroupidentifier.label"),
+        RIGHTS_LABEL("rights.label"),
+        RIGHTS_URI_LABEL("rightsuri.label"),
+        BAGGING_DATE_LABEL("baggingdate.label"),
+        BAG_SIZE_LABEL("bagsize.label"),
+        PACKAGE_METADATA("packagemetadata.label");
 
         private String property;
 

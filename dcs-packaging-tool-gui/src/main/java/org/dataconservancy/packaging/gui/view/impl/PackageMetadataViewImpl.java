@@ -17,7 +17,7 @@
 package org.dataconservancy.packaging.gui.view.impl;
 
 import javafx.beans.value.ChangeListener;
-import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -28,7 +28,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
@@ -44,6 +43,7 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,12 +53,12 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     //Controls for setting the package name and output directory
     private TextField packageNameField;
-    private Label statusLabel;
 
     //The value of the combobox domain profiles
     private ComboBox<String> domainProfilesComboBox;
     private Button addDomainProfileButton;
-    private VBox domainProfileFields;
+    private VBox domainProfileVBox;
+    private List<String> domainProfileLabelsList = new ArrayList<>();
 
     private Labels labels;
 
@@ -69,11 +69,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     //Package detail fields
     private TextField keywordTextField;
-    private List<RemovableLabel> keywordRemovableLabels;
+    private List<String> keywordsList = new ArrayList<>();
+    private VBox keywordsRemovalLabelVBox;
     private TextField externalIdentifierTextField;
     private TextArea externalDescriptionTextArea;
     private TextField internalSenderIdentifierTextField;
-    private List<RemovableLabel> internalSenderIdentifierRemovableLables;
+    private List<String> internalSenderIdentifiersList = new ArrayList<>();
+    private VBox internalSenderIdsVBox;
     private TextArea internalSenderDescriptionTextArea;
     private TextField sourceOrganizationTextField;
     private TextField organizationAddressTextField;
@@ -81,12 +83,15 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private TextField bagGroupIdentifierTextField;
     private TextField rightsTextField;
     private TextField rightsUriTextField;
+    private VBox rightsUriVBox;
+    private List<String> rightsUriList = new ArrayList<>();
     private DatePicker baggingDateDatePicker;
     private TextField bagSizeTextField;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private ScrollPane contentScrollPane;
+    private VBox bottomContent;
 
     public PackageMetadataViewImpl(Labels labels) {
         super(labels);
@@ -95,31 +100,24 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
         VBox content = new VBox();
+        VBox topContent = new VBox();
+        bottomContent = new VBox();
+        bottomContent.setVisible(false);
+        content.getChildren().add(topContent);
+        content.getChildren().add(bottomContent);
 
         //Set up the text for the controls in the footer.
-        getContinueButton().setText(labels.get(LabelKey.FINISH_BUTTON));
+        getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
-        content.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
+        topContent.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
         contentScrollPane.setContent(content);
-
         setCenter(contentScrollPane);
 
-        //Create a label to show any status messages at the top of the screen.
-        HBox status = new HBox();
-        statusLabel = new Label();
-        statusLabel.setVisible(false);
-        statusLabel.setWrapText(true);
-        //statusLabel.setMaxWidth(600);
-        status.getChildren().add(statusLabel);
-        status.setAlignment(Pos.TOP_CENTER);
-
-        content.getChildren().add(status);
-
         Label requiredLabel = new Label(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
-        content.getChildren().add(requiredLabel);
+        topContent.getChildren().add(requiredLabel);
 
-        HBox topRow = new HBox(30);
+        HBox topRow = new HBox(40);
 
         // Sets up the controls and label for the package name
         VBox packageNameEntryFields = new VBox(4);
@@ -129,41 +127,40 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         packageNameEntryFields.getChildren().add(packageNameLabel);
 
         packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        packageNameField.setPrefWidth(280);
         packageNameEntryFields.getChildren().add(packageNameField);
+        packageNameField.setPrefWidth(310);
 
         topRow.getChildren().add(packageNameEntryFields);
 
-        domainProfileFields = new VBox(4);
+        domainProfileVBox = new VBox(4);
 
         Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL) + "*");
-        domainProfileFields.getChildren().add(domainProfileLabel);
+        domainProfileVBox.getChildren().add(domainProfileLabel);
 
         HBox domainProfileAndButton = new HBox(4);
         domainProfilesComboBox = new ComboBox<>();
-        domainProfilesComboBox.setPrefWidth(250);
+        domainProfilesComboBox.setPrefWidth(260);
 
         addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
+        addDomainProfileButton.setPrefHeight(28);
 
         domainProfileAndButton.getChildren().add(domainProfilesComboBox);
         domainProfileAndButton.getChildren().add(addDomainProfileButton);
 
-        domainProfileFields.getChildren().add(domainProfileAndButton);
+        domainProfileVBox.getChildren().add(domainProfileAndButton);
 
-        topRow.getChildren().add(domainProfileFields);
+        topRow.getChildren().add(domainProfileVBox);
 
-        content.getChildren().add(topRow);
+        topContent.getChildren().add(topRow);
 
-        //Create the controls for supplying contact information.
-        //Create a vbox that displays the label for email entry and the text entry box.
-        VBox contactFields = new VBox(10);
-        Label contactLabel = new Label(labels.get(LabelKey.CONTACT_LABEL));
+        HBox secondRow = new HBox(40);
+
+        VBox secondRowLeftColumn = new VBox(10);
+        Label contactLabel = new Label(labels.get(LabelKey.PACKAGE_METADATA));
         contactLabel.getStyleClass().add(SECTION_LABEL);
-        contactFields.getChildren().add(contactLabel);
+        secondRowLeftColumn.getChildren().add(contactLabel);
 
-        HBox secondRowContactFields = new HBox(60);
         VBox nameEntryFields = new VBox(4);
-
         nameEntryFields.setAlignment(Pos.TOP_LEFT);
 
         Label nameLabel = new Label(labels.get(LabelKey.NAME_LABEL) + "*");
@@ -180,7 +177,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         contactEmailTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
         emailEntryFields.getChildren().add(contactEmailTextField);
-        ;
 
         VBox phoneEntryFields = new VBox(4);
         phoneEntryFields.setAlignment(Pos.TOP_LEFT);
@@ -199,23 +195,105 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         phoneEntryFields.getChildren().add(inputVerificationBox);
 
         //position the contact fields
-        contactFields.getChildren().add(nameEntryFields);
-        secondRowContactFields.getChildren().add(emailEntryFields);
-        secondRowContactFields.getChildren().add(phoneEntryFields);
-        contactFields.getChildren().add(secondRowContactFields);
+        secondRowLeftColumn.getChildren().add(nameEntryFields);
+        secondRowLeftColumn.getChildren().add(emailEntryFields);
+        secondRowLeftColumn.getChildren().add(phoneEntryFields);
 
-        content.getChildren().add(contactFields);
+        secondRow.getChildren().add(secondRowLeftColumn);
 
-        VBox externalIdentifierBox = new VBox(4);
-        externalIdentifierBox.setAlignment(Pos.CENTER_LEFT);
+        VBox secondRowRightColumn = new VBox(10);
 
-        Label externalIdentifierLabel = new Label(labels.get(LabelKey.EXTERNAL_IDENTIFIER_LABEL_KEY) + "*");
-        externalIdentifierBox.getChildren().add(externalIdentifierLabel);
+        VBox keywordsVBox = new VBox(4);
+        VBox.setMargin(keywordsVBox, new Insets(30, 0, 0, 0));
+        Label keywordLabel = new Label(labels.get(LabelKey.KEYWORD_LABEL));
+        keywordTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        keywordTextField.setPromptText("Insert keyword and press enter to add");
+        keywordsRemovalLabelVBox = new VBox(4);
+        keywordsRemovalLabelVBox.getStyleClass().add(VBOX_BORDER);
+        keywordsVBox.getChildren().add(keywordLabel);
+        keywordsVBox.getChildren().add(keywordTextField);
+        keywordsVBox.getChildren().add(keywordsRemovalLabelVBox);
 
+        secondRowRightColumn.getChildren().add(keywordsVBox);
+
+        secondRow.getChildren().add(secondRowRightColumn);
+
+        bottomContent.getChildren().add(secondRow);
+
+        VBox bottomVBox = new VBox(4);
+        bottomVBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label externalIdentifierLabel = new Label(labels.get(LabelKey.EXTERNAL_IDENTIFIER_LABEL_KEY));
+        bottomVBox.getChildren().add(externalIdentifierLabel);
         externalIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        externalIdentifierTextField.setPrefWidth(300);
-        externalIdentifierBox.getChildren().add(externalIdentifierTextField);
-        content.getChildren().add(externalIdentifierBox);
+        bottomVBox.getChildren().add(externalIdentifierTextField);
+
+        Label externalDescriptionLabel = new Label(labels.get(LabelKey.EXTERNAL_DESCRIPTION_LABEL));
+        bottomVBox.getChildren().add(externalDescriptionLabel);
+        externalDescriptionTextArea = (TextArea) ControlFactory.createControl(ControlType.TEXT_AREA, null);
+        bottomVBox.getChildren().add(externalDescriptionTextArea);
+
+        Label internalSenderIdentifierLabel = new Label(labels.get(LabelKey.INTERNAL_SENDER_IDENTIFIER_LABEL));
+        bottomVBox.getChildren().add(internalSenderIdentifierLabel);
+        internalSenderIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        internalSenderIdentifierTextField.setPromptText("Insert ID and press enter to add");
+        bottomVBox.getChildren().add(internalSenderIdentifierTextField);
+        internalSenderIdsVBox = new VBox(4);
+        internalSenderIdsVBox.getStyleClass().add(VBOX_BORDER);
+        bottomVBox.getChildren().add(internalSenderIdsVBox);
+
+        Label internalDescriptionLabel = new Label(labels.get(LabelKey.INTERNAL_DESCRIPTION_LABEL));
+        bottomVBox.getChildren().add(internalDescriptionLabel);
+        internalSenderDescriptionTextArea = (TextArea) ControlFactory.createControl(ControlType.TEXT_AREA, null);
+        bottomVBox.getChildren().add(internalSenderDescriptionTextArea);
+
+        Label sourceOrganizationLabel = new Label(labels.get(LabelKey.SOURCE_ORGANIZATION_LABEL));
+        bottomVBox.getChildren().add(sourceOrganizationLabel);
+        sourceOrganizationTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        bottomVBox.getChildren().add(sourceOrganizationTextField);
+
+        Label organizationAddressLabel = new Label(labels.get(LabelKey.ORGANIZATION_ADDRESS_LABEL));
+        bottomVBox.getChildren().add(organizationAddressLabel);
+        organizationAddressTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        bottomVBox.getChildren().add(organizationAddressTextField);
+
+        Label bagCountLabel = new Label(labels.get(LabelKey.BAG_COUNT_LABEL) + "*");
+        bottomVBox.getChildren().add(bagCountLabel);
+        bagCountTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        bottomVBox.getChildren().add(bagCountTextField);
+
+        Label bagGroupIdentifierLabel = new Label(labels.get(LabelKey.BAG_GROUP_IDENTIFIER_LABEL) + "*");
+        bottomVBox.getChildren().add(bagGroupIdentifierLabel);
+        bagGroupIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        bottomVBox.getChildren().add(bagGroupIdentifierTextField);
+
+        Label rightsLabel = new Label(labels.get(LabelKey.RIGHTS_LABEL));
+        bottomVBox.getChildren().add(rightsLabel);
+        rightsTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        bottomVBox.getChildren().add(rightsTextField);
+
+        Label rightsUriLabel = new Label(labels.get(LabelKey.RIGHTS_URI_LABEL));
+        bottomVBox.getChildren().add(rightsUriLabel);
+        rightsUriTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        rightsUriTextField.setPromptText("Insert URI and press enter to add");
+        bottomVBox.getChildren().add(rightsUriTextField);
+        rightsUriVBox = new VBox(4);
+        rightsUriVBox.getStyleClass().add(VBOX_BORDER);
+        bottomVBox.getChildren().add(rightsUriVBox);
+
+        Label bagSizeLabel = new Label(labels.get(LabelKey.BAG_SIZE_LABEL));
+        bottomVBox.getChildren().add(bagSizeLabel);
+        bagSizeTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        bottomVBox.getChildren().add(bagSizeTextField);
+
+        Label baggingDateLabel = new Label(labels.get(LabelKey.BAGGING_DATE_LABEL));
+        bottomVBox.getChildren().add(baggingDateLabel);
+        baggingDateDatePicker = new DatePicker();
+        baggingDateDatePicker.setEditable(false);
+        baggingDateDatePicker.setPromptText("Select Date ->");
+        bottomVBox.getChildren().add(baggingDateDatePicker);
+
+        bottomContent.getChildren().add(bottomVBox);
 
     }
 
@@ -263,11 +341,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public Label getStatusLabel() {
-        return statusLabel;
-    }
-
-    @Override
     public TextField getContactEmailTextField() {
         return contactEmailTextField;
     }
@@ -288,8 +361,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public List<RemovableLabel> getKeywordsRemovableLabels() {
-        return keywordRemovableLabels;
+    public List<String> getKeywordsList() {
+        return keywordsList;
     }
 
     @Override
@@ -308,8 +381,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public List<RemovableLabel> getInternalIdentifierRemovableLabels() {
-        return internalSenderIdentifierRemovableLables;
+    public List<String> getInternalIdentifiersList() {
+        return internalSenderIdentifiersList;
     }
 
     @Override
@@ -348,6 +421,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
+    public List<String> getRightsUriList() {
+        return rightsUriList;
+    }
+
+    @Override
     public DatePicker getBaggingDateDatePicker() {
         return baggingDateDatePicker;
     }
@@ -355,6 +433,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     @Override
     public TextField getBagSizeTextField() {
         return bagSizeTextField;
+    }
+
+    @Override
+    public List<String> getDomainProfileLabelsList() {
+        return this.domainProfileLabelsList;
     }
 
     @Override
@@ -371,21 +454,70 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         setHelpPopupContent(helpText);
     }
 
+    @Override
     public void loadDomainProfileNames(List<String> profileNames) {
         domainProfilesComboBox.getItems().addAll(profileNames);
     }
 
-    public void addDomainProfileRemovableLabel(String label) {
-        final RemovableLabel removableLabel = new RemovableLabel(label);
-        domainProfileFields.getChildren().add(removableLabel);
-        removableLabel.getRemoveImage().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+    @Override
+    public void addDomainProfileRemovableLabel(String domainProfileName) {
+        RemovableLabel removableLabel = new RemovableLabel(domainProfileName, domainProfileLabelsList, domainProfileVBox);
+        domainProfileLabelsList.add(domainProfileName);
+        domainProfileVBox.getChildren().add(removableLabel);
+    }
 
-            @Override
-            public void handle(MouseEvent event) {
-                domainProfileFields.getChildren().remove(removableLabel);
-                event.consume();
-            }
-        });
+    @Override
+    public void addKeywordRemovableLabel(String keyword) {
+        RemovableLabel removableLabel = new RemovableLabel(keyword, keywordsList, keywordsRemovalLabelVBox);
+        keywordsList.add(keyword);
+        keywordsRemovalLabelVBox.getChildren().add(removableLabel);
+    }
+
+    @Override
+    public void addInternalSenderIdentifierRemovableLabel(String internalSenderIdentifier) {
+        RemovableLabel removableLabel = new RemovableLabel(internalSenderIdentifier, internalSenderIdentifiersList, internalSenderIdsVBox);
+        internalSenderIdentifiersList.add(internalSenderIdentifier);
+        internalSenderIdsVBox.getChildren().add(removableLabel);
+    }
+
+    @Override
+    public void addRightsUriRemovableLabel(String rightsUri) {
+        RemovableLabel removableLabel = new RemovableLabel(rightsUri, rightsUriList, rightsUriVBox);
+        rightsUriList.add(rightsUri);
+        rightsUriVBox.getChildren().add(removableLabel);
+    }
+
+    @Override
+    public void showBottomContent(boolean show) {
+        bottomContent.setVisible(show);
+    }
+
+    @Override
+    public void clearAllFields() {
+         packageNameField.clear();
+         domainProfileVBox.getChildren().clear();
+         domainProfileLabelsList.clear();
+         contactEmailTextField.clear();
+         contactNameTextField.clear();
+         contactPhoneTextField.clear();
+         keywordTextField.clear();
+         keywordsList.clear();
+         keywordsRemovalLabelVBox.getChildren().clear();
+         externalIdentifierTextField.clear();
+         externalDescriptionTextArea.clear();
+         internalSenderIdentifierTextField.clear();
+         internalSenderIdentifiersList.clear();
+         internalSenderIdsVBox.getChildren().clear();
+         internalSenderDescriptionTextArea.clear();
+         sourceOrganizationTextField.clear();
+         organizationAddressTextField.clear();
+         bagCountTextField.clear();
+         bagGroupIdentifierTextField.clear();
+         rightsTextField.clear();
+         rightsUriTextField.clear();
+         rightsUriVBox.getChildren().clear();
+         rightsUriList.clear();
+         bagSizeTextField.clear();
     }
 
 }
