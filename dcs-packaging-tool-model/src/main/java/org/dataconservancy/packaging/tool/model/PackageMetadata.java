@@ -32,8 +32,8 @@ public class PackageMetadata {
     private int minOccurrence;
     private int maxOccurrence;
 
-    public String setName() {
-        return name;
+    public ValidationType getValidationType() {
+        return validationType;
     }
 
     public void setName(String name) {
