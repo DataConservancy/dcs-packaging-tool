@@ -13,6 +13,7 @@ public interface IPMService {
      * with it, but does not have types assigned to nodes.
      * 
      * @param path The path on the file system to create a node tree from.
+     * @throws IOException If a file can't be read or a symbolic link cycle is found.
      * @return root of tree
      */
     Node createTreeFromFileSystem(Path path) throws IOException;

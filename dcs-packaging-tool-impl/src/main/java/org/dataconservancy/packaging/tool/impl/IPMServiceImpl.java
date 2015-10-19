@@ -26,8 +26,11 @@ public class IPMServiceImpl implements IPMService {
         return root;
     }
 
+    /*
+     * Creates a Node in the tree for the given path, and will recurse the file structure to add all child files and folders.
+     */
     private Node createTree(Node parent, Path path) throws IOException {
-
+        //Tests to ensure any symbolic links do not create cycles in the tree.
         try {
             if (visitedFiles.contains(path.toRealPath())) {
                 if (Files.isSymbolicLink(path)) {
@@ -56,6 +59,7 @@ public class IPMServiceImpl implements IPMService {
         FileInfo info = new FileInfo(path);
         node.setFileInfo(info);
 
+        //If it's not the root set the parent child information.
         if (parent != null) {
             parent.addChild(node);
 
@@ -74,6 +78,7 @@ public class IPMServiceImpl implements IPMService {
             node.setIgnored(true);
         }
 
+        //If the path represents a directory loop through all children and add them to the tree.
         if (Files.isDirectory(path)) {
             DirectoryStream<Path> stream = Files.newDirectoryStream(path);
             for (Path childPath : stream) {

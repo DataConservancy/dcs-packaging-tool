@@ -1,10 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
-import org.dataconservancy.dcs.util.extraction.UnpackException;
 import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -16,10 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class IPMServiceTest {
 
@@ -33,6 +30,11 @@ public class IPMServiceTest {
         underTest = new IPMServiceImpl();
     }
 
+    /**
+     * Tests that a tree can successfully be generated from the file system. Tests that folders that begin with "." are ignored,
+     * along with their children.
+     * @throws IOException
+     */
     @Test
     public void testGenerateTree() throws IOException {
         File mainDir = tmpfolder.newFolder("farm");
@@ -86,6 +88,10 @@ public class IPMServiceTest {
         assertTrue(subDirFound);
     }
 
+    /**
+     * Tests that symbolic links that create cycles throw an exception during tree creation.
+     * @throws Exception
+     */
     @Test(expected=IOException.class)
     public void simLinkCycleTest() throws Exception {
         File tempDir = tmpfolder.newFolder("moo");
