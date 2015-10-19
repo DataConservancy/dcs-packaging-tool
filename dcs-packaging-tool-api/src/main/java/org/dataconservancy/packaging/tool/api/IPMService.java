@@ -1,5 +1,6 @@
 package org.dataconservancy.packaging.tool.api;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public interface IPMService {
      * @param path The path on the file system to create a node tree from.
      * @return root of tree
      */
-    Node createTreeFromFileSystem(Path path);
+    Node createTreeFromFileSystem(Path path) throws IOException;
 
     /**
      * Change the ignored status of a node. This may cause the types of other
