@@ -15,7 +15,7 @@ public class PropertyType extends AbstractDescribedObject {
     private PropertyValueType value_type;
     private PropertyValueHint value_hint;
     private List<PropertyValue> allowed_values;
-    private List<PropertyType> subtypes;
+    private List<PropertyConstraint> subtypes;
     private PropertyCategory category;
     private boolean readonly;
 
@@ -53,7 +53,7 @@ public class PropertyType extends AbstractDescribedObject {
      * 
      * @return If the value is complex, return list of property sub-types.
      */
-    public List<PropertyType> getPropertySubTypes() {
+    public List<PropertyConstraint> getPropertySubTypes() {
         return subtypes;
     }
 
@@ -102,7 +102,7 @@ public class PropertyType extends AbstractDescribedObject {
     /**
      * @param subtypes The sub-types to set.
      */
-    public void setPropertySubTypes(List<PropertyType> subtypes) {
+    public void setPropertySubTypes(List<PropertyConstraint> subtypes) {
         this.subtypes = subtypes;
     }
 
@@ -132,7 +132,7 @@ public class PropertyType extends AbstractDescribedObject {
             allowedValueSet.addAll(allowed_values);
         }
 
-        HashSet<PropertyType> subTypeSet = null;
+        HashSet<PropertyConstraint> subTypeSet = null;
         if (subtypes != null) {
             subTypeSet = new HashSet<>();
             subTypeSet.addAll(subtypes);
