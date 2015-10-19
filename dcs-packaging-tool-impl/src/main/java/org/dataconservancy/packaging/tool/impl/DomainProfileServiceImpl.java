@@ -5,13 +5,18 @@ import java.util.List;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.model.dprofile.CardinalityConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
+import org.dataconservancy.packaging.tool.model.dprofile.Requirement;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public class DomainProfileServiceImpl implements DomainProfileService {
@@ -45,49 +50,115 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public boolean validateProperties(Node node, NodeType type) {
-        // TODO Auto-generated method stub
-        return false;
+        for (PropertyConstraint pc : type.getPropertyConstraints()) {
+            PropertyType prop_type = pc.getPropertyType();
+
+            List<PropertyValue> props = objstore.getProperties(node.getDomainObject(), prop_type);
+
+            if (props.size() < pc.getMinimum() || (pc.getMaximum() != -1 && props.size() > pc.getMaximum())) {
+                return false;
+            }
+            
+            if (prop_type.getPropertyValueType() == PropertyValueType.COMPLEX) {
+                for (PropertyValue prop: props) {
+                    if (!validate_complex_property_cardinality(prop)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+    
+    private boolean validate_complex_property_cardinality(PropertyValue val) {
+        // Must check cardinality of complex property subvalues
+        
+        for (PropertyConstraint subcon : val.getPropertyType().getPropertySubTypes()) {
+            int count = 0;
+            
+            for (PropertyValue subval: val.getComplexValue()) {
+                if (subval.getPropertyType().equals(subcon.getPropertyType())) {
+                    count++;
+                }
+            }
+            
+            if (count < subcon.getMinimum() || (subcon.getMaximum() != -1 && count > subcon.getMaximum())) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     @Override
-    public void transformNode(Node node, NodeTransform trans) {
-        // TODO Auto-generated method stub
+    public void transformNode(Node node, NodeTransform tr) {
+        if (!can_transform(node, tr)) {
+            throw new IllegalArgumentException("Transform not available.");
+        }
+
+        // TODO
     }
 
     @Override
     public List<NodeTransform> getNodeTransforms(Node node) {
-        // TODO Auto-generated method stub
-        return null;
+        ArrayList<NodeTransform> result = new ArrayList<>();
+
+        for (NodeTransform tr : node.getNodeType().getDomainProfile().getNodeTransforms()) {
+            if (can_transform(node, tr)) {
+                result.add(tr);
+            }
+        }
+
+        return result;
     }
 
-    @Override
-    public boolean validateTree(Node root) {
+    private boolean can_transform(Node node, NodeTransform tr) {
         // TODO Auto-generated method stub
         return false;
     }
 
-    private boolean meets_parent_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
-        if (parent_constraint == null) {
-            return true;
-        }
-
-        // Check type
-
-        if (!parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier())) {
+    @Override
+    public boolean validateTree(Node node) {
+        if (!is_valid(node)) {
             return false;
         }
 
-        // Check that existing objects have one of the required structural
-        // predicates
+        if (node.isLeaf()) {
+            return true;
+        }
 
-        if (node.getDomainObject() != null && parent.getDomainObject() != null) {
-            StructuralRelation rel = parent_constraint.getStructuralRelation();
-            
-            if (objstore.hasRelationship(node.getDomainObject(), rel.getHasParentPredicate(), parent.getDomainObject())
-                    && objstore.hasRelationship(parent.getDomainObject(), rel.getHasChildPredicate(),
-                            node.getDomainObject())) {
-                return true;
-            } else {
+        for (Node child : node.getChildren()) {
+            if (!validateTree(child)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean meets_parent_type_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
+        return parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier());
+    }
+
+    // Check that existing domain objects have the required relations
+    private boolean meets_parent_relation_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
+        if (node.getDomainObject() == null || parent.getDomainObject() == null) {
+            return false;
+        }
+
+        StructuralRelation rel = parent_constraint.getStructuralRelation();
+
+        if (rel.getHasParentPredicate() != null) {
+            if (!objstore.hasRelationship(node.getDomainObject(), rel.getHasParentPredicate(),
+                    parent.getDomainObject())) {
+                return false;
+            }
+        }
+
+        if (rel.getHasChildPredicate() != null) {
+            if (!objstore.hasRelationship(parent.getDomainObject(), rel.getHasParentPredicate(),
+                    node.getDomainObject())) {
                 return false;
             }
         }
@@ -96,24 +167,49 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean meets_file_requirements(Node node, NodeType type) {
-        type.getFileAssociationRequirement();
+        FileInfo info = node.getFileInfo();
 
-        type.getDirectoryAssociationRequirement();
+        if (info.isFile()) {
+            if (type.getFileAssociationRequirement() == Requirement.MUST) {
+                return true;
+            }
 
-        // TODO
+            if (type.getFileAssociationRequirement() == Requirement.MUST_NOT) {
+                return false;
+            }
+        }
+
+        if (info.isDirectory()) {
+            if (type.getDirectoryAssociationRequirement() == Requirement.MUST) {
+                return true;
+            }
+
+            if (type.getDirectoryAssociationRequirement() == Requirement.MUST_NOT) {
+                return false;
+            }
+        }
 
         return true;
     }
 
-    private boolean is_valid_type(Node node, NodeType type) {
+    // Check if node can be the given type.
+    private boolean may_be_type(Node node, NodeType type) {
         if (!meets_file_requirements(node, type)) {
             return false;
         }
 
+        List<NodeConstraint> constraints = type.getParentConstraints();
+
+        if (constraints == null || constraints.isEmpty()) {
+            return true;
+        }
+
         // Parent must meet one constraint
 
-        for (NodeConstraint c : type.getParentConstraints()) {
-            if (meets_parent_constraint(node, node.getParent(), c)) {
+        Node parent = node.getParent();
+
+        for (NodeConstraint c : constraints) {
+            if (meets_parent_type_constraint(node, parent, c)) {
                 return true;
             }
         }
@@ -121,17 +217,74 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         return false;
     }
 
-    private List<NodeType> get_valid_types_ordered_by_preference(Node node) {
+    // Check if node is valid given constraints of its type
+    private boolean is_valid(Node node) {
+        NodeType type = node.getNodeType();
+
+        if (!meets_file_requirements(node, type)) {
+            return false;
+        }
+
+        List<NodeConstraint> constraints = type.getParentConstraints();
+
+        if (constraints == null || constraints.isEmpty()) {
+            return true;
+        }
+
+        // Parent must meet one constraint
+
+        Node parent = node.getParent();
+
+        for (NodeConstraint c : constraints) {
+            if (meets_parent_type_constraint(node, parent, c) && meets_parent_relation_constraint(node, parent, c)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private int count_children_with_files(Node node) {
+        if (node.isLeaf()) {
+            return 0;
+        }
+
+        int result = 0;
+
+        for (Node child : node.getChildren()) {
+            FileInfo info = child.getFileInfo();
+
+            if (info != null && info.isFile()) {
+                result++;
+            }
+        }
+
+        return result;
+    }
+
+    private boolean is_preferred_type(Node node, NodeType type) {
+        CardinalityConstraint cc = type.getPreferredCountOfChildrenWithFiles();
+
+        if (cc != null) {
+            int count = count_children_with_files(node);
+
+            return count >= cc.getMinimum() && (count <= cc.getMaximum() || cc.getMaximum() == -1);
+        }
+
+        return false;
+    }
+
+    // Return valid types for node with preferred types in front.
+    private List<NodeType> get_possible_types(Node node) {
         List<NodeType> result = new ArrayList<>();
 
-        for (NodeType nt : profile.getNodeTypes()) {
-
-            // Order by preference
-
-            nt.getPreferredCountOfChildrenWithFiles();
-
-            if (is_valid_type(node, nt)) {
-                result.add(nt);
+        for (NodeType type : profile.getNodeTypes()) {
+            if (may_be_type(node, type)) {
+                if (is_preferred_type(node, type)) {
+                    result.add(0, type);
+                } else {
+                    result.add(type);
+                }
             }
         }
 
@@ -140,42 +293,47 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public boolean assignNodeTypes(Node node) {
-        boolean result = assign_node_types(node);
+        boolean success = assign_node_types(node);
 
-        if (result) {
+        if (success) {
             update_domain_objects(node);
         }
 
-        return result;
+        return success;
     }
 
     private void update_domain_objects(Node node) {
         objstore.updateObject(node);
 
-        if (node.isLeaf()) {
-            return;
-        }
-
-        for (Node child : node.getChildren()) {
-            update_domain_objects(child);
+        if (!node.isLeaf()) {
+            for (Node child : node.getChildren()) {
+                update_domain_objects(child);
+            }
         }
     }
 
     private boolean assign_node_types(Node node) {
-        next: for (NodeType nt : get_valid_types_ordered_by_preference(node)) {
-            node.setNodeType(nt);
+        List<NodeType> valid_types = get_possible_types(node);
 
-            if (node.isLeaf()) {
-                continue;
-            }
+        if (valid_types.isEmpty()) {
+            return false;
+        }
+
+        if (node.isLeaf()) {
+            node.setNodeType(valid_types.get(0));
+            return true;
+        }
+
+        next: for (NodeType nt : valid_types) {
+            node.setNodeType(nt);
 
             for (Node child : node.getChildren()) {
                 if (!assign_node_types(child)) {
                     continue next;
                 }
-
-                return true;
             }
+
+            return true;
         }
 
         return false;
