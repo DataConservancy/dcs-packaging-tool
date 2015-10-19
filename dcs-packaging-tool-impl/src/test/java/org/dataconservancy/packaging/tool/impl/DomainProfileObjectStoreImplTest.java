@@ -24,6 +24,10 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * Test DomainProfileObjectStoreImpl by using a tree of nodes in FarmIpmTree
+ * which uses the FarmDomainProfile.
+ */
 public class DomainProfileObjectStoreImplTest {
     private Model model;
     private DomainProfileObjectStoreImpl store;
@@ -38,6 +42,10 @@ public class DomainProfileObjectStoreImplTest {
         profile = ipmtree.getProfile();
     }
 
+    /**
+     * Update object tests walks the tree updating objects and checking the
+     * model for correct triples.
+     */
     @Test
     public void testUpdateObject() {
         test_update_object(ipmtree.getRoot());
@@ -57,7 +65,7 @@ public class DomainProfileObjectStoreImplTest {
 
         assertTrue(has_property(test_object, val));
     }
-    
+
     @Test
     public void testAddLongProperty() {
         URI test_object = URI.create("test:jimfoot");
@@ -70,7 +78,7 @@ public class DomainProfileObjectStoreImplTest {
 
         assertTrue(has_property(test_object, val));
     }
-    
+
     @Test
     public void testAddDateTimeProperty() {
         URI test_object = URI.create("test:jimlunch");
@@ -80,29 +88,29 @@ public class DomainProfileObjectStoreImplTest {
         val.setDateTimeValue(new DateTime(100000000));
 
         store.addProperty(test_object, val);
-        
+
         assertTrue(has_property(test_object, val));
     }
-    
+
     @Test
     public void testAddComplexProperty() {
         URI test_object = URI.create("test:farmcontactinfo");
 
         PropertyType type = profile.getPersonProperty();
         PropertyValue val = new PropertyValue(type);
-        
+
         List<PropertyValue> subvals = new ArrayList<>();
         PropertyValue name_val = new PropertyValue(profile.getNameProperty());
-        name_val.setStringValue("Jim Moocow Farmer");        
+        name_val.setStringValue("Jim Moocow Farmer");
         PropertyValue mbox_val = new PropertyValue(profile.getMboxProperty());
         mbox_val.setStringValue("moo@moo.moo");
         subvals.add(name_val);
         subvals.add(mbox_val);
-        
+
         val.setComplexValue(subvals);
 
         store.addProperty(test_object, val);
-        
+
         assertTrue(has_property(test_object, val));
     }
 
@@ -116,12 +124,12 @@ public class DomainProfileObjectStoreImplTest {
 
         store.addProperty(test_object, val);
         assertTrue(has_property(test_object, val));
-        
+
         store.removeProperty(test_object, val);
-        
+
         assertFalse(has_property(test_object, val));
     }
-    
+
     @Test
     public void testRemoveSimplePropertyByType() {
         URI test_object = URI.create("test:jimfeet");
@@ -134,22 +142,22 @@ public class DomainProfileObjectStoreImplTest {
 
         store.addProperty(test_object, val1);
         store.addProperty(test_object, val2);
-        
+
         assertTrue(has_property(test_object, val1));
         assertTrue(has_property(test_object, val2));
-        
+
         store.removeProperty(test_object, profile.getSizePropertyType());
-        
+
         assertFalse(has_property(test_object, val1));
         assertFalse(has_property(test_object, val2));
     }
 
     private void test_update_object(Node node) {
-        System.err.println("Node: " + node.getIdentifier());
+        // System.err.println("Node: " + node.getIdentifier());
 
         store.updateObject(node);
 
-        System.err.println("Domain object: " + node.getDomainObject());
+        // System.err.println("Domain object: " + node.getDomainObject());
 
         check_properties(node.getDomainObject(), node.getNodeType());
 
@@ -171,7 +179,7 @@ public class DomainProfileObjectStoreImplTest {
     }
 
     private void check_properties(URI id, NodeType type) {
-        print_model();
+        // print_model();
 
         // Check RDF types
 

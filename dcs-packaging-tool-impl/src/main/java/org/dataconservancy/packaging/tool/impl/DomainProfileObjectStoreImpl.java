@@ -96,8 +96,8 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
             return;
         }
 
-        // TODO What semantics here...
         if (node.getNodeType().getParentConstraints() == null || node.getNodeType().getParentConstraints().isEmpty()) {
+            // No relationship to parent.
             return;
         }
 
@@ -106,8 +106,6 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         if (nc == null) {
             throw new IllegalStateException("Cannot find parent constraint.");
         }
-
-        // Use first relation if it exists
 
         Resource object = as_resource(node.getDomainObject());
         Resource parent = as_resource(parent_node.getDomainObject());
