@@ -26,7 +26,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
  * Farm has Barns and Troughs.
  * Barn has Cows and Stockpiles.
  * Troughs and Stockpiles have Feed.
- * 
+ *
  * TODO Switch to more real looking uris.
  */
 public class FarmDomainProfile extends DomainProfile {
@@ -132,7 +132,7 @@ public class FarmDomainProfile extends DomainProfile {
         StructuralRelation has_part_rel = new StructuralRelation(URI.create("dcterms:isPartOf"), URI.create("dcterms:hasPart"));
         StructuralRelation has_occupant_rel= new StructuralRelation(URI.create("farm:isOccupantOf"), URI.create("farm:hasOccupant"));
         StructuralRelation has_data_rel= new StructuralRelation(URI.create("farm:isDataFor"), URI.create("farm:hasData"));
-        
+
         NodeConstraint farm_parent_constraint = new NodeConstraint();
         farm_parent_constraint.setNodeType(farm_node_type);
         farm_parent_constraint.setStructuralRelation(has_part_rel);
@@ -166,6 +166,7 @@ public class FarmDomainProfile extends DomainProfile {
         feed_node_type.setPropertyConstraints(Collections.singletonList(weight_constraint));
         feed_node_type.setDefaultPropertyValues(Collections.emptyList());
         feed_node_type.setParentConstraints(Collections.singletonList(trough_parent_constraint));
+        feed_node_type.setDomainProfile(this);
 
         NodeConstraint barn_parent_constraint = new NodeConstraint();
         barn_parent_constraint.setNodeType(barn_node_type);
@@ -178,11 +179,12 @@ public class FarmDomainProfile extends DomainProfile {
         stockpile_node_type.setPropertyConstraints(Collections.singletonList(weight_constraint));
         stockpile_node_type.setDefaultPropertyValues(Collections.emptyList());
         stockpile_node_type.setParentConstraints(Collections.singletonList(barn_parent_constraint));
+        stockpile_node_type.setDomainProfile(this);
 
         NodeConstraint barn_occ_parent_constraint = new NodeConstraint();
         barn_occ_parent_constraint.setNodeType(barn_node_type);
         barn_occ_parent_constraint.setStructuralRelation(has_occupant_rel);
-        
+
         cow_node_type.setIdentifier(URI.create("fdp:cow"));
         cow_node_type.setLabel("Cow");
         cow_node_type.setDescription("A cow is a tasty and noble creature.");
@@ -200,7 +202,7 @@ public class FarmDomainProfile extends DomainProfile {
         NodeConstraint cow_data_parent_constraint = new NodeConstraint();
         cow_data_parent_constraint.setNodeType(cow_node_type);
         cow_data_parent_constraint.setStructuralRelation(has_data_rel);
-        
+
         media_node_type.setIdentifier(URI.create("fdp:media"));
         media_node_type.setLabel("Media");
         media_node_type.setDescription("Commemorative media of best tasting animals.");
@@ -215,7 +217,7 @@ public class FarmDomainProfile extends DomainProfile {
         setIdentifier(URI.create("http://example.com/farm"));
         setLabel("Farm");
         setDescription("Vocabulary for describing a farm");
-        setNodeTypes(Arrays.asList(farm_node_type, cow_node_type, barn_node_type, media_node_type));
+        setNodeTypes(Arrays.asList(farm_node_type, cow_node_type, barn_node_type, media_node_type, trough_node_type, feed_node_type, stockpile_node_type));
         setPropertyTypes(Arrays.asList(species, weight, title_property_type, breed, size_property_type));
 
         PropertyCategory saleCategory = new PropertyCategory();
@@ -240,7 +242,7 @@ public class FarmDomainProfile extends DomainProfile {
         NodeConstraint stockpile_parent_constraint = new NodeConstraint();
         stockpile_parent_constraint.setNodeType(stockpile_node_type);
         stockpile_parent_constraint.setStructuralRelation(has_part_rel);
-        
+
         //Move feed to the stockpile
         NodeTransform feedTransform = new NodeTransform();
         feedTransform.setLabel("Feed transform");
