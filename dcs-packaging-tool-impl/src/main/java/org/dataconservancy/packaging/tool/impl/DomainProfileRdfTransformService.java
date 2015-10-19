@@ -374,7 +374,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             }
 
             if (type.getPropertySubTypes() != null && !type.getPropertySubTypes().isEmpty()) {
-                for (PropertyType subType : type.getPropertySubTypes()) {
+                for (PropertyConstraint subType : type.getPropertySubTypes()) {
                     transformToRdf(model, subType);
                 }
             }
@@ -844,13 +844,13 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (resource.hasProperty(HAS_PROPERTY_TYPE)) {
-            List<PropertyType> subTypes = new ArrayList<>();
+            List<PropertyConstraint> subTypes = new ArrayList<>();
             for (RDFNode subTypeNode : model.listObjectsOfProperty(resource, HAS_PROPERTY_TYPE).toList()) {
                 if (!subTypeNode.isResource()) {
                     throw new RDFTransformException(
                         "Expected node " + subTypeNode + " to be resource");
                 }
-                subTypes.add(transformToPropertyType(subTypeNode.asResource(), profile, model));
+                subTypes.add(transformToPropertyConstraint(subTypeNode.asResource(), profile, model));
             }
             propertyType.setPropertySubTypes(subTypes);
         }
