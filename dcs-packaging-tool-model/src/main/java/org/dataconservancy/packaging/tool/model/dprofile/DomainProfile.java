@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.tool.model.dprofile;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -119,18 +120,37 @@ public class DomainProfile extends AbstractDescribedObject {
     }
 
     /**
-     * Generates a hashcode for the DomainProfile node types are excluded from the hashcode to eliminate recursive issues.
+     * Generates a hashcode for the DomainProfile NodeTypes are excluded from the hashcode to eliminate recursive issues.
+     * Note: Lists are converted to HashSets to make them order independent.
      * @return The hashcode of this DomainProfile object.
      */
     @Override
     public int hashCode() {
+        HashSet<PropertyType> propertyTypeSet = null;
+        if (prop_types != null) {
+            propertyTypeSet = new HashSet<>();
+            propertyTypeSet.addAll(prop_types);
+        }
+
+        HashSet<PropertyCategory> propertyCategorySet = null;
+        if (prop_categories != null) {
+            propertyCategorySet = new HashSet<>();
+            propertyCategorySet.addAll(prop_categories);
+        }
+
+        HashSet<NodeTransform> nodeTransformSet = null;
+        if (node_transforms != null) {
+            nodeTransformSet = new HashSet<>();
+            nodeTransformSet.addAll(node_transforms);
+        }
+
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((domain_id == null) ? 0 : domain_id.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((node_transforms == null) ? 0 : node_transforms.hashCode());
-        result = prime * result + ((prop_categories == null) ? 0 : prop_categories.hashCode());
-        result = prime * result + ((prop_types == null) ? 0 : prop_types.hashCode());
+        result = prime * result + ((nodeTransformSet == null) ? 0 : nodeTransformSet.hashCode());
+        result = prime * result + ((propertyCategorySet == null) ? 0 : propertyCategorySet.hashCode());
+        result = prime * result + ((propertyTypeSet == null) ? 0 : propertyTypeSet.hashCode());
         return result;
     }
     

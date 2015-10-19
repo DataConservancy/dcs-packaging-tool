@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.tool.model.dprofile;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -119,22 +120,38 @@ public class PropertyType extends AbstractDescribedObject {
         this.readonly = readonly;
     }
 
+    /**
+     * Note this method converts lists to HashSets so they are order independent.
+     * @return The hashcode of the PropertyType
+     */
     @Override
     public int hashCode() {
+        HashSet<PropertyValue> allowedValueSet = null;
+        if (allowed_values != null) {
+            allowedValueSet = new HashSet<>();
+            allowedValueSet.addAll(allowed_values);
+        }
+
+        HashSet<PropertyType> subTypeSet = null;
+        if (subtypes != null) {
+            subTypeSet = new HashSet<>();
+            subTypeSet.addAll(subtypes);
+        }
+
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((allowed_values == null) ? 0 : allowed_values.hashCode());
+        result = prime * result + ((allowedValueSet == null) ? 0 : allowedValueSet.hashCode());
         result = prime * result + ((category == null) ? 0 : category.hashCode());
         result = prime * result + ((domain_pred == null) ? 0 : domain_pred.hashCode());
         result = prime * result + (readonly ? 1231 : 1237);
-        result = prime * result + ((subtypes == null) ? 0 : subtypes.hashCode());
+        result = prime * result + ((subTypeSet == null) ? 0 : subTypeSet.hashCode());
         result = prime * result + ((value_hint == null) ? 0 : value_hint.hashCode());
         result = prime * result + ((value_type == null) ? 0 : value_type.hashCode());
         return result;
     }
 
     /**
-     * @param other
+     * @param other The object to compare
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {

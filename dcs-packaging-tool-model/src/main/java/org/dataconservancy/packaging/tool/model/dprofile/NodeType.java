@@ -1,6 +1,9 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -192,26 +195,61 @@ public class NodeType extends AbstractDescribedObject {
         this.profile = profile;
     }
 
+    /**
+     * Calculates the HashCode of the NodeType.
+     * Note: Lists are converted to HashSets in this method to make them order independent.
+     * @return The hashcode of the NodeType.
+     */
     @Override
     public int hashCode() {
+        HashSet<URI> domainTypeSet = null;
+        if (domain_types != null) {
+            domainTypeSet = new HashSet<>();
+            domainTypeSet.addAll(domain_types);
+        }
+
+        HashSet<NodeConstraint> parentConstraintSet = null;
+        if (parent_constraints != null) {
+            parentConstraintSet = new HashSet<>();
+            parentConstraintSet.addAll(parent_constraints);
+        }
+
+        HashSet<PropertyConstraint> propertyConstraintSet = null;
+        if (property_constraints != null) {
+            propertyConstraintSet = new HashSet<>();
+            propertyConstraintSet.addAll(property_constraints);
+        }
+
+        HashSet<PropertyType> inheritablePropertySet = null;
+        if (inheritable_properties != null) {
+            inheritablePropertySet = new HashSet<>();
+            inheritablePropertySet.addAll(inheritable_properties);
+        }
+
+        HashSet<PropertyValue> defaultPropertyValueSet = null;
+        if (default_property_values != null) {
+            defaultPropertyValueSet = new HashSet<>();
+            defaultPropertyValueSet.addAll(default_property_values);
+        }
+
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((child_file_constraint == null) ? 0 : child_file_constraint.hashCode());
-        result = prime * result + ((default_property_values == null) ? 0 : default_property_values.hashCode());
+        result = prime * result + ((defaultPropertyValueSet == null) ? 0 : defaultPropertyValueSet.hashCode());
         result = prime * result + ((dir_req == null) ? 0 : dir_req.hashCode());
-        result = prime * result + ((domain_types == null) ? 0 : domain_types.hashCode());
+        result = prime * result + ((domainTypeSet == null) ? 0 : domainTypeSet.hashCode());
         result = prime * result + ((file_req == null) ? 0 : file_req.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((inheritable_properties == null) ? 0 : inheritable_properties.hashCode());
-        result = prime * result + ((parent_constraints == null) ? 0 : parent_constraints.hashCode());
+        result = prime * result + ((inheritablePropertySet == null) ? 0 : inheritablePropertySet.hashCode());
+        result = prime * result + ((parentConstraintSet == null) ? 0 : parentConstraintSet.hashCode());
         result = prime * result + ((profile == null || profile.getIdentifier() == null) ? 0 : profile.getIdentifier().hashCode());
-        result = prime * result + ((property_constraints == null) ? 0 : property_constraints.hashCode());
+        result = prime * result + ((propertyConstraintSet == null) ? 0 : propertyConstraintSet.hashCode());
         result = prime * result + ((supplied_properties == null) ? 0 : supplied_properties.hashCode());
         return result;
     }
 
     /**
-     * @param other
+     * @param other The object to compare
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {
@@ -246,7 +284,7 @@ public class NodeType extends AbstractDescribedObject {
         if (domain_types == null) {
             if (other.domain_types != null)
                 return false;
-        } else if (!domain_types.equals(other.domain_types))
+        } else if (other.domain_types == null || !CollectionUtils.isEqualCollection(domain_types, other.domain_types))
             return false;
         if (file_req != other.file_req)
             return false;

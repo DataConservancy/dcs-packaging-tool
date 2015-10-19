@@ -2,6 +2,7 @@ package org.dataconservancy.packaging.tool.model.dprofile;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -24,16 +25,25 @@ public class PropertyCategory extends AbstractDescribedObject {
         return types;
     }
 
+    /**
+     * Note: This method converts list to HashSet so that it is order independent.
+     * @return The hashcode of the PropertyCategory.
+     */
     @Override
     public int hashCode() {
+        HashSet<PropertyType> typeSet = null;
+        if (types != null) {
+            typeSet = new HashSet<>();
+            typeSet.addAll(types);
+        }
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((types == null) ? 0 : types.hashCode());
+        result = prime * result + ((typeSet == null) ? 0 : typeSet.hashCode());
         return result;
     }
 
     /**
-     * @param other
+     * @param other The object to compare
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {
