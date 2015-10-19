@@ -31,6 +31,15 @@ public class PackageMetadata {
     private String helpText;
     private int minOccurrence;
     private int maxOccurrence;
+    private boolean isEditable;
+
+    public boolean isEditable() {
+        return isEditable;
+    }
+
+    public void setEditable(boolean isEditable) {
+        this.isEditable = isEditable;
+    }
 
     public ValidationType getValidationType() {
         return validationType;
@@ -81,11 +90,12 @@ public class PackageMetadata {
 
         PackageMetadata that = (PackageMetadata) o;
 
+        if (isEditable != that.isEditable) return false;
         if (maxOccurrence != that.maxOccurrence) return false;
         if (minOccurrence != that.minOccurrence) return false;
-        if (validationType != that.validationType) return false;
         if (helpText != null ? !helpText.equals(that.helpText) : that.helpText != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (validationType != that.validationType) return false;
 
         return true;
     }
@@ -97,6 +107,7 @@ public class PackageMetadata {
         result = 31 * result + (helpText != null ? helpText.hashCode() : 0);
         result = 31 * result + minOccurrence;
         result = 31 * result + maxOccurrence;
+        result = 31 * result + (isEditable ? 1 : 0);
         return result;
     }
 }
