@@ -83,10 +83,20 @@ public class FarmDomainProfile extends DomainProfile {
         mbox_property_type.setPropertyValueType(PropertyValueType.STRING);
         mbox_property_type.setDomainPredicate(URI.create("foaf:mbox"));
 
+        PropertyConstraint mbox_constraint = new PropertyConstraint();
+        mbox_constraint.setPropertyType(mbox_property_type);
+        mbox_constraint.setMin(1);
+        mbox_constraint.setMax(1);
+        
+        PropertyConstraint name_constraint = new PropertyConstraint();
+        name_constraint.setPropertyType(name_property_type);
+        name_constraint.setMin(1);
+        name_constraint.setMax(1);
+        
         person_property_type = new PropertyType();
         person_property_type.setPropertyValueType(PropertyValueType.COMPLEX);
         person_property_type.setDomainPredicate(URI.create("foaf:person"));
-        person_property_type.setPropertySubTypes(Arrays.asList(name_property_type, mbox_property_type));        
+        person_property_type.setPropertySubTypes(Arrays.asList(name_constraint, mbox_constraint));        
 
         PropertyType species = new PropertyType();
         species.setPropertyValueType(PropertyValueType.STRING);
