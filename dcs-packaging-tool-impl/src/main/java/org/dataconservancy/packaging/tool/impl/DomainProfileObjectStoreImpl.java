@@ -184,7 +184,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     @Override
     public void removeProperty(URI object, PropertyValue value) {
         RDFNode rdf_value = as_rdf_node(value);
-        
+
         if (rdf_value.isAnon()) {
             throw new IllegalArgumentException("Complex properties can only be removed by type.");
         } else {
@@ -244,7 +244,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     private Statement as_statement(URI subject, URI predicate, URI object) {
         return model.createStatement(as_resource(subject), as_property(predicate), as_resource(object));
     }
-    
+
     private Statement as_statement(URI subject, URI predicate, RDFNode node) {
         return model.createStatement(as_resource(subject), as_property(predicate), node);
     }
@@ -276,27 +276,38 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         }
     }
 
+    // Attempt to convert a given rdf node to a property value of the given
+    // type. Return null on failure.
     private PropertyValue as_property_value(RDFNode rdfnode, PropertyType type) {
         PropertyValue value = new PropertyValue(type);
 
         switch (type.getPropertyValueType()) {
         case COMPLEX:
-            List<PropertyValue> subvalues = new ArrayList<>();
-
             if (rdfnode.isResource()) {
-                for (PropertyType subtype : type.getPropertySubTypes()) {
+                List<PropertyValue> subvalues = new ArrayList<>();
+
+                for (PropertyConstraint subtypecon : type.getPropertySubTypes()) {
                     // TODO Might be many objects of predicate. Just pick one.
 
+                    PropertyType subtype = subtypecon.getPropertyType();
+                    
                     Statement s = model.getProperty(rdfnode.asResource(), as_property(subtype.getDomainPredicate()));
 
                     if (s != null) {
-                        subvalues.add(as_property_value(s.getObject(), subtype));
+                        PropertyValue subval = as_property_value(s.getObject(), subtype);
+
+                        if (subval != null) {
+                            subvalues.add(subval);
+                        }
                     }
                 }
-            }
 
-            value.setComplexValue(subvalues);
-            return value;
+                value.setComplexValue(subvalues);
+                
+                return value;
+            } else {
+                return null;
+            }
         case DATE_TIME:
             if (rdfnode.isLiteral() && rdfnode.asLiteral().getValue() instanceof XSDDateTime) {
                 XSDDateTime dt = XSDDateTime.class.cast(rdfnode.asLiteral().getValue());
@@ -304,22 +315,30 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                 if (dt != null) {
                     value.setDateTimeValue(as_date_time(dt));
                 }
+                
+                return value;
+            } else {
+                return null;
             }
-
-            return value;
         case LONG:
             if (rdfnode.isLiteral()) {
                 value.setLongValue(rdfnode.asLiteral().getLong());
+                
+                return value;
+            } else {
+                return null;
             }
-            return value;
         case STRING:
             if (rdfnode.isLiteral()) {
                 value.setStringValue(rdfnode.asLiteral().getString());
+                
+                return value;
+            } else {
+                return null;
             }
-            return value;
         default:
             throw new RuntimeException("Unhandled value type");
-        }
+        }                
     }
 
     @Override
