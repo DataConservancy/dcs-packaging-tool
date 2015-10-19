@@ -147,6 +147,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
     public static final Property HAS_COMPLEX_VALUE = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasComplexValue");
 
+    private Map<URI, NodeType> transformedNodeTypes;
+
     /**
      * Transforms a DomainProfile into a Jena RDF Model
      * @param profile The DomainProfile to transform.
@@ -496,6 +498,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
      * @throws RDFTransformException
      */
     public DomainProfile transformToProfile(Model model) throws RDFTransformException {
+        transformedNodeTypes = new HashMap<>();
+
         DomainProfile profile = new DomainProfile();
         List<Resource> domainProfiles = model.listResourcesWithProperty(RDF.type, DP_TYPE).toList();
 
@@ -576,8 +580,23 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
     private NodeType transformToNodeType(Resource resource, DomainProfile profile, Model model)
         throws RDFTransformException {
+
+        URI identifier = null;
+        if (resource.hasProperty(HAS_ID)) {
+            try {
+                identifier = new URI(getLiteral(resource, HAS_ID).getString());
+            } catch (URISyntaxException e) {
+                throw new RDFTransformException("Expected identifier to be a URI");
+            }
+        }
+
+        if (transformedNodeTypes.get(identifier) != null) {
+            return transformedNodeTypes.get(identifier);
+        }
+
         NodeType nodeType = new NodeType();
         nodeType.setDomainProfile(profile);
+        nodeType.setIdentifier(identifier);
 
         if (resource.hasProperty(RDFS.label)) {
             nodeType.setLabel(getLiteral(resource, RDFS.label).getString());
@@ -585,14 +604,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
         if (resource.hasProperty(RDFS.comment)) {
             nodeType.setDescription(getLiteral(resource, RDFS.comment).getString());
-        }
-
-        if (resource.hasProperty(HAS_ID)) {
-            try {
-                nodeType.setIdentifier(new URI(getLiteral(resource, HAS_ID).getString()));
-            } catch (URISyntaxException e) {
-                throw new RDFTransformException("Expected identifier to be a URI");
-            }
         }
 
         List<URI> domainTypes = new ArrayList<>();
@@ -630,16 +641,19 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
         nodeType.setPropertyConstraints(propertyConstraints);
 
-        List<PropertyType> inheritableProperties = new ArrayList<>();
-        for (RDFNode inheritablePropertyNode : model.listObjectsOfProperty(resource, HAS_INHERITABLE_PROPERTY).toList()) {
-            if (!inheritablePropertyNode.isResource()) {
-                throw new RDFTransformException(
-                    "Expected node " + inheritablePropertyNode + " to be resource");
-            }
+        if (resource.hasProperty(HAS_INHERITABLE_PROPERTY)) {
+            List<PropertyType> inheritableProperties = new ArrayList<>();
+            for (RDFNode inheritablePropertyNode : model.listObjectsOfProperty(resource, HAS_INHERITABLE_PROPERTY).toList()) {
+                if (!inheritablePropertyNode.isResource()) {
+                    throw new RDFTransformException(
+                        "Expected node " + inheritablePropertyNode +
+                            " to be resource");
+                }
 
-            inheritableProperties.add(transformToPropertyType(inheritablePropertyNode.asResource(), profile, model));
+                inheritableProperties.add(transformToPropertyType(inheritablePropertyNode.asResource(), profile, model));
+            }
+            nodeType.setInheritableProperties(inheritableProperties);
         }
-        nodeType.setInheritableProperties(inheritableProperties);
 
         List<PropertyValue> defaultPropertyValues = new ArrayList<>();
         for (RDFNode defaultPropertyNode : model.listObjectsOfProperty(resource, HAS_DEFAULT_PROPERTY_VALUE).toList()) {
@@ -652,7 +666,9 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
         nodeType.setDefaultPropertyValues(defaultPropertyValues);
 
-        nodeType.setSuppliedProperties(transformToSuppliedProperties(resource, profile, model));
+        if (resource.hasProperty(HAS_SUPPLIED_PROPERTY)) {
+            nodeType.setSuppliedProperties(transformToSuppliedProperties(resource, profile, model));
+        }
 
         if (resource.hasProperty(HAS_FILE_REQUIREMENT)) {
             nodeType.setFileAssocationRequirement(Requirement.valueOf(getLiteral(resource, HAS_FILE_REQUIREMENT).getString()));
@@ -668,6 +684,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setChildFileConstraint(childConstraint);
         }
 
+        transformedNodeTypes.put(nodeType.getIdentifier(), nodeType);
         return nodeType;
     }
 
