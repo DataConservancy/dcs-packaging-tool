@@ -21,6 +21,13 @@ public class PropertyValue {
     public PropertyType getPropertyType() {
         return type;
     }
+    
+    /**
+     * @return Whether or not a value is held.
+     */
+    public boolean hasValue() {
+        return value != null;
+    }
 
     /**
      * @return If type is string, return string value.
