@@ -45,7 +45,7 @@ public abstract class BaseGuiTest {
     protected Errors errors;
 
     @Autowired
-    protected Configuration config;
+    protected Configuration configuration;
     
     @Autowired
     protected OntologyLabels propertyLabels;

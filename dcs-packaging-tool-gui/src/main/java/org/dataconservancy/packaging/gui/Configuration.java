@@ -36,7 +36,7 @@ public class Configuration {
 
     private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
     private String ontologyFile;
-    private String packageFilenameIllegalCharacters;
+    private String packageFilenameIllegalCharacters;;
 
     //the default application configuration directory
     private String configurationDirectory;
@@ -47,12 +47,14 @@ public class Configuration {
     private String disciplineMapFile;
     private String availableProjectsFile;
     private String packageGenerationParametersFile;
+    private String packageMetadataParametersFile;
 
     //the "resolved" configuration files - precedence is
     //command line, then user config directory, and finally the application default
     private String disciplineMap;
     private String availableProjects;
     private String packageGenerationParameters;
+    private String packageMetadataParameters;
 
     @Option(name="--ontology", aliases={"-o"}, usage="Sets an ontology file")
     public void setOntologyFile(String ontologyFile) {
@@ -97,6 +99,12 @@ public class Configuration {
         return packageGenerationParameters;
     }
 
+    public void setPackageMetadataParameters(String packageMetadataParameters){
+        this.packageMetadataParameters = packageMetadataParameters;
+    }
+
+    public String getPackageMetadataParameters(){return packageMetadataParameters; }
+
     public void setConfigurationDirectory(String dir){
         this.configurationDirectory = dir;
     }
@@ -127,6 +135,14 @@ public class Configuration {
 
     public String getAvailableProjectsFile(){
         return availableProjectsFile;
+    }
+
+    public void setPackageMetadataParametersFile(String packageMetadataParametersFile){
+        this.packageMetadataParametersFile = packageMetadataParametersFile;
+    }
+
+    public String getPackageMetadataParametersFile(){
+        return packageMetadataParametersFile;
     }
 
     /**
