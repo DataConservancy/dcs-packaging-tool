@@ -296,12 +296,12 @@ public class NodeType extends AbstractDescribedObject {
         if (inheritable_properties == null) {
             if (other.inheritable_properties != null)
                 return false;
-        } else if (!inheritable_properties.equals(other.inheritable_properties))
+        } else if (other.inheritable_properties == null ||!CollectionUtils.isEqualCollection(inheritable_properties, other.inheritable_properties))
             return false;
         if (parent_constraints == null) {
             if (other.parent_constraints != null)
                 return false;
-        } else if (!parent_constraints.equals(other.parent_constraints))
+        } else if (other.parent_constraints == null || !CollectionUtils.isEqualCollection(parent_constraints, other.parent_constraints))
             return false;
         if (profile == null) {
             if (other.profile != null)
@@ -314,7 +314,7 @@ public class NodeType extends AbstractDescribedObject {
         if (property_constraints == null) {
             if (other.property_constraints != null)
                 return false;
-        } else if (!property_constraints.equals(other.property_constraints))
+        } else if (other.property_constraints == null || !CollectionUtils.isEqualCollection(property_constraints, other.property_constraints))
             return false;
         if (supplied_properties == null) {
             if (other.supplied_properties != null)
