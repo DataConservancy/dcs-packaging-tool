@@ -1,5 +1,6 @@
 package org.dataconservancy.packaging.tool.impl;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,8 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
@@ -254,6 +257,10 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     private RDFNode as_rdf_node(PropertyValue value) {
+        if (!value.hasValue()) {
+            throw new IllegalArgumentException("No value set on property.");
+        }
+        
         PropertyType type = value.getPropertyType();
 
         switch (type.getPropertyValueType()) {
@@ -344,5 +351,11 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     @Override
     public boolean hasRelationship(URI subject, URI predicate, URI object) {
         return model.contains(as_statement(subject, predicate, object));
+    }
+    
+    public String toString() {
+        StringWriter result = new StringWriter();
+        RDFDataMgr.write(result, model, RDFFormat.TURTLE_PRETTY);
+        return result.toString();
     }
 }
