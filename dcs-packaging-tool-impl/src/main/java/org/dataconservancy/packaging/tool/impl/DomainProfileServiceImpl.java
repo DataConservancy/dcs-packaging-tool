@@ -20,75 +20,103 @@ import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public class DomainProfileServiceImpl implements DomainProfileService {
-    private final DomainProfile profile;
     private final DomainProfileObjectStore objstore;
 
-    public DomainProfileServiceImpl(DomainProfile profile, DomainProfileObjectStore objstore) {
-        this.profile = profile;
+    public DomainProfileServiceImpl(DomainProfileObjectStore objstore) {
         this.objstore = objstore;
     }
 
     @Override
     public void addProperty(Node node, PropertyValue value) {
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("Node does not have domain object.");
+        }
+
         objstore.addProperty(node.getDomainObject(), value);
     }
 
     @Override
     public void removeProperty(Node node, PropertyValue value) {
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("Node does not have domain object.");
+        }
+
         objstore.removeProperty(node.getDomainObject(), value);
     }
 
     @Override
     public void removeProperty(Node node, PropertyType type) {
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("Node does not have domain object.");
+        }
+
         objstore.removeProperty(node.getDomainObject(), type);
     }
 
     @Override
     public List<PropertyValue> getProperties(Node node, NodeType type) {
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("Node does not have domain object.");
+        }
+
         return objstore.getProperties(node.getDomainObject(), type);
     }
 
     @Override
     public boolean validateProperties(Node node, NodeType type) {
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("Node does not have domain object.");
+        }
+
         for (PropertyConstraint pc : type.getPropertyConstraints()) {
             PropertyType prop_type = pc.getPropertyType();
 
-            List<PropertyValue> props = objstore.getProperties(node.getDomainObject(), prop_type);
+            List<PropertyValue> vals = objstore.getProperties(node.getDomainObject(), prop_type);
 
-            if (props.size() < pc.getMinimum() || (pc.getMaximum() != -1 && props.size() > pc.getMaximum())) {
+            if (vals.size() < pc.getMinimum() || (pc.getMaximum() != -1 && vals.size() > pc.getMaximum())) {
                 return false;
             }
-            
-            if (prop_type.getPropertyValueType() == PropertyValueType.COMPLEX) {
-                for (PropertyValue prop: props) {
-                    if (!validate_complex_property_cardinality(prop)) {
-                        return false;
-                    }
+
+            if (!validate_complex_property_cardinality(vals)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean validate_complex_property_cardinality(List<PropertyValue> vals) {
+        for (PropertyValue val : vals) {
+            if (val.getPropertyType().getPropertyValueType() == PropertyValueType.COMPLEX) {
+                if (!validate_complex_property_cardinality(val)) {
+                    return false;
                 }
             }
         }
 
         return true;
     }
-    
+
     private boolean validate_complex_property_cardinality(PropertyValue val) {
-        // Must check cardinality of complex property subvalues
-        
+        // Check cardinality of sub-value for each constraint
+
         for (PropertyConstraint subcon : val.getPropertyType().getPropertySubTypes()) {
             int count = 0;
-            
-            for (PropertyValue subval: val.getComplexValue()) {
+
+            for (PropertyValue subval : val.getComplexValue()) {
                 if (subval.getPropertyType().equals(subcon.getPropertyType())) {
                     count++;
                 }
             }
-            
+
             if (count < subcon.getMinimum() || (subcon.getMaximum() != -1 && count > subcon.getMaximum())) {
                 return false;
             }
         }
-        
-        return true;
+
+        // Recurse to check sub-values that are themselves complex
+
+        return validate_complex_property_cardinality(val.getComplexValue());
     }
 
     @Override
@@ -138,6 +166,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean meets_parent_type_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
+        if (parent == null) {
+            return false;
+        }
+
         return parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier());
     }
 
@@ -204,7 +236,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             return true;
         }
 
-        // Parent must meet one constraint
+        // Parent must meet one constraint. Only the type matters.
 
         Node parent = node.getParent();
 
@@ -275,7 +307,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     // Return valid types for node with preferred types in front.
-    private List<NodeType> get_possible_types(Node node) {
+    private List<NodeType> get_possible_types(DomainProfile profile, Node node) {
         List<NodeType> result = new ArrayList<>();
 
         for (NodeType type : profile.getNodeTypes()) {
@@ -292,8 +324,8 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
-    public boolean assignNodeTypes(Node node) {
-        boolean success = assign_node_types(node);
+    public boolean assignNodeTypes(DomainProfile profile, Node node) {
+        boolean success = assign_node_types(profile, node);
 
         if (success) {
             update_domain_objects(node);
@@ -312,8 +344,8 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
     }
 
-    private boolean assign_node_types(Node node) {
-        List<NodeType> valid_types = get_possible_types(node);
+    private boolean assign_node_types(DomainProfile profile, Node node) {
+        List<NodeType> valid_types = get_possible_types(profile, node);
 
         if (valid_types.isEmpty()) {
             return false;
@@ -328,7 +360,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             node.setNodeType(nt);
 
             for (Node child : node.getChildren()) {
-                if (!assign_node_types(child)) {
+                if (!assign_node_types(profile, child)) {
                     continue next;
                 }
             }
@@ -337,12 +369,5 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         return false;
-    }
-
-    @Override
-    public void propagateInheritedProperties(Node node) {
-        // nodetypemap.get(node.getNodeType()).getInheritableProperties();
-
-        // TODO Auto-generated method stub
     }
 }
