@@ -265,13 +265,14 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         throws RDFTransformException {
         FileInfo fileInfo = null;
         if (fileInfoResource != null) {
-            Path fileInfoPath = null;
+            URI location = null;
             if (fileInfoResource.hasProperty(HAS_LOCATION)) {
+                location = URI.create(getLiteral(fileInfoResource, HAS_LOCATION));
+            }
 
-                fileInfoPath = Paths.get(URI.create(getLiteral(fileInfoResource, HAS_LOCATION)));
-                if (fileInfoPath == null) {
-                    throw new RDFTransformException("Expected at least one path for file info.");
-                }
+            String name = null;
+            if (fileInfoResource.hasProperty(HAS_NAME)) {
+                name = getLiteral(fileInfoResource, HAS_NAME);
             }
 
             boolean isFile = true;
@@ -320,13 +321,14 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
                 modifiedDate = FileTime.fromMillis(Long.valueOf(getLiteral(fileInfoResource, HAS_MODIFIED_DATE)));
             }
 
-            FileAttributes fileAttributes = new FileAttributes();
-            fileAttributes.setIsFile(isFile);
-            fileAttributes.setCreationTime(createdDate);
-            fileAttributes.setModifiedTime(modifiedDate);
-            fileAttributes.setSize(size);
-
-            fileInfo = new FileInfo(fileInfoPath, fileAttributes, formats, checksumMap);
+            fileInfo = new FileInfo(location, name);
+            fileInfo.setSize(size);
+            fileInfo.setCreationTime(createdDate);
+            fileInfo.setLastModifiedTime(modifiedDate);
+            fileInfo.setIsDirectory(!isFile);
+            fileInfo.setIsFile(isFile);
+            fileInfo.setChecksums(checksumMap);
+            fileInfo.setFormats(formats);
         }
 
         return fileInfo;
@@ -345,74 +347,5 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         }
 
         return value.asLiteral().getString();
-    }
-
-    private class FileAttributes implements BasicFileAttributes {
-
-        private boolean isFile;
-        private FileTime modifiedTime;
-        private FileTime creationTime;
-        private long size;
-
-        public void setModifiedTime(FileTime modifiedTime) {
-            this.modifiedTime = modifiedTime;
-        }
-
-        @Override
-        public FileTime lastModifiedTime() {
-            return modifiedTime;
-        }
-
-        @Override
-        public FileTime lastAccessTime() {
-            return null;
-        }
-
-        public void setCreationTime(FileTime creationTime) {
-            this.creationTime = creationTime;
-        }
-
-        @Override
-        public FileTime creationTime() {
-            return creationTime;
-        }
-
-        public void setIsFile(boolean isFile) {
-            this.isFile = isFile;
-        }
-
-        @Override
-        public boolean isRegularFile() {
-            return isFile;
-        }
-
-        @Override
-        public boolean isDirectory() {
-            return !isFile;
-        }
-
-        @Override
-        public boolean isSymbolicLink() {
-            return false;
-        }
-
-        @Override
-        public boolean isOther() {
-            return false;
-        }
-
-        public void setSize(long size) {
-            this.size = size;
-        }
-
-        @Override
-        public long size() {
-            return size;
-        }
-
-        @Override
-        public Object fileKey() {
-            return null;
-        }
     }
 }
