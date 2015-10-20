@@ -15,6 +15,10 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+/**
+ * This class captures information necessary to the package tool to know what and how prompt user for specific package
+ * metadata.
+ */
 public class PackageMetadata {
 
     public enum ValidationType {
@@ -31,9 +35,28 @@ public class PackageMetadata {
     private String helpText;
     private int minOccurrence;
     private int maxOccurrence;
+    private boolean isEditable;
 
-    public String setName() {
-        return name;
+    /**
+     * Indicates whether the field is editable.
+     * @return {@code true} if the field is editable by user.
+     * @return {@code false} if the field is not editable by user.
+     */
+    public boolean isEditable() {
+        return isEditable;
+    }
+
+    public void setEditable(boolean isEditable) {
+        this.isEditable = isEditable;
+    }
+
+    /**
+     * Returns the type of validation ({@link org.dataconservancy.packaging.tool.model.PackageMetadata.ValidationType})
+     * that should be performed on the field's value. These types include: {@code NONE}, {@code EMAIL}, {@code PHONE},
+     * {@code DATE}, {@code URL}, {@code FILENAME}.
+     */
+    public ValidationType getValidationType() {
+        return validationType;
     }
 
     public void setName(String name) {
@@ -44,10 +67,16 @@ public class PackageMetadata {
         this.validationType = validationType;
     }
 
+    /**
+     * Returns the name of the metadata field.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the help text associated with the metadata field.
+     */
     public String getHelpText() {
         return helpText;
     }
@@ -56,6 +85,9 @@ public class PackageMetadata {
         this.helpText = helpText;
     }
 
+    /**
+     * Returns the minimum number of times the field should occur on the GUI form.
+     */
     public int getMinOccurrence() {
         return minOccurrence;
     }
@@ -64,6 +96,10 @@ public class PackageMetadata {
         this.minOccurrence = minOccurrence;
     }
 
+    /**
+     * Returns maximum number of times the fields should occur on the GUI form.
+     * @return
+     */
     public int getMaxOccurrence() {
         return maxOccurrence;
     }
@@ -81,11 +117,12 @@ public class PackageMetadata {
 
         PackageMetadata that = (PackageMetadata) o;
 
+        if (isEditable != that.isEditable) return false;
         if (maxOccurrence != that.maxOccurrence) return false;
         if (minOccurrence != that.minOccurrence) return false;
-        if (validationType != that.validationType) return false;
         if (helpText != null ? !helpText.equals(that.helpText) : that.helpText != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (validationType != that.validationType) return false;
 
         return true;
     }
@@ -97,6 +134,7 @@ public class PackageMetadata {
         result = 31 * result + (helpText != null ? helpText.hashCode() : 0);
         result = 31 * result + minOccurrence;
         result = 31 * result + maxOccurrence;
+        result = 31 * result + (isEditable ? 1 : 0);
         return result;
     }
 }
