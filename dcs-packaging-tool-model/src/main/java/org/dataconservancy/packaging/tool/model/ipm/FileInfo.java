@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.dataconservancy.dcs.model.DetectedFormat;
 import org.dataconservancy.dcs.util.ChecksumGeneratorVerifier;
@@ -30,7 +31,7 @@ public class FileInfo {
     private String name;
     private List<String> formats;
     private Map<Algorithm, String> checksums;
-    private BasicFileAttributes fileAttributes;
+    private FileInfoAttributes fileAttributes;
 
     /**
      * Default constructor that should be used in most cases. Will read the file at the path location and load the necessary file attributes.
@@ -41,7 +42,7 @@ public class FileInfo {
         name = path.getFileName().toString();
 
         try {
-            fileAttributes = Files.readAttributes(path, BasicFileAttributes.class);
+            fileAttributes = new FileInfoAttributes(Files.readAttributes(path, BasicFileAttributes.class));
             if (fileAttributes.isRegularFile()) {
                 checksums = new HashMap<>();
                 formats = new ArrayList<>();
@@ -75,9 +76,36 @@ public class FileInfo {
         location = path.toUri();
         name = path.getFileName().toString();
 
-        this.fileAttributes = fileAttributes;
+        this.fileAttributes = new FileInfoAttributes(fileAttributes);
         this.formats = formats;
         this.checksums = checksums;
+    }
+
+    /**
+     * Constructor that creates an essentially empty FileInfo object. Only location and name will be set.
+     * Note: FileAttributes will not be created with this constructor and must be set manually.
+     * @param location The location of the File system entity referenced by this FileInfo object.
+     * @param name The name of the File System Entity referenced by this FileInfo object.
+     */
+    public FileInfo(URI location, String name) {
+        this.location = location;
+        this.name = name;
+    }
+
+    public FileInfo(URI location, String name, FileTime creationTime, FileTime modifiedTime, boolean isFile, boolean isDirectory, long size,
+                    List<String> formats, Map<Algorithm, String> checksums) {
+        this.location = location;
+        this.name = name;
+
+        this.formats = formats;
+        this.checksums = checksums;
+
+        fileAttributes = new FileInfoAttributes();
+        fileAttributes.setCreationTime(creationTime);
+        fileAttributes.setLastModifiedTime(modifiedTime);
+        fileAttributes.setIsRegularFile(isFile);
+        fileAttributes.setIsDirectory(isDirectory);
+        fileAttributes.setSize(size);
     }
 
     /**
@@ -100,6 +128,27 @@ public class FileInfo {
     }
 
     /**
+     * Add a checksum for this FileInfo object.
+     * @param algorithm The algorithm of the FileInfo object.
+     * @param value The value of checksum.
+     */
+    public void addChecksum(Algorithm algorithm, String value) {
+        if (checksums == null) {
+            checksums = new HashMap<>();
+        }
+
+        checksums.put(algorithm, value);
+    }
+
+    /**
+     * Sets the map of checksums
+     * @param checksumMap The map of checksums for the FileInfo object.
+     */
+    public void setChecksums(Map<Algorithm, String> checksumMap) {
+        this.checksums = checksumMap;
+    }
+
+    /**
      * @return Name of the file.
      */
     public String getName() {
@@ -111,6 +160,26 @@ public class FileInfo {
      */
     public List<String> getFormats() {
         return formats;
+    }
+
+    /**
+     * Add a new format for this FileInfo object.
+     * @param format The format to add.
+     */
+    public void addFormat(String format) {
+        if (formats == null) {
+            formats = new ArrayList<>();
+        }
+
+        formats.add(format);
+    }
+
+    /**
+     * Sets the list of formats for the File backing this FileInfo object.
+     * @param formats The list of formats to add.
+     */
+    public void setFormats(List<String> formats) {
+        this.formats = formats;
     }
 
     /**
@@ -126,6 +195,18 @@ public class FileInfo {
     }
 
     /**
+     * Sets the size of the File backing this FileInfo object.
+     * @param size The size in bytes of the file backing this FileInfo object.
+     */
+    public void setSize(long size) {
+        if (fileAttributes == null) {
+            fileAttributes = new FileInfoAttributes();
+        }
+
+        fileAttributes.setSize(size);
+    }
+
+    /**
      * @return Whether or not a file is being described.
      */
     public boolean isFile() {
@@ -135,6 +216,18 @@ public class FileInfo {
         }
 
         return isFile;
+    }
+
+    /**
+     * Sets whether or not the FileInfo describes a file on the file system.
+     * @param isFile True if the FileInfo object describes a file, false otherwise.
+     */
+    public void setIsFile(boolean isFile) {
+        if (fileAttributes == null) {
+            fileAttributes = new FileInfoAttributes();
+        }
+
+        fileAttributes.setIsRegularFile(isFile);
     }
 
     /**
@@ -150,6 +243,18 @@ public class FileInfo {
     }
 
     /**
+     * Sets whether or not the FileInfo describes a directory on the file system.
+     * @param isDirectory True if the FileInfo object describes a directory, false otherwise.
+     */
+    public void setIsDirectory(boolean isDirectory) {
+        if (fileAttributes == null) {
+            fileAttributes = new FileInfoAttributes();
+        }
+
+        fileAttributes.setIsDirectory(isDirectory);
+    }
+
+    /**
      * @return Creation time of file.
      */
     public FileTime getCreationTime() {
@@ -162,6 +267,18 @@ public class FileInfo {
     }
 
     /**
+     * Sets the time this file was created.
+     * @param creationTime The FileTime representing when this file was created.
+     */
+    public void setCreationTime(FileTime creationTime) {
+        if (fileAttributes == null) {
+            fileAttributes = new FileInfoAttributes();
+        }
+
+        fileAttributes.setCreationTime(creationTime);
+    }
+
+    /**
      * @return Last modification time of file.
      */
     public FileTime getLastModifiedTime() {
@@ -171,6 +288,18 @@ public class FileInfo {
         }
 
         return modifiedTime;
+    }
+
+    /**
+     * Sets the time this file was last modified.
+     * @param modifiedTime The FileTime representing when this file was last modified.
+     */
+    public void setLastModifiedTime(FileTime modifiedTime) {
+        if (fileAttributes == null) {
+            fileAttributes = new FileInfoAttributes();
+        }
+
+        fileAttributes.setLastModifiedTime(modifiedTime);
     }
 
     /**
@@ -229,5 +358,143 @@ public class FileInfo {
         result = 31 * result + (formats != null ? formats.hashCode() : 0);
         result = 31 * result + (checksums != null ? checksums.hashCode() : 0);
         return result;
+    }
+
+    private class FileInfoAttributes implements BasicFileAttributes {
+        private FileTime lastModifiedTime;
+        private FileTime creationTime;
+        private boolean isRegularFile;
+        private boolean isDirectory;
+        private boolean isSymbolicLink;
+        private long size;
+
+        public FileInfoAttributes() {
+
+        }
+
+        public FileInfoAttributes(BasicFileAttributes superAttributes) {
+            lastModifiedTime = superAttributes.lastModifiedTime();
+            creationTime = superAttributes.creationTime();
+            isRegularFile = superAttributes.isRegularFile();
+            isDirectory = superAttributes.isDirectory();
+            isSymbolicLink = superAttributes.isSymbolicLink();
+            size = superAttributes.size();
+        }
+
+        @Override
+        public FileTime lastModifiedTime() {
+            return lastModifiedTime;
+        }
+
+        public void setLastModifiedTime(FileTime lastModifiedTime) {
+            this.lastModifiedTime = lastModifiedTime;
+        }
+
+        @Override
+        public FileTime lastAccessTime() {
+            return null;
+        }
+
+        @Override
+        public FileTime creationTime() {
+            return creationTime;
+        }
+
+        public void setCreationTime(FileTime creationTime) {
+            this.creationTime = creationTime;
+        }
+
+        @Override
+        public boolean isRegularFile() {
+            return isRegularFile;
+        }
+
+        public void setIsRegularFile(boolean regularFile) {
+            this.isRegularFile = regularFile;
+        }
+
+        @Override
+        public boolean isDirectory() {
+            return isDirectory;
+        }
+
+        public void setIsDirectory(boolean isDirectory) {
+            this.isDirectory = isDirectory;
+        }
+
+        @Override
+        public boolean isSymbolicLink() {
+            return isSymbolicLink;
+        }
+
+        public void setIsSymbolicLink(boolean symbolicLink) {
+            this.isSymbolicLink = symbolicLink;
+        }
+
+        @Override
+        public boolean isOther() {
+            return false;
+        }
+
+        @Override
+        public long size() {
+            return size;
+        }
+
+        public void setSize(long size) {
+            this.size = size;
+        }
+
+        @Override
+        public Object fileKey() {
+            return null;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof FileInfoAttributes)) {
+                return false;
+            }
+
+            FileInfoAttributes that = (FileInfoAttributes) o;
+
+            if (isRegularFile != that.isRegularFile) {
+                return false;
+            }
+            if (isDirectory != that.isDirectory) {
+                return false;
+            }
+            if (isSymbolicLink != that.isSymbolicLink) {
+                return false;
+            }
+            if (size != that.size) {
+                return false;
+            }
+            if (lastModifiedTime !=
+                null ? !lastModifiedTime.equals(that.lastModifiedTime) :
+                that.lastModifiedTime != null) {
+                return false;
+            }
+            return !(
+                creationTime != null ? !creationTime.equals(that.creationTime) :
+                    that.creationTime != null);
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result =
+                lastModifiedTime != null ? lastModifiedTime.hashCode() : 0;
+            result = 31 * result +
+                (creationTime != null ? creationTime.hashCode() : 0);
+            result = 31 * result + (isRegularFile ? 1 : 0);
+            result = 31 * result + (isDirectory ? 1 : 0);
+            result = 31 * result + (isSymbolicLink ? 1 : 0);
+            result = 31 * result + (int) (size ^ (size >>> 32));
+            return result;
+        }
     }
 }
