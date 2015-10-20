@@ -328,7 +328,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
     private Resource transformCardinalityConstraintToRdf(Model model, CardinalityConstraint constraint) {
         Resource constraintResource = model.createResource();
         constraintResource.hasProperty(RDF.type, CARDINALITY_CONSTRAINT_TYPE);
-        constraintResource.addLiteral(HAS_MIN, constraint.getMaximum());
+        constraintResource.addLiteral(HAS_MIN, constraint.getMinimum());
         constraintResource.addLiteral(HAS_MAX, constraint.getMaximum());
         return constraintResource;
     }
@@ -375,7 +375,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
             if (type.getPropertySubTypes() != null && !type.getPropertySubTypes().isEmpty()) {
                 for (PropertyConstraint subType : type.getPropertySubTypes()) {
-                    transformToRdf(model, subType);
+                    typeResource.addProperty(HAS_PROPERTY_TYPE, transformToRdf(model, subType));
                 }
             }
 
