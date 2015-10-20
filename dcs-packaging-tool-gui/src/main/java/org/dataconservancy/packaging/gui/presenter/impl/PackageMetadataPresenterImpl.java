@@ -68,7 +68,6 @@ import java.util.List;
 
 /**
  * Implementation for the screen that will handle package metadata.
- *
  */
 public class PackageMetadataPresenterImpl extends BasePresenterImpl implements PackageMetadataPresenter {
     private PackageMetadataView view;
@@ -97,7 +96,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         setView(view);
         super.bindBaseElements();
 
-        return view.asNode();        
+        return view.asNode();
     }
 
     private void bind() {
@@ -116,11 +115,30 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         });
 
+        view.getInternalSenderIdentifierTextField().setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                view.addInternalSenderIdentifierRemovableLabel(view.getInternalSenderIdentifierTextField().getText());
+                view.getInternalSenderIdentifierTextField().clear();
+            }
+        });
+
+        view.getRightsUriTextField().setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                view.addRightsUriRemovableLabel(view.getRightsUriTextField().getText());
+                view.getRightsUriTextField().clear();
+            }
+        });
+
         // FIXME: The profile names should come from an actual service
         view.loadDomainProfileNames(Arrays.asList("Eloka", "Custom Profile", "Custom Profile 2"));
         view.getAddDomainProfileButton().setOnAction(event -> {
-            view.addDomainProfileRemovableLabel(view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem());
-            view.showBottomContent(true);
+            if (view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem() != null &&
+                    !view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem().isEmpty()) {
+                view.addDomainProfileRemovableLabel(view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem());
+                view.showBottomContent(true);
+            }
         });
 
     }
@@ -139,7 +157,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 }
             }
         }
-        
+
         //If the file is null attempt to load the built in resource file.
         if (generationParams == null) {
             InputStream fileStream = PackageMetadataPresenterImpl.class.getResourceAsStream("/packageGenerationParameters");
@@ -149,12 +167,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 } catch (ParametersBuildException e) {
                     log.error("Error reading default params from file: " + e.getMessage());
                 }
-            }
-            else {
+            } else {
                 log.error("Error reading default params files. Couldn't find classpath file: /packageGenerationParameters");
             }
         }
-        
+
 
         setViewToDefaults();
     }
@@ -184,6 +201,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     /**
      * Appends the string values in list separated by a semicolon
      * FIXME: This may need to be done some other way.
+     *
      * @param values
      * @return semicolon separated string
      */
@@ -204,21 +222,21 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             generationParams.addParam(key, value);
         }
     }
-    
+
     /**
      * If any required parameters are missing from the file fill them in with default values.
      */
     private void fillInMissingParams() {
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID).isEmpty()) {
-            generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());            
+            generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
         }
-        
-        if (generationParams.getParam(GeneralParameterNames.PACKAGE_NAME) == null || 
+
+        if (generationParams.getParam(GeneralParameterNames.PACKAGE_NAME) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_NAME).isEmpty()) {
             generationParams.addParam(GeneralParameterNames.PACKAGE_NAME, getPackageName());
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION) == null ||
                 generationParams.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION).isEmpty()) {
             if (controller.getContentRoot() != null) {
@@ -226,44 +244,44 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         }
 
-        if (generationParams.getParam(BagItParameterNames.PKG_BAG_DIR) == null || 
+        if (generationParams.getParam(BagItParameterNames.PKG_BAG_DIR) == null ||
                 generationParams.getParam(BagItParameterNames.PKG_BAG_DIR).isEmpty()) {
             generationParams.addParam(BagItParameterNames.PKG_BAG_DIR, getPackageName());
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.CONTACT_EMAIL) == null ||
                 generationParams.getParam(BagItParameterNames.CONTACT_EMAIL).isEmpty()) {
             if (view.getContactEmailTextField().getText() != null && !view.getContactEmailTextField().getText().isEmpty()) {
                 generationParams.addParam(BagItParameterNames.CONTACT_EMAIL, view.getContactEmailTextField().getText());
             }
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.CONTACT_NAME) == null ||
                 generationParams.getParam(BagItParameterNames.CONTACT_NAME).isEmpty()) {
             if (view.getContactNameTextField().getText() != null && !view.getContactNameTextField().getText().isEmpty()) {
                 generationParams.addParam(BagItParameterNames.CONTACT_NAME, view.getContactNameTextField().getText());
             }
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.CONTACT_PHONE) == null ||
                 generationParams.getParam(BagItParameterNames.CONTACT_PHONE).isEmpty()) {
             if (view.getContactPhoneTextField().getText() != null && !view.getContactPhoneTextField().getText().isEmpty()) {
                 generationParams.addParam(BagItParameterNames.CONTACT_PHONE, view.getContactPhoneTextField().getText());
             }
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.BAGIT_PROFILE_ID) == null ||
                 generationParams.getParam(BagItParameterNames.BAGIT_PROFILE_ID).isEmpty()) {
             generationParams.addParam(BagItParameterNames.BAGIT_PROFILE_ID, "http://dataconservancy.org/formats/data-conservancy-pkg-0.9");
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION).isEmpty()) {
             if (controller.getPackageState().getOutputDirectory() != null) {
                 generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getPackageState().getOutputDirectory().getAbsolutePath());
             }
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER) == null ||
                 generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER).isEmpty()) {
             if (view.getExternalIdentifierTextField().getText() != null && !view.getExternalIdentifierTextField().getText().isEmpty()) {
@@ -273,43 +291,41 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 generationParams.addParam(BagItParameterNames.EXTERNAL_IDENTIFIER, "none");
             }
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.BAG_COUNT) == null ||
                 generationParams.getParam(BagItParameterNames.BAG_COUNT).isEmpty()) {
             generationParams.addParam(BagItParameterNames.BAG_COUNT, "1 of 1");
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.BAG_GROUP_ID) == null ||
                 generationParams.getParam(BagItParameterNames.BAG_GROUP_ID).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.BAG_GROUP_ID, "none");            
+            generationParams.addParam(BagItParameterNames.BAG_GROUP_ID, "none");
         }
     }
-    
+
     private void setViewToDefaults() {
 
-        
+
         if (generationParams.getParam(BagItParameterNames.CONTACT_EMAIL) != null
                 && !generationParams.getParam(BagItParameterNames.CONTACT_EMAIL).isEmpty()) {
             view.getContactEmailTextField().setText(generationParams.getParam(BagItParameterNames.CONTACT_EMAIL).get(0));
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.CONTACT_NAME) != null
                 && !generationParams.getParam(BagItParameterNames.CONTACT_NAME).isEmpty()) {
             view.getContactNameTextField().setText(generationParams.getParam(BagItParameterNames.CONTACT_NAME, 0));
         }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_PHONE) != null 
+
+        if (generationParams.getParam(BagItParameterNames.CONTACT_PHONE) != null
                 && !generationParams.getParam(BagItParameterNames.CONTACT_PHONE).isEmpty()) {
             view.getContactPhoneTextField().setText(generationParams.getParam(BagItParameterNames.CONTACT_PHONE, 0));
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER) != null
                 && !generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER).isEmpty()) {
             view.getExternalIdentifierTextField().setText(generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER, 0));
         }
-        
 
-        
 
     }
 

@@ -110,7 +110,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
         topContent.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
-        bottomContent.getStyleClass().add(PACKAGE_DESCRIPTION_VIEW_CLASS);
+        bottomContent.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
         contentScrollPane.setContent(content);
         setCenter(contentScrollPane);
 
