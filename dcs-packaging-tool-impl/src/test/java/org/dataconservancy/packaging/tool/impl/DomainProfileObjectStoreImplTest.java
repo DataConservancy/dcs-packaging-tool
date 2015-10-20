@@ -49,8 +49,6 @@ public class DomainProfileObjectStoreImplTest {
     @Test
     public void testUpdateObject() {
         test_update_object(ipmtree.getRoot());
-
-        // TODO spot checks on known objects...
     }
 
     @Test
@@ -83,7 +81,7 @@ public class DomainProfileObjectStoreImplTest {
     public void testAddDateTimeProperty() {
         URI test_object = URI.create("test:jimlunch");
 
-        PropertyType type = profile.getCreatedProperty();
+        PropertyType type = profile.getCreatedPropertyType();
         PropertyValue val = new PropertyValue(type);
         val.setDateTimeValue(new DateTime(100000000));
 
@@ -96,13 +94,13 @@ public class DomainProfileObjectStoreImplTest {
     public void testAddComplexProperty() {
         URI test_object = URI.create("test:farmcontactinfo");
 
-        PropertyType type = profile.getPersonProperty();
+        PropertyType type = profile.getPersonPropertyType();
         PropertyValue val = new PropertyValue(type);
 
         List<PropertyValue> subvals = new ArrayList<>();
-        PropertyValue name_val = new PropertyValue(profile.getNameProperty());
+        PropertyValue name_val = new PropertyValue(profile.getNamePropertyType());
         name_val.setStringValue("Jim Moocow Farmer");
-        PropertyValue mbox_val = new PropertyValue(profile.getMboxProperty());
+        PropertyValue mbox_val = new PropertyValue(profile.getMboxPropertyType());
         mbox_val.setStringValue("moo@moo.moo");
         subvals.add(name_val);
         subvals.add(mbox_val);
@@ -262,15 +260,5 @@ public class DomainProfileObjectStoreImplTest {
 
     private Statement as_statement(URI subject, Property prop, URI object) {
         return model.createStatement(as_resource(subject), prop, as_resource(object));
-    }
-
-    private void print_model() {
-        StmtIterator iter = model.listStatements();
-
-        while (iter.hasNext()) {
-            System.err.println(iter.next());
-        }
-
-        System.err.println();
     }
 }

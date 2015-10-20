@@ -43,6 +43,8 @@ public class FarmDomainProfile extends DomainProfile {
     private PropertyType person_property_type;
     private PropertyType name_property_type;
     private PropertyType mbox_property_type;
+    private PropertyType weight_property_type;
+    private PropertyType species_property_type;
     
 
     public FarmDomainProfile() {
@@ -54,10 +56,10 @@ public class FarmDomainProfile extends DomainProfile {
         feed_node_type = new NodeType();
         stockpile_node_type = new NodeType();
 
-        PropertyType weight = new PropertyType();
-        weight.setPropertyValueType(PropertyValueType.LONG);
-        weight.setPropertyValueHint(PropertyValueHint.NUMBER);
-        weight.setDomainPredicate(URI.create("farm:weight"));
+        weight_property_type = new PropertyType();
+        weight_property_type.setPropertyValueType(PropertyValueType.LONG);
+        weight_property_type.setPropertyValueHint(PropertyValueHint.NUMBER);
+        weight_property_type.setDomainPredicate(URI.create("farm:weight"));
 
         PropertyType breed = new PropertyType();
         breed.setPropertyValueType(PropertyValueType.STRING);
@@ -82,7 +84,7 @@ public class FarmDomainProfile extends DomainProfile {
         mbox_property_type = new PropertyType();
         mbox_property_type.setPropertyValueType(PropertyValueType.STRING);
         mbox_property_type.setDomainPredicate(URI.create("foaf:mbox"));
-
+        
         PropertyConstraint mbox_constraint = new PropertyConstraint();
         mbox_constraint.setPropertyType(mbox_property_type);
         mbox_constraint.setMin(1);
@@ -98,43 +100,48 @@ public class FarmDomainProfile extends DomainProfile {
         person_property_type.setDomainPredicate(URI.create("foaf:person"));
         person_property_type.setPropertySubTypes(Arrays.asList(name_constraint, mbox_constraint));        
 
-        PropertyType species = new PropertyType();
-        species.setPropertyValueType(PropertyValueType.STRING);
-        species.setDomainPredicate(URI.create("farm:species"));
+        species_property_type = new PropertyType();
+        species_property_type.setPropertyValueType(PropertyValueType.STRING);
+        species_property_type.setDomainPredicate(URI.create("farm:species"));
 
         PropertyConstraint weight_constraint = new PropertyConstraint();
-        weight_constraint.setPropertyType(weight);
+        weight_constraint.setPropertyType(weight_property_type);
         weight_constraint.setMin(1);
         weight_constraint.setMax(1);
 
         PropertyConstraint breed_constraint = new PropertyConstraint();
         breed_constraint.setPropertyType(breed);
         breed_constraint.setMin(0);
-        breed_constraint.setMax(1);
+        breed_constraint.setMax(-1);
+        
+        PropertyConstraint person_constraint = new PropertyConstraint();
+        person_constraint.setPropertyType(person_property_type);
+        person_constraint.setMin(1);
+        person_constraint.setMax(-1);
 
         PropertyConstraint species_constraint = new PropertyConstraint();
-        species_constraint.setPropertyType(species);
+        species_constraint.setPropertyType(species_property_type);
         species_constraint.setMin(1);
         species_constraint.setMax(1);
         
         PropertyConstraint size_constraint = new PropertyConstraint();
-        species_constraint.setPropertyType(size_property_type);
-        species_constraint.setMin(1);
-        species_constraint.setMax(1);
+        size_constraint.setPropertyType(size_property_type);
+        size_constraint.setMin(1);
+        size_constraint.setMax(1);
 
         PropertyConstraint title_constraint = new PropertyConstraint();
         title_constraint.setPropertyType(title_property_type);
         title_constraint.setMin(1);
-        title_constraint.setMax(-1);
+        title_constraint.setMax(2);
 
-        PropertyValue cow_species = new PropertyValue(species);
+        PropertyValue cow_species = new PropertyValue(species_property_type);
         cow_species.setStringValue("Bos taurus");
 
         farm_node_type.setIdentifier(URI.create("fdp:farm"));
         farm_node_type.setLabel("farm");
         farm_node_type.setDescription("The domain of a benevolent dictator.");
         farm_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Farm"), URI.create("org:Organization")));
-        farm_node_type.setPropertyConstraints(Arrays.asList());
+        farm_node_type.setPropertyConstraints(Arrays.asList(title_constraint, person_constraint));
         farm_node_type.setDefaultPropertyValues(Arrays.asList());
         farm_node_type.setParentConstraints(Arrays.asList());
         farm_node_type.setDomainProfile(this);
@@ -228,10 +235,10 @@ public class FarmDomainProfile extends DomainProfile {
         setLabel("Farm");
         setDescription("Vocabulary for describing a farm");
         setNodeTypes(Arrays.asList(farm_node_type, cow_node_type, barn_node_type, media_node_type, trough_node_type, feed_node_type, stockpile_node_type));
-        setPropertyTypes(Arrays.asList(species, weight, title_property_type, breed, size_property_type));
+        setPropertyTypes(Arrays.asList(species_property_type, weight_property_type, title_property_type, breed));
 
         PropertyCategory saleCategory = new PropertyCategory();
-        saleCategory.setPropertyTypes(Arrays.asList(weight, breed));
+        saleCategory.setPropertyTypes(Arrays.asList(weight_property_type, breed));
         saleCategory.setLabel("Sale Properties");
         saleCategory.setDescription("Properties relevant to the sale of animals.");
         setPropertyCategories(Collections.singletonList(saleCategory));
@@ -296,23 +303,31 @@ public class FarmDomainProfile extends DomainProfile {
         return title_property_type;
     }
     
+    public PropertyType getWeightPropertyType() {
+        return weight_property_type;
+    }
+    
     public PropertyType getSizePropertyType() {
         return size_property_type;
     }
 
-    public PropertyType getCreatedProperty() {
+    public PropertyType getCreatedPropertyType() {
         return created_property_type;
     }
     
-    public PropertyType getPersonProperty() {
+    public PropertyType getPersonPropertyType() {
         return person_property_type;
     }
     
-    public PropertyType getNameProperty() {
+    public PropertyType getNamePropertyType() {
         return name_property_type;
     }
     
-    public PropertyType getMboxProperty() {
+    public PropertyType getMboxPropertyType() {
         return mbox_property_type;
+    }
+
+    public PropertyType getSpeciesPropertyType() {
+        return species_property_type;
     }
 }
