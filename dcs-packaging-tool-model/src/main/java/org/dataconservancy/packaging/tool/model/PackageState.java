@@ -16,8 +16,7 @@
 package org.dataconservancy.packaging.tool.model;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * {@code PackageState} is an object responsible for maintaining the state information of individual package at any
@@ -43,9 +42,10 @@ public class PackageState {
     //private DomainProfileObjectStore domainProfileObjectStore;
 
     /**
-     * A collection of metadata fields relevant to this package.
+     * A map of metadata fields relevant to this package, keyed by the name of the metadata field to their associated
+     * list of values.
      */
-    private List<PackageMetadata> packageMetadataList;
+    private HashMap<String, List<String>> packageMetadataList;
 
     /**
      * Package serialization/generation information
@@ -58,10 +58,10 @@ public class PackageState {
     private ApplicationVersion creationToolVersion;
 
     public PackageState() {
-        packageMetadataList = new ArrayList<>();
+        packageMetadataList = new HashMap<>();
     }
     public PackageState(ApplicationVersion appVersion) {
-        packageMetadataList = new ArrayList<>();
+        packageMetadataList = new HashMap<>();
         this.creationToolVersion = appVersion;
     }
 
@@ -78,8 +78,7 @@ public class PackageState {
     }
 
     /**
-     * The default location at which the final package file/directory will be placed
-     * @return
+     * Returns location at which the final package file/directory will be placed
      */
     public File getOutputDirectory() {
         return outputDirectory;
@@ -90,17 +89,35 @@ public class PackageState {
     }
 
     /**
-     * Collection of other package level metadata that are specific to a packaging format, such as BagIt.
-     * @return
+     * Returns the set of metadata fields used to describe this package.
      */
-    public List<PackageMetadata> getPackageMetadataList() {
-        return packageMetadataList;
+    public Set<String> getMetadataFields() {
+        return packageMetadataList.keySet();
     }
 
-    public void setPackageMetadataList(List<PackageMetadata> packageMetadataList) {
-        this.packageMetadataList = packageMetadataList;
+
+    /**
+     * Returns list of values for package metadata named {@code fieldName}
+     */
+    public List<String> getPackageMetadataValues(String fieldName) {
+        return packageMetadataList.get(fieldName);
     }
 
+    /**
+     * Allows one or more values of the specified package metadata to be added.
+     * @param fieldName
+     * @param values
+     */
+    public void addPackageMetadata(String fieldName, String ... values) {
+        if (packageMetadataList.get(fieldName) == null) {
+            packageMetadataList.put(fieldName, new ArrayList<>());
+        }
+        packageMetadataList.get(fieldName).addAll(Arrays.asList(values));
+    }
+
+    /**
+     * Returns version information about the tool used to create this package.
+     */
     public ApplicationVersion getCreationToolVersion() {
         return creationToolVersion;
     }
