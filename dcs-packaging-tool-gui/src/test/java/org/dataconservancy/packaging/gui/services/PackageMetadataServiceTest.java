@@ -31,20 +31,25 @@ public class PackageMetadataServiceTest {
 
     @Before
     public void setup() throws IOException{
-        String fileName = configuration.getPackageMetadataParametersFile();
-        underTest = new PackageMetadataService(configuration.resolveConfigurationFile(fileName));
+        underTest = new PackageMetadataService(configuration);
     }
 
     @Test
     public void testGetRequiredPackageMetadata(){
         List<PackageMetadata> requiredMetadata = underTest.getRequiredPackageMetadata();
         Assert.assertNotNull(requiredMetadata);
-        Assert.assertEquals(1, requiredMetadata.size());
+        Assert.assertEquals(3, requiredMetadata.size());
         PackageMetadata pm = requiredMetadata.get(0);
         Assert.assertEquals("Package-Name", pm.getName());
         Assert.assertEquals(1,pm.getMinOccurrence());
         Assert.assertEquals(1,pm.getMaxOccurrence());
         Assert.assertFalse(pm.isEditable());
+
+        pm = requiredMetadata.get(1);
+        Assert.assertEquals("Bag-Count", pm.getName());
+
+        pm = requiredMetadata.get(2);
+        Assert.assertEquals("Internal-Sender-Identifier", pm.getName());
     }
 
     @Test
@@ -53,21 +58,27 @@ public class PackageMetadataServiceTest {
         Assert.assertNotNull(recommendedMetadata);
         Assert.assertEquals(5,recommendedMetadata.size());
         PackageMetadata pm = recommendedMetadata.get(0);
-        Assert.assertEquals("Bag-Count", pm.getName());
+        Assert.assertEquals("Bag-Group-Identifier", pm.getName());
         Assert.assertEquals(0,pm.getMinOccurrence());
         Assert.assertEquals(1,pm.getMaxOccurrence());
         Assert.assertFalse(pm.isEditable());
+
+        pm = recommendedMetadata.get(4);
+        Assert.assertEquals("External-Description", pm.getName());
     }
 
     @Test
     public void testGetOptionalPackageMetadata(){
         List<PackageMetadata> optionalMetadata = underTest.getOptionalPackageMetadata();
         Assert.assertNotNull(optionalMetadata);
-        Assert.assertEquals(9, optionalMetadata.size());
+        Assert.assertEquals(7, optionalMetadata.size());
         PackageMetadata pm = optionalMetadata.get(0);
         Assert.assertEquals("Keyword", pm.getName());
         Assert.assertEquals(0,pm.getMinOccurrence());
         Assert.assertEquals(Integer.MAX_VALUE,pm.getMaxOccurrence());
         Assert.assertTrue(pm.isEditable());
+
+        pm = optionalMetadata.get(6);
+        Assert.assertEquals("Rights-URI", pm.getName());
     }
 }

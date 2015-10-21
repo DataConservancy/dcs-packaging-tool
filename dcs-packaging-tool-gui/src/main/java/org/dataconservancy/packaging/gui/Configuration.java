@@ -19,6 +19,9 @@ package org.dataconservancy.packaging.gui;
 import org.kohsuke.args4j.Option;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This class is responsible for getters and setters for various configuration parameters, as well as path resolution for
@@ -188,12 +191,32 @@ public class Configuration {
      * @param configurationFileName The name of the configuration file to be resolved. These names are specified in the
      *                              config_defaults.properties file and set on the  *File fields.
      *
-     * @return  the resolved configuration.file
+     * @return  the resolved configuration.file path
      */
     public String resolveConfigurationFile(String configurationFileName){
         String userFile = locateUserConfigFile(configurationFileName);
         String defaultFile = locateDefaultConfigFile(configurationFileName);
         return (userFile == null ? defaultFile : userFile);
+    }
+
+    public InputStream getConfigurationFileInputStream(String configurationFileName) throws IOException{
+        String filePath = resolveConfigurationFile(configurationFileName);
+        InputStream fileStream = null;
+
+        if (filePath.startsWith("classpath:")) {
+            String path = filePath.substring("classpath:".length());
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+            fileStream = this.getClass().getResourceAsStream(path);
+            //this also works:
+            // URL url = this.getClass().getResource(path);
+            //fileStream = url.openStream();
+        } else {
+            fileStream = new FileInputStream(filePath);
+        }
+
+        return fileStream;
     }
 
 }
