@@ -82,7 +82,7 @@ public class PackageMetadataService {
             List<String> values = Arrays.asList(props.getStringArray(key));
             packageMetadata.setName(key);
             packageMetadata.setEditable((values.contains("Editable")));
-            packageMetadata.setMaxOccurrence((values.contains("Repeatable") ? Integer.MAX_VALUE : 1));
+            packageMetadata.setRepeatable(values.contains("Repeatable"));
 
             PackageMetadata.ValidationType type;
             if (values.contains("Phone")) {
@@ -101,13 +101,13 @@ public class PackageMetadataService {
             packageMetadata.setValidationType(type);
 
             if (values.contains("Required")) {
-                packageMetadata.setMinOccurrence(1);
+                packageMetadata.setRequiredness(PackageMetadata.Requiredness.REQUIRED);
                 required.add(packageMetadata);
             } else if (values.contains("Recommended")) {
-                packageMetadata.setMinOccurrence(0);
+                packageMetadata.setRequiredness(PackageMetadata.Requiredness.RECOMMENDED);
                 recommended.add(packageMetadata);
             } else {
-                packageMetadata.setMinOccurrence(0);
+                packageMetadata.setRequiredness(PackageMetadata.Requiredness.OPTIONAL);
                 optional.add(packageMetadata);
             }
         }

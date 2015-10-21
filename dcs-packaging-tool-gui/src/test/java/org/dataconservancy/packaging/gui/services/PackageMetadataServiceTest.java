@@ -41,8 +41,8 @@ public class PackageMetadataServiceTest {
         Assert.assertEquals(3, requiredMetadata.size());
         PackageMetadata pm = requiredMetadata.get(0);
         Assert.assertEquals("Package-Name", pm.getName());
-        Assert.assertEquals(1,pm.getMinOccurrence());
-        Assert.assertEquals(1,pm.getMaxOccurrence());
+        Assert.assertEquals(PackageMetadata.Requiredness.REQUIRED, pm.getRequiredness());
+        Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
 
         pm = requiredMetadata.get(1);
@@ -59,8 +59,8 @@ public class PackageMetadataServiceTest {
         Assert.assertEquals(5,recommendedMetadata.size());
         PackageMetadata pm = recommendedMetadata.get(0);
         Assert.assertEquals("Bag-Group-Identifier", pm.getName());
-        Assert.assertEquals(0,pm.getMinOccurrence());
-        Assert.assertEquals(1,pm.getMaxOccurrence());
+        Assert.assertEquals(PackageMetadata.Requiredness.RECOMMENDED, pm.getRequiredness());
+        Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
 
         pm = recommendedMetadata.get(4);
@@ -74,8 +74,8 @@ public class PackageMetadataServiceTest {
         Assert.assertEquals(7, optionalMetadata.size());
         PackageMetadata pm = optionalMetadata.get(0);
         Assert.assertEquals("Keyword", pm.getName());
-        Assert.assertEquals(0,pm.getMinOccurrence());
-        Assert.assertEquals(Integer.MAX_VALUE,pm.getMaxOccurrence());
+        Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
+        Assert.assertTrue(pm.isRepeatable());
         Assert.assertTrue(pm.isEditable());
 
         pm = optionalMetadata.get(6);
