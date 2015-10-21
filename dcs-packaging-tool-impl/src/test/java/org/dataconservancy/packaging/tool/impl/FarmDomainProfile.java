@@ -13,7 +13,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.dprofile.Requirement;
@@ -134,7 +134,7 @@ public class FarmDomainProfile extends DomainProfile {
         title_constraint.setMin(1);
         title_constraint.setMax(2);
 
-        PropertyValue cow_species = new PropertyValue(species_property_type);
+        Property cow_species = new Property(species_property_type);
         cow_species.setStringValue("Bos taurus");
 
         farm_node_type.setIdentifier(URI.create("fdp:farm"));
@@ -231,12 +231,6 @@ public class FarmDomainProfile extends DomainProfile {
         media_node_type.setFileAssocationRequirement(Requirement.MUST);
         media_node_type.setDomainProfile(this);
 
-        setIdentifier(URI.create("http://example.com/farm"));
-        setLabel("Farm");
-        setDescription("Vocabulary for describing a farm");
-        setNodeTypes(Arrays.asList(farm_node_type, cow_node_type, barn_node_type, media_node_type, trough_node_type, feed_node_type, stockpile_node_type));
-        setPropertyTypes(Arrays.asList(species_property_type, weight_property_type, title_property_type, breed));
-
         PropertyCategory saleCategory = new PropertyCategory();
         saleCategory.setPropertyTypes(Arrays.asList(weight_property_type, breed));
         saleCategory.setLabel("Sale Properties");
@@ -274,6 +268,11 @@ public class FarmDomainProfile extends DomainProfile {
         feedTransform.setRemoveEmptyParent(true);
         feedTransform.setMoveResultToGrandParent(false);
 
+        setIdentifier(URI.create("http://example.com/farm"));
+        setLabel("Farm");
+        setDescription("Vocabulary for describing a farm");
+        setNodeTypes(Arrays.asList(trough_node_type, media_node_type, cow_node_type, barn_node_type, feed_node_type, stockpile_node_type, farm_node_type));
+        setPropertyTypes(Arrays.asList(species_property_type, weight_property_type, title_property_type, breed));
         setNodeTransforms(Arrays.asList(locationTransform, feedTransform));
     }
 

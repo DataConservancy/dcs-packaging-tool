@@ -90,7 +90,7 @@ public class ModelEqualsAndHashCodeTest {
     @Test
     public void PropertyValueTest() {
         EqualsVerifier
-                .forClass(PropertyValue.class)
+                .forClass(Property.class)
                 .allFieldsShouldBeUsed()
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();

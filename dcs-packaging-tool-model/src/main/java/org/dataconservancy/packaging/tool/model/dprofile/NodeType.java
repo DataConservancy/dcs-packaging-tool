@@ -20,7 +20,7 @@ public class NodeType extends AbstractDescribedObject {
     private List<NodeConstraint> parent_constraints;
     private List<PropertyConstraint> property_constraints;
     private List<PropertyType> inheritable_properties;
-    private List<PropertyValue> default_property_values;
+    private List<Property> default_property_values;
     private Map<PropertyType, SuppliedProperty> supplied_properties;
     private Requirement file_req;
     private Requirement dir_req;
@@ -74,7 +74,7 @@ public class NodeType extends AbstractDescribedObject {
      * @return List of default property values the domain object must have on
      *         creation.
      */
-    public List<PropertyValue> getDefaultPropertyValues() {
+    public List<Property> getDefaultPropertyValues() {
         return default_property_values;
     }
 
@@ -155,7 +155,7 @@ public class NodeType extends AbstractDescribedObject {
     /**
      * @param default_property_values The default_property_values to set.
      */
-    public void setDefaultPropertyValues(List<PropertyValue> default_property_values) {
+    public void setDefaultPropertyValues(List<Property> default_property_values) {
         this.default_property_values = default_property_values;
     }
 
@@ -226,7 +226,7 @@ public class NodeType extends AbstractDescribedObject {
             inheritablePropertySet.addAll(inheritable_properties);
         }
 
-        HashSet<PropertyValue> defaultPropertyValueSet = null;
+        HashSet<Property> defaultPropertyValueSet = null;
         if (default_property_values != null) {
             defaultPropertyValueSet = new HashSet<>();
             defaultPropertyValueSet.addAll(default_property_values);

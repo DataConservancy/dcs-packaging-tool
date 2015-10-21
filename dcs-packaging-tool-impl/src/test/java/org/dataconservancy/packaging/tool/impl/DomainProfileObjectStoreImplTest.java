@@ -9,15 +9,13 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.joda.time.DateTime;
@@ -47,7 +45,7 @@ public class DomainProfileObjectStoreImplTest {
      * model for correct triples.
      */
     @Test
-    public void testUpdateObject() {
+    public void testUpdateObject() { // TODO move tree here
         test_update_object(ipmtree.getRoot());
     }
 
@@ -56,7 +54,7 @@ public class DomainProfileObjectStoreImplTest {
         URI test_object = URI.create("test:moo");
 
         PropertyType type = profile.getTitlePropertyType();
-        PropertyValue val = new PropertyValue(type);
+        Property val = new Property(type);
         val.setStringValue("Jim the cow");
 
         store.addProperty(test_object, val);
@@ -69,7 +67,7 @@ public class DomainProfileObjectStoreImplTest {
         URI test_object = URI.create("test:jimfoot");
 
         PropertyType type = profile.getSizePropertyType();
-        PropertyValue val = new PropertyValue(type);
+        Property val = new Property(type);
         val.setLongValue(32);
 
         store.addProperty(test_object, val);
@@ -82,7 +80,7 @@ public class DomainProfileObjectStoreImplTest {
         URI test_object = URI.create("test:jimlunch");
 
         PropertyType type = profile.getCreatedPropertyType();
-        PropertyValue val = new PropertyValue(type);
+        Property val = new Property(type);
         val.setDateTimeValue(new DateTime(100000000));
 
         store.addProperty(test_object, val);
@@ -95,12 +93,12 @@ public class DomainProfileObjectStoreImplTest {
         URI test_object = URI.create("test:farmcontactinfo");
 
         PropertyType type = profile.getPersonPropertyType();
-        PropertyValue val = new PropertyValue(type);
+        Property val = new Property(type);
 
-        List<PropertyValue> subvals = new ArrayList<>();
-        PropertyValue name_val = new PropertyValue(profile.getNamePropertyType());
+        List<Property> subvals = new ArrayList<>();
+        Property name_val = new Property(profile.getNamePropertyType());
         name_val.setStringValue("Jim Moocow Farmer");
-        PropertyValue mbox_val = new PropertyValue(profile.getMboxPropertyType());
+        Property mbox_val = new Property(profile.getMboxPropertyType());
         mbox_val.setStringValue("moo@moo.moo");
         subvals.add(name_val);
         subvals.add(mbox_val);
@@ -117,7 +115,7 @@ public class DomainProfileObjectStoreImplTest {
         URI test_object = URI.create("test:jimfoot");
 
         PropertyType type = profile.getSizePropertyType();
-        PropertyValue val = new PropertyValue(type);
+        Property val = new Property(type);
         val.setLongValue(32);
 
         store.addProperty(test_object, val);
@@ -133,9 +131,9 @@ public class DomainProfileObjectStoreImplTest {
         URI test_object = URI.create("test:jimfeet");
 
         PropertyType type = profile.getSizePropertyType();
-        PropertyValue val1 = new PropertyValue(type);
+        Property val1 = new Property(type);
         val1.setLongValue(32);
-        PropertyValue val2 = new PropertyValue(type);
+        Property val2 = new Property(type);
         val2.setLongValue(42);
 
         store.addProperty(test_object, val1);
@@ -190,7 +188,7 @@ public class DomainProfileObjectStoreImplTest {
         // Check default properties
 
         if (type.getDefaultPropertyValues() != null) {
-            for (PropertyValue val : type.getDefaultPropertyValues()) {
+            for (Property val : type.getDefaultPropertyValues()) {
                 assertTrue(id + " has property " + val, has_property(id, val));
             }
         }
@@ -234,7 +232,7 @@ public class DomainProfileObjectStoreImplTest {
         }
     }
 
-    private boolean has_property(URI id, PropertyValue val) {
+    private boolean has_property(URI id, Property val) {
         return store.getProperties(id, val.getPropertyType()).contains(val);
     }
 
@@ -242,7 +240,7 @@ public class DomainProfileObjectStoreImplTest {
         return model.createResource(uri.toString());
     }
 
-    private Property as_property(URI uri) {
+    private org.apache.jena.rdf.model.Property as_property(URI uri) {
         return model.createProperty(uri.toString());
     }
 
@@ -254,11 +252,11 @@ public class DomainProfileObjectStoreImplTest {
         return model.contains(as_statement(subject, predicate, object));
     }
 
-    private boolean has_statement(URI subject, Property prop, URI object) {
+    private boolean has_statement(URI subject, org.apache.jena.rdf.model.Property prop, URI object) {
         return model.contains(as_statement(subject, prop, object));
     }
 
-    private Statement as_statement(URI subject, Property prop, URI object) {
+    private Statement as_statement(URI subject, org.apache.jena.rdf.model.Property prop, URI object) {
         return model.createStatement(as_resource(subject), prop, as_resource(object));
     }
 }

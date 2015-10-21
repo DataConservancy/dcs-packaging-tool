@@ -1,17 +1,14 @@
 package org.dataconservancy.packaging.tool.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.util.Arrays;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,21 +33,19 @@ public class DomainProfileServiceImplTest {
         profile = tree.getProfile();
     }
 
+    /**
+     * A single node must get assigned to Farm because it is the only type which
+     * may not have a parent.
+     */
     @Test
     public void testAssignNodeTypesToSingleNode() {
-        Node root = tree.getRoot();
-
-        root.getChildren().clear();
-        root.setNodeType(null);
-        root.setDomainObject(null);
+        Node root = new Node(URI.create("test:node"));
 
         service.assignNodeTypes(profile, root);
 
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
-
-        System.err.println(root.getNodeType());
-
+        assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
     }
 
     /**
@@ -65,18 +60,18 @@ public class DomainProfileServiceImplTest {
         // Missing species, title, and weight
         assertFalse(service.validateProperties(node, profile.getCowNodeType()));
 
-        PropertyValue species = new PropertyValue(profile.getSpeciesPropertyType());
+        Property species = new Property(profile.getSpeciesPropertyType());
         species.setStringValue("robocow");
         service.addProperty(node, species);
 
-        PropertyValue title = new PropertyValue(profile.getTitlePropertyType());
+        Property title = new Property(profile.getTitlePropertyType());
         title.setStringValue("Good cow");
         service.addProperty(node, title);
 
         // Missing weight
         assertFalse(service.validateProperties(node, profile.getCowNodeType()));
 
-        PropertyValue weight = new PropertyValue(profile.getWeightPropertyType());
+        Property weight = new Property(profile.getWeightPropertyType());
         weight.setLongValue(100);
         service.addProperty(node, weight);
 
@@ -96,35 +91,35 @@ public class DomainProfileServiceImplTest {
         // Missing title and person
         assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
 
-        PropertyValue title = new PropertyValue(profile.getTitlePropertyType());
+        Property title = new Property(profile.getTitlePropertyType());
         title.setStringValue("Jim's farm.");
-        
+
         service.addProperty(node, title);
 
         // Missing person
         assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
-        
-        PropertyValue person1 = new PropertyValue(profile.getPersonPropertyType());
-        
-        PropertyValue name1 = new PropertyValue(profile.getNamePropertyType());
+
+        Property person1 = new Property(profile.getPersonPropertyType());
+
+        Property name1 = new Property(profile.getNamePropertyType());
         name1.setStringValue("Farmer Jim");
-        
+
         person1.setComplexValue(Arrays.asList(name1));
-        
+
         service.addProperty(node, person1);
 
         // Missing mbox on person1
         assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
-        
-        PropertyValue mbox1 = new PropertyValue(profile.getMboxPropertyType());
+
+        Property mbox1 = new Property(profile.getMboxPropertyType());
         mbox1.setStringValue("mooooo@moo");
-        
+
         person1.setComplexValue(Arrays.asList(name1, mbox1));
-        
+
         // Must remove existing incorrect person property
         service.removeProperty(node, profile.getPersonPropertyType());
         service.addProperty(node, person1);
-        
+
         assertTrue(service.validateProperties(node, profile.getFarmNodeType()));
     }
 }

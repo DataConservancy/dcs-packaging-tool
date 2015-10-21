@@ -5,8 +5,8 @@ import java.util.List;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
@@ -19,20 +19,20 @@ public interface DomainProfileService {
      * 
      * @param node
      *            The node that the property will be added to.
-     * @param value
+     * @param prop
      *            The value of the property that should be added to the node.
      */
-    void addProperty(Node node, PropertyValue value);
+    void addProperty(Node node, Property prop);
 
     /**
      * Remove a particular property from a node.
      * 
      * @param node
      *            The node to remove the properties from.
-     * @param value
+     * @param prop
      *            The value of the property to remove.
      */
-    void removeProperty(Node node, PropertyValue value);
+    void removeProperty(Node node, Property prop);
 
     /**
      * Remove all properties of a given type from a node.
@@ -52,7 +52,7 @@ public interface DomainProfileService {
      *            types.
      * @return All properties of a node.
      */
-    List<PropertyValue> getProperties(Node node, NodeType type);
+    List<Property> getProperties(Node node, NodeType type);
 
     /**
      * Check that all the properties on a node satisfy constraints for that node

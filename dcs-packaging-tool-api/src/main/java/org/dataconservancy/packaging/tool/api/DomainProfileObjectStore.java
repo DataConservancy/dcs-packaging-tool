@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.List;
 
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
@@ -40,10 +40,10 @@ public interface DomainProfileObjectStore {
      * 
      * @param object
      *            The identifier of the object to modify.
-     * @param value
+     * @param prop
      *            The value to add.
      */
-    void addProperty(URI object, PropertyValue value);
+    void addProperty(URI object, Property prop);
 
     /**
      * Remove a particular property from a object. Complex properties may not be
@@ -51,10 +51,10 @@ public interface DomainProfileObjectStore {
      * 
      * @param object
      *            The identifier of the object to modify.
-     * @param value
+     * @param prop
      *            The value to remove.
      */
-    void removeProperty(URI object, PropertyValue value);
+    void removeProperty(URI object, Property prop);
 
     /**
      * Remove all properties of a given type from a object.
@@ -73,7 +73,7 @@ public interface DomainProfileObjectStore {
      *            The node type which the object corresponds to.
      * @return All properties of an object specified by a node type.
      */
-    List<PropertyValue> getProperties(URI object, NodeType type);
+    List<Property> getProperties(URI object, NodeType type);
 
     /**
      * @param object
@@ -82,7 +82,7 @@ public interface DomainProfileObjectStore {
      *            The type of properties to retrieve.
      * @return All properties of an object specified of the given type.
      */
-    List<PropertyValue> getProperties(URI object, PropertyType type);
+    List<Property> getProperties(URI object, PropertyType type);
 
     /**
      * Check for the existence of a relationship.

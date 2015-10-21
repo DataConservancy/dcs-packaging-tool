@@ -20,7 +20,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.dprofile.Requirement;
@@ -257,7 +256,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             }
 
             if (nodeType.getDefaultPropertyValues() != null && !nodeType.getDefaultPropertyValues().isEmpty()) {
-                for (PropertyValue defaultValue : nodeType.getDefaultPropertyValues()) {
+                for (org.dataconservancy.packaging.tool.model.dprofile.Property defaultValue : nodeType.getDefaultPropertyValues()) {
                     nodeTypeResource.addProperty(HAS_DEFAULT_PROPERTY_VALUE, transformToRdf(model, defaultValue));
                 }
             }
@@ -368,7 +367,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             }
 
             if (type.getAllowedPropertyValues() != null && !type.getAllowedPropertyValues().isEmpty()) {
-                for (PropertyValue value : type.getAllowedPropertyValues()) {
+                for (org.dataconservancy.packaging.tool.model.dprofile.Property value : type.getAllowedPropertyValues()) {
                     typeResource.addProperty(HAS_ALLOWED_VALUE, transformToRdf(model, value));
                 }
             }
@@ -386,7 +385,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         return typeResource;
     }
 
-    private Resource transformToRdf(Model model, PropertyValue value)
+    private Resource transformToRdf(Model model, org.dataconservancy.packaging.tool.model.dprofile.Property value)
         throws RDFTransformException {
         Resource valueResource = model.createResource();
         valueResource.addProperty(RDF.type, PROPERTY_VALUE_TYPE);
@@ -403,7 +402,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
                 valueResource.addLiteral(HAS_DATE_TIME_VALUE, value.getDateTimeValue().getMillis());
                 break;
             case COMPLEX:
-                for (PropertyValue subValue : value.getComplexValue()) {
+                for (org.dataconservancy.packaging.tool.model.dprofile.Property subValue : value.getComplexValue()) {
                     valueResource.addProperty(HAS_COMPLEX_VALUE, transformToRdf(model, subValue));
                 }
                 break;
@@ -655,7 +654,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setInheritableProperties(inheritableProperties);
         }
 
-        List<PropertyValue> defaultPropertyValues = new ArrayList<>();
+        List<org.dataconservancy.packaging.tool.model.dprofile.Property> defaultPropertyValues = new ArrayList<>();
         for (RDFNode defaultPropertyNode : model.listObjectsOfProperty(resource, HAS_DEFAULT_PROPERTY_VALUE).toList()) {
             if (!defaultPropertyNode.isResource()) {
                 throw new RDFTransformException(
@@ -831,7 +830,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (resource.hasProperty(HAS_ALLOWED_VALUE)) {
-            List<PropertyValue> allowedValues = new ArrayList<>();
+            List<org.dataconservancy.packaging.tool.model.dprofile.Property> allowedValues = new ArrayList<>();
             for (RDFNode allowedValueNode : model.listObjectsOfProperty(resource, HAS_ALLOWED_VALUE).toList()) {
                 if (!allowedValueNode.isResource()) {
                     throw new RDFTransformException(
@@ -861,9 +860,9 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         return propertyType;
     }
 
-    private PropertyValue transformToPropertyValue(Resource resource, DomainProfile profile, Model model)
+    private org.dataconservancy.packaging.tool.model.dprofile.Property transformToPropertyValue(Resource resource, DomainProfile profile, Model model)
         throws RDFTransformException {
-        PropertyValue value = null;
+        org.dataconservancy.packaging.tool.model.dprofile.Property value = null;
 
         PropertyType type = null;
         if (resource.hasProperty(HAS_PROPERTY_TYPE)) {
@@ -871,7 +870,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (type != null) {
-            value = new PropertyValue(type);
+            value = new org.dataconservancy.packaging.tool.model.dprofile.Property(type);
 
             if (resource.hasProperty(HAS_STRING_VALUE)) {
                 value.setStringValue(getLiteral(resource, HAS_STRING_VALUE).getString());
@@ -880,7 +879,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             } else if (resource.hasProperty(HAS_DATE_TIME_VALUE)) {
                 value.setDateTimeValue(new DateTime(getLiteral(resource, HAS_DATE_TIME_VALUE).getLong()));
             } else {
-                List<PropertyValue> complexValues = new ArrayList<>();
+                List<org.dataconservancy.packaging.tool.model.dprofile.Property> complexValues = new ArrayList<>();
                 for (RDFNode complexValueNode : model.listObjectsOfProperty(resource, HAS_COMPLEX_VALUE).toList()) {
                     if (!complexValueNode.isResource()) {
                         throw new RDFTransformException(

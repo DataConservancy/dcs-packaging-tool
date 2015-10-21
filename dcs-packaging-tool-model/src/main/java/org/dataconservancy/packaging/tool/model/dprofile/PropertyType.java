@@ -14,7 +14,7 @@ public class PropertyType extends AbstractDescribedObject {
     private URI domain_pred;
     private PropertyValueType value_type;
     private PropertyValueHint value_hint;
-    private List<PropertyValue> allowed_values;
+    private List<Property> allowed_values;
     private List<PropertyConstraint> subtypes;
     private PropertyCategory category;
     private boolean readonly;
@@ -44,7 +44,7 @@ public class PropertyType extends AbstractDescribedObject {
      * @return If non-null and not empty, the value must be one contained in
      *         this list.
      */
-    public List<PropertyValue> getAllowedPropertyValues() {
+    public List<Property> getAllowedPropertyValues() {
         return allowed_values;
     }
 
@@ -95,7 +95,7 @@ public class PropertyType extends AbstractDescribedObject {
     /**
      * @param allowed_values The allowed values to set.
      */
-    public void setAllowedPropertyValues(List<PropertyValue> allowed_values) {
+    public void setAllowedPropertyValues(List<Property> allowed_values) {
         this.allowed_values = allowed_values;
     }
 
@@ -126,7 +126,7 @@ public class PropertyType extends AbstractDescribedObject {
      */
     @Override
     public int hashCode() {
-        HashSet<PropertyValue> allowedValueSet = null;
+        HashSet<Property> allowedValueSet = null;
         if (allowed_values != null) {
             allowedValueSet = new HashSet<>();
             allowedValueSet.addAll(allowed_values);

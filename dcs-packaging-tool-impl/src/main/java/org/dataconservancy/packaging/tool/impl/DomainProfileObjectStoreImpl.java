@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -19,9 +18,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValue;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
@@ -136,35 +135,35 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return null;
     }
 
-    private List<PropertyValue> as_property_values(PropertyType type, SuppliedProperty sup, FileInfo info) {
-        List<PropertyValue> result = new ArrayList<>();
-        PropertyValue value;
+    private List<Property> as_property_values(PropertyType type, SuppliedProperty sup, FileInfo info) {
+        List<Property> result = new ArrayList<>();
+        Property value;
 
         switch (sup) {
         case FILE_CREATED_DATE:
-            value = new PropertyValue(type);
+            value = new Property(type);
             value.setDateTimeValue(new DateTime(info.getCreationTime()));
             result.add(value);
             break;
         case FILE_FORMAT_URI:
             for (String fmt : info.getFormats()) {
-                value = new PropertyValue(type);
+                value = new Property(type);
                 value.setStringValue(fmt);
                 result.add(value);
             }
             break;
         case FILE_MODIFIED_DATE:
-            value = new PropertyValue(type);
+            value = new Property(type);
             value.setDateTimeValue(new DateTime(info.getLastModifiedTime()));
             result.add(value);
             break;
         case FILE_NAME:
-            value = new PropertyValue(type);
+            value = new Property(type);
             value.setStringValue(info.getName());
             result.add(value);
             break;
         case FILE_SIZE:
-            value = new PropertyValue(type);
+            value = new Property(type);
             value.setLongValue(info.getSize());
             result.add(value);
             break;
@@ -176,16 +175,16 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     @Override
-    public void addProperty(URI object, PropertyValue value) {
+    public void addProperty(URI object, Property value) {
         add_property(as_resource(object), value);
     }
 
-    private void add_property(Resource obj, PropertyValue value) {
+    private void add_property(Resource obj, Property value) {
         obj.addProperty(as_property(value.getPropertyType().getDomainPredicate()), as_rdf_node(value));
     }
 
     @Override
-    public void removeProperty(URI object, PropertyValue value) {
+    public void removeProperty(URI object, Property value) {
         RDFNode rdf_value = as_rdf_node(value);
 
         if (rdf_value.isAnon()) {
@@ -203,8 +202,8 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     @Override
-    public List<PropertyValue> getProperties(URI object, NodeType type) {
-        List<PropertyValue> result = new ArrayList<PropertyValue>();
+    public List<Property> getProperties(URI object, NodeType type) {
+        List<Property> result = new ArrayList<Property>();
 
         Resource obj = model.createResource(object.toString());
 
@@ -218,8 +217,8 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     @Override
-    public List<PropertyValue> getProperties(URI object, PropertyType type) {
-        List<PropertyValue> result = new ArrayList<PropertyValue>();
+    public List<Property> getProperties(URI object, PropertyType type) {
+        List<Property> result = new ArrayList<Property>();
 
         Resource obj = model.createResource(object.toString());
 
@@ -228,7 +227,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return result;
     }
 
-    private void get_properties(Resource obj, PropertyType type, List<PropertyValue> result) {
+    private void get_properties(Resource obj, PropertyType type, List<Property> result) {
         NodeIterator iter = model.listObjectsOfProperty(obj, as_property(type.getDomainPredicate()));
 
         while (iter.hasNext()) {
@@ -240,7 +239,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return model.createResource(uri.toString());
     }
 
-    private Property as_property(URI uri) {
+    private org.apache.jena.rdf.model.Property as_property(URI uri) {
         return model.createProperty(uri.toString());
     }
 
@@ -256,7 +255,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return ISODateTimeFormat.dateTimeParser().parseDateTime(dt.toString());
     }
 
-    private RDFNode as_rdf_node(PropertyValue value) {
+    private RDFNode as_rdf_node(Property value) {
         if (!value.hasValue()) {
             throw new IllegalArgumentException("No value set on property.");
         }
@@ -267,7 +266,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         case COMPLEX:
             Resource res = model.createResource();
 
-            for (PropertyValue subval : value.getComplexValue()) {
+            for (Property subval : value.getComplexValue()) {
                 res.addProperty(as_property(subval.getPropertyType().getDomainPredicate()), as_rdf_node(subval));
             }
 
@@ -285,13 +284,13 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     // Attempt to convert a given rdf node to a property value of the given
     // type. Return null on failure.
-    private PropertyValue as_property_value(RDFNode rdfnode, PropertyType type) {
-        PropertyValue value = new PropertyValue(type);
+    private Property as_property_value(RDFNode rdfnode, PropertyType type) {
+        Property value = new Property(type);
 
         switch (type.getPropertyValueType()) {
         case COMPLEX:
             if (rdfnode.isResource()) {
-                List<PropertyValue> subvalues = new ArrayList<>();
+                List<Property> subvalues = new ArrayList<>();
 
                 for (PropertyConstraint subtypecon : type.getPropertySubTypes()) {
                     // TODO Might be many objects of predicate. Just pick one.
@@ -301,7 +300,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                     Statement s = model.getProperty(rdfnode.asResource(), as_property(subtype.getDomainPredicate()));
 
                     if (s != null) {
-                        PropertyValue subval = as_property_value(s.getObject(), subtype);
+                        Property subval = as_property_value(s.getObject(), subtype);
 
                         if (subval != null) {
                             subvalues.add(subval);

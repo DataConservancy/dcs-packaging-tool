@@ -5,13 +5,13 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 /**
- * The value of a property.
+ * A property has a value and a type.
  */
-public class PropertyValue {
+public class Property {
     private Object value;
     private PropertyType type;
 
-    public PropertyValue(PropertyType type) {
+    public Property(PropertyType type) {
         this.type = type;
     }
     
@@ -54,7 +54,7 @@ public class PropertyValue {
      * @return If type is complex, return contained values.
      */
     @SuppressWarnings("unchecked")
-    public List<PropertyValue> getComplexValue() {
+    public List<Property> getComplexValue() {
         check_value_type(PropertyValueType.COMPLEX);
         return List.class.cast(value);
     }
@@ -96,7 +96,7 @@ public class PropertyValue {
      * @param value
      *            The value to set.
      */
-    public void setComplexValue(List<PropertyValue> value) {
+    public void setComplexValue(List<Property> value) {
         check_value_type(PropertyValueType.COMPLEX);
         this.value = value;
     }
@@ -124,9 +124,9 @@ public class PropertyValue {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof PropertyValue))
+        if (!(obj instanceof Property))
             return false;
-        PropertyValue other = (PropertyValue) obj;
+        Property other = (Property) obj;
         if (type == null) {
             if (other.type != null)
                 return false;
