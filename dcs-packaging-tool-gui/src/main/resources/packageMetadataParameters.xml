@@ -3,79 +3,94 @@
     <packageMetadata>
         <name>Package-Name</name>
         <requiredness>REQUIRED</requiredness>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Name</name>
         <requiredness>RECOMMENDED</requiredness>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Phone</name>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>PHONE</validationType>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Email</name>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>EMAIL</validationType>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Keyword</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>A keyword string</helpText>
         <repeatable>true</repeatable>
+         <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>External-Identifier</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>Sender-provided Identifier of the package. There should be a one-to-one mapping between the External-Identifier and the Bag-Group-Identifier.</helpText>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>External-Description</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>Description of A brief explanation of the contents and provenance.</helpText>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Internal-Sender-Identifier</name>
         <requiredness>OPTIONAL</requiredness>
         <repeatable>true</repeatable>
+        <editable>true</editable>
         <helpText>An alternate sender-specific identifier for the content and/or bag.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Internal-Sender-Description</name>
         <requiredness>OPTIONAL</requiredness>
+        <editable>true</editable>
         <helpText>A sender-local prose description of the contents of the bag.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Source-Organization</name>
         <requiredness>OPTIONAL</requiredness>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Organization-Address</name>
         <requiredness>OPTIONAL</requiredness>
+        <editable>true</editable>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Count</name>
         <requiredness>RECOMMENDED</requiredness>
+        <editable>true</editable>
         <helpText>Sequence number of a given bag within a bag group. The format is "&lt;n&gt; of &lt;m&gt;", where &lt;n&gt; is the sequence number within the group and &lt;m&gt; is the total number of bags in the group. If the latter is not known, the value of &lt;m&gt; should be '?'. "Bag-Count: 1 of 1" should be specified if the entire package will be captured in a single bag. This mechanism allows a package to be split across multiple bags.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Group-Identifier</name>
         <requiredness>RECOMMENDED</requiredness>
+        <editable>true</editable>
         <helpText>A sender-provided identifier for a bag group. For DCS packages, the bag group identifier should uniquely identify a package and when combined with the sequence number ('&lt;n&gt;') from the Bag-Count should uniquely identify a bag.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Rights-String</name>
         <requiredness>OPTIONAL</requiredness>
+        <editable>true</editable>
         <helpText>A rights/use statement.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Rights-URI</name>
         <requiredness>OPTIONAL</requiredness>
         <repeatable>true</repeatable>
+        <editable>true</editable>
         <helpText>A URI representing rights/use information.</helpText>
     </packageMetadata>
     <packageMetadata>
-        <name>Bagging-Data</name>
+        <name>Bagging-Date</name>
         <requiredness>RECOMMENDED</requiredness>
     </packageMetadata>
     <packageMetadata>
