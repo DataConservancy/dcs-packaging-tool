@@ -168,7 +168,18 @@ public class IPMServiceTest {
     }
 
     /**
-     * Tests that if a directory is changed the new directory and children are marked as added and the old ones are marked removed
+     * Tests that if a directory is changed the new directory and children are marked as added and the old ones are marked removed.
+     *
+     * This test is also to document current behavior note that even if two files remain the same, but their parent has changed they are considered moved.
+     *
+     * For example
+     * Node -> C:\foo
+     *  Node -> C:\cow\moo.txt
+     *
+     * Node -> C:\bar
+     *  Node -> C:\cow\moo.txt
+     *
+     * Even though in this example moo.txt is at the same location since it's parent node has changed we label it as a move (i.e. delete existing/add new).
      * @throws URISyntaxException
      */
     @Test

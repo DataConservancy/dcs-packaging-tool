@@ -130,86 +130,62 @@ public class IPMServiceImpl implements IPMService {
                                                        Node comparisonTree) {
 
         Map<Node, NodeComparisonStatus> nodeMap = new HashMap<>();
-        //Check if root nodes compare
-        compareNode(existingTree, comparisonTree, nodeMap);
 
-        //Check if any nodes from the comparison tree weren't reached, in which case they're new nodes.
-        checkNodeReached(comparisonTree, nodeMap);
+        //Generate maps of existing locations in the trees
+        Map<URI, Node> existingLocationMap = new HashMap<>();
+        Map<URI, Node> comparisonLocationMap = new HashMap<>();
+
+        addNodeLocation(existingTree, existingLocationMap);
+        addNodeLocation(comparisonTree, comparisonLocationMap);
+
+        for (URI location : existingLocationMap.keySet()) {
+            if (comparisonLocationMap.containsKey(location)) {
+                Node existingNode = existingLocationMap.get(location);
+                Node comparisonNode = comparisonLocationMap.get(location);
+
+                //If the node is root or the node's parent location is the same then we consider if the same
+                if ((existingNode.getParent() == null && comparisonNode.getParent() == null) || existingNode.getParent().getFileInfo().getLocation().equals(comparisonNode.getParent().getFileInfo().getLocation())) {
+                    if (existingNode.getFileInfo().isFile()
+                            && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5))
+                            && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1))) {
+
+                        //The checksums are different so we consider this an update
+                        nodeMap.put(existingNode, NodeComparisonStatus.UPDATED);
+                        nodeMap.put(comparisonNode, NodeComparisonStatus.UPDATED);
+                        comparisonLocationMap.remove(location);
+                    } else {
+                        //The file location is completely unchanged and not updated
+                        nodeMap.put(existingNode, NodeComparisonStatus.UNCHANGED);
+                        nodeMap.put(comparisonNode, NodeComparisonStatus.UNCHANGED);
+                        comparisonLocationMap.remove(location);
+                    }
+                } else {
+                    //The node has moved so we consider it a delete and add.
+                    nodeMap.put(existingNode, NodeComparisonStatus.DELETED);
+                    nodeMap.put(comparisonNode, NodeComparisonStatus.ADDED);
+                    comparisonLocationMap.remove(location);
+                }
+            } else {
+                nodeMap.put(existingLocationMap.get(location), NodeComparisonStatus.DELETED);
+            }
+        }
+
+        //Anything remaining in the comparison location map should be added
+        if (!comparisonLocationMap.isEmpty()) {
+            for (URI location : comparisonLocationMap.keySet()) {
+                nodeMap.put(comparisonLocationMap.get(location), NodeComparisonStatus.ADDED);
+            }
+        }
+
         return nodeMap;
     }
 
-    private void compareNode(Node existingNode, Node comparisonNode, Map<Node, NodeComparisonStatus> nodeMap) {
-        if (existingNode.getFileInfo().getLocation().equals(comparisonNode.getFileInfo().getLocation())) {
-            //Navigate the new tree
-            for (Node existingChild : existingNode.getChildren()) {
-                FileInfo existingInfo = existingChild.getFileInfo();
-                boolean existingChildFound = false;
-                for (Node comparisonChild : comparisonNode.getChildren()) {
-                    if (existingInfo.getLocation().equals(comparisonChild.getFileInfo().getLocation())) {
-                        existingChildFound = true;
+    private void addNodeLocation(Node node, Map<URI, Node> nodeLocationMap) {
+        nodeLocationMap.put(node.getFileInfo().getLocation(), node);
 
-                        //If it's a file and the checksums have changed it's an update, otherwise it's an unchanged file or directory
-                        if (existingInfo.isFile()
-                            && !existingInfo.getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(comparisonChild.getFileInfo().getChecksum(FileInfo.Algorithm.MD5))
-                            && !existingInfo.getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(comparisonChild.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1))) {
-                            nodeMap.put(existingChild, NodeComparisonStatus.UPDATED);
-                            nodeMap.put(comparisonChild, NodeComparisonStatus.UPDATED);
-                        } else {
-                            nodeMap.put(existingChild, NodeComparisonStatus.UNCHANGED);
-                            nodeMap.put(comparisonChild, NodeComparisonStatus.UNCHANGED);
-
-                            if (existingChild.getChildren() != null && !existingChild.getChildren().isEmpty()) {
-                                compareNode(existingChild, comparisonChild, nodeMap);
-                            }
-
-                            //TODO Can we put an else in here to handle children not found, instead of doing it later?
-                        }
-                    }
-                }
-
-                //If we were unable to find the corresponding file entity in the new tree mark the old one and it's children as removed.
-                if (!existingChildFound) {
-                    markNodesAsRemoved(existingChild, nodeMap);
-                }
-            }
-
-            nodeMap.put(existingNode, NodeComparisonStatus.UNCHANGED);
-            nodeMap.put(comparisonNode, NodeComparisonStatus.UNCHANGED);
-        } else { //The roots are different so the entire trees are different
-            //If the entire trees are different mark every node in the existing tree as deleted and every node in the new tree as added.
-            markNodesAsAdded(comparisonNode, nodeMap);
-            markNodesAsRemoved(existingNode, nodeMap);
-        }
-    }
-
-    private void checkNodeReached(Node comparisonNode, Map<Node, NodeComparisonStatus> nodeMap) {
-        if (nodeMap.keySet().contains(comparisonNode)) {
-            if (comparisonNode.getChildren() != null && !comparisonNode.getChildren().isEmpty()) {
-                for (Node comparisonChild : comparisonNode.getChildren()) {
-                    checkNodeReached(comparisonChild, nodeMap);
-                }
-            }
-        } else {
-            markNodesAsAdded(comparisonNode, nodeMap);
-        }
-    }
-
-    //Marks a node and all it's children as added.
-    private void markNodesAsAdded(Node node, Map<Node, NodeComparisonStatus> nodeMap) {
-        nodeMap.put(node, NodeComparisonStatus.ADDED);
-        if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+        if (node.getChildren() != null) {
             for (Node child : node.getChildren()) {
-                markNodesAsAdded(child, nodeMap);
-            }
-        }
-    }
-
-    //Marks a node and all it's children as removed.
-    private void markNodesAsRemoved(Node node, Map<Node, NodeComparisonStatus> nodeMap) {
-        nodeMap.put(node, NodeComparisonStatus.DELETED);
-        if (node.getChildren() != null && !node.getChildren().isEmpty()) {
-            for (Node child : node.getChildren()) {
-                markNodesAsRemoved(child, nodeMap);
+                addNodeLocation(child, nodeLocationMap);
             }
         }
     }
