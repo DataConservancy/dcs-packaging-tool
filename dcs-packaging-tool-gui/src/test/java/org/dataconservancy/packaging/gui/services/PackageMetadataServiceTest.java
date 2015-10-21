@@ -7,6 +7,7 @@ import org.junit.Assert;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,47 +39,57 @@ public class PackageMetadataServiceTest {
     public void testGetRequiredPackageMetadata(){
         List<PackageMetadata> requiredMetadata = underTest.getRequiredPackageMetadata();
         Assert.assertNotNull(requiredMetadata);
-        Assert.assertEquals(3, requiredMetadata.size());
+        Assert.assertEquals(1, requiredMetadata.size());
         PackageMetadata pm = requiredMetadata.get(0);
-        Assert.assertEquals("Package-Name", pm.getName());
+        Assert.assertEquals("Package-Metadata-Required", pm.getName());
         Assert.assertEquals(PackageMetadata.Requiredness.REQUIRED, pm.getRequiredness());
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
-
-        pm = requiredMetadata.get(1);
-        Assert.assertEquals("Bag-Count", pm.getName());
-
-        pm = requiredMetadata.get(2);
-        Assert.assertEquals("Internal-Sender-Identifier", pm.getName());
+        Assert.assertEquals("This is the help text for Package-Metadata-1",pm.getHelpText());
+        Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
     }
 
     @Test
     public void testGetRecommendedPackageMetadata(){
         List<PackageMetadata> recommendedMetadata = underTest.getRecommendedPackageMetadata();
         Assert.assertNotNull(recommendedMetadata);
-        Assert.assertEquals(5,recommendedMetadata.size());
+        Assert.assertEquals(3,recommendedMetadata.size());
         PackageMetadata pm = recommendedMetadata.get(0);
-        Assert.assertEquals("Bag-Group-Identifier", pm.getName());
+        Assert.assertEquals("Package-Metadata-Recommended", pm.getName());
         Assert.assertEquals(PackageMetadata.Requiredness.RECOMMENDED, pm.getRequiredness());
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
-
-        pm = recommendedMetadata.get(4);
-        Assert.assertEquals("External-Description", pm.getName());
+        Assert.assertEquals("This is the help text for Package-Metadata-2",pm.getHelpText());
+        Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
     }
 
     @Test
     public void testGetOptionalPackageMetadata(){
         List<PackageMetadata> optionalMetadata = underTest.getOptionalPackageMetadata();
         Assert.assertNotNull(optionalMetadata);
-        Assert.assertEquals(7, optionalMetadata.size());
+        Assert.assertEquals(3, optionalMetadata.size());
         PackageMetadata pm = optionalMetadata.get(0);
-        Assert.assertEquals("Keyword", pm.getName());
+        Assert.assertEquals("Package-Metadata-Optional", pm.getName());
+        Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
+        Assert.assertFalse(pm.isRepeatable());
+        Assert.assertFalse(pm.isEditable());
+        Assert.assertEquals("This is the help text for Package-Metadata-2",pm.getHelpText());
+        Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
+
+        pm = optionalMetadata.get(1);
+        Assert.assertEquals("Repeatable-Metadata", pm.getName());
         Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
         Assert.assertTrue(pm.isRepeatable());
-        Assert.assertTrue(pm.isEditable());
+        Assert.assertFalse(pm.isEditable());
+        Assert.assertNull(pm.getHelpText());
+        Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
 
-        pm = optionalMetadata.get(6);
-        Assert.assertEquals("Rights-URI", pm.getName());
+        pm = optionalMetadata.get(2);
+        Assert.assertEquals("Editable-Metadata", pm.getName());
+        Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
+        Assert.assertFalse(pm.isRepeatable());
+        Assert.assertTrue(pm.isEditable());
+        Assert.assertNull(pm.getHelpText());
+        Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
     }
 }

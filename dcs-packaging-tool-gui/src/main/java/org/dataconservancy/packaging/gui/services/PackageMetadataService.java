@@ -1,20 +1,18 @@
 package org.dataconservancy.packaging.gui.services;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
-import org.dataconservancy.packaging.tool.model.ParametersBuildException;
+import org.dataconservancy.packaging.tool.model.PackageMetadataList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+
 import java.util.List;
 
 /**
@@ -33,7 +31,7 @@ public class PackageMetadataService {
 
     public PackageMetadataService(Configuration configuration) throws IOException{
         packageMetadataParametersFile = configuration.getPackageMetadataParametersFile();
-        createPackageModels(configuration.getConfigurationFileInputStream(packageMetadataParametersFile));
+        createPackageMetadata(configuration.getConfigurationFileInputStream(packageMetadataParametersFile));
     }
 
     public List<PackageMetadata> getRequiredPackageMetadata(){
@@ -48,67 +46,47 @@ public class PackageMetadataService {
         return optional;
     }
 
-    private void createPackageModels(InputStream fileStream){
-        required = new ArrayList<PackageMetadata>();
-        recommended = new ArrayList<PackageMetadata>();
-        optional = new ArrayList<PackageMetadata>();
-
-        if (fileStream != null) {
-            try {
-                createPackageMetadata(fileStream);
-            } catch (ParametersBuildException e) {
-            log.error("Error building package metadata from file: " + packageMetadataParametersFile);
-            }
-        }
-        else {;
-            log.error("Error reading package metadata parameters file. Couldn't find classpath file: " + packageMetadataParametersFile);
-        }
-
+    public List<PackageMetadata> getAllPackageMetadata(){
+        List<PackageMetadata> allPackageMetadata = new ArrayList<>();
+        allPackageMetadata.addAll(required);
+        allPackageMetadata.addAll(recommended);
+        allPackageMetadata.addAll(optional);
+        return allPackageMetadata;
     }
 
-    private void createPackageMetadata(InputStream inputStream) throws ParametersBuildException {
+    private void createPackageMetadata(InputStream inputStream) {
 
-        PropertiesConfiguration props = new PropertiesConfiguration();
-        try {
-            props.load(new InputStreamReader(inputStream));
-        } catch (ConfigurationException e) {
-            throw new ParametersBuildException(e);
-        }
+        required = new ArrayList<>();
+        recommended = new ArrayList<>();
+        optional = new ArrayList<>();
 
-        Iterator<String> keys = props.getKeys();
-        while (keys.hasNext()) {
-            PackageMetadata packageMetadata = new PackageMetadata();
-            String key = keys.next();
-            List<String> values = Arrays.asList(props.getStringArray(key));
-            packageMetadata.setName(key);
-            packageMetadata.setEditable((values.contains("Editable")));
-            packageMetadata.setRepeatable(values.contains("Repeatable"));
+        if (inputStream != null) {
 
-            PackageMetadata.ValidationType type;
-            if (values.contains("Phone")) {
-                type = PackageMetadata.ValidationType.PHONE;
-            } else if (values.contains("Email")) {
-                type = PackageMetadata.ValidationType.EMAIL;
-            } else if (values.contains("URL")) {
-                type = PackageMetadata.ValidationType.URL;
-            } else if (values.contains("Date")) {
-                type = PackageMetadata.ValidationType.DATE;
-            } else if (values.contains("File")) {
-                type = PackageMetadata.ValidationType.FILENAME;
-            } else {
-                type = PackageMetadata.ValidationType.NONE;
-            }
-            packageMetadata.setValidationType(type);
+            try {
+                JAXBContext jaxbContext = JAXBContext.newInstance(PackageMetadataList.class);
+                Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-            if (values.contains("Required")) {
-                packageMetadata.setRequiredness(PackageMetadata.Requiredness.REQUIRED);
-                required.add(packageMetadata);
-            } else if (values.contains("Recommended")) {
-                packageMetadata.setRequiredness(PackageMetadata.Requiredness.RECOMMENDED);
-                recommended.add(packageMetadata);
-            } else {
-                packageMetadata.setRequiredness(PackageMetadata.Requiredness.OPTIONAL);
-                optional.add(packageMetadata);
+                PackageMetadataList pmList = (PackageMetadataList) jaxbUnmarshaller.unmarshal(inputStream);
+
+                for (PackageMetadata pm : pmList.getPackageMetadatalist()) {
+                    if (pm.getRequiredness()!= null && pm.getRequiredness().equals(PackageMetadata.Requiredness.REQUIRED)) {
+                        required.add(pm);
+                    } else if (pm.getRequiredness()!= null && pm.getRequiredness().equals(PackageMetadata.Requiredness.RECOMMENDED)) {
+                        recommended.add(pm);
+                    } else if (pm.getRequiredness()!= null && pm.getRequiredness().equals(PackageMetadata.Requiredness.OPTIONAL)){
+                        optional.add(pm);
+                    } else {
+                        pm.setRequiredness(PackageMetadata.Requiredness.OPTIONAL);
+                        optional.add(pm);
+                    }
+
+                    if(pm.getValidationType() == null){
+                        pm.setValidationType(PackageMetadata.ValidationType.NONE);
+                    }
+                }
+            } catch (JAXBException e) {
+                log.error("Error processing package metadata from file " + packageMetadataParametersFile);
+
             }
         }
     }

@@ -15,12 +15,18 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This class captures information necessary to the package tool to know what and how prompt user for specific package
  * metadata.
  */
+@XmlRootElement(name="packageMetadata")
 public class PackageMetadata {
 
+    @XmlEnum
     public enum ValidationType {
         NONE,
         PHONE,
@@ -30,6 +36,7 @@ public class PackageMetadata {
         FILENAME,
     };
 
+    @XmlEnum
     public enum Requiredness {
         REQUIRED,
         RECOMMENDED,
@@ -39,7 +46,9 @@ public class PackageMetadata {
     private String name;
     private ValidationType validationType;
     private String helpText;
+    @XmlAttribute(name = "editable")
     private boolean isEditable;
+    @XmlAttribute(name = "repeatable")
     private boolean isRepeatable;
     private Requiredness requiredness;
 
