@@ -55,8 +55,8 @@ public class FarmIpmTree {
 
         if (file) {
             fileInfo.addFormat("application/octet-stream");
-            fileInfo.addChecksum(Algorithm.MD5, UUID.randomUUID().toString());
-            fileInfo.addChecksum(Algorithm.SHA1, UUID.randomUUID().toString());
+            fileInfo.addChecksum(Algorithm.MD5, "12345");
+            fileInfo.addChecksum(Algorithm.SHA1, "54321");
         }
         return fileInfo;
     }
