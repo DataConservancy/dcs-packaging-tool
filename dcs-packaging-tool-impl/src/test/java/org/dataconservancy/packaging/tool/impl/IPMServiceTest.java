@@ -1,7 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.support.NodeComparisonStatus;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
@@ -135,16 +135,16 @@ public class IPMServiceTest {
         nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
         nodeOne.addChild(nodeTwo);
 
-        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(farmTree.getRoot(), nodeOne);
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(farmTree.getRoot(), nodeOne);
         assertNotNull(nodeMap);
 
         assertEquals(6, nodeMap.size());
 
         for (Node node : nodeMap.keySet()) {
             if (node.getIdentifier() == identifierOne || node.getIdentifier() == identifierTwo) {
-                assertEquals(NodeComparisonStatus.ADDED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.ADDED, nodeMap.get(node).getStatus());
             } else {
-                assertEquals(NodeComparisonStatus.DELETED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.DELETED, nodeMap.get(node).getStatus());
             }
         }
     }
@@ -159,12 +159,8 @@ public class IPMServiceTest {
         FarmIpmTree treeTwo = new FarmIpmTree();
         updateNodeId(treeTwo.getRoot());
 
-        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
-        assertEquals(8, nodeMap.size());
-
-        for (Node node : nodeMap.keySet()) {
-            assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
-        }
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        assertEquals(0, nodeMap.size());
     }
 
     /**
@@ -200,20 +196,17 @@ public class IPMServiceTest {
         FileInfo newInfo = new FileInfo(URI.create("/foo/bar"), "bar");
         directoryNode.setFileInfo(newInfo);
 
-        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
 
-        assertEquals(8, nodeMap.size());
+        assertEquals(4, nodeMap.size());
 
         for (Node node : nodeMap.keySet()) {
             if (node.getIdentifier().equals(directoryNodeId) || node.getIdentifier().equals(childId)) {
-                assertEquals(NodeComparisonStatus.ADDED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.ADDED, nodeMap.get(node).getStatus());
             } else if (node.getIdentifier().equals(oldDirectoryNodeId) || node.getIdentifier().equals(oldChildId)){
-                assertEquals(NodeComparisonStatus.DELETED, nodeMap.get(node));
-            } else {
-                assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.DELETED, nodeMap.get(node).getStatus());
             }
         }
-
     }
 
     /**
@@ -246,17 +239,15 @@ public class IPMServiceTest {
         nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
         directoryNode.addChild(nodeTwo);
 
-        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
 
-        assertEquals(9, nodeMap.size());
+        assertEquals(3, nodeMap.size());
 
         for (Node node : nodeMap.keySet()) {
             if (node.getIdentifier().equals(identifierOne) || node.getIdentifier().equals(identifierTwo)) {
-                assertEquals(NodeComparisonStatus.ADDED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.ADDED, nodeMap.get(node).getStatus());
             } else if (node.getIdentifier().equals(oldChildId)){
-                assertEquals(NodeComparisonStatus.DELETED, nodeMap.get(node));
-            } else {
-                assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.DELETED, nodeMap.get(node).getStatus());
             }
         }
     }
@@ -281,15 +272,13 @@ public class IPMServiceTest {
         childNode.getFileInfo().addChecksum(FileInfo.Algorithm.MD5, UUID.randomUUID().toString());
         childNode.getFileInfo().addChecksum(FileInfo.Algorithm.SHA1, UUID.randomUUID().toString());
 
-        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
 
-        assertEquals(8, nodeMap.size());
+        assertEquals(1, nodeMap.size());
 
         for (Node node : nodeMap.keySet()) {
             if (node.getIdentifier().equals(oldChildId) || node.getIdentifier().equals(childId)) {
-                assertEquals(NodeComparisonStatus.UPDATED, nodeMap.get(node));
-            } else {
-                assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+                assertEquals(NodeComparison.Status.UPDATED, nodeMap.get(node).getStatus());
             }
         }
     }
@@ -298,9 +287,7 @@ public class IPMServiceTest {
     private void updateNodeId(Node node) {
         node.setIdentifier(URI.create("test:" + UUID.randomUUID()));
         if (node.getChildren() != null) {
-            for (Node child : node.getChildren()) {
-                updateNodeId(child);
-            }
+            node.getChildren().forEach(this::updateNodeId);
         }
     }
 }

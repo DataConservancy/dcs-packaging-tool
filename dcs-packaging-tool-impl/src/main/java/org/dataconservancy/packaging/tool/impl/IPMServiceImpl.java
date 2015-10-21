@@ -1,7 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.support.NodeComparisonStatus;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -120,16 +120,22 @@ public class IPMServiceImpl implements IPMService {
 
     @Override
     public void mergeTree(Node existingTree,
-                          Map<Node, NodeComparisonStatus> comparisonResult) {
-        // TODO Auto-generated method stub
+                          Map<Node, NodeComparison> comparisonResult) {
+
+        //Handle the case where root node has been deleted.
+        if (comparisonResult.get(existingTree) != null && comparisonResult.get(existingTree).getStatus() == NodeComparison.Status.DELETED) {
+
+        } else {
+
+        }
 
     }
 
     @Override
-    public Map<Node, NodeComparisonStatus> compareTree(Node existingTree,
-                                                       Node comparisonTree) {
+    public Map<Node, NodeComparison> compareTree(Node existingTree,
+                                                 Node comparisonTree) {
 
-        Map<Node, NodeComparisonStatus> nodeMap = new HashMap<>();
+        Map<Node, NodeComparison> nodeMap = new HashMap<>();
 
         //Generate maps of existing locations in the trees
         Map<URI, Node> existingLocationMap = new HashMap<>();
@@ -150,30 +156,50 @@ public class IPMServiceImpl implements IPMService {
                             && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1))) {
 
                         //The checksums are different so we consider this an update
-                        nodeMap.put(existingNode, NodeComparisonStatus.UPDATED);
-                        nodeMap.put(comparisonNode, NodeComparisonStatus.UPDATED);
+                        nodeMap.put(comparisonNode, new NodeComparison(NodeComparison.Status.UPDATED, existingNode));
                         comparisonLocationMap.remove(location);
                     } else {
                         //The file location is completely unchanged and not updated
-                        nodeMap.put(existingNode, NodeComparisonStatus.UNCHANGED);
-                        nodeMap.put(comparisonNode, NodeComparisonStatus.UNCHANGED);
                         comparisonLocationMap.remove(location);
                     }
                 } else {
                     //The node has moved so we consider it a delete and add.
-                    nodeMap.put(existingNode, NodeComparisonStatus.DELETED);
-                    nodeMap.put(comparisonNode, NodeComparisonStatus.ADDED);
+                    nodeMap.put(existingNode, new NodeComparison(NodeComparison.Status.DELETED, null));
+
+                    //Determine what the parent of the new node will be it will either be already in the tree, or a new node being added.
+                    Node parent;
+
+                    //If we've added the comparison node as the parent it will be in the map
+                    if (nodeMap.get(comparisonNode.getParent()) != null) {
+                        parent = comparisonNode.getParent();
+                    } else {
+                        parent = existingNode.getParent();
+                    }
+                    nodeMap.put(comparisonNode, new NodeComparison(NodeComparison.Status.ADDED, parent));
                     comparisonLocationMap.remove(location);
                 }
             } else {
-                nodeMap.put(existingLocationMap.get(location), NodeComparisonStatus.DELETED);
+                nodeMap.put(existingLocationMap.get(location), new NodeComparison(NodeComparison.Status.DELETED, null));
             }
         }
 
         //Anything remaining in the comparison location map should be added
         if (!comparisonLocationMap.isEmpty()) {
             for (URI location : comparisonLocationMap.keySet()) {
-                nodeMap.put(comparisonLocationMap.get(location), NodeComparisonStatus.ADDED);
+                //Determine what the parent of the new node will be it will either be already in the tree, or a new node being added.
+                Node parent = null;
+
+                if (existingLocationMap.get(location) != null) {
+                   parent = existingLocationMap.get(location).getParent();
+                }
+
+                //If we've added the comparison node as the parent it will be in the map
+                if ( parent == null || (nodeMap.get(parent) != null && nodeMap.get(parent).getStatus() ==
+                    NodeComparison.Status.DELETED)) {
+                    parent = comparisonLocationMap.get(location).getParent();
+                }
+
+                nodeMap.put(comparisonLocationMap.get(location), new NodeComparison(NodeComparison.Status.ADDED, parent));
             }
         }
 

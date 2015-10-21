@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
-import org.dataconservancy.packaging.tool.api.support.NodeComparisonStatus;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public interface IPMService {
@@ -39,14 +39,14 @@ public interface IPMService {
      * @param comparisonTree The root node of the new tree to compare against the existing tree.
      * @return A map of nodes and their status after comparison.
      */
-    Map<Node, NodeComparisonStatus> compareTree(Node existingTree, Node comparisonTree);
+    Map<Node, NodeComparison> compareTree(Node existingTree, Node comparisonTree);
 
     /**
      * Merges the provided comparison tree into the existing tree.
      * @param existingTree The existing tree that will receive the results of the merge.
      * @param comparisonResult A map of the comparison result to apply to the existing tree.
      */
-    void mergeTree(Node existingTree, Map<Node, NodeComparisonStatus> comparisonResult);
+    void mergeTree(Node existingTree, Map<Node, NodeComparison> comparisonResult);
     
     /**
      * Checks that the file backing the node is accessible on the file system.
