@@ -1,6 +1,8 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.api.support.NodeComparisonStatus;
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -9,9 +11,13 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -110,5 +116,180 @@ public class IPMServiceTest {
         }
 
         underTest.createTreeFromFileSystem(tempDir.toPath());
+    }
+
+    /**
+     * Tests that if two trees have nothing in common the existing one has all it's items marked as delete, and the new tree has all it's items marked as added.
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testCompareSeparateTrees() throws URISyntaxException {
+        FarmIpmTree farmTree = new FarmIpmTree();
+
+        URI identifierOne = URI.create("compare:one");
+        Node nodeOne = new Node(identifierOne);
+        nodeOne.setFileInfo(new FileInfo(new URI("location:foo"), "one"));
+
+        URI identifierTwo = URI.create("compare:two");
+        Node nodeTwo = new Node(identifierTwo);
+        nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
+        nodeOne.addChild(nodeTwo);
+
+        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(farmTree.getRoot(), nodeOne);
+        assertNotNull(nodeMap);
+
+        assertEquals(6, nodeMap.size());
+
+        for (Node node : nodeMap.keySet()) {
+            if (node.getIdentifier() == identifierOne || node.getIdentifier() == identifierTwo) {
+                assertEquals(NodeComparisonStatus.ADDED, nodeMap.get(node));
+            } else {
+                assertEquals(NodeComparisonStatus.DELETED, nodeMap.get(node));
+            }
+        }
+    }
+
+    /**
+     * Tests that if the exact same tree is compared all nodes are returned marked unchanged
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testCompareSameTree() throws URISyntaxException {
+        FarmIpmTree treeOne = new FarmIpmTree();
+        FarmIpmTree treeTwo = new FarmIpmTree();
+        updateNodeId(treeTwo.getRoot());
+
+        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        assertEquals(8, nodeMap.size());
+
+        for (Node node : nodeMap.keySet()) {
+            assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+        }
+    }
+
+    /**
+     * Tests that if a directory is changed the new directory and children are marked as added and the old ones are marked removed
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testCompareWithDirectoryChange() throws URISyntaxException {
+        FarmIpmTree treeOne = new FarmIpmTree();
+        FarmIpmTree treeTwo = new FarmIpmTree();
+
+        updateNodeId(treeTwo.getRoot());
+
+        URI oldDirectoryNodeId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getIdentifier();
+        URI oldChildId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
+
+        //Get a directory node in the second tree
+        Node directoryNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0);
+        URI directoryNodeId = directoryNode.getIdentifier();
+
+        URI childId = directoryNode.getChildren().get(0).getIdentifier();
+        FileInfo newInfo = new FileInfo(URI.create("/foo/bar"), "bar");
+        directoryNode.setFileInfo(newInfo);
+
+        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+
+        assertEquals(8, nodeMap.size());
+
+        for (Node node : nodeMap.keySet()) {
+            if (node.getIdentifier().equals(directoryNodeId) || node.getIdentifier().equals(childId)) {
+                assertEquals(NodeComparisonStatus.ADDED, nodeMap.get(node));
+            } else if (node.getIdentifier().equals(oldDirectoryNodeId) || node.getIdentifier().equals(oldChildId)){
+                assertEquals(NodeComparisonStatus.DELETED, nodeMap.get(node));
+            } else {
+                assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+            }
+        }
+
+    }
+
+    /**
+     * Tests that if files are added and removed they are correctly designated in tree comparison
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testCompareAddRemoveFile() throws URISyntaxException {
+        FarmIpmTree treeOne = new FarmIpmTree();
+        FarmIpmTree treeTwo = new FarmIpmTree();
+
+        updateNodeId(treeTwo.getRoot());
+
+        URI oldChildId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
+
+        //Get a directory node in the second tree
+        Node directoryNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0);
+
+        //Remove the child node from the directory
+        directoryNode.removeChild(directoryNode.getChildren().get(0));
+
+        //Add two new nodes to the directory node
+        URI identifierOne = URI.create("compare:one");
+        Node nodeOne = new Node(identifierOne);
+        nodeOne.setFileInfo(new FileInfo(new URI("location:foo"), "one"));
+        directoryNode.addChild(nodeOne);
+
+        URI identifierTwo = URI.create("compare:two");
+        Node nodeTwo = new Node(identifierTwo);
+        nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
+        directoryNode.addChild(nodeTwo);
+
+        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+
+        assertEquals(9, nodeMap.size());
+
+        for (Node node : nodeMap.keySet()) {
+            if (node.getIdentifier().equals(identifierOne) || node.getIdentifier().equals(identifierTwo)) {
+                assertEquals(NodeComparisonStatus.ADDED, nodeMap.get(node));
+            } else if (node.getIdentifier().equals(oldChildId)){
+                assertEquals(NodeComparisonStatus.DELETED, nodeMap.get(node));
+            } else {
+                assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+            }
+        }
+    }
+
+    /**
+     * Tests that if a file has different checksums it's marked as an update.
+     * @throws URISyntaxException
+     */
+    @Test
+    public void testCompareUpdateFile() throws URISyntaxException {
+        FarmIpmTree treeOne = new FarmIpmTree();
+        FarmIpmTree treeTwo = new FarmIpmTree();
+
+        updateNodeId(treeTwo.getRoot());
+
+        URI oldChildId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
+
+        //Get a directory node in the second tree
+        Node childNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0);
+
+        URI childId = childNode.getIdentifier();
+        childNode.getFileInfo().addChecksum(FileInfo.Algorithm.MD5, UUID.randomUUID().toString());
+        childNode.getFileInfo().addChecksum(FileInfo.Algorithm.SHA1, UUID.randomUUID().toString());
+
+        Map<Node, NodeComparisonStatus> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+
+        assertEquals(8, nodeMap.size());
+
+        for (Node node : nodeMap.keySet()) {
+            if (node.getIdentifier().equals(oldChildId) || node.getIdentifier().equals(childId)) {
+                assertEquals(NodeComparisonStatus.UPDATED, nodeMap.get(node));
+            } else {
+                assertEquals(NodeComparisonStatus.UNCHANGED, nodeMap.get(node));
+            }
+        }
+    }
+
+    //Used to update node ids of the FarmIpmTree so it's a different tree from the original
+    private void updateNodeId(Node node) {
+        node.setIdentifier(URI.create("test:" + UUID.randomUUID()));
+        if (node.getChildren() != null) {
+            for (Node child : node.getChildren()) {
+                updateNodeId(child);
+            }
+        }
     }
 }
