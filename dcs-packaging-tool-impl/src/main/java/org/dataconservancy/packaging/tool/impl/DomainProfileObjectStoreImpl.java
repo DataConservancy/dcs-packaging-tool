@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.vocabulary.RDF;
@@ -184,14 +185,30 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     @Override
-    public void removeProperty(URI object, Property value) {
-        RDFNode rdf_value = as_rdf_node(value);
-
-        if (rdf_value.isAnon()) {
-            throw new IllegalArgumentException("Complex properties can only be removed by type.");
-        } else {
-            model.remove(as_statement(object, value.getPropertyType().getDomainPredicate(), rdf_value));
+    public void removeProperty(URI object, Property prop) {
+        RDFNode node = find_property(as_resource(object), prop);
+        
+        if (node != null) {
+            model.remove(as_statement(object, prop.getPropertyType().getDomainPredicate(), node));
         }
+    }
+
+    private RDFNode find_property(Resource res, Property prop) {
+        PropertyType type = prop.getPropertyType();
+
+        NodeIterator iter = model.listObjectsOfProperty(res, as_property(type.getDomainPredicate()));
+
+        while (iter.hasNext()) {
+            RDFNode node = iter.next();
+            
+            Property p = as_property_value(node, type);
+
+            if (prop.equals(p)) {
+                return node;
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -259,7 +276,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         if (!value.hasValue()) {
             throw new IllegalArgumentException("No value set on property.");
         }
-        
+
         PropertyType type = value.getPropertyType();
 
         switch (type.getPropertyValueType()) {
@@ -293,14 +310,11 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                 List<Property> subvalues = new ArrayList<>();
 
                 for (PropertyConstraint subtypecon : type.getPropertySubTypes()) {
-                    // TODO Might be many objects of predicate. Just pick one.
-
                     PropertyType subtype = subtypecon.getPropertyType();
-                    
-                    Statement s = model.getProperty(rdfnode.asResource(), as_property(subtype.getDomainPredicate()));
+                    NodeIterator iter = model.listObjectsOfProperty(rdfnode.asResource(), as_property(subtype.getDomainPredicate()));
 
-                    if (s != null) {
-                        Property subval = as_property_value(s.getObject(), subtype);
+                    while (iter.hasNext()) {
+                        Property subval = as_property_value(iter.next(), subtype);
 
                         if (subval != null) {
                             subvalues.add(subval);
@@ -309,7 +323,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                 }
 
                 value.setComplexValue(subvalues);
-                
+
                 return value;
             } else {
                 return null;
@@ -321,7 +335,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                 if (dt != null) {
                     value.setDateTimeValue(as_date_time(dt));
                 }
-                
+
                 return value;
             } else {
                 return null;
@@ -329,7 +343,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         case LONG:
             if (rdfnode.isLiteral()) {
                 value.setLongValue(rdfnode.asLiteral().getLong());
-                
+
                 return value;
             } else {
                 return null;
@@ -337,24 +351,34 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         case STRING:
             if (rdfnode.isLiteral()) {
                 value.setStringValue(rdfnode.asLiteral().getString());
-                
+
                 return value;
             } else {
                 return null;
             }
         default:
             throw new RuntimeException("Unhandled value type");
-        }                
+        }
     }
 
     @Override
     public boolean hasRelationship(URI subject, URI predicate, URI object) {
         return model.contains(as_statement(subject, predicate, object));
     }
-    
+
     public String toString() {
         StringWriter result = new StringWriter();
+        
+        StmtIterator iter = model.listStatements();
+        
+        while (iter.hasNext()) {
+            result.append(iter.next() + "\n");
+        }
+
+        result.append("\n\n");
+        
         RDFDataMgr.write(result, model, RDFFormat.TURTLE_PRETTY);
+        
         return result.toString();
     }
 }

@@ -1,5 +1,6 @@
 package org.dataconservancy.packaging.tool.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -62,6 +63,29 @@ public class DomainProfileObjectStoreImplTest {
         assertTrue(has_property(test_object, val));
     }
 
+    /**
+     * Test that adding the same simple property twice only results in one
+     * instance of the property being added.
+     */
+    @Test
+    public void testAddSameSimpleProperty() {
+        URI test_object = URI.create("test:moo");
+
+        PropertyType type = profile.getTitlePropertyType();
+        Property val = new Property(type);
+        val.setStringValue("Jim the cow");
+
+        store.addProperty(test_object, val);
+
+        assertTrue(has_property(test_object, val));
+        assertEquals(1, store.getProperties(test_object, type).size());
+
+        store.addProperty(test_object, val);
+
+        assertTrue(has_property(test_object, val));
+        assertEquals(1, store.getProperties(test_object, type).size());
+    }
+
     @Test
     public void testAddLongProperty() {
         URI test_object = URI.create("test:jimfoot");
@@ -89,25 +113,65 @@ public class DomainProfileObjectStoreImplTest {
     }
 
     @Test
-    public void testAddComplexProperty() {
+    public void testAddAndRemoveComplexProperty() {
         URI test_object = URI.create("test:farmcontactinfo");
 
         PropertyType type = profile.getPersonPropertyType();
-        Property val = new Property(type);
+        Property prop1 = new Property(type);
 
-        List<Property> subvals = new ArrayList<>();
-        Property name_val = new Property(profile.getNamePropertyType());
-        name_val.setStringValue("Jim Moocow Farmer");
-        Property mbox_val = new Property(profile.getMboxPropertyType());
-        mbox_val.setStringValue("moo@moo.moo");
-        subvals.add(name_val);
-        subvals.add(mbox_val);
+        {
+            List<Property> subvals = new ArrayList<>();
+            Property name_val = new Property(profile.getNamePropertyType());
+            name_val.setStringValue("Jim Moocow Farmer");
+            Property mbox_val = new Property(profile.getMboxPropertyType());
+            mbox_val.setStringValue("moo@moo.moo");
+            subvals.add(name_val);
+            subvals.add(mbox_val);
 
-        val.setComplexValue(subvals);
+            prop1.setComplexValue(subvals);
+        }
 
-        store.addProperty(test_object, val);
+        store.addProperty(test_object, prop1);
+        assertTrue(has_property(test_object, prop1));
 
-        assertTrue(has_property(test_object, val));
+        // There may be multiple complex objects with same value
+        
+        store.addProperty(test_object, prop1);
+        assertTrue(has_property(test_object, prop1));
+        assertEquals(2, store.getProperties(test_object, type).size());
+        
+
+        Property prop2 = new Property(type);
+        
+        {
+            List<Property> subvals = new ArrayList<>();
+            Property name_val = new Property(profile.getNamePropertyType());
+            name_val.setStringValue("Jeff OinkOink Farmer");
+            Property mbox_val = new Property(profile.getMboxPropertyType());
+            mbox_val.setStringValue("oink@oink.oink");
+            subvals.add(name_val);
+            subvals.add(mbox_val);
+
+            prop2.setComplexValue(subvals);
+        }
+        
+        // May be multiple complex objects with same type
+
+        store.addProperty(test_object, prop2);
+        
+        assertTrue(has_property(test_object, prop2));
+        assertEquals(3, store.getProperties(test_object, type).size());
+        
+        // Complex properties may be removed independently even if same value
+        
+        store.removeProperty(test_object, prop1);        
+        assertTrue(has_property(test_object, prop1));
+        assertTrue(has_property(test_object, prop2));
+        assertEquals(2, store.getProperties(test_object, type).size());
+        
+        store.removeProperty(test_object, prop1);     
+        assertTrue(has_property(test_object, prop2));
+        assertEquals(1, store.getProperties(test_object, type).size());
     }
 
     @Test

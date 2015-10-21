@@ -36,7 +36,9 @@ public interface DomainProfileObjectStore {
     void updateObject(Node node);
 
     /**
-     * Add a property to a domain object.
+     * Add a property to a domain object. Only one simple property with a given
+     * value may be on an object. Others are ignored. Multiple complex
+     * properties with the same value may be added.
      * 
      * @param object
      *            The identifier of the object to modify.
@@ -46,8 +48,7 @@ public interface DomainProfileObjectStore {
     void addProperty(URI object, Property prop);
 
     /**
-     * Remove a particular property from a object. Complex properties may not be
-     * removed this way.
+     * Remove a particular property from a n object.
      * 
      * @param object
      *            The identifier of the object to modify.
