@@ -61,6 +61,14 @@ public class PackageMetadataServiceTest {
         Assert.assertFalse(pm.isEditable());
         Assert.assertEquals("This is the help text for Package-Metadata-2",pm.getHelpText());
         Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
+
+        pm = recommendedMetadata.get(1);
+        Assert.assertEquals("Email-Metadata", pm.getName());
+        Assert.assertEquals(PackageMetadata.ValidationType.EMAIL, pm.getValidationType());
+
+        pm = recommendedMetadata.get(2);
+        Assert.assertEquals("Phone-Metadata", pm.getName());
+        Assert.assertEquals(PackageMetadata.ValidationType.PHONE, pm.getValidationType());
     }
 
     @Test

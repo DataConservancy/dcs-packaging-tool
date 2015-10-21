@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class PackageMetadataService {
 
-
     private List<PackageMetadata> required;
     private List<PackageMetadata> recommended;
     private List<PackageMetadata> optional;

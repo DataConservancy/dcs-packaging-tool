@@ -7,7 +7,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
- * Created by jrm on 10/21/15.
+ * This is a wrapper class which allows us to pull in the configuration for the List of PackageMetadata elements
+ * using jaxb in the PackageMetadataService
  */
 @XmlRootElement(name="packageMetadataList")
 @XmlAccessorType(XmlAccessType.FIELD)
