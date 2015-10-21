@@ -1,11 +1,14 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 
 /**
  * A property has a value and a type.
+ * Complex properties hold a set of sub-properties.
  */
 public class Property {
     private Object value;
@@ -14,14 +17,14 @@ public class Property {
     public Property(PropertyType type) {
         this.type = type;
     }
-    
+
     /**
      * @return The type of the property.
      */
     public PropertyType getPropertyType() {
         return type;
     }
-    
+
     /**
      * @return Whether or not a value is held.
      */
@@ -109,12 +112,34 @@ public class Property {
         this.type = type;
     }
 
+    /**
+     * @return Whether or not the property has a simple value.
+     */
+    public boolean isSimpleValue() {
+        return type != null && type.getPropertyValueType() != PropertyValueType.COMPLEX;
+    }
+
+    /**
+     * @return Whether or not the property has a complex value.
+     */
+    public boolean isComplexValue() {
+        return type != null && type.getPropertyValueType() == PropertyValueType.COMPLEX;
+    }
+
     @Override
     public int hashCode() {
+        // Special handling to ignore order of complex values.
+
+        Object value_hash = value;
+
+        if (isComplexValue() && hasValue()) {
+            value_hash = new HashSet<>(getComplexValue());
+        }
+
         final int prime = 31;
         int result = 1;
         result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + ((value_hash == null) ? 0 : value_hash.hashCode());
         return result;
     }
 
@@ -135,8 +160,13 @@ public class Property {
         if (value == null) {
             if (other.value != null)
                 return false;
-        } else if (!value.equals(other.value))
+        } else if (isSimpleValue() && !value.equals(other.value)) {
             return false;
+        } else if (isComplexValue() && (other.value == null
+                || !CollectionUtils.isEqualCollection(getComplexValue(), other.getComplexValue()))) {
+            return false;
+        }
+
         return true;
     }
 
