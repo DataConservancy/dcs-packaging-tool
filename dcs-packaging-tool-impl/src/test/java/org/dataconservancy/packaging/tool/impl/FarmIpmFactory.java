@@ -2,28 +2,35 @@ package org.dataconservancy.packaging.tool.impl;
 
 import java.net.URI;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo.Algorithm;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
- * Tree of in memory IPM node used for testing.
+ * Factory for creating trees of IPM nodes for testing.
  */
-public class FarmIpmTree {
-    private final Node root;
+public class FarmIpmFactory {
     private final FarmDomainProfile profile;
 
-    public FarmIpmTree() {
+    public FarmIpmFactory() {
         this.profile = new FarmDomainProfile();
-        this.root = new Node(URI.create("test:farm"));
+    }
+
+    /**
+     * Return a tree with types assigned.
+     * 
+     * <pre>
+     *  /farm  (Farm)
+     *  /farm/barn1/ (Barn)
+     *  /farm/barn1/cow1 (Cow)
+     *  /farm/barn1/cow1/lastgoodbye.mp4 (Media)
+     * </pre>
+     * @return root of tree.
+     */
+    public Node createSimpleTree() {
+        Node root = new Node(URI.create("test:farm"));
 
         root.setNodeType(profile.getFarmNodeType());
         root.setFileInfo(createFileInfo("/farm", "farm", -1, -1, 100, false));
@@ -43,6 +50,8 @@ public class FarmIpmTree {
         root.addChild(barn);
         barn.addChild(cow);
         cow.addChild(video);
+        
+        return root;
     }
 
     private FileInfo createFileInfo(String path, String name, final long size, final long create_date_ms, final long mod_date_ms, boolean file) {
@@ -59,10 +68,6 @@ public class FarmIpmTree {
             fileInfo.addChecksum(Algorithm.SHA1, "54321");
         }
         return fileInfo;
-    }
-
-    public Node getRoot() {
-        return root;
     }
 
     public FarmDomainProfile getProfile() {
