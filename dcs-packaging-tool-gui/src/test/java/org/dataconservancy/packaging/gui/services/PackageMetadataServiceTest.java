@@ -86,10 +86,14 @@ public class PackageMetadataServiceTest {
 
         pm = optionalMetadata.get(1);
         Assert.assertEquals("Repeatable-Metadata", pm.getName());
+        //This last assert checks that misspelled or invalid specification for the requiredness
+        //defaults to OPTIONAL - was set to MISSPELLED in the xml file
         Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
         Assert.assertTrue(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
         Assert.assertNull(pm.getHelpText());
+        //This last assert checks that misspelled or invalid specification for the validation type
+        //defaults to NONE - was set to MISSPELLED in the xml file
         Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
 
         pm = optionalMetadata.get(2);

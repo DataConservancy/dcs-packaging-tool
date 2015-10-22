@@ -153,7 +153,7 @@ public class Configuration {
      *  This directory is hard-coded in the userConfDirectory field above.
      * @param fileName the name of the file to be found. These names are specified in the
      *                              config_defaults.properties file and set on the  *File fields.
-     * @return
+     * @return the user's local configuration path
      */
     private String locateUserConfigFile(String fileName) {
         File confFile = new File(userConfDirectory, fileName);
@@ -171,7 +171,7 @@ public class Configuration {
      *                              config_defaults.properties file and set on the  *File fields.
      * @return the default configuration path
      */
-    private String locateDefaultConfigFile(String fileName) {
+    public String locateDefaultConfigFile(String fileName) {
         if (configurationDirectory.startsWith("classpath:")) {
             if (configurationDirectory.endsWith("/")) {
                 return configurationDirectory + fileName;
@@ -199,8 +199,14 @@ public class Configuration {
         return (userFile == null ? defaultFile : userFile);
     }
 
-    public InputStream getConfigurationFileInputStream(String configurationFileName) throws IOException{
-        String filePath = resolveConfigurationFile(configurationFileName);
+    /**
+     * This method gets the InputStream associated with the provided file path string, which
+     * may be either a classpath resource or a filesystem path.
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
+    public InputStream getConfigurationFileInputStream(String filePath) throws IOException{
         InputStream fileStream = null;
 
         if (filePath.startsWith("classpath:")) {

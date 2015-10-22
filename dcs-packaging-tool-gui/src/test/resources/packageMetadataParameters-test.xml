@@ -27,7 +27,8 @@
     </packageMetadata>
     <packageMetadata>
         <name>Repeatable-Metadata</name>
-        <requiredness>OPTIONAL</requiredness>
+        <requiredness>MISSPELLED</requiredness>
+        <validationType>MISSPELLED</validationType>
         <repeatable>true</repeatable>
     </packageMetadata>
     <packageMetadata>

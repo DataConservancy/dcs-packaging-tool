@@ -84,6 +84,7 @@ public class PackageMetadata {
 
     /**
      * Returns the name of the metadata field.
+     * @return the name of the field
      */
     public String getName() {
         return name;
@@ -91,6 +92,7 @@ public class PackageMetadata {
 
     /**
      * Returns the help text associated with the metadata field.
+     * @return the help test associated with the metadata field
      */
     public String getHelpText() {
         return helpText;
@@ -102,7 +104,7 @@ public class PackageMetadata {
 
     /**
      * Indicate whether this package metadata field is repeatable.
-     * @return
+     * @return bollean idicating whether this package metadata is repeatable
      */
     public boolean isRepeatable() {
         return isRepeatable;
@@ -113,7 +115,7 @@ public class PackageMetadata {
     }
 
     /**
-     * Indicated whether this package metadata field is REQUIRED, RECOMMENDED or OPTIONAL
+     * Indicated whether this package metadata field is {@code REQUIRED}, {@code RECOMMENDED} or {@code OPTIONAL}
      */
     public Requiredness getRequiredness() {
         return requiredness;

@@ -92,6 +92,7 @@
     <packageMetadata>
         <name>Bagging-Date</name>
         <requiredness>RECOMMENDED</requiredness>
+        <validationType>DATE</validationType>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Size</name>
