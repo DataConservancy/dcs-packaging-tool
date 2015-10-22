@@ -3,6 +3,8 @@ package org.dataconservancy.packaging.gui.util;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -19,10 +21,10 @@ public class RemovableLabel extends HBox implements CssConstants {
 
     public RemovableLabel(final String labelName, final List<String> labelNames, final VBox parentElement) {
 
-        setSpacing(5);
+        setSpacing(4);
 
         ImageView removeImage = new ImageView();
-        removeImage.getStyleClass().add(BAD_INPUT_IMAGE);
+        removeImage.getStyleClass().add(TRASH_IMAGE);
         removeImage.getStyleClass().add(CLICKABLE);
         removeImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 
@@ -35,6 +37,7 @@ public class RemovableLabel extends HBox implements CssConstants {
         });
 
         Label label = new Label(labelName);
+        label.setPadding(new Insets(4, 0, 0, 0));
 
         getChildren().add(removeImage);
         getChildren().add(label);

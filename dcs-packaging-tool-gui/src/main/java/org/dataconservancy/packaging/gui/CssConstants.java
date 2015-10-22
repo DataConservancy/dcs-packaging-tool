@@ -53,6 +53,8 @@ public interface CssConstants {
     public static final String UNEDITABLE_PROPERTY_VALUE = "UneditablePropertyValue";
     public static final String PROPERTY_TEXT_AREA = "PopertyTextArea";
     public static final String HOMEPAGE_VIEW_CLASS = "HomepageView";
+    public static final String HOMEPAGE_VIEW_BUTTON_CLASS = "HomepageViewButton";
     public static final String CLICKABLE = "Clickable";
     public static final String VBOX_BORDER = "VBoxBorder";
+    public static final String TRASH_IMAGE = "TrashImage";
 }

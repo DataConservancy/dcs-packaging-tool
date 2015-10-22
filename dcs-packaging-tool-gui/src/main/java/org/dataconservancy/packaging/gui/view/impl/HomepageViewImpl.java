@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -43,14 +45,14 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
         getContinueButton().setVisible(false);
         getSaveButton().setVisible(false);
 
-        VBox content = new VBox();
-        content.setSpacing(32);
+        VBox content = new VBox(60);
+        content.setAlignment(Pos.CENTER);
         content.getStyleClass().add(HOMEPAGE_VIEW_CLASS);
-
-        setCenter(content);
 
         content.getChildren().add(createNewPackageButton);
         content.getChildren().add(openExistingPackageButton);
+
+        setCenter(content);
 
     }
 
