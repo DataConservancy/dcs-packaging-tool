@@ -61,7 +61,7 @@ public class Factory {
     private HeaderView headerView;
     private SelectContentDirectoryPresenter contentDirectoryPresenter;
     private SelectContentDirectoryView contentDirectoryView;
-    
+
     private Labels labels;
     private Messages messages;
 

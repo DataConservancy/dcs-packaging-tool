@@ -19,6 +19,9 @@ package org.dataconservancy.packaging.gui;
 import org.kohsuke.args4j.Option;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This class is responsible for getters and setters for various configuration parameters, as well as path resolution for
@@ -36,7 +39,7 @@ public class Configuration {
 
     private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
     private String ontologyFile;
-    private String packageFilenameIllegalCharacters;
+    private String packageFilenameIllegalCharacters;;
 
     //the default application configuration directory
     private String configurationDirectory;
@@ -47,12 +50,14 @@ public class Configuration {
     private String disciplineMapFile;
     private String availableProjectsFile;
     private String packageGenerationParametersFile;
+    private String packageMetadataParametersFile;
 
     //the "resolved" configuration files - precedence is
     //command line, then user config directory, and finally the application default
     private String disciplineMap;
     private String availableProjects;
     private String packageGenerationParameters;
+    private String packageMetadataParameters;
 
     @Option(name="--ontology", aliases={"-o"}, usage="Sets an ontology file")
     public void setOntologyFile(String ontologyFile) {
@@ -97,6 +102,12 @@ public class Configuration {
         return packageGenerationParameters;
     }
 
+    public void setPackageMetadataParameters(String packageMetadataParameters){
+        this.packageMetadataParameters = packageMetadataParameters;
+    }
+
+    public String getPackageMetadataParameters(){return packageMetadataParameters; }
+
     public void setConfigurationDirectory(String dir){
         this.configurationDirectory = dir;
     }
@@ -129,12 +140,20 @@ public class Configuration {
         return availableProjectsFile;
     }
 
+    public void setPackageMetadataParametersFile(String packageMetadataParametersFile){
+        this.packageMetadataParametersFile = packageMetadataParametersFile;
+    }
+
+    public String getPackageMetadataParametersFile(){
+        return packageMetadataParametersFile;
+    }
+
     /**
      *  This method locates the default configuration with the supplied file name, in the user's configuration directory.
      *  This directory is hard-coded in the userConfDirectory field above.
      * @param fileName the name of the file to be found. These names are specified in the
      *                              config_defaults.properties file and set on the  *File fields.
-     * @return
+     * @return the user's local configuration path
      */
     private String locateUserConfigFile(String fileName) {
         File confFile = new File(userConfDirectory, fileName);
@@ -152,7 +171,7 @@ public class Configuration {
      *                              config_defaults.properties file and set on the  *File fields.
      * @return the default configuration path
      */
-    private String locateDefaultConfigFile(String fileName) {
+    public String locateDefaultConfigFile(String fileName) {
         if (configurationDirectory.startsWith("classpath:")) {
             if (configurationDirectory.endsWith("/")) {
                 return configurationDirectory + fileName;
@@ -172,12 +191,38 @@ public class Configuration {
      * @param configurationFileName The name of the configuration file to be resolved. These names are specified in the
      *                              config_defaults.properties file and set on the  *File fields.
      *
-     * @return  the resolved configuration.file
+     * @return  the resolved configuration.file path
      */
     public String resolveConfigurationFile(String configurationFileName){
         String userFile = locateUserConfigFile(configurationFileName);
         String defaultFile = locateDefaultConfigFile(configurationFileName);
         return (userFile == null ? defaultFile : userFile);
+    }
+
+    /**
+     * This method gets the InputStream associated with the provided file path string, which
+     * may be either a classpath resource or a filesystem path.
+     * @param filePath
+     * @return
+     * @throws IOException
+     */
+    public InputStream getConfigurationFileInputStream(String filePath) throws IOException{
+        InputStream fileStream = null;
+
+        if (filePath.startsWith("classpath:")) {
+            String path = filePath.substring("classpath:".length());
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+            fileStream = this.getClass().getResourceAsStream(path);
+            //this also works:
+            // URL url = this.getClass().getResource(path);
+            //fileStream = url.openStream();
+        } else {
+            fileStream = new FileInputStream(filePath);
+        }
+
+        return fileStream;
     }
 
 }
