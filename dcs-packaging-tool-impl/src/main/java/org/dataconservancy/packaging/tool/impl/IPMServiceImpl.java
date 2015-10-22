@@ -119,16 +119,64 @@ public class IPMServiceImpl implements IPMService {
     }
 
     @Override
-    public void mergeTree(Node existingTree,
+    public boolean mergeTree(Node existingTree,
                           Map<Node, NodeComparison> comparisonResult) {
 
         //Handle the case where root node has been deleted.
         if (comparisonResult.get(existingTree) != null && comparisonResult.get(existingTree).getStatus() == NodeComparison.Status.DELETED) {
+            //In the case where we're building a new tree we need to find the new root.
+            Node newRoot = null;
+            for (Node node : comparisonResult.keySet()) {
+                NodeComparison comparison = comparisonResult.get(node);
+                if (comparison.getStatus() == NodeComparison.Status.ADDED && comparison.getNode() == null && !node.equals(existingTree)) {
+                    newRoot = node;
+                }
+            }
+
+            if (newRoot == null) {
+                return false;
+            }
+
+            applyTreeChanges(comparisonResult);
+
+            //Assign the new root to the old root
+            existingTree.setIdentifier(newRoot.getIdentifier());
+            existingTree.setFileInfo(newRoot.getFileInfo());
+            existingTree.setDomainObject(newRoot.getDomainObject());
+            existingTree.getChildren().clear();
+
+            existingTree.setChildren(newRoot.getChildren());
+            existingTree.setNodeType(newRoot.getNodeType());
+            existingTree.setSubNodeTypes(newRoot.getSubNodeTypes());
 
         } else {
-
+            applyTreeChanges(comparisonResult);
         }
+        return true;
+    }
 
+    private void applyTreeChanges(Map<Node, NodeComparison> comparisonMap) {
+        for (Node key : comparisonMap.keySet()) {
+            NodeComparison comparison = comparisonMap.get(key);
+
+            switch (comparison.getStatus()) {
+                case ADDED:
+                    if (comparison.getNode() != null) {
+                        comparison.getNode().addChild(key);
+                    }
+                    break;
+                case DELETED:
+                    if (comparison.getNode() != null) {
+                        comparison.getNode().removeChild(key);
+                    }
+                    break;
+                case UPDATED:
+                    if (comparison.getNode() != null) {
+                        comparison.getNode().setFileInfo(key.getFileInfo());
+                    }
+                    break;
+            }
+        }
     }
 
     @Override
@@ -164,7 +212,7 @@ public class IPMServiceImpl implements IPMService {
                     }
                 } else {
                     //The node has moved so we consider it a delete and add.
-                    nodeMap.put(existingNode, new NodeComparison(NodeComparison.Status.DELETED, null));
+                    nodeMap.put(existingNode, new NodeComparison(NodeComparison.Status.DELETED, existingNode.getParent()));
 
                     //Determine what the parent of the new node will be it will either be already in the tree, or a new node being added.
                     Node parent;
@@ -179,7 +227,7 @@ public class IPMServiceImpl implements IPMService {
                     comparisonLocationMap.remove(location);
                 }
             } else {
-                nodeMap.put(existingLocationMap.get(location), new NodeComparison(NodeComparison.Status.DELETED, null));
+                nodeMap.put(existingLocationMap.get(location), new NodeComparison(NodeComparison.Status.DELETED, existingLocationMap.get(location).getParent()));
             }
         }
 

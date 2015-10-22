@@ -45,8 +45,9 @@ public interface IPMService {
      * Merges the provided comparison tree into the existing tree.
      * @param existingTree The existing tree that will receive the results of the merge.
      * @param comparisonResult A map of the comparison result to apply to the existing tree.
+     * @return True if the tree was successfully merged, false otherwise
      */
-    void mergeTree(Node existingTree, Map<Node, NodeComparison> comparisonResult);
+    boolean mergeTree(Node existingTree, Map<Node, NodeComparison> comparisonResult);
     
     /**
      * Checks that the file backing the node is accessible on the file system.
