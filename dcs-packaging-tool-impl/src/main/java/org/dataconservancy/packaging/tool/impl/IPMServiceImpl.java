@@ -138,8 +138,6 @@ public class IPMServiceImpl implements IPMService {
                 return false;
             }
 
-            applyTreeChanges(comparisonResult);
-
             //Assign the new root to the old root
             existingTree.setIdentifier(newRoot.getIdentifier());
             existingTree.setFileInfo(newRoot.getFileInfo());
@@ -198,7 +196,7 @@ public class IPMServiceImpl implements IPMService {
                 Node existingNode = existingLocationMap.get(location);
                 Node comparisonNode = comparisonLocationMap.get(location);
 
-                //If the node is root or the node's parent location is the same then we consider if the same
+                //If the node is root or the node's parent location is the same then we consider it the same
                 if ((existingNode.getParent() == null && comparisonNode.getParent() == null) || existingNode.getParent().getFileInfo().getLocation().equals(comparisonNode.getParent().getFileInfo().getLocation())) {
                     if (existingNode.getFileInfo().isFile()
                             && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5))
@@ -213,7 +211,7 @@ public class IPMServiceImpl implements IPMService {
                     }
                 } else {
                     //The node has moved so we consider it a delete and add.
-                    nodeMap.put(existingNode, new NodeComparison(NodeComparison.Status.DELETED, existingNode.getParent()));
+                    markNodesRemoved(existingNode, existingNode.getParent(), nodeMap);
 
                     //Determine what the parent of the new node will be it will either be already in the tree, or a new node being added.
                     Node parent;
@@ -228,7 +226,7 @@ public class IPMServiceImpl implements IPMService {
                     comparisonLocationMap.remove(location);
                 }
             } else {
-                nodeMap.put(existingLocationMap.get(location), new NodeComparison(NodeComparison.Status.DELETED, existingLocationMap.get(location).getParent()));
+                markNodesRemoved(existingLocationMap.get(location), existingLocationMap.get(location).getParent(), nodeMap);
             }
         }
 
@@ -254,6 +252,15 @@ public class IPMServiceImpl implements IPMService {
         }
 
         return nodeMap;
+    }
+
+    private void markNodesRemoved(Node node, Node parent, Map<Node, NodeComparison> nodeMap) {
+        nodeMap.put(node, new NodeComparison(NodeComparison.Status.DELETED, parent));
+        if (node.getChildren() != null) {
+            for (Node child : node.getChildren()) {
+                markNodesRemoved(child, node, nodeMap);
+            }
+        }
     }
 
     private void addNodeLocation(Node node, Map<URI, Node> nodeLocationMap) {
