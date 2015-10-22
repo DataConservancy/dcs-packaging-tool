@@ -238,17 +238,18 @@ public class IPMServiceImpl implements IPMService {
                 //Determine what the parent of the new node will be it will either be already in the tree, or a new node being added.
                 Node parent = null;
 
-                if (existingLocationMap.get(location) != null) {
-                   parent = existingLocationMap.get(location).getParent();
-                }
+                Node newNode = comparisonLocationMap.get(location);
+                if (newNode.getParent() != null) {
+                    if (existingLocationMap.get(newNode.getParent().getFileInfo().getLocation()) != null) {
+                        parent = existingLocationMap.get(newNode.getParent().getFileInfo().getLocation());
+                    }
 
-                //If we've added the comparison node as the parent it will be in the map
-                if ( parent == null || (nodeMap.get(parent) != null && nodeMap.get(parent).getStatus() ==
-                    NodeComparison.Status.DELETED)) {
-                    parent = comparisonLocationMap.get(location).getParent();
+                    //If the parent isn't existing then we must have added it
+                    if (parent == null) {
+                        parent = comparisonLocationMap.get(newNode.getParent().getFileInfo().getLocation());
+                    }
                 }
-
-                nodeMap.put(comparisonLocationMap.get(location), new NodeComparison(NodeComparison.Status.ADDED, parent));
+                nodeMap.put(newNode, new NodeComparison(NodeComparison.Status.ADDED, parent));
             }
         }
 
