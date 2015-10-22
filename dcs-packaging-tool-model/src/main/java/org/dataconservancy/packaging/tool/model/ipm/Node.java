@@ -100,6 +100,14 @@ public class Node {
     }
 
     /**
+     * Sets the list of children for this node.
+     * @param children The children to add for the node.
+     */
+    public void setChildren(List<Node> children) {
+        this.children = children;
+    }
+
+    /**
      * @return Identifier of domain object associated with node.
      */
     public URI getDomainObject() {
