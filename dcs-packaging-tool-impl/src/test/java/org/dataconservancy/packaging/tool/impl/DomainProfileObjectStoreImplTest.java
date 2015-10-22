@@ -31,14 +31,14 @@ public class DomainProfileObjectStoreImplTest {
     private Model model;
     private DomainProfileObjectStoreImpl store;
     private FarmDomainProfile profile;
-    private FarmIpmTree ipmtree;
+    private FarmIpmFactory ipmfactory;
 
     @Before
     public void setup() {
         model = ModelFactory.createDefaultModel();
         store = new DomainProfileObjectStoreImpl(model);
-        ipmtree = new FarmIpmTree();
-        profile = ipmtree.getProfile();
+        ipmfactory = new FarmIpmFactory();
+        profile = ipmfactory.getProfile();
     }
 
     /**
@@ -46,8 +46,10 @@ public class DomainProfileObjectStoreImplTest {
      * model for correct triples.
      */
     @Test
-    public void testUpdateObject() { // TODO move tree here
-        test_update_object(ipmtree.getRoot());
+    public void testUpdateObject() {
+        test_update_object(ipmfactory.createSimpleTree());
+        
+        // TODO Test more complex trees.
     }
 
     @Test

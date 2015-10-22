@@ -143,7 +143,7 @@ public class IPMServiceTest {
      */
     @Test
     public void testCompareSeparateTrees() throws URISyntaxException {
-        FarmIpmTree farmTree = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
 
         URI identifierOne = URI.create("compare:one");
         Node nodeOne = new Node(identifierOne);
@@ -154,7 +154,7 @@ public class IPMServiceTest {
         nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
         nodeOne.addChild(nodeTwo);
 
-        Map<Node, NodeComparison> nodeMap = underTest.compareTree(farmTree.getRoot(), nodeOne);
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(ipmFact.createSimpleTree(), nodeOne);
         assertNotNull(nodeMap);
 
         assertEquals(6, nodeMap.size());
@@ -174,11 +174,13 @@ public class IPMServiceTest {
      */
     @Test
     public void testCompareSameTree() throws URISyntaxException {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
-        updateNodeId(treeTwo.getRoot());
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
+        
+        updateNodeId(treeTwo);
 
-        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne, treeTwo);
         assertEquals(0, nodeMap.size());
     }
 
@@ -199,23 +201,24 @@ public class IPMServiceTest {
      */
     @Test
     public void testCompareWithDirectoryChange() throws URISyntaxException {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
 
-        updateNodeId(treeTwo.getRoot());
+        updateNodeId(treeTwo);
 
-        URI oldDirectoryNodeId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getIdentifier();
-        URI oldChildId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
+        URI oldDirectoryNodeId = treeOne.getChildren().get(0).getChildren().get(0).getIdentifier();
+        URI oldChildId = treeOne.getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
 
         //Get a directory node in the second tree
-        Node directoryNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0);
+        Node directoryNode = treeTwo.getChildren().get(0).getChildren().get(0);
         URI directoryNodeId = directoryNode.getIdentifier();
 
         URI childId = directoryNode.getChildren().get(0).getIdentifier();
         FileInfo newInfo = new FileInfo(URI.create("/foo/bar"), "bar");
         directoryNode.setFileInfo(newInfo);
 
-        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne, treeTwo);
 
         assertEquals(4, nodeMap.size());
 
@@ -234,15 +237,16 @@ public class IPMServiceTest {
      */
     @Test
     public void testCompareAddRemoveFile() throws URISyntaxException {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
 
-        updateNodeId(treeTwo.getRoot());
+        updateNodeId(treeTwo);
 
-        URI oldChildId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
+        URI oldChildId = treeOne.getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
 
         //Get a directory node in the second tree
-        Node directoryNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0);
+        Node directoryNode = treeTwo.getChildren().get(0).getChildren().get(0);
 
         //Remove the child node from the directory
         directoryNode.removeChild(directoryNode.getChildren().get(0));
@@ -258,7 +262,7 @@ public class IPMServiceTest {
         nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
         directoryNode.addChild(nodeTwo);
 
-        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne, treeTwo);
 
         assertEquals(3, nodeMap.size());
 
@@ -277,21 +281,22 @@ public class IPMServiceTest {
      */
     @Test
     public void testCompareUpdateFile() throws URISyntaxException {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
 
-        updateNodeId(treeTwo.getRoot());
+        updateNodeId(treeTwo);
 
-        URI oldChildId = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
+        URI oldChildId = treeOne.getChildren().get(0).getChildren().get(0).getChildren().get(0).getIdentifier();
 
         //Get a directory node in the second tree
-        Node childNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0);
+        Node childNode = treeTwo.getChildren().get(0).getChildren().get(0).getChildren().get(0);
 
         URI childId = childNode.getIdentifier();
         childNode.getFileInfo().addChecksum(FileInfo.Algorithm.MD5, UUID.randomUUID().toString());
         childNode.getFileInfo().addChecksum(FileInfo.Algorithm.SHA1, UUID.randomUUID().toString());
 
-        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne.getRoot(), treeTwo.getRoot());
+        Map<Node, NodeComparison> nodeMap = underTest.compareTree(treeOne, treeTwo);
 
         assertEquals(1, nodeMap.size());
 
@@ -306,7 +311,7 @@ public class IPMServiceTest {
      */
     @Test
     public void testMergeCompletelyDisparateTrees() throws URISyntaxException {
-        FarmIpmTree farmTree = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
 
         URI identifierOne = URI.create("compare:one");
         Node nodeOne = new Node(identifierOne);
@@ -320,7 +325,7 @@ public class IPMServiceTest {
         nodeMap.put(nodeOne, new NodeComparison(NodeComparison.Status.ADDED, null));
         nodeMap.put(nodeTwo, new NodeComparison(NodeComparison.Status.ADDED, nodeOne));
 
-        Node root = farmTree.getRoot();
+        Node root = ipmFact.createSimpleTree();
         //Iterate through the farmTree and remove all the nodes
         markAllNodesRemoved(root, nodeMap);
 
@@ -350,28 +355,29 @@ public class IPMServiceTest {
      */
     @Test
     public void testMergeDirectoryChange() {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
 
-        updateNodeId(treeTwo.getRoot());
+        updateNodeId(treeTwo);
 
-        Node oldDirectoryNode = treeOne.getRoot().getChildren().get(0).getChildren().get(0);
-        Node oldChild = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0);
+        Node oldDirectoryNode = treeOne.getChildren().get(0).getChildren().get(0);
+        Node oldChild = treeOne.getChildren().get(0).getChildren().get(0).getChildren().get(0);
 
         Map<Node, NodeComparison> nodeMap = new HashMap<>();
         nodeMap.put(oldDirectoryNode, new NodeComparison(NodeComparison.Status.DELETED, oldDirectoryNode.getParent()));
         nodeMap.put(oldChild, new NodeComparison(NodeComparison.Status.DELETED, oldDirectoryNode));
 
         //Get a directory node in the second tree
-        Node directoryNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0);
+        Node directoryNode = treeTwo.getChildren().get(0).getChildren().get(0);
         Node child = directoryNode.getChildren().get(0);
         nodeMap.put(directoryNode, new NodeComparison(NodeComparison.Status.ADDED, oldDirectoryNode.getParent()));
         nodeMap.put(child, new NodeComparison(NodeComparison.Status.ADDED, directoryNode));
 
-        assertTrue(underTest.mergeTree(treeOne.getRoot(), nodeMap));
+        assertTrue(underTest.mergeTree(treeOne, nodeMap));
 
         //Check that the location in the tree has been correctly updated.
-        Node returnedDirectory = treeOne.getRoot().getChildren().get(0).getChildren().get(0);
+        Node returnedDirectory = treeOne.getChildren().get(0).getChildren().get(0);
         assertEquals(directoryNode, returnedDirectory);
 
         Node returnedChild = returnedDirectory.getChildren().get(0);
@@ -384,13 +390,14 @@ public class IPMServiceTest {
      */
     @Test
     public void testMergeAddRemoveFiles() throws URISyntaxException {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
-
-        updateNodeId(treeTwo.getRoot());
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
+        
+        updateNodeId(treeTwo);
 
         Map<Node, NodeComparison> nodeMap = new HashMap<>();
-        Node treeOneDirectory = treeOne.getRoot().getChildren().get(0).getChildren().get(0);
+        Node treeOneDirectory = treeOne.getChildren().get(0).getChildren().get(0);
 
         Node oldChild = treeOneDirectory.getChildren().get(0);
 
@@ -407,9 +414,9 @@ public class IPMServiceTest {
         nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
         nodeMap.put(nodeTwo, new NodeComparison(NodeComparison.Status.ADDED, treeOneDirectory));
 
-        assertTrue(underTest.mergeTree(treeOne.getRoot(), nodeMap));
+        assertTrue(underTest.mergeTree(treeOne, nodeMap));
 
-        Node returnedDirectory = treeOne.getRoot().getChildren().get(0).getChildren().get(0);
+        Node returnedDirectory = treeOne.getChildren().get(0).getChildren().get(0);
         assertEquals(2, returnedDirectory.getChildren().size());
 
         boolean foundOldNode = false;
@@ -436,15 +443,16 @@ public class IPMServiceTest {
      */
     @Test
     public void testMergeFileUpdate() {
-        FarmIpmTree treeOne = new FarmIpmTree();
-        FarmIpmTree treeTwo = new FarmIpmTree();
+        FarmIpmFactory ipmFact = new FarmIpmFactory();
+        Node treeOne = ipmFact.createSimpleTree();
+        Node treeTwo = ipmFact.createSimpleTree();
+        
+        updateNodeId(treeTwo);
 
-        updateNodeId(treeTwo.getRoot());
-
-        Node oldChild = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0);
+        Node oldChild = treeOne.getChildren().get(0).getChildren().get(0).getChildren().get(0);
 
         //Get a directory node in the second tree
-        Node childNode = treeTwo.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0);
+        Node childNode = treeTwo.getChildren().get(0).getChildren().get(0).getChildren().get(0);
 
         childNode.getFileInfo().addChecksum(FileInfo.Algorithm.MD5, UUID.randomUUID().toString());
         childNode.getFileInfo().addChecksum(FileInfo.Algorithm.SHA1, UUID.randomUUID().toString());
@@ -452,9 +460,9 @@ public class IPMServiceTest {
         Map<Node, NodeComparison> nodeMap = new HashMap<>();
         nodeMap.put(childNode, new NodeComparison(NodeComparison.Status.UPDATED, oldChild));
 
-        assertTrue(underTest.mergeTree(treeOne.getRoot(), nodeMap));
+        assertTrue(underTest.mergeTree(treeOne, nodeMap));
 
-        Node returnedNode = treeOne.getRoot().getChildren().get(0).getChildren().get(0).getChildren().get(0);
+        Node returnedNode = treeOne.getChildren().get(0).getChildren().get(0).getChildren().get(0);
         assertEquals(oldChild.getIdentifier(), returnedNode.getIdentifier());
 
         assertTrue(childNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(returnedNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5)));

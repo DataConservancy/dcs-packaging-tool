@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,7 @@ import org.junit.Test;
  */
 public class DomainProfileServiceImplTest {
     private DomainProfileServiceImpl service;
-    private FarmIpmTree tree;
+    private FarmIpmFactory tree;
     private FarmDomainProfile profile;
 
     @Before
@@ -29,7 +30,7 @@ public class DomainProfileServiceImplTest {
         DomainProfileObjectStore store = new DomainProfileObjectStoreImpl(model);
 
         service = new DomainProfileServiceImpl(store);
-        tree = new FarmIpmTree();
+        tree = new FarmIpmFactory();
         profile = tree.getProfile();
     }
 
@@ -47,6 +48,28 @@ public class DomainProfileServiceImplTest {
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
     }
+    
+    /**
+     * A single node must get assigned to Farm because it is the only type which
+     * may not have a parent.
+     */
+    @Test
+    public void testAssignNodeTypesDirectoryTwoFiles() {
+        Node root = new Node(URI.create("test:dir"));
+        Node node1 = new Node(URI.create("test:file1"));
+        Node node2 = new Node(URI.create("test:file2"));
+
+        //root.setFileInfo(new FileInfo(location, name, 10000, 200000, false, true, -1, null, null));
+        
+        service.assignNodeTypes(profile, root);
+
+        assertNotNull(root.getNodeType());
+        assertNotNull(root.getDomainObject());
+        assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+    }
+    
+   
+    
 
     /**
      * Test validating properties on a Cow in the Farm domain profile.
