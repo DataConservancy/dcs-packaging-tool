@@ -320,6 +320,7 @@ public class IPMServiceTest {
         URI identifierTwo = URI.create("compare:two");
         Node nodeTwo = new Node(identifierTwo);
         nodeTwo.setFileInfo(new FileInfo(new URI("location:baz"), "two"));
+        nodeOne.addChild(nodeTwo);
 
         Map<Node, NodeComparison> nodeMap = new HashMap<>();
         nodeMap.put(nodeOne, new NodeComparison(NodeComparison.Status.ADDED, null));
