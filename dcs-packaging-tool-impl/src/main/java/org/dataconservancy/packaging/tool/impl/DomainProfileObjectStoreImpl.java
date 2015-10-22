@@ -107,7 +107,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         NodeConstraint nc = find_parent_constraint(node.getNodeType(), parent_node.getNodeType());
 
         if (nc == null) {
-            throw new IllegalStateException("Cannot find parent constraint.");
+            throw new IllegalStateException("Cannot find parent constraint for " + node.getIdentifier());
         }
 
         Resource object = as_resource(node.getDomainObject());
