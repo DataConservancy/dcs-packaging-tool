@@ -10,6 +10,7 @@ import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -266,8 +267,15 @@ public class IPMServiceImpl implements IPMService {
 
     @Override
     public boolean checkFileInfoIsAccessible(Node node) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean accessible = false;
+
+        if (node != null && node.getFileInfo() != null) {
+            FileInfo info = node.getFileInfo();
+            if (info.getLocation() != null) {
+                accessible = Paths.get(info.getLocation()).toFile().exists();
+            }
+        }
+        return accessible;
     }
 
 }

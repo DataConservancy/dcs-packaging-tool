@@ -121,6 +121,23 @@ public class IPMServiceTest {
     }
 
     /**
+     * Tests that correct result is returned for files that either exist or don't.
+     */
+    @Test
+    public void testIfNodeFileExists() throws IOException, URISyntaxException {
+        URI identifierOne = URI.create("existing:node");
+        Node existingNode = new Node(identifierOne);
+        File existingFile = tmpfolder.newFile("foo.txt");
+        existingNode.setFileInfo(new FileInfo(existingFile.toPath().toUri(), "two"));
+        assertTrue(underTest.checkFileInfoIsAccessible(existingNode));
+
+        URI identifierTwo = URI.create("existing:node");
+        Node nonExistantNode = new Node(identifierTwo);
+        nonExistantNode.setFileInfo(new FileInfo(new URI("file:/foo/bar"), "two"));
+        assertFalse(underTest.checkFileInfoIsAccessible(nonExistantNode));
+    }
+
+    /**
      * Tests that if two trees have nothing in common the existing one has all it's items marked as delete, and the new tree has all it's items marked as added.
      * @throws URISyntaxException
      */
@@ -283,6 +300,10 @@ public class IPMServiceTest {
                                                  node.getIdentifier().equals(childId)).forEach(node -> assertEquals(NodeComparison.Status.UPDATED, nodeMap.get(node).getStatus()));
     }
 
+    /**
+     * Tests that merging disparate trees results in the old tree being deleted and replaced by the new tree.
+     * @throws URISyntaxException
+     */
     @Test
     public void testMergeCompletelyDisparateTrees() throws URISyntaxException {
         FarmIpmTree farmTree = new FarmIpmTree();
@@ -313,6 +334,7 @@ public class IPMServiceTest {
 
     }
 
+    //Helper method to iterate through a tree and mark all the nodes as deleted.
     private void markAllNodesRemoved(Node node, Map<Node, NodeComparison> nodeMap) {
         nodeMap.put(node, new NodeComparison(NodeComparison.Status.DELETED, node.getParent()));
 
@@ -323,6 +345,9 @@ public class IPMServiceTest {
         }
     }
 
+    /**
+     * Tests that if a directory changes it and the file beneath are correctly merged.
+     */
     @Test
     public void testMergeDirectoryChange() {
         FarmIpmTree treeOne = new FarmIpmTree();
@@ -353,6 +378,10 @@ public class IPMServiceTest {
         assertEquals(child, returnedChild);
     }
 
+    /**
+     * Tests that files being added and removed from the tree are correctly merged.
+     * @throws URISyntaxException
+     */
     @Test
     public void testMergeAddRemoveFiles() throws URISyntaxException {
         FarmIpmTree treeOne = new FarmIpmTree();
@@ -402,6 +431,9 @@ public class IPMServiceTest {
         assertFalse(foundOldNode);
     }
 
+    /**
+     * Tests that an updated file is correctly merged into the tree, which consists of updating the file information.
+     */
     @Test
     public void testMergeFileUpdate() {
         FarmIpmTree treeOne = new FarmIpmTree();
