@@ -278,11 +278,9 @@ public class IPMServiceTest {
 
         assertEquals(1, nodeMap.size());
 
-        for (Node node : nodeMap.keySet()) {
-            if (node.getIdentifier().equals(oldChildId) || node.getIdentifier().equals(childId)) {
-                assertEquals(NodeComparison.Status.UPDATED, nodeMap.get(node).getStatus());
-            }
-        }
+        nodeMap.keySet().stream().filter(node ->
+                                             node.getIdentifier().equals(oldChildId) ||
+                                                 node.getIdentifier().equals(childId)).forEach(node -> assertEquals(NodeComparison.Status.UPDATED, nodeMap.get(node).getStatus()));
     }
 
     @Test
@@ -310,6 +308,8 @@ public class IPMServiceTest {
         assertEquals(identifierOne, root.getIdentifier());
 
         assertEquals(1, root.getChildren().size());
+
+        assertEquals(identifierTwo, root.getChildren().get(0).getIdentifier());
 
     }
 
@@ -427,8 +427,6 @@ public class IPMServiceTest {
 
         assertTrue(childNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(returnedNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5)));
         assertTrue(childNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(returnedNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1)));
-
-
     }
 
     //Used to update node ids of the FarmIpmTree so it's a different tree from the original
