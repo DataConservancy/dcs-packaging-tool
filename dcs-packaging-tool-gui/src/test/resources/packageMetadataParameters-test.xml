@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<packageMetadataList>
+    <packageMetadata>
+        <name>Package-Metadata-Required</name>
+        <requiredness>REQUIRED</requiredness>
+        <helpText>This is the help text for Package-Metadata-1</helpText>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Package-Metadata-Recommended</name>
+        <requiredness>RECOMMENDED</requiredness>
+        <helpText>This is the help text for Package-Metadata-2</helpText>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Package-Metadata-Optional</name>
+        <requiredness>OPTIONAL</requiredness>
+        <helpText>This is the help text for Package-Metadata-2</helpText>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Email-Metadata</name>
+        <requiredness>RECOMMENDED</requiredness>
+        <validationType>EMAIL</validationType>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Phone-Metadata</name>
+        <requiredness>RECOMMENDED</requiredness>
+        <validationType>PHONE</validationType>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Repeatable-Metadata</name>
+        <requiredness>MISSPELLED</requiredness>
+        <validationType>MISSPELLED</validationType>
+        <repeatable>true</repeatable>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Editable-Metadata</name>
+        <editable>true</editable>
+    </packageMetadata>
+</packageMetadataList>

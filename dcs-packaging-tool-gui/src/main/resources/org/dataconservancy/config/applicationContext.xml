@@ -81,6 +81,7 @@
     <property name="availableProjectsFile"  value="${availableProjectsFile}"/>
     <property name="disciplineMapFile" value="${disciplineMapFile}" />
     <property name="packageGenerationParametersFile" value="${packageGenerationParametersFile}"/>
+    <property name="packageMetadataParametersFile" value = "${packageMetadataParametersFile}" />
   </bean>
 
   <bean id="labels" class="org.dataconservancy.packaging.gui.Labels">
@@ -106,7 +107,7 @@
   <bean id="internalProperties" class="org.dataconservancy.packaging.gui.InternalProperties">
       <constructor-arg ref="internalPropertyResource"/>
   </bean>
-  
+
 
   <!-- SERVICES AND BUILDERS -->
   <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />

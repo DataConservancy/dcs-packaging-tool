@@ -15,12 +15,18 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This class captures information necessary to the package tool to know what and how prompt user for specific package
  * metadata.
  */
+@XmlRootElement(name="packageMetadata")
 public class PackageMetadata {
 
+    @XmlEnum
     public enum ValidationType {
         NONE,
         PHONE,
@@ -30,12 +36,21 @@ public class PackageMetadata {
         FILENAME,
     };
 
+    @XmlEnum
+    public enum Requiredness {
+        REQUIRED,
+        RECOMMENDED,
+        OPTIONAL
+    }
+
     private String name;
     private ValidationType validationType;
     private String helpText;
-    private int minOccurrence;
-    private int maxOccurrence;
+    @XmlAttribute(name = "editable")
     private boolean isEditable;
+    @XmlAttribute(name = "repeatable")
+    private boolean isRepeatable;
+    private Requiredness requiredness;
 
     /**
      * Indicates whether the field is editable.
@@ -69,6 +84,7 @@ public class PackageMetadata {
 
     /**
      * Returns the name of the metadata field.
+     * @return the name of the field
      */
     public String getName() {
         return name;
@@ -76,6 +92,7 @@ public class PackageMetadata {
 
     /**
      * Returns the help text associated with the metadata field.
+     * @return the help test associated with the metadata field
      */
     public String getHelpText() {
         return helpText;
@@ -86,42 +103,40 @@ public class PackageMetadata {
     }
 
     /**
-     * Returns the minimum number of times the field should occur on the GUI form.
+     * Indicate whether this package metadata field is repeatable.
+     * @return bollean idicating whether this package metadata is repeatable
      */
-    public int getMinOccurrence() {
-        return minOccurrence;
+    public boolean isRepeatable() {
+        return isRepeatable;
     }
 
-    public void setMinOccurrence(int minOccurrence) {
-        this.minOccurrence = minOccurrence;
+    public void setRepeatable(boolean isRepeatable) {
+        this.isRepeatable = isRepeatable;
     }
 
     /**
-     * Returns maximum number of times the fields should occur on the GUI form.
-     * @return
+     * Indicated whether this package metadata field is {@code REQUIRED}, {@code RECOMMENDED} or {@code OPTIONAL}
      */
-    public int getMaxOccurrence() {
-        return maxOccurrence;
+    public Requiredness getRequiredness() {
+        return requiredness;
     }
 
-    public void setMaxOccurrence(int maxOccurrence) {
-        this.maxOccurrence = maxOccurrence;
+    public void setRequiredness(Requiredness requiredness) {
+        this.requiredness = requiredness;
     }
 
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
-        if (o == null) return false;
-        if (!(o instanceof PackageMetadata)) return false;
+        if (o == null || !(o instanceof PackageMetadata)) return false;
 
         PackageMetadata that = (PackageMetadata) o;
 
         if (isEditable != that.isEditable) return false;
-        if (maxOccurrence != that.maxOccurrence) return false;
-        if (minOccurrence != that.minOccurrence) return false;
+        if (isRepeatable != that.isRepeatable) return false;
         if (helpText != null ? !helpText.equals(that.helpText) : that.helpText != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (requiredness != that.requiredness) return false;
         if (validationType != that.validationType) return false;
 
         return true;
@@ -132,9 +147,9 @@ public class PackageMetadata {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (validationType != null ? validationType.hashCode() : 0);
         result = 31 * result + (helpText != null ? helpText.hashCode() : 0);
-        result = 31 * result + minOccurrence;
-        result = 31 * result + maxOccurrence;
         result = 31 * result + (isEditable ? 1 : 0);
+        result = 31 * result + (isRepeatable ? 1 : 0);
+        result = 31 * result + (requiredness != null ? requiredness.hashCode() : 0);
         return result;
     }
 }
