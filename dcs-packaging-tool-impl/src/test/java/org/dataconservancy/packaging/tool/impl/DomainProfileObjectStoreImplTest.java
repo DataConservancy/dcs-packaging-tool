@@ -42,16 +42,56 @@ public class DomainProfileObjectStoreImplTest {
     }
 
     /**
-     * Update object tests walks the tree updating objects and checking the
+     * Update object tests walks various trees updating objects and checking the
      * model for correct triples.
      */
     @Test
     public void testUpdateObject() {
+        test_update_object(ipmfactory.createSingleDirectoryTree());
+        test_update_object(ipmfactory.createTwoDirectoryTree());
         test_update_object(ipmfactory.createSimpleTree());
-        
-        // TODO Test more complex trees.
+        test_update_object(ipmfactory.createSimpleTree2());
     }
 
+    /**
+     * Check updating existing objects with new types.
+     */
+    @Test
+    public void testUpdateObjectAfterChangingTypes() {
+        Node root = ipmfactory.createSimpleTree();
+        
+        test_update_object(root);
+        
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+        
+        // Barn can have a stockpile
+        cow.setNodeType(profile.getStockpileNodeType());
+
+        // Stockpile can have feed.
+        media.setNodeType(profile.getFeedNodeType());
+
+        StructuralRelation occ = profile.getOccupantRelation();
+        StructuralRelation part = profile.getPartRelation();
+        
+        assertTrue(store.hasRelationship(cow.getDomainObject(), occ.getHasParentPredicate(), barn.getDomainObject()));
+        assertFalse(store.hasRelationship(cow.getDomainObject(), part.getHasParentPredicate(), barn.getDomainObject()));
+
+        test_update_object(root);
+        
+        // Check that old relations no longer exist
+        
+        assertFalse(store.hasRelationship(cow.getDomainObject(), occ.getHasParentPredicate(), barn.getDomainObject()));
+        assertTrue(store.hasRelationship(cow.getDomainObject(), part.getHasParentPredicate(), barn.getDomainObject()));
+        
+        // Has new domain types
+        profile.getStockpileNodeType().getDomainTypes().forEach(u -> assertTrue(store.hasRelationship(cow.getDomainObject(), URI.create(RDF.type.getURI()), u)));
+        
+        // Does not have old domain types
+        profile.getCowNodeType().getDomainTypes().forEach(u -> assertFalse(store.hasRelationship(cow.getDomainObject(), URI.create(RDF.type.getURI()), u)));
+    }
+    
     @Test
     public void testAddStringProperty() {
         URI test_object = URI.create("test:moo");
