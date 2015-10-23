@@ -1,6 +1,9 @@
 package org.dataconservancy.packaging.tool.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -9,9 +12,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
-import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -21,7 +24,7 @@ import org.junit.Test;
  */
 public class DomainProfileServiceImplTest {
     private DomainProfileServiceImpl service;
-    private FarmIpmFactory tree;
+    private FarmIpmFactory ipmfact;
     private FarmDomainProfile profile;
 
     @Before
@@ -30,8 +33,8 @@ public class DomainProfileServiceImplTest {
         DomainProfileObjectStore store = new DomainProfileObjectStoreImpl(model);
 
         service = new DomainProfileServiceImpl(store);
-        tree = new FarmIpmFactory();
-        profile = tree.getProfile();
+        ipmfact = new FarmIpmFactory();
+        profile = ipmfact.getProfile();
     }
 
     /**
@@ -39,28 +42,39 @@ public class DomainProfileServiceImplTest {
      * may not have a parent.
      */
     @Test
-    public void testAssignNodeTypesToSingleNode() {
-        Node root = new Node(URI.create("test:node"));
+    public void testAssignNodeTypesSingleDirectory() {
+        Node root = ipmfact.createSingleDirectoryTree();
 
-        service.assignNodeTypes(profile, root);
+        boolean success = service.assignNodeTypes(profile, root);
 
+        assertTrue(success);
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
     }
     
     /**
-     * A single node must get assigned to Farm because it is the only type which
-     * may not have a parent.
+     * A single file has no valid assignment.
      */
-    @Test
-    public void testAssignNodeTypesDirectoryTwoFiles() {
-        Node root = new Node(URI.create("test:dir"));
-        Node node1 = new Node(URI.create("test:file1"));
-        Node node2 = new Node(URI.create("test:file2"));
+    @Ignore
+    public void testAssignNodeTypesSingleFile() {
+        Node root = ipmfact.createInvalidSingleFileTree();
 
-        //root.setFileInfo(new FileInfo(location, name, 10000, 200000, false, true, -1, null, null));
-        
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertFalse(success);
+        assertNotNull(root.getNodeType());
+        assertNotNull(root.getDomainObject());
+        assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+    }
+    
+    /**
+     * A tree 
+     */
+    @Ignore
+    public void testAssignNodeTypesSingleChildDirectory() {
+        Node root = ipmfact.createTwoDirectoryTree();
+
         service.assignNodeTypes(profile, root);
 
         assertNotNull(root.getNodeType());

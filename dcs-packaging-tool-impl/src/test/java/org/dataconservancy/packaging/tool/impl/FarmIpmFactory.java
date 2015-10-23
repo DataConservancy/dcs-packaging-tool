@@ -35,6 +35,26 @@ public class FarmIpmFactory {
 
         return root;
     }
+    
+    /**
+     * Return a tree with types assigned for a single file.
+     * The tree is invalid.
+     * 
+     * <pre>
+     *  /moo.wav                (Media)
+     * </pre>
+     * 
+     * @return root of tree.
+     */
+    public Node createInvalidSingleFileTree() {
+        Node root = new Node(URI.create("test:moo"));
+
+        root.setNodeType(profile.getMediaNodeType());
+        root.setFileInfo(create_file_info("/moo.wav", "Moo!"));
+
+        return root;
+    }
+
 
     /**
      * Return a tree with types assigned of a single directory with a single
@@ -139,6 +159,33 @@ public class FarmIpmFactory {
         return root;
     }
 
+    private FileInfo create_directory_info(String path, String name) {
+        FileInfo result = new FileInfo(Paths.get(path).toUri(), name);
+        
+        result.setIsDirectory(true);
+        result.setCreationTime(FileTime.fromMillis(400000));
+        result.setLastModifiedTime(FileTime.fromMillis(600000));
+        
+        return result;
+    }
+    
+    private FileInfo create_file_info(String path, String name) {
+        FileInfo result = new FileInfo(Paths.get(path).toUri(), name);
+        
+        result.setIsFile(true);
+        result.setSize(120032);
+        
+        result.setCreationTime(FileTime.fromMillis(10000000));
+        result.setLastModifiedTime(FileTime.fromMillis(2000000));
+        
+        result.addFormat("application/octet-stream");
+        result.addChecksum(Algorithm.MD5, "12345");
+        result.addChecksum(Algorithm.SHA1, "54321");
+        
+        return result;
+    }
+    
+    // TODO better helpers for file/dir
     private FileInfo createFileInfo(String path, String name, final long size, final long create_date_ms,
             final long mod_date_ms, boolean file) {
         FileInfo fileInfo = new FileInfo(Paths.get(path).toUri(), name);

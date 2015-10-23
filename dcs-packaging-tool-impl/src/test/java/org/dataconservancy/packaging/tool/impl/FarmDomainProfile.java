@@ -7,16 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
-import org.dataconservancy.packaging.tool.model.dprofile.Requirement;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
 
@@ -148,7 +148,7 @@ public class FarmDomainProfile extends DomainProfile {
         farm_node_type.setPropertyConstraints(Arrays.asList(title_constraint, person_constraint));
         farm_node_type.setDefaultPropertyValues(Arrays.asList());
         farm_node_type.setParentConstraints(Arrays.asList());
-        farm_node_type.setDirectoryAssocationRequirement(Requirement.MUST);
+        farm_node_type.setFileAssociation(FileAssociation.DIRECTORY);
         farm_node_type.setDomainProfile(this);
 
         has_part_rel = new StructuralRelation(URI.create("dcterms:isPartOf"), URI.create("dcterms:hasPart"));
@@ -166,6 +166,7 @@ public class FarmDomainProfile extends DomainProfile {
         barn_node_type.setPropertyConstraints(Arrays.asList());
         barn_node_type.setDefaultPropertyValues(Arrays.asList());
         barn_node_type.setParentConstraints(Arrays.asList(farm_parent_constraint));
+        barn_node_type.setFileAssociation(FileAssociation.DIRECTORY);
         barn_node_type.setDomainProfile(this);
 
         trough_node_type.setIdentifier(URI.create("fdp:trough"));
@@ -219,7 +220,6 @@ public class FarmDomainProfile extends DomainProfile {
                 Arrays.asList(species_constraint, weight_constraint, breed_constraint, title_constraint));
         cow_node_type.setDefaultPropertyValues(Arrays.asList(cow_species));
         cow_node_type.setParentConstraints(Arrays.asList(barn_occ_parent_constraint));
-        cow_node_type.setDirectoryAssocationRequirement(Requirement.MUST);
         cow_node_type.setDomainProfile(this);
 
         Map<PropertyType, SuppliedProperty> supplied_media_properties = new HashMap<>();
@@ -237,7 +237,7 @@ public class FarmDomainProfile extends DomainProfile {
         media_node_type.setDefaultPropertyValues(Arrays.asList());
         media_node_type.setParentConstraints(Arrays.asList(cow_data_parent_constraint, farm_parent_constraint, barn_parent_constraint));
         media_node_type.setSuppliedProperties(supplied_media_properties);
-        media_node_type.setFileAssocationRequirement(Requirement.MUST);
+        media_node_type.setFileAssociation(FileAssociation.REGULAR_FILE);
         media_node_type.setDomainProfile(this);
 
         PropertyCategory saleCategory = new PropertyCategory();
