@@ -1,5 +1,12 @@
 package org.dataconservancy.packaging.tool.impl;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -14,6 +21,7 @@ import org.dataconservancy.packaging.tool.model.PackageResourceMapConstants;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.CardinalityConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -22,17 +30,9 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
-import org.dataconservancy.packaging.tool.model.dprofile.Requirement;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
 import org.joda.time.DateTime;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Transforms DomainProfile and related classes to RDF and back.
@@ -71,10 +71,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         DC_DP_NS_URI + "PropertyValue");
     public static final Property HAS_SUPPLIED_PROPERTY = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasSuppliedProperty");
-    public static final Property HAS_FILE_REQUIREMENT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "hasAssociationFileRequirement");
-    public static final Property HAS_DIRECTORY_REQUIREMENT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "hasDirectoryAssociationRequirement");
+    public static final Property HAS_FILE_ASSOCIATION = ResourceFactory.createProperty(
+        DC_DP_NS_URI, "hasFileAssociation");
     public static final Resource CARDINALITY_CONSTRAINT_TYPE = ResourceFactory.createResource(
         DC_DP_NS_URI + "CardinalityConstraint");
     public static final Property HAS_CHILD_CONSTRAINT = ResourceFactory.createProperty(
@@ -278,12 +276,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
                 transformSuppliedPropertiesToRdf(model, nodeType.getSuppliedProperties(), nodeTypeResource);
             }
 
-            if (nodeType.getFileAssociationRequirement() != null) {
-                nodeTypeResource.addProperty(HAS_FILE_REQUIREMENT, nodeType.getFileAssociationRequirement().toString());
-            }
-
-            if (nodeType.getDirectoryAssociationRequirement() != null) {
-                nodeTypeResource.addProperty(HAS_DIRECTORY_REQUIREMENT, nodeType.getDirectoryAssociationRequirement().toString());
+            if (nodeType.getFileAssociation() != null) {
+                nodeTypeResource.addProperty(HAS_FILE_ASSOCIATION, nodeType.getFileAssociation().toString());
             }
 
             if (nodeType.getPreferredCountOfChildrenWithFiles() != null) {
@@ -682,12 +676,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setSuppliedProperties(transformToSuppliedProperties(resource, profile, model));
         }
 
-        if (resource.hasProperty(HAS_FILE_REQUIREMENT)) {
-            nodeType.setFileAssocationRequirement(Requirement.valueOf(getLiteral(resource, HAS_FILE_REQUIREMENT).getString()));
-        }
-
-        if (resource.hasProperty(HAS_DIRECTORY_REQUIREMENT)) {
-            nodeType.setDirectoryAssocationRequirement(Requirement.valueOf(getLiteral(resource, HAS_DIRECTORY_REQUIREMENT).getString()));
+        if (resource.hasProperty(HAS_FILE_ASSOCIATION)) {
+            nodeType.setFileAssociation(FileAssociation.valueOf(getLiteral(resource, HAS_FILE_ASSOCIATION).getString()));
         }
 
         if (resource.hasProperty(HAS_CHILD_CONSTRAINT)) {

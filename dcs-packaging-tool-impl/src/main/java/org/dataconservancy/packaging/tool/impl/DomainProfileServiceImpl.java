@@ -7,6 +7,7 @@ import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.model.dprofile.CardinalityConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -15,7 +16,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
-import org.dataconservancy.packaging.tool.model.dprofile.Requirement;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -201,32 +201,21 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     private boolean meets_file_requirements(Node node, NodeType type) {
         FileInfo info = node.getFileInfo();
-
-        if (info == null) {
+        FileAssociation assoc = type.getFileAssociation();
+        
+        if (info == null || assoc == null) {
             return true;
         }
         
-        if (info.isFile()) {
-            if (type.getFileAssociationRequirement() == Requirement.MUST) {
-                return true;
-            }
-
-            if (type.getFileAssociationRequirement() == Requirement.MUST_NOT) {
-                return false;
-            }
+        if (info.isFile() && assoc == FileAssociation.REGULAR_FILE) {
+            return true;
+        }
+        
+        if (info.isDirectory() && assoc == FileAssociation.DIRECTORY) {
+            return true;
         }
 
-        if (info.isDirectory()) {
-            if (type.getDirectoryAssociationRequirement() == Requirement.MUST) {
-                return true;
-            }
-
-            if (type.getDirectoryAssociationRequirement() == Requirement.MUST_NOT) {
-                return false;
-            }
-        }
-
-        return true;
+        return false;
     }
 
     // Check if node can be the given type.
