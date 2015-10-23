@@ -14,7 +14,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
@@ -149,13 +148,19 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public boolean validateTree(Node node) {
+        System.err.println("hi " + node.getIdentifier());
+        
         if (!is_valid(node)) {
             return false;
         }
-
+        
+        System.err.println("here 1" + node.getIdentifier());
+        
         if (node.isLeaf()) {
             return true;
         }
+        
+        System.err.println("here 2" + node.getIdentifier());
 
         for (Node child : node.getChildren()) {
             if (!validateTree(child)) {
@@ -167,19 +172,33 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean meets_parent_type_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
+        if (parent == null && parent_constraint.matchesNone()) {
+            return false;
+        }
+        
+        if (parent != null && parent_constraint.matchesAny()) {
+            return true;
+        }
+
         if (parent == null) {
             return false;
         }
-
+        
         return parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier());
     }
 
     // Check that existing domain objects have the required relations
+    // Must first pass meets_parent_type_constraint
     private boolean meets_parent_relation_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
+        if (parent == null) {
+            // Handled by meets_parent_type_constraint.
+            return true;
+        }
+        
         if (node.getDomainObject() == null || parent.getDomainObject() == null) {
             return false;
         }
-
+        
         StructuralRelation rel = parent_constraint.getStructuralRelation();
 
         if (rel.getHasParentPredicate() != null) {
@@ -190,7 +209,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         if (rel.getHasChildPredicate() != null) {
-            if (!objstore.hasRelationship(parent.getDomainObject(), rel.getHasParentPredicate(),
+            if (!objstore.hasRelationship(parent.getDomainObject(), rel.getHasChildPredicate(),
                     node.getDomainObject())) {
                 return false;
             }
@@ -247,6 +266,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     private boolean is_valid(Node node) {
         NodeType type = node.getNodeType();
 
+        if (type == null) {
+            return false;
+        }
+        
         if (!meets_file_requirements(node, type)) {
             return false;
         }

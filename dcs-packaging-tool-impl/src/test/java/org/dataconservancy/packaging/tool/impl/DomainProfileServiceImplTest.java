@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.tool.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
@@ -14,13 +15,14 @@ import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Test the DomainProfileServiceImpl against the FarmDomainProfile. Methods that
- * add and remove properties are not tested here because they are actually
- * implemented by the DomainProfileObjectStoreImpl.
+ * Test the DomainProfileServiceImpl against the FarmDomainProfile.
+ * 
+ * Methods that create objects and add and remove properties from them are not
+ * tested here because they are actually implemented by the
+ * DomainProfileObjectStoreImpl.
  */
 public class DomainProfileServiceImplTest {
     private DomainProfileServiceImpl service;
@@ -45,45 +47,57 @@ public class DomainProfileServiceImplTest {
     public void testAssignNodeTypesSingleDirectory() {
         Node root = ipmfact.createSingleDirectoryTree();
 
+        root.walk(Node::clearNodeTypes);
+
         boolean success = service.assignNodeTypes(profile, root);
 
         assertTrue(success);
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+
+        assertTrue(service.validateTree(root));
     }
-    
+
     /**
      * A single file has no valid assignment.
      */
-    @Ignore
+    @Test
     public void testAssignNodeTypesSingleFile() {
         Node root = ipmfact.createInvalidSingleFileTree();
+
+        root.walk(Node::clearNodeTypes);
 
         boolean success = service.assignNodeTypes(profile, root);
 
         assertFalse(success);
-        assertNotNull(root.getNodeType());
-        assertNotNull(root.getDomainObject());
-        assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertNull(root.getDomainObject());
+
+        assertFalse(service.validateTree(root));
     }
-    
+
     /**
-     * A tree 
+     * A tree consisting of one directory containing another directory.
      */
-    @Ignore
-    public void testAssignNodeTypesSingleChildDirectory() {
+    @Test
+    public void testAssignNodeTypesTwoDirectory() {
         Node root = ipmfact.createTwoDirectoryTree();
 
-        service.assignNodeTypes(profile, root);
+        root.walk(Node::clearNodeTypes);
 
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertTrue(success);
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+
+        Node child = root.getChildren().get(0);
+        assertNotNull(child.getNodeType());
+        assertNotNull(child.getDomainObject());
+
+        assertTrue(service.validateTree(root));
     }
-    
-   
-    
 
     /**
      * Test validating properties on a Cow in the Farm domain profile.
