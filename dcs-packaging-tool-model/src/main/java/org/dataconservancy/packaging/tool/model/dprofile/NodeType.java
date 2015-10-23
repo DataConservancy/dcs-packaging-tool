@@ -22,8 +22,7 @@ public class NodeType extends AbstractDescribedObject {
     private List<PropertyType> inheritable_properties;
     private List<Property> default_property_values;
     private Map<PropertyType, SuppliedProperty> supplied_properties;
-    private Requirement file_req;
-    private Requirement dir_req;
+    private FileAssociation file_assoc;
     private CardinalityConstraint child_file_constraint;
     
     /**
@@ -93,17 +92,10 @@ public class NodeType extends AbstractDescribedObject {
     }
 
     /**
-     * @return Requirement about association with a regular file or null for no requirement.
+     * @return Required association with a file
      */
-    public Requirement getFileAssociationRequirement() {
-        return file_req;
-    }
-
-    /**
-     * @return Requirement about association with a directory or null for no requirement.
-     */
-    public Requirement getDirectoryAssociationRequirement() {
-        return dir_req;
+    public FileAssociation getFileAssociation() {
+        return file_assoc;
     }
 
     /**
@@ -160,24 +152,17 @@ public class NodeType extends AbstractDescribedObject {
     }
 
     /**
-     * @param supplied_properties The supplied_properties to set.
+     * @param supplied_properties The supplied properties to set.
      */
     public void setSuppliedProperties(Map<PropertyType, SuppliedProperty> supplied_properties) {
         this.supplied_properties = supplied_properties;
     }
 
     /**
-     * @param file_req the file_req to set
+     * @param file_assoc The file association to set.
      */
-    public void setFileAssocationRequirement(Requirement file_req) {
-        this.file_req = file_req;
-    }
-
-    /**
-     * @param dir_req the dir_req to set
-     */
-    public void setDirectoryAssocationRequirement(Requirement dir_req) {
-        this.dir_req = dir_req;
+    public void setFileAssociation(FileAssociation file_assoc) {
+        this.file_assoc = file_assoc;
     }
 
     /**
@@ -236,9 +221,8 @@ public class NodeType extends AbstractDescribedObject {
         int result = super.hashCode();
         result = prime * result + ((child_file_constraint == null) ? 0 : child_file_constraint.hashCode());
         result = prime * result + ((defaultPropertyValueSet == null) ? 0 : defaultPropertyValueSet.hashCode());
-        result = prime * result + ((dir_req == null) ? 0 : dir_req.hashCode());
         result = prime * result + ((domainTypeSet == null) ? 0 : domainTypeSet.hashCode());
-        result = prime * result + ((file_req == null) ? 0 : file_req.hashCode());
+        result = prime * result + ((file_assoc == null) ? 0 : file_assoc.hashCode());
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((inheritablePropertySet == null) ? 0 : inheritablePropertySet.hashCode());
         result = prime * result + ((parentConstraintSet == null) ? 0 : parentConstraintSet.hashCode());
@@ -279,14 +263,12 @@ public class NodeType extends AbstractDescribedObject {
                 return false;
         } else if (!default_property_values.equals(other.default_property_values))
             return false;
-        if (dir_req != other.dir_req)
-            return false;
         if (domain_types == null) {
             if (other.domain_types != null)
                 return false;
         } else if (other.domain_types == null || !CollectionUtils.isEqualCollection(domain_types, other.domain_types))
             return false;
-        if (file_req != other.file_req)
+        if (file_assoc != other.file_assoc)
             return false;
         if (id == null) {
             if (other.id != null)
@@ -329,7 +311,7 @@ public class NodeType extends AbstractDescribedObject {
         return "NodeType [id=" + id + ", profile=" + profile + ", domain_types=" + domain_types
                 + ", parent_constraints=" + parent_constraints + ", property_constraints=" + property_constraints
                 + ", inheritable_properties=" + inheritable_properties + ", default_property_values="
-                + default_property_values + ", supplied_properties=" + supplied_properties + ", file_req=" + file_req
-                + ", dir_req=" + dir_req + ", child_file_constraint=" + child_file_constraint + "]";
+                + default_property_values + ", supplied_properties=" + supplied_properties + ", file_assoc=" + file_assoc
+                + ", child_file_constraint=" + child_file_constraint + "]";
     }
 }
