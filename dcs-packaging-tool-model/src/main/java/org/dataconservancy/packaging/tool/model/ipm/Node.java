@@ -5,6 +5,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A node in the PTG tree which the user views and manipulates. The tree is a
@@ -213,6 +214,27 @@ public class Node {
         return parent == null;
     }
 
+    /**
+     * Do a pre-order tree traversal.
+     * 
+     * @param consumer
+     */
+    public void walk(Consumer<Node> consumer) {
+        consumer.accept(this);
+        
+        if (children != null) {
+            children.forEach(child -> child.walk(consumer));
+        }
+    }
+    
+    /**
+     * Remove all node types set on node.
+     */
+    public void clearNodeTypes() {
+        setNodeType(null);
+        setSubNodeTypes(null);
+    }
+    
     /**
      * Nodes are considered equal if their identifiers are equal.
      */
