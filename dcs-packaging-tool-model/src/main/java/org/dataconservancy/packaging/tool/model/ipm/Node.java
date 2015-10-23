@@ -237,4 +237,9 @@ public class Node {
     public int hashCode() {
         return identifier != null ? identifier.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "Node [identifier=" + identifier + ", domainObject=" + domainObject + ", fileInfo=" + fileInfo + "]";
+    }
 }

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import org.dataconservancy.dcs.model.DetectedFormat;
 import org.dataconservancy.dcs.util.ChecksumGeneratorVerifier;
@@ -359,6 +358,15 @@ public class FileInfo {
         result = 31 * result + (checksums != null ? checksums.hashCode() : 0);
         return result;
     }
+    
+    
+
+    @Override
+    public String toString() {
+        return "FileInfo [location=" + location + ", name=" + name + ", formats=" + formats + ", checksums=" + checksums
+                + ", fileAttributes=" + fileAttributes + "]";
+    }
+
 
     private class FileInfoAttributes implements BasicFileAttributes {
         private FileTime lastModifiedTime;
@@ -481,7 +489,6 @@ public class FileInfo {
             return !(
                 creationTime != null ? !creationTime.equals(that.creationTime) :
                     that.creationTime != null);
-
         }
 
         @Override
@@ -495,6 +502,13 @@ public class FileInfo {
             result = 31 * result + (isSymbolicLink ? 1 : 0);
             result = 31 * result + (int) (size ^ (size >>> 32));
             return result;
+        }
+        
+        @Override
+        public String toString() {
+            return "FileInfoAttributes [lastModifiedTime=" + lastModifiedTime + ", creationTime=" + creationTime
+                    + ", isRegularFile=" + isRegularFile + ", isDirectory=" + isDirectory + ", isSymbolicLink="
+                    + isSymbolicLink + ", size=" + size + "]";
         }
     }
 }
