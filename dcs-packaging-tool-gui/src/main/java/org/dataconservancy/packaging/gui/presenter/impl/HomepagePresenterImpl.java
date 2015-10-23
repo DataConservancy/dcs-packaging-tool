@@ -38,8 +38,8 @@ public class HomepagePresenterImpl extends BasePresenterImpl implements Homepage
     }
 
     private void bind() {
-        view.getCreateNewPackageButton().setOnAction(arg0 -> getController().goToNextPage(Page.NEW_PACKAGE_METADATA));
-        view.getOpenExistingPackageButton().setOnAction(arg0 -> getController().goToNextPage(Page.SELECT_PACKAGE_DIRECTORY));
+        view.getCreateNewPackageButton().setOnAction(event -> getController().goToNextPage(Page.NEW_PACKAGE_METADATA));
+        view.getOpenExistingPackageButton().setOnAction(event -> getController().goToNextPage(Page.SELECT_PACKAGE_DIRECTORY));
     }
 
     @Override

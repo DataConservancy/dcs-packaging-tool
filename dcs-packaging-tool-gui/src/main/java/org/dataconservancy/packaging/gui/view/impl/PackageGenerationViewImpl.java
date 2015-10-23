@@ -276,7 +276,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         directoryBox.setMinWidth(350);
         directoryBox.getStyleClass().add(DIRECTORY_BOX);
 
-        currentOutputDirectoryTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+        currentOutputDirectoryTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
         currentOutputDirectoryTextField.setMinWidth(340);
         currentOutputDirectoryTextField.setEditable(false);
         currentOutputDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);

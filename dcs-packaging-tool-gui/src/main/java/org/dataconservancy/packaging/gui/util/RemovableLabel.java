@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class RemovableLabel extends HBox implements CssConstants {
 
-    public RemovableLabel(final String labelName, final List<String> labelNames, final VBox parentElement) {
+    public RemovableLabel(final String labelName, final VBox parentElement) {
 
         setSpacing(4);
 
@@ -31,7 +31,6 @@ public class RemovableLabel extends HBox implements CssConstants {
             @Override
             public void handle(MouseEvent event) {
                 parentElement.getChildren().remove(RemovableLabel.this);
-                labelNames.remove(labelName);
                 event.consume();
             }
         });

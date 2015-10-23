@@ -16,6 +16,7 @@
 
 package org.dataconservancy.packaging.gui.view;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -23,6 +24,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
+import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
 import java.util.List;
 
@@ -54,146 +56,6 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     Button getAddDomainProfileButton();
 
     /**
-     * The list of domain profiles currently selected.
-     *
-     * @return the list of domain profiles user has selected.
-     */
-    List<String> getDomainProfileLabelsList();
-
-    /**
-     * Gets the contact information text field, that will be supplied in the bag.
-     *
-     * @return the contact information text field
-     */
-    TextField getContactEmailTextField();
-
-    /**
-     * Gets the contact name text field, that will be supplied in the bag.
-     *
-     * @return the contact name text field
-     */
-    TextField getContactNameTextField();
-
-    /**
-     * Gets the contact phone number text field, that will be supplied in the bag.
-     *
-     * @return The text field for entering in a contact phone number.
-     */
-    TextField getContactPhoneTextField();
-
-    /**
-     * Gets the keyword text field, that will be supplied in the bag.
-     *
-     * @return The text field for entering in a keyword
-     */
-    TextField getKeywordTextField();
-
-    /**
-     * Gets the list of labels that display the keywords
-     *
-     * @return The table with the keywords.
-     */
-    List<String> getKeywordsList();
-
-    /**
-     * Gets the text field for setting the external identifier if there is one.
-     *
-     * @return The text field for entering in an external identifier.
-     */
-    TextField getExternalIdentifierTextField();
-
-    /**
-     * Gets the text area for setting the external description
-     *
-     * @return the text area for external description
-     */
-    TextArea getExternalDescriptionTextArea();
-
-    /**
-     * Gets the text field for setting the internal sender identifier.
-     *
-     * @return The text field for entering the internal sender identifier.
-     */
-    TextField getInternalSenderIdentifierTextField();
-
-    /**
-     * Gets the text area for setting the internal sender description
-     *
-     * @return the text area for external description
-     */
-    TextArea getInternalSenderDescriptionTextArea();
-
-    /**
-     * Gets the list of labels that display the keywords
-     *
-     * @return The table with the keywords.
-     */
-    List<String> getInternalIdentifiersList();
-
-    /**
-     * Gets the text field for setting the source organization.
-     *
-     * @return The text field for entering the source organization.
-     */
-    TextField getSourceOrganizationTextField();
-
-    /**
-     * Gets the text field for setting the organization address.
-     *
-     * @return The text field for entering the organization address.
-     */
-    TextField getOrganizationAddressTextField();
-
-    /**
-     * Gets the text field for setting the bag count.
-     *
-     * @return The text field for entering the bag count.
-     */
-    TextField getBagCountTextField();
-
-    /**
-     * Gets the text field for setting the bag group identifier.
-     *
-     * @return The text field for entering the bag group identifier.
-     */
-    TextField getBagGroupIdentifierTextField();
-
-    /**
-     * Gets the text field for setting the rights.
-     *
-     * @return The text field for entering the rights.
-     */
-    TextField getRightsTextField();
-
-    /**
-     * Gets the text field for setting the rights uri.
-     *
-     * @return The text field for entering the rights uri.
-     */
-    TextField getRightsUriTextField();
-
-    /**
-     * Gets the list of rights uri
-     *
-     * @return The list of rights uris.
-     */
-    List<String> getRightsUriList();
-
-    /**
-     * Gets the date picker for setting the bagging date.
-     *
-     * @return The date picker for entering bagging date.
-     */
-    DatePicker getBaggingDateDatePicker();
-
-    /**
-     * Gets the text field for setting the bag size.
-     *
-     * @return The text field for entering the bag size.
-     */
-    TextField getBagSizeTextField();
-
-    /**
      * Scrolls the view back to the top of the window.
      */
     void scrollToTop();
@@ -212,39 +74,16 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      */
     void addDomainProfileRemovableLabel(String domainProfile);
 
-    /**
-     * Add the keyword as a removable label
-     *
-     * @param keyword
-     */
-    void addKeywordRemovableLabel(String keyword);
+    void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList);
 
-    /**
-     * Add the id as a removable label
-     *
-     * @param id
-     */
-    void addInternalSenderIdentifierRemovableLabel(String id);
+    void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
 
-    /**
-     * Add the rights uri as a removable label
-     *
-     * @param rightsUri
-     */
-    void addRightsUriRemovableLabel(String rightsUri);
-
-    /**
-     * Determines whether to show the package metadata section or not
-     *
-     * @param show
-     */
-    void showBottomContent(boolean show);
+    void showStatus(String status);
 
     /**
      * Clears all the fields
      *
      */
     void clearAllFields();
-
 
 }

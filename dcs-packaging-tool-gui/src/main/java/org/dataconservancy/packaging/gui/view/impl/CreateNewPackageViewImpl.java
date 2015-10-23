@@ -101,7 +101,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         baseDirectorySelector.getChildren().add(chooseBaseDirectoryButton);
         
         //currentBaseDirectory = new TextField();
-        currentBaseDirectory = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, "");
+        currentBaseDirectory = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, "", "");
         currentBaseDirectory.setEditable(false);
         currentBaseDirectory.getStyleClass().add(INVISBILE_TEXT_FIELD);
         baseDirectorySelector.getChildren().add(currentBaseDirectory);

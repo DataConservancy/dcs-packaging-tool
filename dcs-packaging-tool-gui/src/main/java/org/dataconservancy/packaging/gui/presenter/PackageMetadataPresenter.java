@@ -15,18 +15,20 @@
  */
 package org.dataconservancy.packaging.gui.presenter;
 
+import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 
 /**
- * Handles the screen related to generating a package. Allows the user to select packaging options and an output directory to save to.
+ * Handles the screen related to package metadata.
  */
 public interface PackageMetadataPresenter extends Presenter {
 
     /**
-     * Sets the package parameters builder that will be used for deserializing package parameters from a file. Note currently this is not used.
-     * @param packageParamsBuilder the PackageGenerationParametersBuilder
+     * Sets the package metadata service to be used to handle package metadata properties
+     * @param packageMetadataService the PackageMetadataService
      */
-    public void setPackageGenerationParametersBuilder(PackageGenerationParametersBuilder packageParamsBuilder);
+    public void setPackageMetadataService(PackageMetadataService packageMetadataService);
+
 }

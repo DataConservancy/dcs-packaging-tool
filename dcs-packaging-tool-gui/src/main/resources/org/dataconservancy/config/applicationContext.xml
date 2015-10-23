@@ -113,7 +113,9 @@
   <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
   <bean id="packageDescriptionBuilder" class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
   <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
-
+  <bean id="packageMetadataService" class="org.dataconservancy.packaging.gui.services.PackageMetadataService">
+    <constructor-arg ref="configuration"/>
+  </bean>
 
   <!--
   <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
@@ -134,6 +136,8 @@
   <bean id="phoneNumberValidator" class="org.dataconservancy.packaging.gui.util.PhoneNumberValidator">
     <property name="localCountryCode" value="${localCountryCode}"/>
   </bean>
+
+  <bean id="emailValidator" class="org.dataconservancy.packaging.gui.util.EmailValidator" />
 
   <!-- VIEWS -->
   <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
@@ -224,7 +228,7 @@
   <bean id="packageMetadataPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageMetadataPresenterImpl">
     <constructor-arg ref="packageMetadataView"/>
     <property name="controller" ref="controller"/>
-    <property name="packageGenerationParametersBuilder" ref="propertiesConfigurationParametersBuilder"/>
+    <property name="packageMetadataService" ref="packageMetadataService"/>
     <property name="messages" ref="messages"/>
     <property name="errors" ref="errors"/>
     <property name="internalProperties" ref="internalProperties"/>

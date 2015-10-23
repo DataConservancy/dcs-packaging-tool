@@ -126,7 +126,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         namespaceBox.getChildren().add(schemaLabel);
 
         //The combobox that allows for selecting a namespace.
-        final ComboBox<RelationshipGroup> namespaceComboBox = (ComboBox) ControlFactory.createControl(ControlType.COMBO_BOX, null);
+        final ComboBox<RelationshipGroup> namespaceComboBox = (ComboBox) ControlFactory.createControl(ControlType.COMBO_BOX, null, null);
         //namespaceComboBox.setPrefWidth(800);
         namespaceComboBox.setCellFactory(relationshipGroupCellFactory);
         namespaceComboBox.setDisable(!editable.getValue());
@@ -175,7 +175,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         relationshipDefinitionBox.getChildren().add(relationshipLabel);
 
         //Create a combobox to select or enter the relationship uri or name, this box selection is controlled by the namespace selection.
-        final ComboBox<Relationship> relationshipComboBox = (ComboBox) ControlFactory.createControl(ControlType.EDITABLE_COMBO_BOX, null);
+        final ComboBox<Relationship> relationshipComboBox = (ComboBox) ControlFactory.createControl(ControlType.EDITABLE_COMBO_BOX, null, null);
         relationshipComboBox.setDisable(!editable.getValue());
         relationshipComboBox.setCellFactory(relationshipCellFactory);
         relationshipComboBox.getEditor().textProperty().addListener(addNewRelationshipListener);
@@ -349,7 +349,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         if (relatedItems == null || relatedItems.isEmpty()) {
             final Label userInputImageLabel = new Label();
             userInputImageLabel.setPrefWidth(18);
-            TextField relatedItem = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+            TextField relatedItem = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
             //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
             relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));;
             relatedItem.setMinWidth(260);
@@ -373,7 +373,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
                 final Label userInputImageLabel = new Label();
                 userInputImageLabel.setPrefWidth(18);
 
-                TextField relatedItemTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, relatedItem);
+                TextField relatedItemTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, relatedItem, null);
                 //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
                 relatedItemTextField.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));
                 relatedItemTextField.textProperty().addListener(targetChangeListener);
@@ -410,7 +410,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
 
             final Label userInputImageLabel = new Label();
 
-            TextField relatedItem = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
+            TextField relatedItem = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
             //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
             relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));
             relatedItem.textProperty().addListener(targetChangeListener);
