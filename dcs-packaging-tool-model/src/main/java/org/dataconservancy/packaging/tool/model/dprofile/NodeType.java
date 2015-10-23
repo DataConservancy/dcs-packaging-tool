@@ -48,6 +48,7 @@ public class NodeType extends AbstractDescribedObject {
 
     /**
      * The parent node must meet at least one of these constraints.
+     * If there are no constraint the node must be the root node.
      * 
      * @return Constraints on parent node.
      */
