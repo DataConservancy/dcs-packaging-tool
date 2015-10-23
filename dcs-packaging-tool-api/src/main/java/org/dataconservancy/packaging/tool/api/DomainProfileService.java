@@ -103,7 +103,8 @@ public interface DomainProfileService {
      * The parent of the node must either not exist or be part of a valid tree.
      * 
      * On success, domain objects will be created if they do not exist or
-     * updated with the new type if they do.
+     * updated with the new type if they do. On failure, node types may be
+     * assigned, but no domain objects will be modified.
      * 
      * @param profile
      *            The profile used to assign types to the nodes.
