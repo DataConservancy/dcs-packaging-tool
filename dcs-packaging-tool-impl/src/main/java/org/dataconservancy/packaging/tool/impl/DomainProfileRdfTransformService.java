@@ -149,17 +149,30 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
     private Map<URI, NodeType> transformedNodeTypes;
 
     /**
-     * Transforms a DomainProfile into a Jena RDF Model
+     * Transforms a DomainProfile into a Jena RDF Model.  The profile will be a blank node.
      * @param profile The DomainProfile to transform.
      * @return The Jena model containing the RDF representation of the DomainProfile
      * @throws RDFTransformException
      */
-    public Model transformToRdf(DomainProfile profile)
+    public Model transformToRdf(DomainProfile profile) throws RDFTransformException {
+        return transformToRdf(profile, null);
+    }
+    
+    /**
+     * Transforms a DomainProfile into a Jena RDF Model
+     * @param profile The DomainProfile to transform.
+     * @param profileResourceURI If defined, the Profile resource will have this URI. 
+     *        If null, it will be a blank node.
+     * @return The Jena model containing the RDF representation of the DomainProfile
+     * @throws RDFTransformException
+     */
+    public Model transformToRdf(DomainProfile profile, String profileResourceURI)
         throws RDFTransformException {
         //Create the basic model that will hold the RDF graph
         Model profileModel = ModelFactory.createDefaultModel();
 
-        Resource profileResource = profileModel.createResource();
+        Resource profileResource = profileModel.createResource(profileResourceURI);
+        
         profileResource.addProperty(RDF.type, DP_TYPE);
 
         if (profile.getLabel() != null) {

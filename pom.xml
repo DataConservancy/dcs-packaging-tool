@@ -40,6 +40,7 @@
  	<module>dcs-packaging-tool-model-builder-json</module>
  	<module>dcs-packaging-tool-model-builder-xstream</module>
  	<module>dcs-packaging-tool-assemblies</module>
+ 	<module>dcs-packaging-tool-profiles</module>
   </modules>
   
   <!-- Properties  ================================================ -->
