@@ -32,6 +32,8 @@ public enum PackagingToolReturnInfo {
     PKG_IO_EXCEPTION (101, "IO Exception"),
     PKG_OBJECT_INSTANTIATION_EXP (102, "Could not instantiate object needed to create the package."),
     PKG_REQUIRED_PARAMS_MISSING (103, "One or more parameters required for generating the package is missing."),
+    PKG_DIR_CREATION_EXP (104, "Required directory could not be created "),
+
 
     PKG_NO_SUCH_CHECKSUM_ALGORITHM_EXCEPTION (201, "No such checksum algorithm"),
 
@@ -46,7 +48,6 @@ public enum PackagingToolReturnInfo {
     PKG_ASSEMBLER_URI_GENERATION_EXP (401, "Failed to generate file URI."),
     PKG_ASSEMBLER_PARAMS_NOT_INITIALIZED_EXP (402, "This assembler has not been initialized with required package " +
             "generation parameters."),
-    PKG_ASSEMBLER_DIR_CREATION_EXP (403, "Required directory could not be created "),
     PKG_ASSEMBLER_ARCHIVE_EXP (404, "Exception occurred during package serialization. "),
     PKG_ASSEMBLER_COMPRESSION_EXP (405, "Exception occurred when compressing package's serialization. "),
     PKG_ASSEMBLER_INVALID_PARAMS (406, "One or more initial parameters for package assembler was invalid "),
