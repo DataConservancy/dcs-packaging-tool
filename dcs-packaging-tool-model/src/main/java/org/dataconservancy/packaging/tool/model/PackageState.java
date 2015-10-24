@@ -43,9 +43,9 @@ public class PackageState {
 
     /**
      * A map of metadata fields relevant to this package, keyed by the name of the metadata field to their associated
-     * list of values.
+     * list of values. The map maintains entry by the order of insertion.
      */
-    private HashMap<String, List<String>> packageMetadataList;
+    private LinkedHashMap<String, List<String>> packageMetadataList;
 
     /**
      * Package serialization/generation information
@@ -58,10 +58,11 @@ public class PackageState {
     private ApplicationVersion creationToolVersion;
 
     public PackageState() {
-        packageMetadataList = new HashMap<>();
+        packageMetadataList = new LinkedHashMap<>();
     }
+
     public PackageState(ApplicationVersion appVersion) {
-        packageMetadataList = new HashMap<>();
+        packageMetadataList = new LinkedHashMap<>();
         this.creationToolVersion = appVersion;
     }
 
@@ -115,6 +116,13 @@ public class PackageState {
         packageMetadataList.get(fieldName).addAll(Arrays.asList(values));
     }
 
+    /**
+     * Assign a map metadata fields and their values to this package state.
+     * @param metadataList
+     */
+    public void setPackageMetadataList(LinkedHashMap <String, List<String>> metadataList) {
+        this.packageMetadataList = metadataList;
+    }
     /**
      * Returns version information about the tool used to create this package.
      */
