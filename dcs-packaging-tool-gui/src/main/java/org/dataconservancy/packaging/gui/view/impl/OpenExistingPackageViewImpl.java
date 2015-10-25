@@ -80,9 +80,12 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
 
         content.getChildren().add(contentDirectorySelectionFields);
 
+        VBox orLabelVBox = new VBox(4);
         Label orLabel = new Label(labels.get(Labels.LabelKey.OR_LABEL));
         orLabel.setAlignment(Pos.TOP_LEFT);
-        content.getChildren().add(orLabel);
+        orLabelVBox.getChildren().add(orLabel);
+
+        content.getChildren().add(orLabelVBox);
 
         //Create the controls for choosing a package file
         VBox chooseFileSelectionFields = new VBox(4);
