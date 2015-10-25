@@ -66,6 +66,10 @@
       <type>pom</type>
     </dependency>
 
+    <dependency>
+      <groupId>gov.loc</groupId>
+      <artifactId>bagit</artifactId>
+    </dependency>
     <!-- This is a compile time dependency of jena libs code used in this module. It's excluded in project pom -->
     <dependency>
       <groupId>xerces</groupId>
