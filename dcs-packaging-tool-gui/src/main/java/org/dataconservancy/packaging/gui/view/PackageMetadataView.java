@@ -74,6 +74,8 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      */
     void addDomainProfileRemovableLabel(String domainProfile);
 
+    void setupStaticFields();
+
     void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList);
 
     void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
@@ -85,5 +87,8 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      *
      */
     void clearAllFields();
+
+    List<Node> getAllFields();
+
 
 }

@@ -16,9 +16,11 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import com.hp.hpl.jena.sparql.function.library.date;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
@@ -29,6 +31,9 @@ import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 /**
@@ -44,7 +49,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         this.view = view;
 
         view.setPresenter(this);
-        //bind();
     }
 
     @Override
@@ -63,6 +67,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     }
 
     private void bind() {
+
+        view.setupStaticFields();
 
         // FIXME: The profile names should come from an actual service
         view.loadDomainProfileNames(Arrays.asList("Bag-It", "Custom Profile", "Custom Profile 2"));
@@ -93,10 +99,30 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     private void updatePackageState() {
 
+        getController().getPackageState().setPackageName(view.getPackageNameField().getText());
+
+        for (Node node : view.getAllFields()) {
+            if (node instanceof TextField) {
+                getController().getPackageState().addPackageMetadata(node.getId(), ((TextField) node).getText());
+            }
+            else if (node instanceof VBox) {
+                for (Node removableLabel : ((VBox) node).getChildren()) {
+                    getController().getPackageState().addPackageMetadata(node.getId(), ((RemovableLabel) removableLabel).getLabel().getText());
+                }
+            }
+            else if (node instanceof DatePicker) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                LocalDate date = ((DatePicker) node).getValue();
+                if (date != null) {
+                    String dateString = formatter.format(date);
+                    getController().getPackageState().addPackageMetadata(node.getId(), dateString);
+                }
+            }
+        }
     }
 
     private boolean validateRequiredFields() {
-        if (getController().getPackageState().getPackageName() != null) {
+        if (view.getPackageNameField().getText() != null) {
             return true;
         }
         else {

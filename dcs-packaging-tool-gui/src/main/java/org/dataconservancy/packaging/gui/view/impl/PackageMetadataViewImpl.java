@@ -68,28 +68,26 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     private Label statusLabel;
     private ScrollPane contentScrollPane;
-    private VBox bottomContent;
+    private VBox content;
 
     private Labels labels;
+    private List<Node> allFields;
 
     public PackageMetadataViewImpl(Labels labels) {
         super(labels);
         this.labels = labels;
 
+        allFields = new ArrayList<>();
+
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
-        VBox content = new VBox();
-        VBox topContent = new VBox();
-        bottomContent = new VBox();
-        content.getChildren().add(topContent);
-        content.getChildren().add(bottomContent);
+        content = new VBox();
 
         //Set up the text for the controls in the footer.
         getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
-        topContent.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
-        bottomContent.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
+        content.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
         contentScrollPane.setContent(content);
         setCenter(contentScrollPane);
 
@@ -105,86 +103,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         content.getChildren().add(status);
 
         Label requiredLabel = new Label(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
-        topContent.getChildren().add(requiredLabel);
+        content.getChildren().add(requiredLabel);
 
-        HBox topRow = new HBox(40);
-
-        // Sets up the controls and label for the package name
-        VBox packageNameEntryFields = new VBox(4);
-        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
-
-        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
-        packageNameEntryFields.getChildren().add(packageNameLabel);
-
-        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
-        packageNameEntryFields.getChildren().add(packageNameField);
-        packageNameField.setPrefWidth(310);
-
-        topRow.getChildren().add(packageNameEntryFields);
-
-        VBox domainProfileVBox = new VBox(4);
-
-        Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL) + "*");
-        domainProfileVBox.getChildren().add(domainProfileLabel);
-
-        HBox domainProfileAndButton = new HBox(4);
-        domainProfilesComboBox = new ComboBox<>();
-        domainProfilesComboBox.setPrefWidth(260);
-
-        addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
-        addDomainProfileButton.setPrefHeight(28);
-        addDomainProfileButton.getStyleClass().add(CLICKABLE);
-
-        domainProfileRemovableLabelVBox = new VBox(4);
-        domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
-
-        domainProfileAndButton.getChildren().add(domainProfilesComboBox);
-        domainProfileAndButton.getChildren().add(addDomainProfileButton);
-
-        domainProfileVBox.getChildren().add(domainProfileAndButton);
-        domainProfileVBox.getChildren().add(domainProfileRemovableLabelVBox);
-
-        topRow.getChildren().add(domainProfileVBox);
-
-        topContent.getChildren().add(topRow);
-
-    }
-
-    private ChangeListener<String> getNewChangeListenerForPhoneNumber(final Label errorMessageLabel) {
-        //Add a listener for text entry in the phone number box
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (PhoneNumberValidator.isValid(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-            }
-        };
-    }
-
-    private ChangeListener<String> getNewChangeListenerForEmail(final Label errorMessageLabel) {
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (EmailValidator.isValidEmail(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-            }
-        };
-    }
-
-    private ChangeListener<String> getNewChangeListenerForUrl(final Label errorMessageLabel) {
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (UriUtility.isHttpUrl(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-            }
-        };
     }
 
     /*
@@ -240,13 +160,60 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void addDomainProfileRemovableLabel(String domainProfileName) {
         RemovableLabel removableLabel = new RemovableLabel(domainProfileName, domainProfileRemovableLabelVBox);
         domainProfileRemovableLabelVBox.getChildren().add(removableLabel);
+        allFields.add(removableLabel);
+    }
+
+    @Override
+    public void setupStaticFields() {
+
+        HBox topRow = new HBox(40);
+
+        VBox packageNameEntryFields = new VBox(4);
+        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
+
+        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
+        packageNameEntryFields.getChildren().add(packageNameLabel);
+
+        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
+        packageNameEntryFields.getChildren().add(packageNameField);
+        packageNameField.setPrefWidth(310);
+
+        topRow.getChildren().add(packageNameEntryFields);
+
+        VBox domainProfileVBox = new VBox(4);
+
+        Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL) + "*");
+        domainProfileVBox.getChildren().add(domainProfileLabel);
+
+        HBox domainProfileAndButton = new HBox(4);
+        domainProfilesComboBox = new ComboBox<>();
+        domainProfilesComboBox.setPrefWidth(260);
+
+        addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
+        addDomainProfileButton.setPrefHeight(28);
+        addDomainProfileButton.getStyleClass().add(CLICKABLE);
+
+        domainProfileRemovableLabelVBox = new VBox(4);
+        domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
+        domainProfileRemovableLabelVBox.setId("Domain-Profile");
+        allFields.add(domainProfileRemovableLabelVBox);
+
+        domainProfileAndButton.getChildren().add(domainProfilesComboBox);
+        domainProfileAndButton.getChildren().add(addDomainProfileButton);
+
+        domainProfileVBox.getChildren().add(domainProfileAndButton);
+        domainProfileVBox.getChildren().add(domainProfileRemovableLabelVBox);
+
+        topRow.getChildren().add(domainProfileVBox);
+
+        content.getChildren().add(topRow);
     }
 
     @Override
     public void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList) {
         for (PackageMetadata packageMetadata : recommendedPackageMetadataList) {
             VBox fieldContainer = createFieldsView(packageMetadata);
-            bottomContent.getChildren().add(fieldContainer);
+            content.getChildren().add(fieldContainer);
         }
     }
 
@@ -254,8 +221,36 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList) {
         for (PackageMetadata packageMetadata : optionalPackageMetadataList) {
             VBox fieldContainer = createFieldsView(packageMetadata);
-            bottomContent.getChildren().add(fieldContainer);
+            content.getChildren().add(fieldContainer);
         }
+    }
+
+    @Override
+    public void showStatus(String status) {
+        statusLabel.setText(status);
+        statusLabel.setVisible(true);
+    }
+
+    @Override
+    public void clearAllFields() {
+        packageNameField.clear();
+        domainProfileRemovableLabelVBox.getChildren().clear();
+        for (Node node : allFields) {
+            if (node instanceof TextField) {
+                ((TextField) node).clear();
+            }
+            if (node instanceof DatePicker) {
+                ((DatePicker) node).setValue(null);
+            }
+            if (node instanceof VBox) {
+                ((VBox) node).getChildren().clear();
+            }
+        }
+    }
+
+    @Override
+    public List<Node> getAllFields() {
+        return this.allFields;
     }
 
     private VBox createFieldsView(PackageMetadata packageMetadata) {
@@ -266,57 +261,95 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         if (packageMetadata.isRepeatable()) {
             VBox parentContainer = new VBox();
             parentContainer.getStyleClass().add(VBOX_BORDER);
+            parentContainer.setId(packageMetadata.getName());
 
             TextField textField = (TextField) ControlFactory.createControl("Type value and press enter to add", packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
+            allFields.add(textField);
+
+            if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.URL)) {
+                // TODO: this may have to be done via a button
+                HBox horizontalBox = createHBoxForType(textField, PackageMetadata.ValidationType.URL);
+                fieldContainer.getChildren().add(horizontalBox);
+            }
 
             fieldContainer.getChildren().add(textField);
             fieldContainer.getChildren().add(parentContainer);
 
         } else {
-            if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.PHONE)) {
-                TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
-                HBox horizontalBox = new HBox(4);
-                Label inputVerificationLabel = new Label();
-                textField.textProperty().addListener(getNewChangeListenerForPhoneNumber(inputVerificationLabel));
-                horizontalBox.getChildren().add(textField);
-                horizontalBox.getChildren().add(inputVerificationLabel);
-                fieldContainer.getChildren().add(horizontalBox);
-            } else if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.EMAIL)) {
-                TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
-                HBox horizontalBox = new HBox(4);
-                Label inputVerificationLabel = new Label();
-                textField.textProperty().addListener(getNewChangeListenerForEmail(inputVerificationLabel));
-                horizontalBox.getChildren().add(textField);
-                horizontalBox.getChildren().add(inputVerificationLabel);
-                fieldContainer.getChildren().add(horizontalBox);
-            } else if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.URL)) {
-                TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
-                HBox horizontalBox = new HBox(4);
-                Label inputVerificationLabel = new Label();
-                textField.textProperty().addListener(getNewChangeListenerForUrl(inputVerificationLabel));
-                horizontalBox.getChildren().add(textField);
-                horizontalBox.getChildren().add(inputVerificationLabel);
-                fieldContainer.getChildren().add(horizontalBox);
-            } else if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.DATE)) {
+
+            if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.DATE)) {
                 DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, null, packageMetadata.getHelpText());
+                allFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
                 TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
-                fieldContainer.getChildren().add(textField);
+                textField.setId(packageMetadata.getName());
+                allFields.add(textField);
+
+                if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.PHONE)) {
+                    HBox horizontalBox = createHBoxForType(textField, PackageMetadata.ValidationType.PHONE);
+                    fieldContainer.getChildren().add(horizontalBox);
+                } else if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.EMAIL)) {
+                    HBox horizontalBox = createHBoxForType(textField, PackageMetadata.ValidationType.EMAIL);
+                    fieldContainer.getChildren().add(horizontalBox);
+                } else {
+                    fieldContainer.getChildren().add(textField);
+                }
             }
         }
         return fieldContainer;
     }
 
-    @Override
-    public void showStatus(String status) {
-
+    private HBox createHBoxForType(TextField textField, PackageMetadata.ValidationType validationType) {
+        HBox horizontalBox = new HBox(4);
+        Label inputVerificationLabel = new Label();
+        if (validationType.equals(PackageMetadata.ValidationType.URL)) {
+            textField.textProperty().addListener(getNewChangeListenerForUrl(inputVerificationLabel));
+        } else if (validationType.equals(PackageMetadata.ValidationType.PHONE)) {
+            textField.textProperty().addListener(getNewChangeListenerForPhoneNumber(inputVerificationLabel));
+        } else if (validationType.equals(PackageMetadata.ValidationType.EMAIL)) {
+            textField.textProperty().addListener(getNewChangeListenerForEmail(inputVerificationLabel));
+        }
+        horizontalBox.getChildren().add(textField);
+        horizontalBox.getChildren().add(inputVerificationLabel);
+        return horizontalBox;
     }
 
-    @Override
-    public void clearAllFields() {
-        packageNameField.clear();
-        domainProfileRemovableLabelVBox.getChildren().clear();
+    private ChangeListener<String> getNewChangeListenerForPhoneNumber(final Label errorMessageLabel) {
+        //Add a listener for text entry in the phone number box
+        return (observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty()) {
+                setLabelImage(errorMessageLabel, null);
+            } else if (PhoneNumberValidator.isValid(newValue)) {
+                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+            } else {
+                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
+            }
+        };
+    }
+
+    private ChangeListener<String> getNewChangeListenerForEmail(final Label errorMessageLabel) {
+        return (observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty()) {
+                setLabelImage(errorMessageLabel, null);
+            } else if (EmailValidator.isValidEmail(newValue)) {
+                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+            } else {
+                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
+            }
+        };
+    }
+
+    private ChangeListener<String> getNewChangeListenerForUrl(final Label errorMessageLabel) {
+        return (observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.isEmpty()) {
+                setLabelImage(errorMessageLabel, null);
+            } else if (UriUtility.isHttpUrl(newValue)) {
+                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+            } else {
+                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
+            }
+        };
     }
 
 }

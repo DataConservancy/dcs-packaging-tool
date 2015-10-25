@@ -16,7 +16,6 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

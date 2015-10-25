@@ -112,6 +112,7 @@ public class Controller {
      */
     private void clearPresenters() {
         factory.getHomepagePresenter().clear();
+        factory.getPackageMetadataPresenter().clear();
         factory.getCreateNewPackagePresenter().clear();
         factory.getContentDirectoryPresenter().clear();
         factory.getPackageDescriptionPresenter().clear();
@@ -123,6 +124,7 @@ public class Controller {
      */
     private void showHomepage() {
         previousPages.clear();
+        clearPresenters();
         show(factory.getHomepagePresenter());
     }
 

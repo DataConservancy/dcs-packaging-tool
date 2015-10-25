@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class RemovableLabel extends HBox implements CssConstants {
 
+    private Label label;
+
     public RemovableLabel(final String labelName, final VBox parentElement) {
 
         setSpacing(4);
@@ -35,11 +37,14 @@ public class RemovableLabel extends HBox implements CssConstants {
             }
         });
 
-        Label label = new Label(labelName);
+        label = new Label(labelName);
         label.setPadding(new Insets(4, 0, 0, 0));
 
         getChildren().add(removeImage);
         getChildren().add(label);
     }
 
+    public Label getLabel() {
+        return label;
+    }
 }

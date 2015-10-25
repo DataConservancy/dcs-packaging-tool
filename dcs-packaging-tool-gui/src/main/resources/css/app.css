@@ -452,8 +452,10 @@
 	-fx-border-width: 1;
 	-fx-border-color: #008330;
 	-fx-font-weight: bold;
+	-fx-font-size: 22px;
 	-fx-text-fill: #ffffff;
-	-fx-pref-height: 28px;
+	-fx-pref-height: 50px;
+	-fx-pref-width: 400px;
 	-fx-effect: dropshadow( one-pass-box , #005048,
 	1, 0.0, 1, 1);
 	-fx-cursor: hand;
