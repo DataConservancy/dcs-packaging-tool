@@ -228,7 +228,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         });
 
         outputDirectory = new File("./");
-        view.getPackageNameField().textProperty().setValue("tempfile");
+        //view.getPackageNameField().textProperty().setValue("tempfile");
         view.getSelectOutputDirectoryButton().fire();
 
         assertFalse(view.getStatusLabel().isVisible());
@@ -299,7 +299,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         outputDirectory = new File("./");
 
-        view.getPackageNameField().setText("thePackage");
+        //view.getPackageNameField().setText("thePackage");
         view.getStatusLabel().setVisible(false);
         view.getSelectOutputDirectoryButton().fire();
 
@@ -317,7 +317,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     @Test
     public void testEmptyOutputDirectoryProducesEmptyOutputFile() {
         outputDirectory = null;
-        view.getPackageNameField().setText("fake");
+        //view.getPackageNameField().setText("fake");
 
         assertTrue(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
     }
@@ -328,7 +328,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         outputDirectory = new File("./");
         view.getSelectOutputDirectoryButton().fire();
-        view.getPackageNameField().setText("");
+        //view.getPackageNameField().setText("");
 
         assertTrue(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
     }
@@ -337,7 +337,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     public void testOutputFileExistsIfPackageNameAndDirectoryValid() {
         presenter.display();
 
-        view.getPackageNameField().setText("fakefile");
+        //view.getPackageNameField().setText("fakefile");
         outputDirectory = new File("./");
         view.getSelectOutputDirectoryButton().fire();
 
@@ -349,7 +349,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     public void testIllegalCharactersAreNotAllowedInPackage() {
         presenter.display();
 
-        view.getPackageNameField().setText("fake*file");
+        //view.getPackageNameField().setText("fake*file");
         outputDirectory = new File("./");
         view.getSelectOutputDirectoryButton().fire();
 
@@ -362,7 +362,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     public void testLongFilenameShowsWarning() {
         presenter.display();
 
-        view.getPackageNameField().setText(StringUtils.rightPad("fakepackage", 300, "xyz"));
+        //view.getPackageNameField().setText(StringUtils.rightPad("fakepackage", 300, "xyz"));
         outputDirectory = new File("/tmp");
         view.getSelectOutputDirectoryButton().fire();
 

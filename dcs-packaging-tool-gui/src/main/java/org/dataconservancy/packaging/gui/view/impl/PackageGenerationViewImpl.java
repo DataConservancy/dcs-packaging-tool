@@ -16,21 +16,17 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -40,11 +36,9 @@ import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
-import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
-import org.dataconservancy.packaging.gui.util.PhoneNumberValidator;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
 import org.slf4j.Logger;
@@ -64,7 +58,6 @@ import java.util.List;
 public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPresenter> implements PackageGenerationView {
 
     //Controls for setting the package name and output directory
-    private TextField packageNameField;
     private DirectoryChooser outputDirectoryChooser;
     private TextField currentOutputDirectoryTextField;
     private Button selectOutputDirectoryButton;
@@ -87,11 +80,17 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     //Toggle groups that control the input of the archive and compression groups, and simplify the presenter.
     private ToggleGroup compressionToggleGroup;
     private ToggleGroup archiveToggleGroup;
-    
+
+    //Checkbox for serialization format
+    private ToggleGroup serializationToggleGroup;
+    private RadioButton jsonRadioButton;
+    private RadioButton xmlRadioButton;
+    private RadioButton turtleRadioButton;
+
     //Checkbox for the checksum algorithms
     private CheckBox md5CheckBox;
     private CheckBox sha1CheckBox;
-    
+
     private Labels labels;
 
     //Popup to warn of existing package file overwrite
@@ -104,21 +103,11 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     public Hyperlink noThanksLink;
     public Button createAnotherPackageButton;
     
-    //Contact information fields;
-    private TextField contactEmailTextField;
-    private TextField contactNameTextField;
-    private TextField contactPhoneTextField;
-    
-    //Package detail fields
-    private TextField externalIdentifierTextField;
-
     private ProgressDialogPopup progressDialogPopup;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private ScrollPane contentScrollPane;
-
-    private ComboBox<String> externalProjectIdComboBox;
 
     public PackageGenerationViewImpl(Labels labels) {
         super(labels);
@@ -148,36 +137,16 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         content.getChildren().add(status);
 
-        /*
         Label requiredLabel = new Label(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
         content.getChildren().add(requiredLabel);
-        */
-        
+
         //Create a section for setting the packaging options.
         VBox packagingSection = new VBox(16);
         Label packagingOptionsLabel = new Label(labels.get(LabelKey.PACKAGING_OPTIONS_LABEL));
         packagingOptionsLabel.getStyleClass().add(SECTION_LABEL);
         packagingSection.getChildren().add(packagingOptionsLabel);
 
-        /*
-        //Add the controls for setting the external project id.
-        VBox externalProjectIdBox = new VBox(4);
-        externalProjectIdBox.setAlignment(Pos.TOP_LEFT);
-
-        Label externalProjectIdLabel = new Label(labels.get(LabelKey.EXTERNAL_PROJECT_LABEL));
-        externalProjectIdBox.getChildren().add(externalProjectIdLabel);
-
-        externalProjectIdComboBox = (ComboBox) ControlFactory.createControl(ControlType.EDITABLE_COMBO_BOX, null);
-
-
-        externalProjectIdProperty = new SimpleStringProperty();
-        externalProjectIdComboBox.valueProperty().bindBidirectional(externalProjectIdProperty);
-
-        externalProjectIdBox.getChildren().add(externalProjectIdComboBox);
-        packagingSection.getChildren().add(externalProjectIdBox);
-        */
-
-        HBox packagingOptions = new HBox(80);
+        HBox packagingOptions = new HBox(40);
         packagingOptions.setAlignment(Pos.TOP_LEFT);
 
         //Create a vbox for the archiving options.
@@ -239,8 +208,38 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         noneCompressionButton.setUserData("");
         compressionOptions.getChildren().add(noneCompressionButton);
 
+        gZipCompressionButton = new RadioButton(labels.get(LabelKey.GZIP_BUTTON));
+        gZipCompressionButton.setToggleGroup(compressionToggleGroup);
+        gZipCompressionButton.setSelected(true);
+        gZipCompressionButton.setUserData("gz");
+
         packagingOptions.getChildren().add(compressionOptions);
-        
+
+        //Create a vbox for the serialization options.
+        VBox serializationOptions = new VBox(10);
+        serializationOptions.setAlignment(Pos.TOP_LEFT);
+
+        Label serializationLabel = new Label(labels.get(LabelKey.SERIALIZATION_FORMAT_LABEL));
+        serializationOptions.getChildren().add(serializationLabel);
+
+        //Create a toggle group for the compression options.
+        serializationToggleGroup = new ToggleGroup();
+
+        jsonRadioButton = new RadioButton(labels.get(LabelKey.JSON_BUTTON));
+        jsonRadioButton.setToggleGroup(serializationToggleGroup);
+        jsonRadioButton.setSelected(true);
+        serializationOptions.getChildren().add(jsonRadioButton);
+
+        xmlRadioButton = new RadioButton(labels.get(LabelKey.XML_BUTTON));
+        xmlRadioButton.setToggleGroup(serializationToggleGroup);
+        serializationOptions.getChildren().add(xmlRadioButton);
+
+        turtleRadioButton = new RadioButton(labels.get(LabelKey.TURTLE_BUTTON));
+        turtleRadioButton.setToggleGroup(serializationToggleGroup);
+        serializationOptions.getChildren().add(turtleRadioButton);
+
+        packagingOptions.getChildren().add(serializationOptions);
+
         //Create a vbox for the checksum options.
         VBox checksumOptions = new VBox(10);
         checksumOptions.setAlignment(Pos.TOP_LEFT);
@@ -294,86 +293,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         content.getChildren().add(outputDirectoryBox);
 
-        /*
-        // Sets up the controls and label for the package name
-        VBox packageNameEntryFields = new VBox(4);
-        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
-
-        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
-        packageNameEntryFields.getChildren().add(packageNameLabel);
-
-        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        packageNameField.setPrefWidth(240);
-        //packageNameField.setMaxWidth(350);
-        packageNameEntryFields.getChildren().add(packageNameField);
-
-        content.getChildren().add(packageNameEntryFields);
-
-        VBox externalIdentifierBox = new VBox(4);
-        externalIdentifierBox.setAlignment(Pos.CENTER_LEFT);
-
-        Label externalIdentifierLabel = new Label(labels.get(LabelKey.EXTERNAL_IDENTIFIER_LABEL_KEY) + "*");
-        externalIdentifierBox.getChildren().add(externalIdentifierLabel);
-
-        externalIdentifierTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        externalIdentifierTextField.setPrefWidth(300);
-        externalIdentifierBox.getChildren().add(externalIdentifierTextField);
-        content.getChildren().add(externalIdentifierBox);
-
-
-
-        //Create the controls for supplying contact information. 
-        //Create a vbox that displays the label for email entry and the text entry box.
-        VBox contactFields = new VBox(10);
-        Label contactLabel = new Label(labels.get(LabelKey.CONTACT_LABEL));
-        contactLabel.getStyleClass().add(SECTION_LABEL);
-        contactFields.getChildren().add(contactLabel);
-        
-        HBox secondRowContactFields = new HBox(60);
-        VBox nameEntryFields = new VBox(4);
-
-        nameEntryFields.setAlignment(Pos.TOP_LEFT);
-        
-        Label nameLabel = new Label(labels.get(LabelKey.NAME_LABEL) + "*");
-        nameEntryFields.getChildren().add(nameLabel);
-        
-        contactNameTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        nameEntryFields.getChildren().add(contactNameTextField);
-        
-        VBox emailEntryFields = new VBox(4);
-        emailEntryFields.setAlignment(Pos.TOP_LEFT);
-        
-        Label emailLabel = new Label(labels.get(LabelKey.EMAIL_LABEL) + "*");
-        emailEntryFields.getChildren().add(emailLabel);
-        
-        contactEmailTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        emailEntryFields.getChildren().add(contactEmailTextField);;
-        
-        VBox phoneEntryFields = new VBox(4);
-        phoneEntryFields.setAlignment(Pos.TOP_LEFT);
-        
-        Label phoneLabel = new Label(labels.get(LabelKey.PHONE_LABEL) + "*");
-        phoneEntryFields.getChildren().add(phoneLabel);
-        
-        contactPhoneTextField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null);
-        Label inputVerificationLabel = new Label();
-        contactPhoneTextField.textProperty().addListener(getNewChangeListenerForPhoneNumber(inputVerificationLabel));
-        phoneEntryFields.getChildren().add(contactPhoneTextField);
-
-        HBox inputVerificationBox = new HBox(3);
-        inputVerificationBox.getChildren().add(contactPhoneTextField);
-        inputVerificationBox.getChildren().add(inputVerificationLabel);
-        phoneEntryFields.getChildren().add(inputVerificationBox);
-
-        //position the contact fields
-        contactFields.getChildren().add(nameEntryFields);
-        secondRowContactFields.getChildren().add(emailEntryFields);
-        secondRowContactFields.getChildren().add(phoneEntryFields);
-        contactFields.getChildren().add(secondRowContactFields);
-
-        content.getChildren().add(contactFields);
-        */
-        
         //PopupControls
         noThanksLink = new Hyperlink(labels.get(LabelKey.NO_THANKS_LINK));
         createAnotherPackageButton = new Button(labels.get(LabelKey.CREATE_ANOTHER_PACKAGE_BUTTON));
@@ -383,37 +302,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         okOverwriteButton = new Button(labels.get(LabelKey.OK_BUTTON));
 
     }
-
-    private ChangeListener<String> getNewChangeListenerForPhoneNumber(final Label errorMessageLabel) {
-        //Add a listener for text entry in the phone number box
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (PhoneNumberValidator.isValid(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-            }
-        };
-    }
-
-    /*
-     * Set image on the provided label, using a String imageKey
-     * @param label
-     * @param imageKey
-     */
-    private void setLabelImage(Label label, String imageKey) {
-        if (imageKey != null) {
-            ImageView image = new ImageView();
-            image.getStyleClass().add(imageKey);
-            label.setGraphic(image);
-        } else {
-            label.setGraphic(null);
-        }
-    }
-
-    @Override
-    public TextField getPackageNameField() { return packageNameField; }
 
     @Override
     public DirectoryChooser getOutputDirectoryChooser() {
@@ -557,31 +445,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     }
 
     @Override
-    public TextField getContactEmailTextField() {
-        return contactEmailTextField;
-    }
-
-    @Override
-    public TextField getContactNameTextField() {
-        return contactNameTextField;
-    }
-
-    @Override
-    public TextField getContactPhoneTextField() {
-        return contactPhoneTextField;
-    }
-    
-    @Override
-    public TextField getExternalIdentifierTextField() {
-        return externalIdentifierTextField;
-    }
-
-    @Override
-    public StringProperty getExternalProjectIdentifierProperty() {
-        return externalProjectIdProperty;
-    }
-
-    @Override
     public PackageToolPopup getProgressPopup() {
         if (progressDialogPopup == null) {
             progressDialogPopup = new ProgressDialogPopup(labels);
@@ -646,6 +509,5 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
             log.error("Error loading available projects.");
         }
 
-        externalProjectIdComboBox.getItems().addAll(projects);
     }
 }

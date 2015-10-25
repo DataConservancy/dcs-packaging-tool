@@ -25,17 +25,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter;
-import org.dataconservancy.packaging.gui.view.SelectContentDirectoryView;
+import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
+import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 
-public class SelectContentDirectoryViewImpl extends BaseViewImpl<SelectContentDirectoryPresenter> implements SelectContentDirectoryView {
+public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackagePresenterImpl> implements OpenExistingPackageView {
 
     private Button chooseContentDirectoryButton;
     private TextField currentContentDirectory;
 
+    private Button chooseFileButton;
+    private TextField chooseFileTextField;
+
     private Label errorMessage;
 
-    public SelectContentDirectoryViewImpl(Labels labels) {
+    public OpenExistingPackageViewImpl(Labels labels) {
         super(labels);
 
         getContinueButton().setText(labels.get(Labels.LabelKey.CONTINUE_BUTTON));
@@ -76,6 +79,34 @@ public class SelectContentDirectoryViewImpl extends BaseViewImpl<SelectContentDi
         contentDirectorySelectionFields.getChildren().add(baseDirectorySelector);
 
         content.getChildren().add(contentDirectorySelectionFields);
+
+        Label orLabel = new Label(labels.get(Labels.LabelKey.OR_LABEL));
+        orLabel.setAlignment(Pos.TOP_LEFT);
+        content.getChildren().add(orLabel);
+
+        //Create the controls for choosing a package file
+        VBox chooseFileSelectionFields = new VBox(4);
+        chooseFileSelectionFields.setAlignment(Pos.TOP_LEFT);
+
+        Label chooseFileLabel = new Label(labels.get(Labels.LabelKey.SELECT_PACKAGE_FILE_LABEL));
+        chooseFileSelectionFields.getChildren().add(chooseFileLabel);
+
+        HBox fileChooserSelector = new HBox(6);
+        fileChooserSelector.getStyleClass().add(DIRECTORY_BOX);
+        fileChooserSelector.setMaxWidth(420);
+
+        chooseFileButton = new Button(labels.get(Labels.LabelKey.BROWSE_BUTTON));
+        chooseFileButton.setMinWidth(60);
+        fileChooserSelector.getChildren().add(chooseFileButton);
+
+        chooseFileTextField = new TextField();
+        chooseFileTextField.setEditable(false);
+        chooseFileTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
+        chooseFileTextField.setPrefWidth(320);
+        fileChooserSelector.getChildren().add(chooseFileTextField);
+        chooseFileSelectionFields.getChildren().add(fileChooserSelector);
+
+        content.getChildren().add(chooseFileSelectionFields);
     }
 
     @Override
@@ -86,6 +117,16 @@ public class SelectContentDirectoryViewImpl extends BaseViewImpl<SelectContentDi
     @Override
     public TextField getSelectedContentDirectoryTextField() {
         return currentContentDirectory;
+    }
+
+    @Override
+    public Button getChooseFileButton() {
+        return chooseFileButton;
+    }
+
+    @Override
+    public TextField getChooseFileTextField() {
+        return chooseFileTextField;
     }
 
     @Override

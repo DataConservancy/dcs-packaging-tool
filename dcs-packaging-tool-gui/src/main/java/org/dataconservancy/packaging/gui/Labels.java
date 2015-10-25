@@ -141,7 +141,12 @@ public class Labels {
         RIGHTS_URI_LABEL("rightsuri.label"),
         BAGGING_DATE_LABEL("baggingdate.label"),
         BAG_SIZE_LABEL("bagsize.label"),
-        PACKAGE_METADATA("packagemetadata.label");
+        PACKAGE_METADATA("packagemetadata.label"),
+        SERIALIZATION_FORMAT_LABEL("serialization.label"),
+        JSON_BUTTON("json.button"),
+        XML_BUTTON("xml.button"),
+        TURTLE_BUTTON("turtle.button"),
+        SELECT_PACKAGE_FILE_LABEL("selectpackagefile.label");
 
         private String property;
 

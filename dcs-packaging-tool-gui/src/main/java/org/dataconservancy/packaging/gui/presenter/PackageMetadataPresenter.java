@@ -31,4 +31,9 @@ public interface PackageMetadataPresenter extends Presenter {
      */
     public void setPackageMetadataService(PackageMetadataService packageMetadataService);
 
+    /**
+     * Sets the existing values on the form's fields if they can be retrieved from the PackageState
+     */
+    public void setExistingValues();
+
 }

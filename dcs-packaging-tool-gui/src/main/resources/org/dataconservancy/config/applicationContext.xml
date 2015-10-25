@@ -181,7 +181,7 @@
   	<constructor-arg ref="labels"/>
   </bean>
 
-  <bean id="contentDirectoryView" class="org.dataconservancy.packaging.gui.view.impl.SelectContentDirectoryViewImpl">
+  <bean id="openExistingPackageView" class="org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl">
     <constructor-arg ref="labels"/>
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
@@ -234,8 +234,8 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
-  <bean id="contentDirectoryPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter">
-    <constructor-arg ref="contentDirectoryView"/>
+  <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
+    <constructor-arg ref="openExistingPackageView"/>
     <property name="controller" ref="controller" />
     <property name="messages" ref="messages" />
     <property name="errors" ref="errors"/>
@@ -253,14 +253,14 @@
     <property name="createNewPackageView" ref="createNewPackageView" />
     <property name="packageGenerationView" ref="packageGenerationView" />
     <property name="packageDescriptionView" ref="packageDescriptionView" />
-    <property name="contentDirectoryView" ref="contentDirectoryView" />
+    <property name="openExistingPackageView" ref="openExistingPackageView" />
 
     <property name="homepagePresenter" ref="homepagePresenter" />
     <property name="packageMetadataPresenter" ref="packageMetadataPresenter" />
     <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
     <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
-    <property name="contentDirectoryPresenter" ref="contentDirectoryPresenter" />
+    <property name="openExistingPackagePresenter" ref="openExistingPackagePresenter" />
 
     <property name="controller" ref="controller" />
     

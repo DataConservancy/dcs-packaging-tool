@@ -188,45 +188,11 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     }
                 });
 
-        /*
-        //Handles the user pressing a button to choose an existing package description. 
-        view.getChoosePackageDescriptionButton().setOnAction(arg0 -> {
-            File descriptionFile = controller.showOpenFileDialog(fileChooser);
-
-            if (descriptionFile != null) {
-                try {
-                    FileInputStream fis = new FileInputStream(descriptionFile);
-                    PackageDescription description = packageDescriptionBuilder.deserialize(fis);
-                    //If the selected package description file is valid set it on the controller and remove the content directory if it was set.
-                    if (description != null) {
-                        //content_dir = null;
-                        controller.setPackageDescription(description);
-                        controller.setPackageDescriptionFile(descriptionFile);
-                        controller.setRootArtifactDir(null);
-                        controller.setContentRoot(null);
-                        content_dir = null;
-                        root_artifact_dir = null;
-
-                        view.getErrorMessage().setVisible(false);
-                        view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
-                        view.getSelectedBaseDirectoryTextField().setText("");
-                        fileChooser.setInitialDirectory(descriptionFile.getParentFile());
-                    }
-                } catch (FileNotFoundException | PackageToolException e) {
-                    view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
-                    view.getErrorMessage().setVisible(true);
-                    log.error(e.getMessage());
-                }
-            }
-        });
-        */
-
     }
 
     @Override
     public void clear() {
         view.getSelectedBaseDirectoryTextField().setText("");
-        //view.getSelectedPackageDescriptionTextField().setText("");
         view.getErrorMessage().setText("");
 
         content_dir = null;

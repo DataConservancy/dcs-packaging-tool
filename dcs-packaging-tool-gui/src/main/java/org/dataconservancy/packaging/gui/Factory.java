@@ -22,7 +22,7 @@ import java.util.Map;
 import javafx.stage.Stage;
 
 import org.dataconservancy.packaging.gui.presenter.*;
-import org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter;
+import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
 import org.dataconservancy.packaging.gui.view.*;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
@@ -59,8 +59,8 @@ public class Factory {
     private PackageDescriptionPresenter pkgDescriptionPresenter;
     private PackageDescriptionView pkgDescriptionView;
     private HeaderView headerView;
-    private SelectContentDirectoryPresenter contentDirectoryPresenter;
-    private SelectContentDirectoryView contentDirectoryView;
+    private OpenExistingPackagePresenterImpl openExistingPackagePresenter;
+    private OpenExistingPackageView openExistingPackageView;
     private PackageMetadataPresenter packageMetadataPresenter;
     private PackageMetadataView packageMetadataView;
 
@@ -146,11 +146,11 @@ public class Factory {
     public HeaderView getHeaderView() { return headerView; }
     public void setHeaderView(HeaderView headerView) { this.headerView = headerView; }
 
-    public SelectContentDirectoryPresenter getContentDirectoryPresenter() { return contentDirectoryPresenter; }
-    public void setContentDirectoryPresenter(SelectContentDirectoryPresenter presenter) {this.contentDirectoryPresenter = presenter; }
+    public OpenExistingPackagePresenterImpl getOpenExistingPackagePresenter() { return openExistingPackagePresenter; }
+    public void setOpenExistingPackagePresenter(OpenExistingPackagePresenterImpl presenter) {this.openExistingPackagePresenter = presenter; }
 
-    public SelectContentDirectoryView getContentDirectoryView() { return contentDirectoryView; }
-    public void setContentDirectoryView(SelectContentDirectoryView contentDirectoryView) { this.contentDirectoryView = contentDirectoryView; }
+    public OpenExistingPackageView getOpenExistingPackageView() { return openExistingPackageView; }
+    public void setOpenExistingPackageView(OpenExistingPackageView openExistingPackageView) { this.openExistingPackageView = openExistingPackageView; }
 
     public PackageMetadataPresenter getPackageMetadataPresenter() {
         return packageMetadataPresenter;

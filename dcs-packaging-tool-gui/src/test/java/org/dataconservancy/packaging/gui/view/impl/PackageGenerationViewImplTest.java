@@ -47,9 +47,5 @@ public class PackageGenerationViewImplTest extends BaseGuiTest {
         assertNotNull(view.getCreateNewPackageButton());
         assertNotNull(view.getCompressionToggleGroup());
         assertNotNull(view.getCurrentOutputDirectoryTextField());
-        assertNotNull(view.getContactEmailTextField());
-        assertNotNull(view.getContactNameTextField());
-        assertNotNull(view.getContactPhoneTextField());
-        assertNotNull(view.getExternalIdentifierTextField());
     }
 }

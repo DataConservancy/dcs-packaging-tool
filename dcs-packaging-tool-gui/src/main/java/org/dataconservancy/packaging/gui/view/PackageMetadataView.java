@@ -74,12 +74,22 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      */
     void addDomainProfileRemovableLabel(String domainProfile);
 
-    void setupStaticFields();
-
+    /**
+     * Sets up the recommended fields in the form.
+     * @param recommendedPackageMetadataList
+     */
     void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList);
 
+    /**
+     * Sets up the optional fields in the form.
+     * @param optionalPackageMetadataList
+     */
     void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
 
+    /**
+     * Shows any status messages.
+     * @param status
+     */
     void showStatus(String status);
 
     /**
@@ -88,6 +98,10 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      */
     void clearAllFields();
 
+    /**
+     * Gets all the fields in the form to set their values in the PackageState
+     * @return list of nodes in the form
+     */
     List<Node> getAllFields();
 
 

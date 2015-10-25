@@ -66,9 +66,17 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         return view.asNode();
     }
 
-    private void bind() {
+    @Override
+    public void setExistingValues() {
+        /*
+        if (getController().getPackageState().hasPackageMetadataValues()) {
+            // TODO: set the existing values in the form. These need to come from package state previously set by
+            // selecting an existing package.
+        }
+        */
+    }
 
-        view.setupStaticFields();
+    private void bind() {
 
         // FIXME: The profile names should come from an actual service
         view.loadDomainProfileNames(Arrays.asList("Bag-It", "Custom Profile", "Custom Profile 2"));
@@ -86,8 +94,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         view.getContinueButton().setOnAction(event -> {
             if (validateRequiredFields()) {
                 updatePackageState();
-                // TODO: Is this still needed?
-                //fillInMissingParams();
                 getController().goToNextPage(Page.CREATE_NEW_PACKAGE);
             } else {
                 view.showStatus(errors.get(ErrorKey.PACKAGE_NAME_MISSING));
@@ -130,13 +136,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         }
     }
 
-
-    /**
-     * If any required parameters are missing from the file fill them in with default values.
-     */
-    private void fillInMissingParams() {
-
-    }
 
     @Override
     public void setPackageMetadataService(PackageMetadataService packageMetadataService) {

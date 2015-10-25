@@ -90,7 +90,7 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                 // Don't show the location bar in the homepage
                 locationBar.setVisible(false);
                 break;
-            case NEW_PACKAGE_METADATA:
+            case PACKAGE_METADATA:
                 locationBar.setVisible(true);
                 //Remove the old selection, occurs on cancel or finish
                 locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);

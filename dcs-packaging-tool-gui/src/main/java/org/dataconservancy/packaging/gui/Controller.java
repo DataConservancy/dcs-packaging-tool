@@ -66,10 +66,10 @@ public class Controller {
     private PackageToolPopup crossPageProgressIndicatorPopUp;
     private Page currentPage;
     private Stack<Page> previousPages;
-    
+
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
     private final ConcurrentHashMap<Object, Semaphore> locks = new ConcurrentHashMap<>();
-    
+
     public Controller() {
         this.container = new BorderPane();
         container.getStyleClass().add(CssConstants.ROOT_CLASS);
@@ -77,8 +77,13 @@ public class Controller {
         toolVersion = new ApplicationVersion();
     }
 
-    public Factory getFactory() { return factory; }
-    public void setFactory(Factory factory) { this.factory = factory; }
+    public Factory getFactory() {
+        return factory;
+    }
+
+    public void setFactory(Factory factory) {
+        this.factory = factory;
+    }
 
     public void startApp() {
         defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
@@ -86,13 +91,14 @@ public class Controller {
         availableProjects = factory.getConfiguration().getAvailableProjects();
         showHome(true);
     }
-    
+
     /**
      * Switch to home.
+     *
      * @param clear Set to true if the fields on the home page should be cleared, false if not.
      */
     public void showHome(boolean clear) {
-        container.setTop((VBox)factory.getHeaderView());
+        container.setTop((VBox) factory.getHeaderView());
         currentPage = Page.HOMEPAGE;
         packageDescription = null;
         packageDescriptionFile = null;
@@ -114,7 +120,7 @@ public class Controller {
         factory.getHomepagePresenter().clear();
         factory.getPackageMetadataPresenter().clear();
         factory.getCreateNewPackagePresenter().clear();
-        factory.getContentDirectoryPresenter().clear();
+        factory.getOpenExistingPackagePresenter().clear();
         factory.getPackageDescriptionPresenter().clear();
         factory.getPackageGenerationPresenter().clear();
     }
@@ -131,15 +137,9 @@ public class Controller {
     /**
      * Switch to package metadata
      */
-    private void showPackageMetadata(boolean newPackage) {
-        if (newPackage) {
-            // show empty package metadata page
-            show(factory.getPackageMetadataPresenter());
-        }
-        else {
-            // show filled in package metadata page.
-            show(factory.getPackageMetadataPresenter());
-        }
+    private void showPackageMetadata() {
+        show(factory.getPackageMetadataPresenter());
+        factory.getPackageMetadataPresenter().setExistingValues();
     }
 
     /**
@@ -153,15 +153,14 @@ public class Controller {
      * Switch to the screen for selecting a content directory.
      */
     public void showSelectContentDirectory() {
-        show(factory.getContentDirectoryPresenter());
+        show(factory.getOpenExistingPackagePresenter());
     }
 
     /**
      * Switch to the screen for selecting a package directory.
      */
     public void showSelectPackageDirectory() {
-        //show(factory.getPackageDirectoryPresenter());
-        show(factory.getContentDirectoryPresenter());
+        show(factory.getOpenExistingPackagePresenter());
     }
 
     /**
@@ -173,12 +172,13 @@ public class Controller {
 
     /**
      * Shows the presenter and optionally clears the information
+     *
      * @param presenter The presenter to show
      */
     private void show(Presenter presenter) {
         container.setCenter(presenter.display());
     }
-    
+
     public void showGeneratePackage() {
         show(factory.getPackageGenerationPresenter());
     }
@@ -188,9 +188,10 @@ public class Controller {
         show(presenter);
         return presenter;
     }
+
     /**
      * Pops up a dialog that waits for the user to choose a file.
-     * 
+     *
      * @param chooser the FileChooser
      * @return file chosen or null on cancel
      */
@@ -210,10 +211,11 @@ public class Controller {
             return null;
         }
     }
-    
-    /** Pops up a save file dialog.
-     * 
-     * @param chooser  the FileChooser
+
+    /**
+     * Pops up a save file dialog.
+     *
+     * @param chooser the FileChooser
      * @return File to save or null on cancel.
      */
     public File showSaveFileDialog(FileChooser chooser) {
@@ -234,6 +236,7 @@ public class Controller {
 
     /**
      * Pops up a dialog that waits for the user to choose a directory
+     *
      * @param chooser the DirectoryChooser
      * @return directory chosen or null on cancel
      */
@@ -252,41 +255,19 @@ public class Controller {
             return null;
         }
     }
-    
+
     private Semaphore getLock(Object exclusive) {
         locks.putIfAbsent(exclusive, new Semaphore(1));
         return locks.get(exclusive);
     }
-    
+
     //Advances the application to the next page. Or redisplays the current page if it's the last page.
     public void goToNextPage(Page nextPage) {
         previousPages.push(currentPage);
         currentPage = nextPage;
         showPage();
-
-        /*
-        Page nextPage = currentPage;
-        int currentPosition = currentPage.getPosition();
-        int nextPosition = Integer.MAX_VALUE;
-        for (Page pages : Page.values()) {
-            if (pages.getPosition() > currentPosition && pages.getPosition() < nextPosition && pages.isValidPage(this)) {
-                nextPosition = pages.getPosition();
-            }
-        }
-        
-        if (nextPosition < Integer.MAX_VALUE) {
-            Page pageForPosition = Page.getPageByPosition(nextPosition);
-            if (pageForPosition != null) {
-                nextPage = pageForPosition;
-            }
-        }
-
-        previousPages.push(currentPage);
-        currentPage = nextPage;
-        showPage();
-        */
     }
-    
+
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
     public void goToPreviousPage() {
         if (previousPages != null && !previousPages.isEmpty()) {
@@ -296,7 +277,7 @@ public class Controller {
     }
 
     /**
-     * Shows the current page, a tells the presenter if it should clear it's information. 
+     * Shows the current page, a tells the presenter if it should clear it's information.
      */
     private void showPage() {
         factory.getHeaderView().highlightNextPage(currentPage);
@@ -304,8 +285,8 @@ public class Controller {
             case HOMEPAGE:
                 showHomepage();
                 break;
-            case NEW_PACKAGE_METADATA:
-                showPackageMetadata(true);
+            case PACKAGE_METADATA:
+                showPackageMetadata();
                 break;
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
@@ -322,28 +303,25 @@ public class Controller {
             case SELECT_PACKAGE_DIRECTORY:
                 showSelectPackageDirectory();
                 break;
-            case EXISTING_PACKAGE_METADATA:
-                showPackageMetadata(false);
-                break;
             default:
                 //There is no next page do nothing
                 break;
         }
     }
-    
+
     public void setPackageDescription(PackageDescription description) {
         this.packageDescription = description;
     }
-    
+
     public PackageDescription getPackageDescription() {
         return packageDescription;
     }
-    
-    public void setPackageDescriptionFile(File packageDescriptionFile){
+
+    public void setPackageDescriptionFile(File packageDescriptionFile) {
         this.packageDescriptionFile = packageDescriptionFile;
     }
 
-    public File getPackageDescriptionFile(){
+    public File getPackageDescriptionFile() {
         return packageDescriptionFile;
     }
 
@@ -355,17 +333,29 @@ public class Controller {
         this.contentRoot = contentRoot;
     }
 
-    public File getRootArtifactDir() { return rootArtifactDir; }
+    public File getRootArtifactDir() {
+        return rootArtifactDir;
+    }
 
-    public void setRootArtifactDir(File rootArtifactDir) { this.rootArtifactDir = rootArtifactDir; }
+    public void setRootArtifactDir(File rootArtifactDir) {
+        this.rootArtifactDir = rootArtifactDir;
+    }
 
-    public String getPackageFilenameIllegalCharacters() { return packageFilenameIllegalCharacters; }
+    public String getPackageFilenameIllegalCharacters() {
+        return packageFilenameIllegalCharacters;
+    }
 
-    public void setPackageFilenameIllegalCharacters(String illegalCharacters) { this.packageFilenameIllegalCharacters = illegalCharacters;}
+    public void setPackageFilenameIllegalCharacters(String illegalCharacters) {
+        this.packageFilenameIllegalCharacters = illegalCharacters;
+    }
 
-    public String getAvailableProjects() { return availableProjects; }
+    public String getAvailableProjects() {
+        return availableProjects;
+    }
 
-    public void setAvailableProjects(String availableProjects) { this.availableProjects = availableProjects; }
+    public void setAvailableProjects(String availableProjects) {
+        this.availableProjects = availableProjects;
+    }
 
     public PackageState getPackageState() {
         return packageState;
@@ -386,14 +376,16 @@ public class Controller {
     public void setToolBuildNumber(String buildNumber) {
         toolVersion.setBuildNumber(buildNumber);
     }
+
     public void setToolBuildRevision(String buildRevision) {
         toolVersion.setBuildRevision(buildRevision);
     }
+
     public void setToolBuildTimestamp(String buildTimestamp) {
         toolVersion.setBuildTimeStamp(buildTimestamp);
     }
 
-    public String getDefaultPackageGenerationParametersFilePath () {
+    public String getDefaultPackageGenerationParametersFilePath() {
         return defaultPackageGenerationParametersFilePath;
     }
 }

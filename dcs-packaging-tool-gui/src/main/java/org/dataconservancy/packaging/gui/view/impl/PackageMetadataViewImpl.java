@@ -105,6 +105,49 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         Label requiredLabel = new Label(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
         content.getChildren().add(requiredLabel);
 
+        // setup static fields
+        HBox topRow = new HBox(40);
+
+        VBox packageNameEntryFields = new VBox(4);
+        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
+
+        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
+        packageNameEntryFields.getChildren().add(packageNameLabel);
+
+        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
+        packageNameEntryFields.getChildren().add(packageNameField);
+        packageNameField.setPrefWidth(310);
+
+        topRow.getChildren().add(packageNameEntryFields);
+
+        VBox domainProfileVBox = new VBox(4);
+
+        Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL) + "*");
+        domainProfileVBox.getChildren().add(domainProfileLabel);
+
+        HBox domainProfileAndButton = new HBox(4);
+        domainProfilesComboBox = new ComboBox<>();
+        domainProfilesComboBox.setPrefWidth(260);
+
+        addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
+        addDomainProfileButton.setPrefHeight(28);
+        addDomainProfileButton.getStyleClass().add(CLICKABLE);
+
+        domainProfileRemovableLabelVBox = new VBox(4);
+        domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
+        domainProfileRemovableLabelVBox.setId("Domain-Profile");
+        allFields.add(domainProfileRemovableLabelVBox);
+
+        domainProfileAndButton.getChildren().add(domainProfilesComboBox);
+        domainProfileAndButton.getChildren().add(addDomainProfileButton);
+
+        domainProfileVBox.getChildren().add(domainProfileAndButton);
+        domainProfileVBox.getChildren().add(domainProfileRemovableLabelVBox);
+
+        topRow.getChildren().add(domainProfileVBox);
+
+        content.getChildren().add(topRow);
+
     }
 
     /*
@@ -161,52 +204,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         RemovableLabel removableLabel = new RemovableLabel(domainProfileName, domainProfileRemovableLabelVBox);
         domainProfileRemovableLabelVBox.getChildren().add(removableLabel);
         allFields.add(removableLabel);
-    }
-
-    @Override
-    public void setupStaticFields() {
-
-        HBox topRow = new HBox(40);
-
-        VBox packageNameEntryFields = new VBox(4);
-        packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
-
-        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL) + "*");
-        packageNameEntryFields.getChildren().add(packageNameLabel);
-
-        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
-        packageNameEntryFields.getChildren().add(packageNameField);
-        packageNameField.setPrefWidth(310);
-
-        topRow.getChildren().add(packageNameEntryFields);
-
-        VBox domainProfileVBox = new VBox(4);
-
-        Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL) + "*");
-        domainProfileVBox.getChildren().add(domainProfileLabel);
-
-        HBox domainProfileAndButton = new HBox(4);
-        domainProfilesComboBox = new ComboBox<>();
-        domainProfilesComboBox.setPrefWidth(260);
-
-        addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
-        addDomainProfileButton.setPrefHeight(28);
-        addDomainProfileButton.getStyleClass().add(CLICKABLE);
-
-        domainProfileRemovableLabelVBox = new VBox(4);
-        domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
-        domainProfileRemovableLabelVBox.setId("Domain-Profile");
-        allFields.add(domainProfileRemovableLabelVBox);
-
-        domainProfileAndButton.getChildren().add(domainProfilesComboBox);
-        domainProfileAndButton.getChildren().add(addDomainProfileButton);
-
-        domainProfileVBox.getChildren().add(domainProfileAndButton);
-        domainProfileVBox.getChildren().add(domainProfileRemovableLabelVBox);
-
-        topRow.getChildren().add(domainProfileVBox);
-
-        content.getChildren().add(topRow);
     }
 
     @Override

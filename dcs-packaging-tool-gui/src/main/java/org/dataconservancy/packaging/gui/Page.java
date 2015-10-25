@@ -25,7 +25,7 @@ public enum Page {
     //Positions must be in numerical order of there appearance in the workflow but don't need to be sequential
     //Space is left between pages to allow for the future addition of more screens
     HOMEPAGE(Labels.LabelKey.HOMEPAGE_PAGE),
-    NEW_PACKAGE_METADATA(Labels.LabelKey.CREATE_PACKAGE_PAGE),
+    PACKAGE_METADATA(Labels.LabelKey.CREATE_PACKAGE_PAGE),
     CREATE_NEW_PACKAGE(Labels.LabelKey.CREATE_PACKAGE_PAGE),
     SELECT_CONTENT_DIRECTORY(Labels.LabelKey.CREATE_PACKAGE_PAGE),
     DEFINE_RELATIONSHIPS(Labels.LabelKey.DEFINE_RELATIONSHIPS_PAGE),

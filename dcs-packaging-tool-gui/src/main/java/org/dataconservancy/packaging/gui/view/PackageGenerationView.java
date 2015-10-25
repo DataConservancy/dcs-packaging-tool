@@ -38,12 +38,6 @@ import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 public interface PackageGenerationView extends View<PackageGenerationPresenter> {
 
     /**
-     * A text field that is used for entering the package name.
-     * @return The text field for entering the package name.
-     */
-    TextField getPackageNameField();
-
-    /**
      * Gets the directory chooser for setting the output directory.
      * @return  the directory chooser
      */
@@ -139,36 +133,6 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      */
     CheckBox getSHA1CheckBox();
     
-    /**
-     * Gets the contact information text field, that will be supplied in the bag.
-     * @return  the contact information text field
-     */
-    TextField getContactEmailTextField();
-    
-    /**
-     * Gets the contact name text field, that will be supplied in the bag.
-     * @return   the contact name text field
-     */
-    TextField getContactNameTextField();
-    
-    /**
-     * Gets the contact phone number text field, that will be supplied in the bag.
-     * @return The text field for entering in a contact phone number.
-     */
-    TextField getContactPhoneTextField();
-    
-    /**
-     * Gets the text field for setting the external identifier if there is one.
-     * @return The text field for entering in an external identifier.
-     */
-    TextField getExternalIdentifierTextField();
-
-    /**
-     * Gets the text field for setting the external project Identifier if there is one.
-     * @return The string property for labeling the project identifier field.
-     */
-    StringProperty getExternalProjectIdentifierProperty();
-
     /**
      * Gets the progress dialog popup that's used when the package is being generated.
      * @return The popup used to display package generation progress.

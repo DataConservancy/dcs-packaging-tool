@@ -57,12 +57,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Implementation for the screen that will handle generating the actual package. Controls the user selecting packaging options,
  * selecting a basic directory and then generating a package. Will present the user with an option to see if they wish to generate another package,
- * with different options or return to the main screen. 
+ * with different options or return to the main screen.
  */
 public class PackageGenerationPresenterImpl extends BasePresenterImpl implements PackageGenerationPresenter {
     private PackageGenerationView view;
@@ -89,16 +90,16 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     public Node display() {
         //Clear out any values from the previous run
         view.getStatusLabel().setText("");
-        //view.getCurrentOutputDirectoryTextField().setText("");
+        view.getCurrentOutputDirectoryTextField().setText("");
         generationParams = null;
-        //loadPackageGenerationParams();
-        //view.loadAvailableProjects(controller.getAvailableProjects());
+        loadPackageGenerationParams();
+        view.loadAvailableProjects(controller.getAvailableProjects());
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);
         super.bindBaseElements();
 
-        return view.asNode();        
+        return view.asNode();
     }
 
     private void bind() {
@@ -119,11 +120,11 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
             view.getProgressPopup().hide();
             if (workerStateEvent.getSource().getMessage() == null ||
-                workerStateEvent.getSource().getMessage().isEmpty()) {
+                    workerStateEvent.getSource().getMessage().isEmpty()) {
                 Throwable e = workerStateEvent.getSource().getException();
                 view.getStatusLabel().setText(
-                    errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
-                        " " + e.getMessage());
+                        errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
+                                " " + e.getMessage());
             } else {
                 view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
             }
@@ -158,13 +159,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
         });
 
-        /*
-        //Handles the user changing the package name
-        view.getPackageNameField().textProperty().addListener((observableValue, oldVal, newVal) -> {
-            setOutputDirectory(true);
-        });
-        */
-        
         //Handles the user pressing the no thanks link on the create another package popup. This will take the user
         //back to the home screen. 
         view.getNoThanksLink().setOnAction(arg0 -> {
@@ -173,7 +167,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
             controller.showHome(true);
         });
-        
+
         //Handles the user pressing the create another package button on the create another package popup. This will 
         //dismiss the popup and keep the user on the screen.
         view.getCreateNewPackageButton().setOnAction(arg0 -> {
@@ -195,7 +189,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             backgroundService.setOverwriteFile(true);
             backgroundService.execute();
         });
-        
+
         //This listener changes what is shown in the output directory box when the archiving format is changed.
         view.getArchiveToggleGroup().selectedToggleProperty().addListener((ov, toggle, archiveToggle) -> {
             if (archiveToggle != null) {
@@ -210,15 +204,15 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
 
                 //when we select zip or exploded as our archiving format, we must select 'none' as our compression
-                if (archiveExtension.equals("zip") || archiveExtension.equals("exploded")){
+                if (archiveExtension.equals("zip") || archiveExtension.equals("exploded")) {
                     Toggle noCompressionToggle = getNoCompressionToggle();
-                    if(noCompressionToggle != null && noCompressionToggle != view.getCompressionToggleGroup().getSelectedToggle()) {
+                    if (noCompressionToggle != null && noCompressionToggle != view.getCompressionToggleGroup().getSelectedToggle()) {
                         view.getCompressionToggleGroup().selectToggle(noCompressionToggle);
                     }
                 }
             }
-         });
-        
+        });
+
         //This listener changes what is shown in the output directory box when the compression format is changed.
         view.getCompressionToggleGroup().selectedToggleProperty().addListener((ov, toggle, compressionToggle) -> {
             if (compressionToggle != null) {
@@ -232,8 +226,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     generationParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, compressionExtension);
                 }
             }
-         });
-        
+        });
+
         view.getMd5CheckBox().selectedProperty().addListener((ov, oldValue, newValue) -> {
             List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
 
@@ -247,13 +241,13 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
             }
         });
-        
+
         view.getSHA1CheckBox().selectedProperty().addListener((ov, oldValue, newValue) -> {
             List<String> params = generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS);
 
             if (newValue) {
                 if (params != null && !params.isEmpty() &&
-                    !params.contains("sha1")) {
+                        !params.contains("sha1")) {
                     params.add("sha1");
                 }
             } else {
@@ -273,12 +267,14 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         * and error is logged.
         */
         view.getContinueButton().setOnAction(arg0 -> {
+            /* Commenting this out for now as DC-2116 suggests it's out of scope.
             view.getStatusLabel().setVisible(false);
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().show();
             }
             backgroundService.setOverwriteFile(false);
             backgroundService.execute();
+            */
         });
     }
 
@@ -309,7 +305,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             } catch (RuntimeException e) {
                 log.error(e.getMessage());
-                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " "  + e.getMessage();
+                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             }
 
         } else {
@@ -317,7 +313,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
         }
 
-        if(!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded") && !Thread.currentThread().isInterrupted()) {
+        if (!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded") && !Thread.currentThread().isInterrupted()) {
             //If we've successfully generated a package, save the package to the provided output directory,
             //unless we wanted the package exploded, in which case there is no package file produced
             if (createdPackage != null) {
@@ -360,7 +356,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
             }
         }
-        
+
         //If the file is null attempt to load the built in resource file.
         if (generationParams == null) {
             InputStream fileStream = PackageGenerationPresenterImpl.class.getResourceAsStream("/packageGenerationParameters");
@@ -370,71 +366,80 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 } catch (ParametersBuildException e) {
                     log.error("Error reading default params from file: " + e.getMessage());
                 }
-            }
-            else {
+            } else {
                 log.error("Error reading default params files. Couldn't find classpath file: /packageGenerationParameters");
             }
         }
-        
+
         //As an absolute fall back if the parameters can't be loaded from anywhere set them in the code.
         if (generationParams == null) {
-            loadDefaultParams();            
+            loadDefaultParams();
         }
-        
+
         setViewToDefaults();
     }
 
-    private void updateParamsFromForm() {
-        updateSingleParam(BagItParameterNames.CONTACT_NAME, view.getContactNameTextField().getText());
-        updateSingleParam(BagItParameterNames.CONTACT_EMAIL, view.getContactEmailTextField().getText());
-        updateSingleParam(BagItParameterNames.CONTACT_PHONE, view.getContactPhoneTextField().getText());
-        updateSingleParam(GeneralParameterNames.PACKAGE_NAME, view.getPackageNameField().getText());
-        updateSingleParam(BagItParameterNames.EXTERNAL_IDENTIFIER, view.getExternalIdentifierTextField().getText());
-        updateSingleParam(BagItParameterNames.PKG_BAG_DIR, view.getPackageNameField().getText());
-        updateSingleParam(GeneralParameterNames.EXTERNAL_PROJECT_ID, view.getExternalProjectIdentifierProperty().getValue());
+    private void updateParamsFromPackageMetadataList() {
+        updateParams(GeneralParameterNames.PACKAGE_NAME, Arrays.asList(getController().getPackageState().getPackageName()));
+        updateParams(BagItParameterNames.CONTACT_NAME, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_NAME));
+        updateParams(BagItParameterNames.CONTACT_PHONE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_PHONE));
+        updateParams(BagItParameterNames.CONTACT_EMAIL, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_EMAIL));
+        updateParams(BagItParameterNames.KEYWORD, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.KEYWORD));
+        updateParams(BagItParameterNames.EXTERNAL_IDENTIFIER, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.EXTERNAL_IDENTIFIER));
+        updateParams(BagItParameterNames.EXTERNAL_DESCRIPTION, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.EXTERNAL_DESCRIPTION));
+        updateParams(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER));
+        updateParams(BagItParameterNames.INTERNAL_SENDER_DESCRIPTION, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.INTERNAL_SENDER_DESCRIPTION));
+        updateParams(BagItParameterNames.SOURCE_ORG, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.SOURCE_ORG));
+        updateParams(BagItParameterNames.ORG_ADDRESS, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.ORG_ADDRESS));
+        updateParams(BagItParameterNames.BAG_GROUP_ID, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAG_GROUP_ID));
+        updateParams(BagItParameterNames.RIGHTS_STRING, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.RIGHTS_STRING));
+        updateParams(BagItParameterNames.RIGHTS_URI, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.RIGHTS_URI));
+        updateParams(BagItParameterNames.BAGGING_DATE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAGGING_DATE));
+        updateParams(BagItParameterNames.BAG_SIZE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAG_SIZE));
+        updateParams(BagItParameterNames.PAYLOAD_OXUM, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.PAYLOAD_OXUM));
     }
 
-    private void updateSingleParam(String key, String value) {
+    private void updateParams(String key, List<String> values) {
         generationParams.removeParam(key);
 
-        if (value != null && !value.isEmpty()) {
-            generationParams.addParam(key, value);
+        if (values != null && !values.isEmpty()) {
+            generationParams.addParam(key, values);
         }
     }
-    
+
     /**
      * If any required parameters are missing from the file fill them in with default values.
      */
     private void fillInMissingParams() {
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID).isEmpty()) {
-            generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());            
+            generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
         }
-        
-        if (generationParams.getParam(GeneralParameterNames.PACKAGE_NAME) == null || 
+
+        if (generationParams.getParam(GeneralParameterNames.PACKAGE_NAME) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_NAME).isEmpty()) {
             generationParams.addParam(GeneralParameterNames.PACKAGE_NAME, getPackageName());
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.CHECKSUM_ALGORITHMS) == null ||
                 generationParams.getParam(GeneralParameterNames.CHECKSUM_ALGORITHMS).isEmpty()) {
             List<String> checksumAlgs = new ArrayList<>();
-            
+
             if (view.getMd5CheckBox().isSelected()) {
                 checksumAlgs.add("md5");
-            } 
-            
+            }
+
             if (view.getSHA1CheckBox().isSelected()) {
                 checksumAlgs.add("sha1");
             }
-            
+
             if (checksumAlgs.isEmpty()) {
                 checksumAlgs.add("md5");
             }
-            
+
             generationParams.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksumAlgs);
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION) == null ||
                 generationParams.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION).isEmpty()) {
             if (controller.getContentRoot() != null) {
@@ -442,74 +447,48 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
         }
 
-        if (generationParams.getParam(BagItParameterNames.PKG_BAG_DIR) == null || 
+        if (generationParams.getParam(BagItParameterNames.PKG_BAG_DIR) == null ||
                 generationParams.getParam(BagItParameterNames.PKG_BAG_DIR).isEmpty()) {
             generationParams.addParam(BagItParameterNames.PKG_BAG_DIR, getPackageName());
         }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_EMAIL) == null ||
-                generationParams.getParam(BagItParameterNames.CONTACT_EMAIL).isEmpty()) {
-            if (view.getContactEmailTextField().getText() != null && !view.getContactEmailTextField().getText().isEmpty()) {
-                generationParams.addParam(BagItParameterNames.CONTACT_EMAIL, view.getContactEmailTextField().getText());
-            }
-        }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_NAME) == null ||
-                generationParams.getParam(BagItParameterNames.CONTACT_NAME).isEmpty()) {
-            if (view.getContactNameTextField().getText() != null && !view.getContactNameTextField().getText().isEmpty()) {
-                generationParams.addParam(BagItParameterNames.CONTACT_NAME, view.getContactNameTextField().getText());
-            }
-        }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_PHONE) == null ||
-                generationParams.getParam(BagItParameterNames.CONTACT_PHONE).isEmpty()) {
-            if (view.getContactPhoneTextField().getText() != null && !view.getContactPhoneTextField().getText().isEmpty()) {
-                generationParams.addParam(BagItParameterNames.CONTACT_PHONE, view.getContactPhoneTextField().getText());
-            }
-        }
-        
+
         if (generationParams.getParam(BagItParameterNames.BAGIT_PROFILE_ID) == null ||
                 generationParams.getParam(BagItParameterNames.BAGIT_PROFILE_ID).isEmpty()) {
             generationParams.addParam(BagItParameterNames.BAGIT_PROFILE_ID, "http://dataconservancy.org/formats/data-conservancy-pkg-0.9");
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION).isEmpty()) {
             if (controller.getPackageState().getOutputDirectory() != null) {
                 generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getPackageState().getOutputDirectory().getAbsolutePath());
             }
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER) == null ||
                 generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER).isEmpty()) {
-            if (view.getExternalIdentifierTextField().getText() != null && !view.getExternalIdentifierTextField().getText().isEmpty()) {
-                generationParams.addParam(BagItParameterNames.EXTERNAL_IDENTIFIER, view.getExternalIdentifierTextField().getText());
-
-            } else {
-                generationParams.addParam(BagItParameterNames.EXTERNAL_IDENTIFIER, "none");
-            }
+            generationParams.addParam(BagItParameterNames.EXTERNAL_IDENTIFIER, "none");
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.BAG_COUNT) == null ||
                 generationParams.getParam(BagItParameterNames.BAG_COUNT).isEmpty()) {
             generationParams.addParam(BagItParameterNames.BAG_COUNT, "1 of 1");
         }
-        
+
         if (generationParams.getParam(BagItParameterNames.BAG_GROUP_ID) == null ||
                 generationParams.getParam(BagItParameterNames.BAG_GROUP_ID).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.BAG_GROUP_ID, "none");            
+            generationParams.addParam(BagItParameterNames.BAG_GROUP_ID, "none");
         }
     }
-    
+
     /**
-     * This method is a last resort to load default parameters in code, if none of the file options could be loaded. 
+     * This method is a last resort to load default parameters in code, if none of the file options could be loaded.
      */
     private void loadDefaultParams() {
-        
+
         view.getStatusLabel().setText(errors.get(ErrorKey.PARAM_LOADING_ERROR));
         view.getStatusLabel().setTextFill(Color.BLACK);
         view.getStatusLabel().setVisible(true);
-        
+
         generationParams = new PackageGenerationParameters();
         generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
 
@@ -534,9 +513,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         generationParams.addParam(BagItParameterNames.BAGIT_PROFILE_ID, "http://dataconservancy.org/formats/data-conservancy-pkg-0.9");
     }
-    
+
     private void setViewToDefaults() {
-        if (generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT) != null 
+        if (generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT) != null
                 && !generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT).isEmpty()) {
             for (Toggle compressionToggle : view.getCompressionToggleGroup().getToggles()) {
                 if (compressionToggle.getUserData().equals(generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT).get(0))) {
@@ -545,7 +524,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
             }
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT) != null
                 && !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).isEmpty()) {
             for (Toggle archivingToggle : view.getArchiveToggleGroup().getToggles()) {
@@ -555,28 +534,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
             }
         }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_EMAIL) != null
-                && !generationParams.getParam(BagItParameterNames.CONTACT_EMAIL).isEmpty()) {
-            view.getContactEmailTextField().setText(generationParams.getParam(BagItParameterNames.CONTACT_EMAIL).get(0));
-        }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_NAME) != null
-                && !generationParams.getParam(BagItParameterNames.CONTACT_NAME).isEmpty()) {
-            view.getContactNameTextField().setText(generationParams.getParam(BagItParameterNames.CONTACT_NAME, 0));
-        }
-        
-        if (generationParams.getParam(BagItParameterNames.CONTACT_PHONE) != null 
-                && !generationParams.getParam(BagItParameterNames.CONTACT_PHONE).isEmpty()) {
-            view.getContactPhoneTextField().setText(generationParams.getParam(BagItParameterNames.CONTACT_PHONE, 0));
-        }
-        
-        if (generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER) != null
-                && !generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER).isEmpty()) {
-            view.getExternalIdentifierTextField().setText(generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER, 0));
-        }
-        
-        if (generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS) != null 
+
+        if (generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS) != null
                 && !generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS).isEmpty()) {
             for (String checksumParam : generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS)) {
                 if (checksumParam.equalsIgnoreCase("md5")) {
@@ -585,9 +544,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     view.getSHA1CheckBox().setSelected(true);
                 }
             }
-            
+
         }
-        
+
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) != null
                 && !generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION).isEmpty()) {
             String filePath = generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
@@ -606,7 +565,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
             }
         }
-        
+
         setOutputDirectory(false);
     }
 
@@ -636,12 +595,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         if (controller.getPackageState().getOutputDirectory() != null) {
             packageFile = new File(controller.getPackageState().getOutputDirectory(), packageName);
         } else {
-            packageFile = new File ("./", packageName);
+            packageFile = new File("./", packageName);
         }
 
         return packageFile;
     }
-    
+
     /**
      * Sets the output name of the file that will be saved based on the path of the output directory the package name,
      * and the archive format, and the compression format.
@@ -699,20 +658,21 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             view.getStatusLabel().setVisible(true);
         }
 
-       // view.getCurrentOutputDirectoryTextField().setText(currentOutput);
+        view.getCurrentOutputDirectoryTextField().setText(currentOutput);
     }
 
 
     /**
      * we use this method to get the compression toggle corresponding to None - have to set this
      * when zip archive format is selected.
+     *
      * @return toggle
      */
-    private Toggle getNoCompressionToggle(){
+    private Toggle getNoCompressionToggle() {
         List<Toggle> compressionToggles = view.getCompressionToggleGroup().getToggles();
-        for (Toggle toggle : compressionToggles){
+        for (Toggle toggle : compressionToggles) {
             String compressionExtension = (String) toggle.getUserData();
-            if (compressionExtension.isEmpty()){//"None"
+            if (compressionExtension.isEmpty()) {//"None"
                 return toggle;
             }
         }
@@ -763,6 +723,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     private class BackgroundPackageService implements GeneratePackageService {
 
         BackgroundService service;
+
         public BackgroundPackageService() {
             service = new BackgroundService();
         }
@@ -802,49 +763,49 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             service.reset();
         }
 
-        private class BackgroundService extends  Service<Void> {
+        private class BackgroundService extends Service<Void> {
             private boolean overwriteFile = false;
 
-           public void setOverwriteFile(boolean overwriteFile) {
-               this.overwriteFile = overwriteFile;
-           }
+            public void setOverwriteFile(boolean overwriteFile) {
+                this.overwriteFile = overwriteFile;
+            }
 
-           @Override
-           protected Task<Void> createTask() {
-               return new Task<Void>() {
-                   @Override
-                   protected Void call() throws Exception {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
 
-                       //If any parameters weren't set in the user provided files we'll supply defaults
-                       fillInMissingParams();
+                        //If any parameters weren't set in the user provided files we'll supply defaults
+                        fillInMissingParams();
 
-                       //Update params based on what's on the form
-                       updateParamsFromForm();
+                        //Update params based on what's on the form
+                        updateParamsFromPackageMetadataList();
 
-                       File packageFile = getPackageFile();
+                        File packageFile = getPackageFile();
 
-                       if (controller.getPackageState().getOutputDirectory() == null) {
-                           updateMessage(errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING));
-                           cancel();
-                       } else {
-                           if (!packageFile.exists() || overwriteFile) {
-                               String errorMessage = generateAndSavePackage();
-                               if (!errorMessage.isEmpty()) {
-                                   updateMessage(errorMessage);
-                                   cancel();
-                               }
-                           } else {
-                               Platform.runLater(() -> {
-                                   view.getProgressPopup().hide();
-                                   view.showFileOverwriteWarningPopup();
-                               });
-                               cancel();
-                           }
-                       }
-                       return null;
-                   }
-               };
-           }
+                        if (controller.getPackageState().getOutputDirectory() == null) {
+                            updateMessage(errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING));
+                            cancel();
+                        } else {
+                            if (!packageFile.exists() || overwriteFile) {
+                                String errorMessage = generateAndSavePackage();
+                                if (!errorMessage.isEmpty()) {
+                                    updateMessage(errorMessage);
+                                    cancel();
+                                }
+                            } else {
+                                Platform.runLater(() -> {
+                                    view.getProgressPopup().hide();
+                                    view.showFileOverwriteWarningPopup();
+                                });
+                                cancel();
+                            }
+                        }
+                        return null;
+                    }
+                };
+            }
         }
     }
 
@@ -866,7 +827,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             fillInMissingParams();
 
             //Update params based on what's on the form
-            updateParamsFromForm();
+            updateParamsFromPackageMetadataList();
 
             File packageFile = getPackageFile();
 
@@ -876,22 +837,22 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 worker.setState(Worker.State.CANCELLED);
                 cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
             } else {
-               if (!packageFile.exists() || overwriteFile) {
-                   String errorMessage = generateAndSavePackage();
-                   if (!errorMessage.isEmpty()) {
-                       worker.setMessage(errorMessage);
-                       worker.setState(Worker.State.CANCELLED);
-                       cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
-                   }
-               } else {
+                if (!packageFile.exists() || overwriteFile) {
+                    String errorMessage = generateAndSavePackage();
+                    if (!errorMessage.isEmpty()) {
+                        worker.setMessage(errorMessage);
+                        worker.setState(Worker.State.CANCELLED);
+                        cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
+                    }
+                } else {
 
-                   Platform.runLater(() -> {
-                       view.getProgressPopup().hide();
-                       view.showFileOverwriteWarningPopup();
-                   });
-                   worker.setState(Worker.State.CANCELLED);
-                   cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
-               }
+                    Platform.runLater(() -> {
+                        view.getProgressPopup().hide();
+                        view.showFileOverwriteWarningPopup();
+                    });
+                    worker.setState(Worker.State.CANCELLED);
+                    cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
+                }
             }
 
             worker.setState(Worker.State.SUCCEEDED);
