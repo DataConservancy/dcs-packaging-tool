@@ -231,7 +231,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             log.info("Creating bag base dir: " + packageLocationDir.getPath());
             boolean isDirCreated = packageLocationDir.mkdirs();
             if (!isDirCreated) {
-                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DIR_CREATION_EXP,
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
                         "\nAttempt to create staging directory for the package at \"" + packageLocationDir.getPath() +
                                 "\" failed. Possible reasons include: \n" +
                                 "- Permission restriction in creating the specified directory \n" +
@@ -252,7 +252,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             log.info("Creating bag base dir: " + bagBaseDir.getPath());
             boolean isDirCreated = bagBaseDir.mkdirs();
             if (!isDirCreated) {
-                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DIR_CREATION_EXP,
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
                         "Attempt to create a base directory for bag at " + bagBaseDir.getPath() + " failed.");
             }
         } else {
@@ -271,7 +271,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             log.info("Creating payload dir: " + payloadDir.getPath());
             boolean isDirCreated = payloadDir.mkdirs();
             if (!isDirCreated) {
-                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DIR_CREATION_EXP,
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
                         "Attempt to create a payload directory for bag at " + payloadDir.getPath()+ " failed.");
             }
         }
@@ -311,7 +311,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 log.info("Creating parent folders");
                 boolean isDirCreated = newFile.getParentFile().mkdirs();
                 if (!isDirCreated) {
-                    throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DIR_CREATION_EXP);
+                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
                 }
             }
 
@@ -535,6 +535,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             writer.write(String.format(lineFormat, BagItParameterNames.TAG_FILE_CHAR_ENCODING, ENCODING) + newLine);
 
             writer.close();
+
         } catch (IOException e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_IO_EXCEPTION, e,
                     "Exception occurred when writing bagit.txt file.");
