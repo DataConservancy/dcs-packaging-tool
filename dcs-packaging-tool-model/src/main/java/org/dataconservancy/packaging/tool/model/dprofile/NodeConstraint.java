@@ -110,6 +110,6 @@ public class NodeConstraint {
     @Override
     public String toString() {
         return "NodeConstraint [matches_any=" + matches_any + ", matches_none=" + matches_none + ", node_type="
-                + node_type.getIdentifier() + ", struct_rels=" + struct_rel + "]";
+                + (node_type == null ? "" : node_type.getIdentifier()) + ", struct_rels=" + struct_rel + "]";
     }
 }

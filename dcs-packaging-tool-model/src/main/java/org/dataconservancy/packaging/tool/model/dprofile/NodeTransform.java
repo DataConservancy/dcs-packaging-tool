@@ -246,9 +246,9 @@ public class NodeTransform extends AbstractDescribedObject {
 
     @Override
     public String toString() {
-        return "NodeTransform [source_type=" + source_type.getIdentifier() + ", source_parent_constraint=" + source_parent_constraint
+        return "NodeTransform [source_type=" + (source_type == null ? "" : source_type.getIdentifier()) + ", source_parent_constraint=" + source_parent_constraint
                 + ", source_grandparent_constraint=" + source_grandparent_constraint + ", source_child_constraint="
-                + source_child_constraint + ", result_node_type=" + result_node_type.getIdentifier() + ", result_parent_constraint="
+                + source_child_constraint + ", result_node_type=" + (result_node_type == null ? "" : result_node_type.getIdentifier()) + ", result_parent_constraint="
                 + result_parent_constraint + ", insert_parent=" + insert_parent + ", move_result_grandparent="
                 + move_result_grandparent + ", remove_empty_parent=" + remove_empty_parent + "]";
     }
