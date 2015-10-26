@@ -250,7 +250,11 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
             if (nodeType.getParentConstraints() != null && !nodeType.getParentConstraints().isEmpty()) {
                 for (NodeConstraint parentConstraint : nodeType.getParentConstraints()) {
-                    nodeTypeResource.addProperty(HAS_PARENT_CONSTRAINT, transformToRdf(model, parentConstraint, domainProfileResource));
+                    if (parentConstraint.getNodeType() != null && parentConstraint.getNodeType().equals(nodeType)) {
+                        nodeTypeResource.addProperty(HAS_PARENT_CONSTRAINT, transformToRdf(model, parentConstraint, domainProfileResource, nodeTypeResource));
+                    } else {
+                        nodeTypeResource.addProperty(HAS_PARENT_CONSTRAINT, transformToRdf(model, parentConstraint, domainProfileResource, null));
+                    }
                 }
             }
 
@@ -287,7 +291,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         return nodeTypeResource;
     }
 
-    private Resource transformToRdf(Model model, NodeConstraint constraint, Resource domainProfileResource)
+    private Resource transformToRdf(Model model, NodeConstraint constraint, Resource domainProfileResource, Resource nodeTypeResource)
         throws RDFTransformException {
         Resource constraintResource = model.createResource();
         constraintResource.addProperty(RDF.type, NODE_CONSTRAINT_TYPE);
@@ -295,7 +299,11 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         constraintResource.addLiteral(MATCHES_NONE, constraint.matchesNone());
 
         if (constraint.getNodeType() != null) {
-            constraintResource.addProperty(HAS_NODE_TYPE, transformToRdf(model, constraint.getNodeType(), domainProfileResource));
+            if (nodeTypeResource != null) {
+                constraintResource.addProperty(HAS_NODE_TYPE, nodeTypeResource);
+            } else {
+                constraintResource.addProperty(HAS_NODE_TYPE, transformToRdf(model, constraint.getNodeType(), domainProfileResource));
+            }
         }
 
         if (constraint.getStructuralRelation() != null) {
@@ -471,15 +479,15 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (transform.getSourceParentConstraint() != null) {
-            transformResource.addProperty(HAS_SOURCE_PARENT_CONSTRAINT, transformToRdf(model, transform.getSourceParentConstraint(), domainProfileResource));
+            transformResource.addProperty(HAS_SOURCE_PARENT_CONSTRAINT, transformToRdf(model, transform.getSourceParentConstraint(), domainProfileResource, null));
         }
 
         if (transform.getSourceGrandParentConstraint() != null) {
-            transformResource.addProperty(HAS_SOURCE_GRANDPARENT_CONSTRAINT, transformToRdf(model, transform.getSourceGrandParentConstraint(), domainProfileResource));
+            transformResource.addProperty(HAS_SOURCE_GRANDPARENT_CONSTRAINT, transformToRdf(model, transform.getSourceGrandParentConstraint(), domainProfileResource, null));
         }
 
         if (transform.getSourceChildConstraint() != null) {
-            transformResource.addProperty(HAS_SOURCE_CHILD_CONSTRAINT, transformToRdf(model, transform.getSourceChildConstraint(), domainProfileResource));
+            transformResource.addProperty(HAS_SOURCE_CHILD_CONSTRAINT, transformToRdf(model, transform.getSourceChildConstraint(), domainProfileResource, null));
         }
 
         if (transform.getResultNodeType() != null) {
@@ -487,7 +495,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (transform.getResultParentConstraint() != null) {
-            transformResource.addProperty(HAS_RESULT_PARENT_CONSTRAINT, transformToRdf(model, transform.getResultParentConstraint(), domainProfileResource));
+            transformResource.addProperty(HAS_RESULT_PARENT_CONSTRAINT, transformToRdf(model, transform.getResultParentConstraint(), domainProfileResource, null));
         }
 
         transformResource.addLiteral(INSERT_PARENT, transform.insertParent());
@@ -632,6 +640,11 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
         nodeType.setDomainTypes(domainTypes);
 
+        //We add this to the map here so that if parent constraints refer to this node type it's loaded instead of trying to be deserialized
+        if (transformedNodeTypes != null) {
+            transformedNodeTypes.put(nodeType.getIdentifier(), nodeType);
+        }
+
         List<NodeConstraint> parentConstraints = new ArrayList<>();
         for (RDFNode parentConstraintNode : model.listObjectsOfProperty(resource, HAS_PARENT_CONSTRAINT).toList()) {
             if (!parentConstraintNode.isResource()) {
@@ -693,9 +706,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setChildFileConstraint(childConstraint);
         }
 
-        if (transformedNodeTypes != null) {
-            transformedNodeTypes.put(nodeType.getIdentifier(), nodeType);
-        }
         return nodeType;
     }
 
