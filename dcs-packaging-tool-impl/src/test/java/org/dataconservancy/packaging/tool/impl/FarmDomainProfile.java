@@ -23,11 +23,11 @@ import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
 /**
  * Domain profile for testing.
  * 
- * Farm has_part Barns and Troughs.
+ * Farm has_part Barns, Troughs, and Farms.
  * Barn has_occupant Cows and has_part Stockpiles.
  * Troughs and Stockpiles has_part Feed.
  *
- * Media can describe Farms, barn, and cows with has_data.
+ * Media can describe Farms, Barns, and Cows with has_data.
  * 
  * TODO Switch to more real looking uris.
  */
@@ -141,24 +141,27 @@ public class FarmDomainProfile extends DomainProfile {
         Property cow_species = new Property(species_property_type);
         cow_species.setStringValue("Bos taurus");
 
-        farm_node_type.setIdentifier(URI.create("fdp:farm"));
-        farm_node_type.setLabel("farm");
-        farm_node_type.setDescription("The domain of a benevolent dictator.");
-        farm_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Farm"), URI.create("org:Organization")));
-        farm_node_type.setPropertyConstraints(Arrays.asList(title_constraint, person_constraint));
-        farm_node_type.setDefaultPropertyValues(Arrays.asList());
-        farm_node_type.setParentConstraints(Arrays.asList());
-        farm_node_type.setFileAssociation(FileAssociation.DIRECTORY);
-        farm_node_type.setDomainProfile(this);
-
         has_part_rel = new StructuralRelation(URI.create("dcterms:isPartOf"), URI.create("dcterms:hasPart"));
         has_occupant_rel= new StructuralRelation(URI.create("farm:isOccupantOf"), URI.create("farm:hasOccupant"));
         has_data_rel= new StructuralRelation(URI.create("farm:isDataFor"), URI.create("farm:hasData"));
-
+        
         NodeConstraint farm_parent_constraint = new NodeConstraint();
         farm_parent_constraint.setNodeType(farm_node_type);
         farm_parent_constraint.setStructuralRelation(has_part_rel);
         
+        NodeConstraint no_parent_constraint = new NodeConstraint();
+        no_parent_constraint.setMatchesNone(true);
+        
+        farm_node_type.setIdentifier(URI.create("fdp:farm"));
+        farm_node_type.setLabel("Farm");
+        farm_node_type.setDescription("The domain of a benevolent dictator.");
+        farm_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Farm"), URI.create("org:Organization")));
+        farm_node_type.setPropertyConstraints(Arrays.asList(title_constraint, person_constraint));
+        farm_node_type.setDefaultPropertyValues(Arrays.asList());
+        farm_node_type.setParentConstraints(Arrays.asList(no_parent_constraint, farm_parent_constraint));
+        farm_node_type.setFileAssociation(FileAssociation.DIRECTORY);
+        farm_node_type.setDomainProfile(this);
+
         barn_node_type.setIdentifier(URI.create("fdp:barn"));
         barn_node_type.setLabel("Barn");
         barn_node_type.setDescription("A place of rest and relaxation.");
