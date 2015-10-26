@@ -271,6 +271,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return "Node [identifier=" + identifier + ", domainObject=" + domainObject + ", fileInfo=" + fileInfo + "]";
+        return "Node [identifier=" + identifier + ", parent=" + (parent == null ? "null" : parent.getIdentifier()) + ", domainObject=" + domainObject + ", fileInfo=" + fileInfo + "]";
     }
 }
