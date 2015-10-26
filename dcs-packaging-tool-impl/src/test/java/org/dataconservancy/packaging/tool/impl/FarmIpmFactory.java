@@ -31,14 +31,13 @@ public class FarmIpmFactory {
         Node root = new Node(URI.create("test:bestfarm"));
 
         root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(createFileInfo("/bestfarm", "best farm", -1, 10123, 100, false));
+        root.setFileInfo(create_directory_info("/bestfarm", "best farm"));
 
         return root;
     }
-    
+
     /**
-     * Return a tree with types assigned for a single file.
-     * The tree is invalid.
+     * Return a tree with types assigned for a single file. The tree is invalid.
      * 
      * <pre>
      *  /moo.wav                (Media)
@@ -55,7 +54,6 @@ public class FarmIpmFactory {
         return root;
     }
 
-
     /**
      * Return a tree with types assigned of a single directory with a single
      * subdirectory.
@@ -71,11 +69,11 @@ public class FarmIpmFactory {
         Node root = new Node(URI.create("test:farm"));
 
         root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(createFileInfo("/farm", "farm", -1, 10123, 100, false));
+        root.setFileInfo(create_directory_info("/farm", "farm"));
 
         Node barn = new Node(URI.create("test:barn"));
         barn.setNodeType(profile.getBarnNodeType());
-        barn.setFileInfo(createFileInfo("/farm/barn", "barn", -1, 200, 400, false));
+        barn.setFileInfo(create_directory_info("/farm/barn", "barn"));
 
         root.addChild(barn);
 
@@ -98,20 +96,19 @@ public class FarmIpmFactory {
         Node root = new Node(URI.create("test:farm"));
 
         root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(createFileInfo("/farm", "farm", -1, -1, 100, false));
+        root.setFileInfo(create_directory_info("/farm", "farm"));
 
         Node barn = new Node(URI.create("test:barn1"));
         barn.setNodeType(profile.getBarnNodeType());
-        barn.setFileInfo(createFileInfo("/farm/barn1", "barn1", -1, 200, 400, false));
+        barn.setFileInfo(create_directory_info("/farm/barn1", "barn1"));
 
         Node cow = new Node(URI.create("test:cow1"));
         cow.setNodeType(profile.getCowNodeType());
-        cow.setFileInfo(createFileInfo("/farm/barn1/cow1", "cow1", -1, 600, 600, false));
+        cow.setFileInfo(create_directory_info("/farm/barn1/cow1", "cow1"));
 
         Node video = new Node(URI.create("test:cow1_video"));
         video.setNodeType(profile.getMediaNodeType());
-        video.setFileInfo(
-                createFileInfo("/farm/barn1/cow1/lastgoodbye.mp4", "lastgoodbye.mp4", 10000000, 800, 1000, true));
+        video.setFileInfo(create_file_info("/farm/barn1/cow1/lastgoodbye.mp4", "lastgoodbye.mp4"));
 
         root.addChild(barn);
         barn.addChild(cow);
@@ -136,21 +133,19 @@ public class FarmIpmFactory {
         Node root = new Node(URI.create("test:farm"));
 
         root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(createFileInfo("/farm", "farm", -1, 0, 100, false));
+        root.setFileInfo(create_directory_info("/farm", "farm"));
 
         Node barn = new Node(URI.create("test:barn"));
         barn.setNodeType(profile.getBarnNodeType());
-        barn.setFileInfo(createFileInfo("/farm/barn", "barn1", -1, 200, 400, false));
+        barn.setFileInfo(create_directory_info("/farm/barn", "barn1"));
 
         Node sounds = new Node(URI.create("test:farm_sounds"));
         sounds.setNodeType(profile.getMediaNodeType());
-        sounds.setFileInfo(
-                createFileInfo("/farm/sounds.mp3", "sounds.mp3", 1300000, 8000, 19000, true));
-        
-        Node photo  = new Node(URI.create("test:barn_photo"));
+        sounds.setFileInfo(create_file_info("/farm/sounds.mp3", "sounds.mp3"));
+
+        Node photo = new Node(URI.create("test:barn_photo"));
         photo.setNodeType(profile.getMediaNodeType());
-        photo.setFileInfo(
-                createFileInfo("/farm/barn/photo.jpg", "photo.jpg", 300000, 80000, 100000, true));
+        photo.setFileInfo(create_file_info("/farm/barn/photo.jpg", "photo.jpg"));
 
         root.addChild(barn);
         root.addChild(sounds);
@@ -159,48 +154,59 @@ public class FarmIpmFactory {
         return root;
     }
 
+    /**
+     * Return a tree of the given size with the given depth and branching.
+     * Every inner node is a Farm. Every leaf is a Media.
+     * 
+     * @return root of tree.
+     */
+    public Node createCompleteTree(int depth, int branching) {
+        return create_large_tree(0, depth, branching, 0);
+    }
+
+    private Node create_large_tree(int depth, int max_depth, int branching, int node_id) {
+        Node node = new Node(URI.create("test:" + depth + "," + node_id));
+
+        if (++depth < max_depth) {
+            node.setFileInfo(create_directory_info("/" + depth + "/" + node_id + "/", "dir"));
+            node.setNodeType(profile.getFarmNodeType());
+            
+            for (int branch = 0; branch < branching; branch++) {
+                node.addChild(create_large_tree(depth, max_depth, branching, branch));
+            }
+        } else {
+            node.setFileInfo(create_file_info("/" + depth + "/" + node_id, "file"));
+            node.setNodeType(profile.getMediaNodeType());
+        }
+
+
+        return node;
+    }
+
     private FileInfo create_directory_info(String path, String name) {
         FileInfo result = new FileInfo(Paths.get(path).toUri(), name);
-        
+
         result.setIsDirectory(true);
         result.setCreationTime(FileTime.fromMillis(400000));
         result.setLastModifiedTime(FileTime.fromMillis(600000));
-        
+
         return result;
     }
-    
+
     private FileInfo create_file_info(String path, String name) {
         FileInfo result = new FileInfo(Paths.get(path).toUri(), name);
-        
+
         result.setIsFile(true);
         result.setSize(120032);
-        
+
         result.setCreationTime(FileTime.fromMillis(10000000));
         result.setLastModifiedTime(FileTime.fromMillis(2000000));
-        
+
         result.addFormat("application/octet-stream");
         result.addChecksum(Algorithm.MD5, "12345");
         result.addChecksum(Algorithm.SHA1, "54321");
-        
-        return result;
-    }
-    
-    // TODO better helpers for file/dir
-    private FileInfo createFileInfo(String path, String name, final long size, final long create_date_ms,
-            final long mod_date_ms, boolean file) {
-        FileInfo fileInfo = new FileInfo(Paths.get(path).toUri(), name);
-        fileInfo.setSize(size);
-        fileInfo.setCreationTime(FileTime.fromMillis(create_date_ms));
-        fileInfo.setLastModifiedTime(FileTime.fromMillis(mod_date_ms));
-        fileInfo.setIsFile(file);
-        fileInfo.setIsDirectory(!file);
 
-        if (file) {
-            fileInfo.addFormat("application/octet-stream");
-            fileInfo.addChecksum(Algorithm.MD5, "12345");
-            fileInfo.addChecksum(Algorithm.SHA1, "54321");
-        }
-        return fileInfo;
+        return result;
     }
 
     public FarmDomainProfile getProfile() {
