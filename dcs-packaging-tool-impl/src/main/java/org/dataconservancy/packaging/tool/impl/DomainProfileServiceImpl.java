@@ -125,7 +125,45 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             throw new IllegalArgumentException("Transform not available.");
         }
 
-        // TODO
+        // TODO order of operations
+        
+        NodeType result_type = tr.getResultNodeType();
+        Node parent = node.getParent();
+        Node grandparent = parent == null ? null : parent.getParent();
+        NodeConstraint result_parent_constraint = tr.getResultParentConstraint();
+
+        if (tr.insertParent()) {
+            // TODO Get node uri. Add URI gen service for here and object store.
+            Node new_parent = new Node(null);
+            
+            parent.getChildren().remove(node);
+            new_parent.addChild(node);
+            parent = new_parent;
+        } else if (tr.moveResultToGrandParent()) {
+            parent.removeChild(node);
+            grandparent.addChild(node);
+            
+            if (tr.removeEmptyParent()) {
+                if (parent.isIgnored()) {
+                    grandparent.removeChild(node);;
+                }
+            }
+            
+            parent = grandparent;
+        }
+        
+
+        if (parent != null && result_parent_constraint != null) {
+            if (result_parent_constraint.getNodeType() != null) {
+                parent.setNodeType(result_parent_constraint.getNodeType());
+                objstore.updateObject(parent);
+            }
+        }
+        
+        if (result_type != null) {
+            node.setNodeType(result_type);
+            objstore.updateObject(node);
+        }
     }
 
     @Override
@@ -142,25 +180,50 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean can_transform(Node node, NodeTransform tr) {
-        // TODO Auto-generated method stub
-        return false;
+        if (!node.getNodeType().getIdentifier().equals(tr.getSourceNodeType().getIdentifier())) {
+            return false;
+        }
+
+        Node parent = node.getParent();
+        Node grandparent = parent == null ? null : parent.getParent();
+
+        NodeConstraint child_constraint = tr.getSourceChildConstraint();
+
+        // TODO one or all?
+        
+        if (node.hasChildren()) {
+            for (Node child: node.getChildren()) {
+                // TODO
+            }
+        }
+
+        NodeConstraint parent_constraint = tr.getSourceParentConstraint();
+
+        if (!meets_parent_type_constraint(node, parent, parent_constraint)
+                || !meets_parent_relation_constraint(node, parent, parent_constraint)) {
+            return false;
+        }
+
+        NodeConstraint grandparent_constraint = tr.getSourceGrandParentConstraint();
+
+        
+        if (!meets_parent_type_constraint(parent, grandparent, grandparent_constraint)
+                || !meets_parent_relation_constraint(parent, grandparent, grandparent_constraint)) {
+            return false;
+        }
+        
+        return true;
     }
 
     @Override
     public boolean validateTree(Node node) {
-        System.err.println("hi " + node.getIdentifier());
-        
         if (!is_valid(node)) {
             return false;
         }
-        
-        System.err.println("here 1" + node.getIdentifier());
-        
+
         if (node.isLeaf()) {
             return true;
         }
-        
-        System.err.println("here 2" + node.getIdentifier());
 
         for (Node child : node.getChildren()) {
             if (!validateTree(child)) {
@@ -172,16 +235,20 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean meets_parent_type_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
-        if (parent == null && parent_constraint.matchesNone()) {
+        if (parent_constraint.matchesNone()) {
+            return parent == null;
+        }
+
+        if (parent_constraint.matchesAny()) {
+            return parent != null;
+        }
+        
+        if (parent == null) {
             return false;
         }
         
-        if (parent != null && parent_constraint.matchesAny()) {
+        if (parent_constraint.getNodeType() == null) {
             return true;
-        }
-
-        if (parent == null) {
-            return false;
         }
         
         return parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier());
@@ -194,11 +261,11 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             // Handled by meets_parent_type_constraint.
             return true;
         }
-        
+
         if (node.getDomainObject() == null || parent.getDomainObject() == null) {
             return false;
         }
-        
+
         StructuralRelation rel = parent_constraint.getStructuralRelation();
 
         if (rel.getHasParentPredicate() != null) {
@@ -221,15 +288,15 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     private boolean meets_file_requirements(Node node, NodeType type) {
         FileInfo info = node.getFileInfo();
         FileAssociation assoc = type.getFileAssociation();
-        
+
         if (info == null || assoc == null) {
             return true;
         }
-        
+
         if (info.isFile() && assoc == FileAssociation.REGULAR_FILE) {
             return true;
         }
-        
+
         if (info.isDirectory() && assoc == FileAssociation.DIRECTORY) {
             return true;
         }
@@ -242,7 +309,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (!meets_file_requirements(node, type)) {
             return false;
         }
-
+        
         List<NodeConstraint> constraints = type.getParentConstraints();
 
         if (constraints == null || constraints.isEmpty()) {
@@ -269,7 +336,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (type == null) {
             return false;
         }
-        
+
         if (!meets_file_requirements(node, type)) {
             return false;
         }
@@ -381,7 +448,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
                     continue next;
                 }
             }
-
+            
             return true;
         }
 
