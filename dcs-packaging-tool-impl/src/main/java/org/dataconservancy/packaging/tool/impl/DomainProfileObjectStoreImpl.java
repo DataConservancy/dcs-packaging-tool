@@ -78,6 +78,10 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         Resource object = as_resource(node.getDomainObject());
         NodeType type = node.getNodeType();
 
+        if (type == null) {
+            return;
+        }
+        
         if (type.getDomainTypes() != null) {
             type.getDomainTypes().forEach(dt -> object.addProperty(RDF.type, as_resource(dt)));
         }
@@ -128,6 +132,18 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     private NodeConstraint find_parent_constraint(NodeType type, NodeType parent_type) {
         for (NodeConstraint nc : type.getParentConstraints()) {
+            if (nc.matchesNone()) {
+                continue;
+            }
+            
+            if (nc.matchesAny()) {
+                return nc;
+            }
+            
+            if (nc.getNodeType() == null) {
+                return nc;
+            }
+            
             if (nc.getNodeType().getIdentifier().equals(parent_type.getIdentifier())) {
                 return nc;
             }
