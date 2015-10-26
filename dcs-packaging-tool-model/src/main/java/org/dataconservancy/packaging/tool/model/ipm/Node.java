@@ -90,7 +90,7 @@ public class Node {
     }
 
     /**
-     * Remove a child node.
+     * Remove a child node and set its parent to null.
      * 
      * @param node The child node to remove from the node.
      */
@@ -98,6 +98,8 @@ public class Node {
         if (children != null) {
             children.remove(node);
         }
+        
+        node.setParent(null);
     }
 
     /**
