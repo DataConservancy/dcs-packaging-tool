@@ -506,7 +506,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
     public DomainProfile transformToProfile(Model model) throws RDFTransformException {
         transformedNodeTypes = new HashMap<>();
 
-        DomainProfile profile = new DomainProfile();
         List<Resource> domainProfiles = model.listResourcesWithProperty(RDF.type, DP_TYPE).toList();
 
         if (domainProfiles.size() != 1) {
@@ -514,6 +513,14 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         Resource profileResource = domainProfiles.get(0);
+
+        return transformToDomainProfile(profileResource, model);
+    }
+
+    public DomainProfile transformToDomainProfile(Resource profileResource, Model model)
+        throws RDFTransformException {
+        transformedNodeTypes = new HashMap<>();
+        DomainProfile profile = new DomainProfile();
 
         if (profileResource.hasProperty(RDFS.label)) {
             profile.setLabel(getLiteral(profileResource, RDFS.label).getString());
@@ -584,7 +591,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         return profile;
     }
 
-    private NodeType transformToNodeType(Resource resource, DomainProfile profile, Model model)
+    public NodeType transformToNodeType(Resource resource, DomainProfile profile, Model model)
         throws RDFTransformException {
 
         URI identifier = null;
@@ -596,7 +603,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             }
         }
 
-        if (transformedNodeTypes.get(identifier) != null) {
+        if (transformedNodeTypes != null && transformedNodeTypes.get(identifier) != null) {
             return transformedNodeTypes.get(identifier);
         }
 
@@ -686,7 +693,9 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setChildFileConstraint(childConstraint);
         }
 
-        transformedNodeTypes.put(nodeType.getIdentifier(), nodeType);
+        if (transformedNodeTypes != null) {
+            transformedNodeTypes.put(nodeType.getIdentifier(), nodeType);
+        }
         return nodeType;
     }
 
@@ -909,7 +918,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
             Resource suppliedPropertyResource = suppliedPropertyNode.asResource();
             if (suppliedPropertyResource.hasProperty(HAS_PROPERTY_TYPE)) {
-                PropertyType suppliedType = transformToPropertyType(suppliedPropertyResource, profile, model);
+                PropertyType suppliedType = transformToPropertyType(suppliedPropertyResource.getPropertyResourceValue(HAS_PROPERTY_TYPE), profile, model);
                 if (suppliedType != null) {
                     if (suppliedPropertyResource.hasProperty(HAS_SUPPLIED_PROPERTY_VALUE)) {
                         suppliedPropertyMap.put(suppliedType, SuppliedProperty.valueOf(getLiteral(suppliedPropertyResource, HAS_SUPPLIED_PROPERTY_VALUE).getString()));
