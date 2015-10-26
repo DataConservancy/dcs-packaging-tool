@@ -76,7 +76,7 @@ public class NodeConstraint {
         int result = 1;
         result = prime * result + (matches_any ? 1231 : 1237);
         result = prime * result + (matches_none ? 1231 : 1237);
-        result = prime * result + ((node_type == null) ? 0 : node_type.hashCode());
+        result = prime * result + ((node_type == null || node_type.getIdentifier() == null) ? 0 : node_type.getIdentifier().hashCode());
         result = prime * result + ((struct_rel == null) ? 0 : struct_rel.hashCode());
         return result;
     }
@@ -97,7 +97,10 @@ public class NodeConstraint {
         if (node_type == null) {
             if (other.node_type != null)
                 return false;
-        } else if (!node_type.equals(other.node_type))
+        } else if (node_type.getIdentifier() == null) {
+            if (other.node_type.getIdentifier() != null)
+                return  false;
+        } else if (other.node_type == null || other.node_type.getIdentifier() == null || !node_type.getIdentifier().equals(other.node_type.getIdentifier()))
             return false;
         if (struct_rel == null) {
             if (other.struct_rel != null)
