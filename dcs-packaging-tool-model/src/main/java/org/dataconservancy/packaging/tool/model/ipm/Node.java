@@ -206,6 +206,13 @@ public class Node {
     public boolean isLeaf() {
         return children == null || children.isEmpty();
     }
+    
+    /**
+     * @return Whether or not the node has children.
+     */
+    public boolean hasChildren() {
+        return children != null && !children.isEmpty();
+    }
 
     /**
      * @return Whether or not node is the root of the tree.
