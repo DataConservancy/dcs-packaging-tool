@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
@@ -26,14 +26,15 @@ import org.junit.Test;
  */
 public class DomainProfileServiceImplTest {
     private DomainProfileServiceImpl service;
+    private DomainProfileObjectStoreImpl store;
     private FarmIpmFactory ipmfact;
     private FarmDomainProfile profile;
 
     @Before
     public void setup() {
         Model model = ModelFactory.createDefaultModel();
-        DomainProfileObjectStore store = new DomainProfileObjectStoreImpl(model);
 
+        store = new DomainProfileObjectStoreImpl(model);
         service = new DomainProfileServiceImpl(store);
         ipmfact = new FarmIpmFactory();
         profile = ipmfact.getProfile();
@@ -44,7 +45,7 @@ public class DomainProfileServiceImplTest {
      * may not have a parent.
      */
     @Test
-    public void testAssignNodeTypesSingleDirectory() {
+    public void testAssignSingleDirectory() {
         Node root = ipmfact.createSingleDirectoryTree();
 
         root.walk(Node::clearNodeTypes);
@@ -56,14 +57,14 @@ public class DomainProfileServiceImplTest {
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
 
-        assertTrue(service.validateTree(root));
+        assertTrue(validate_tree(root));
     }
 
     /**
      * A single file has no valid assignment.
      */
     @Test
-    public void testAssignNodeTypesSingleFile() {
+    public void testAssignSingleFile() {
         Node root = ipmfact.createInvalidSingleFileTree();
 
         root.walk(Node::clearNodeTypes);
@@ -73,14 +74,14 @@ public class DomainProfileServiceImplTest {
         assertFalse(success);
         assertNull(root.getDomainObject());
 
-        assertFalse(service.validateTree(root));
+        assertFalse(validate_tree(root));
     }
 
     /**
      * A tree consisting of one directory containing another directory.
      */
     @Test
-    public void testAssignNodeTypesTwoDirectory() {
+    public void testAssignTwoDirectory() {
         Node root = ipmfact.createTwoDirectoryTree();
 
         root.walk(Node::clearNodeTypes);
@@ -96,7 +97,85 @@ public class DomainProfileServiceImplTest {
         assertNotNull(child.getNodeType());
         assertNotNull(child.getDomainObject());
 
-        assertTrue(service.validateTree(root));
+        assertTrue(validate_tree(root));
+    }
+
+    /**
+     * A tree consisting of three directories and a file.
+     */
+    @Test
+    public void testAssignSimple() {
+        Node root = ipmfact.createSimpleTree();
+
+        root.walk(Node::clearNodeTypes);
+
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertTrue(success);
+
+        root.walk(n -> {
+            assertNotNull(n.getDomainObject());
+            assertNotNull(n.getNodeType());
+        });
+
+        assertTrue(validate_tree(root));
+    }
+
+    /**
+     * A tree consisting of three directories and a file.
+     */
+    @Test
+    public void testAssignSimple2() {
+        Node root = ipmfact.createSimpleTree2();
+
+        root.walk(Node::clearNodeTypes);
+
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertTrue(success);
+
+        root.walk(n -> {
+            assertNotNull(n.getDomainObject());
+            assertNotNull(n.getNodeType());
+        });
+        
+        assertTrue(validate_tree(root));
+    }
+
+    /**
+     * Test a large tree.
+     */
+    @Test
+    public void testAssignLargeTree() {
+        Node root = ipmfact.createCompleteTree(8, 4);
+
+        root.walk(Node::clearNodeTypes);
+
+        boolean success = service.assignNodeTypes(profile, root);
+
+        // System.err.println(store);
+
+        assertTrue(success);
+
+        // Only valid assignment is meda for leaf
+        // Inner nodes can be farm, barn, or cow.
+
+        root.walk(n -> {
+            assertNotNull(n.getDomainObject());
+            assertNotNull(n.getNodeType());
+            
+            NodeType type = n.getNodeType();
+
+            if (n.isLeaf()) {
+                assertEquals(profile.getMediaNodeType().getIdentifier(), type.getIdentifier());
+            } else {
+                assertTrue(type.getIdentifier().equals(profile.getFarmNodeType().getIdentifier())
+                        || type.getIdentifier().equals(profile.getCowNodeType().getIdentifier())
+                        || type.getIdentifier().equals(profile.getBarnNodeType().getIdentifier()));
+            }
+        });
+
+        assertTrue(validate_tree(root));
     }
 
     /**
@@ -172,5 +251,25 @@ public class DomainProfileServiceImplTest {
         service.addProperty(node, person1);
 
         assertTrue(service.validateProperties(node, profile.getFarmNodeType()));
+    }
+
+    @Test
+    public void testValidateValidTree() {
+        assertTrue(validate_tree(ipmfact.createSingleDirectoryTree()));
+        assertTrue(validate_tree(ipmfact.createTwoDirectoryTree()));
+        assertTrue(validate_tree(ipmfact.createSimpleTree()));
+        assertTrue(validate_tree(ipmfact.createSimpleTree2()));
+        assertTrue(validate_tree(ipmfact.createCompleteTree(3, 3)));
+    }
+
+    @Test
+    public void testValidateInValidTree() {
+        assertFalse(service.validateTree(ipmfact.createInvalidSingleFileTree()));
+    }
+
+    // Update objects and then validate the tree
+    private boolean validate_tree(Node node) {
+        node.walk(store::updateObject);
+        return service.validateTree(node);
     }
 }
