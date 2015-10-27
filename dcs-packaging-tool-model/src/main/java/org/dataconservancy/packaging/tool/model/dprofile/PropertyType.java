@@ -15,7 +15,8 @@ public class PropertyType extends AbstractDescribedObject {
     private PropertyValueType value_type;
     private PropertyValueHint value_hint;
     private List<Property> allowed_values;
-    private List<PropertyConstraint> subtypes;
+    private List<PropertyConstraint> complex_constraints;
+    private List<URI> complex_domain_types;
     private PropertyCategory category;
     private boolean readonly;
 
@@ -51,10 +52,17 @@ public class PropertyType extends AbstractDescribedObject {
     /**
      * Complex properties contain other properties.
      * 
-     * @return If the value is complex, return list of property sub-types.
+     * @return If the value is complex, return list of property constraints.
      */
-    public List<PropertyConstraint> getPropertySubTypes() {
-        return subtypes;
+    public List<PropertyConstraint> getComplexPropertyConstraints() {
+        return complex_constraints;
+    }
+    
+    /**
+     * @return Unordered list of domain types of this complex property.
+     */
+    public List<URI> getComplexDomainTypes() {
+        return complex_domain_types;
     }
 
     /**
@@ -100,10 +108,17 @@ public class PropertyType extends AbstractDescribedObject {
     }
 
     /**
-     * @param subtypes The sub-types to set.
+     * @param complex_constraints The types contained by a complex property.
      */
-    public void setPropertySubTypes(List<PropertyConstraint> subtypes) {
-        this.subtypes = subtypes;
+    public void setComplexPropertyConstraints(List<PropertyConstraint> complex_constraints) {
+        this.complex_constraints = complex_constraints;
+    }
+    
+    /**
+     * @param domain_types The domain types of a complex property.
+     */
+    public void setComplexDomainTypes(List<URI> domain_types) {
+        this.complex_domain_types = domain_types;
     }
 
     /**
@@ -126,25 +141,14 @@ public class PropertyType extends AbstractDescribedObject {
      */
     @Override
     public int hashCode() {
-        HashSet<Property> allowedValueSet = null;
-        if (allowed_values != null) {
-            allowedValueSet = new HashSet<>();
-            allowedValueSet.addAll(allowed_values);
-        }
-
-        HashSet<PropertyConstraint> subTypeSet = null;
-        if (subtypes != null) {
-            subTypeSet = new HashSet<>();
-            subTypeSet.addAll(subtypes);
-        }
-
-        final int prime = 31;
+            final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((allowedValueSet == null) ? 0 : allowedValueSet.hashCode());
+        result = prime * result + ((allowed_values == null) ? 0 : new HashSet<>(allowed_values).hashCode());
         result = prime * result + ((category == null) ? 0 : category.hashCode());
         result = prime * result + ((domain_pred == null) ? 0 : domain_pred.hashCode());
         result = prime * result + (readonly ? 1231 : 1237);
-        result = prime * result + ((subTypeSet == null) ? 0 : subTypeSet.hashCode());
+        result = prime * result + ((complex_constraints == null) ? 0 : new HashSet<>(complex_constraints).hashCode());
+        result = prime * result + ((complex_domain_types == null) ? 0 : new HashSet<>(complex_domain_types).hashCode());
         result = prime * result + ((value_hint == null) ? 0 : value_hint.hashCode());
         result = prime * result + ((value_type == null) ? 0 : value_type.hashCode());
         return result;
@@ -188,11 +192,16 @@ public class PropertyType extends AbstractDescribedObject {
             return false;
         if (readonly != other.readonly)
             return false;
-        if (subtypes == null) {
-            if (other.subtypes != null)
+        if (complex_constraints == null) {
+            if (other.complex_constraints != null)
                 return false;
-        } else if (other.subtypes == null || !CollectionUtils.isEqualCollection(subtypes, other.subtypes))
+        } else if (other.complex_constraints == null || !CollectionUtils.isEqualCollection(complex_constraints, other.complex_constraints))
             return false;
+        if (complex_domain_types == null) {
+            if (other.complex_domain_types != null)
+                return false;
+        } else if (other.complex_domain_types == null || !CollectionUtils.isEqualCollection(complex_domain_types, other.complex_domain_types))
+            return false;        
         if (value_hint != other.value_hint)
             return false;
         if (value_type != other.value_type)
@@ -203,7 +212,7 @@ public class PropertyType extends AbstractDescribedObject {
     @Override
     public String toString() {
         return "PropertyType [domain_pred=" + domain_pred + ", value_type=" + value_type + ", value_hint=" + value_hint
-                + ", allowed_values=" + allowed_values + ", subtypes=" + subtypes + ", category=" + category
+                + ", allowed_values=" + allowed_values + ", subtypes=" + complex_constraints + ", category=" + category
                 + ", readonly=" + readonly + "]";
     }
 }
