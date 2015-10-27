@@ -85,7 +85,12 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         return true;
     }
 
+    // Check cardinality of complex properties in list.
     private boolean validate_complex_property_cardinality(List<Property> vals) {
+        if (vals == null) {
+            return true;
+        }
+        
         for (Property val : vals) {
             if (val.getPropertyType().getPropertyValueType() == PropertyValueType.COMPLEX) {
                 if (!validate_complex_property_cardinality(val)) {
@@ -97,26 +102,28 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         return true;
     }
 
-    private boolean validate_complex_property_cardinality(Property val) {
-        // Check cardinality of sub-value for each constraint
+    private boolean validate_complex_property_cardinality(Property prop) {
+        // Check cardinality of sub-property for each constraint
 
-        for (PropertyConstraint subcon : val.getPropertyType().getPropertySubTypes()) {
+        for (PropertyConstraint pc : prop.getPropertyType().getComplexPropertyConstraints()) {
             int count = 0;
 
-            for (Property subval : val.getComplexValue()) {
-                if (subval.getPropertyType().equals(subcon.getPropertyType())) {
-                    count++;
+            if (prop.getComplexValue() != null) {
+                for (Property subprop : prop.getComplexValue()) {
+                    if (subprop.getPropertyType().equals(pc.getPropertyType())) {
+                        count++;
+                    }
                 }
             }
 
-            if (count < subcon.getMinimum() || (subcon.getMaximum() != -1 && count > subcon.getMaximum())) {
+            if (count < pc.getMinimum() || (pc.getMaximum() != -1 && count > pc.getMaximum())) {
                 return false;
             }
         }
 
-        // Recurse to check sub-values that are themselves complex
-
-        return validate_complex_property_cardinality(val.getComplexValue());
+        // Recurse to check sub-properties that are themselves complex
+ 
+        return validate_complex_property_cardinality(prop.getComplexValue());
     }
 
     @Override
@@ -126,7 +133,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         // TODO order of operations
-        
+
         NodeType result_type = tr.getResultNodeType();
         Node parent = node.getParent();
         Node grandparent = parent == null ? null : parent.getParent();
@@ -135,23 +142,22 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (tr.insertParent()) {
             // TODO Get node uri. Add URI gen service for here and object store.
             Node new_parent = new Node(null);
-            
+
             parent.getChildren().remove(node);
             new_parent.addChild(node);
             parent = new_parent;
         } else if (tr.moveResultToGrandParent()) {
             parent.removeChild(node);
             grandparent.addChild(node);
-            
+
             if (tr.removeEmptyParent()) {
                 if (parent.isIgnored()) {
-                    grandparent.removeChild(node);;
+                    grandparent.removeChild(node);
                 }
             }
-            
+
             parent = grandparent;
         }
-        
 
         if (parent != null && result_parent_constraint != null) {
             if (result_parent_constraint.getNodeType() != null) {
@@ -159,7 +165,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
                 objstore.updateObject(parent);
             }
         }
-        
+
         if (result_type != null) {
             node.setNodeType(result_type);
             objstore.updateObject(node);
@@ -190,9 +196,9 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         NodeConstraint child_constraint = tr.getSourceChildConstraint();
 
         // TODO one or all?
-        
+
         if (node.hasChildren()) {
-            for (Node child: node.getChildren()) {
+            for (Node child : node.getChildren()) {
                 // TODO
             }
         }
@@ -206,12 +212,11 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         NodeConstraint grandparent_constraint = tr.getSourceGrandParentConstraint();
 
-        
         if (!meets_parent_type_constraint(parent, grandparent, grandparent_constraint)
                 || !meets_parent_relation_constraint(parent, grandparent, grandparent_constraint)) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -242,15 +247,15 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (parent_constraint.matchesAny()) {
             return parent != null;
         }
-        
+
         if (parent == null) {
             return false;
         }
-        
+
         if (parent_constraint.getNodeType() == null) {
             return true;
         }
-        
+
         return parent_constraint.getNodeType().getIdentifier().equals(parent.getNodeType().getIdentifier());
     }
 
@@ -309,7 +314,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (!meets_file_requirements(node, type)) {
             return false;
         }
-        
+
         List<NodeConstraint> constraints = type.getParentConstraints();
 
         if (constraints == null || constraints.isEmpty()) {
@@ -448,7 +453,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
                     continue next;
                 }
             }
-            
+
             return true;
         }
 
