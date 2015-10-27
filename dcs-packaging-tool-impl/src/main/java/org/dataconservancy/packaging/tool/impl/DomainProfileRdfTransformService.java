@@ -244,7 +244,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
             if (nodeType.getDomainTypes() != null && !nodeType.getDomainTypes().isEmpty()) {
                 for (URI domainType : nodeType.getDomainTypes()) {
-                    nodeTypeResource.addProperty(HAS_DOMAIN_TYPE, domainType.toString());
+                    nodeTypeResource.addProperty(HAS_DOMAIN_TYPE, model.createResource(domainType.toString()));
                 }
             }
 
@@ -387,9 +387,15 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
                 }
             }
 
-            if (type.getPropertySubTypes() != null && !type.getPropertySubTypes().isEmpty()) {
-                for (PropertyConstraint subType : type.getPropertySubTypes()) {
-                    typeResource.addProperty(HAS_PROPERTY_TYPE, transformToRdf(model, subType));
+            if (type.getComplexPropertyConstraints() != null && !type.getComplexPropertyConstraints().isEmpty()) {
+                for (PropertyConstraint pc : type.getComplexPropertyConstraints()) {
+                    typeResource.addProperty(HAS_PROPERTY_CONSTRAINT, transformToRdf(model, pc));
+                }
+            }
+            
+            if (type.getComplexDomainTypes() != null && !type.getComplexDomainTypes().isEmpty()) {
+                for (URI dt: type.getComplexDomainTypes()) {
+                    typeResource.addProperty(HAS_DOMAIN_TYPE, model.createResource(dt.toString()));
                 }
             }
 
@@ -417,9 +423,12 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
                 valueResource.addLiteral(HAS_DATE_TIME_VALUE, value.getDateTimeValue().getMillis());
                 break;
             case COMPLEX:
-                for (org.dataconservancy.packaging.tool.model.dprofile.Property subValue : value.getComplexValue()) {
-                    valueResource.addProperty(HAS_COMPLEX_VALUE, transformToRdf(model, subValue));
+                if (value.getComplexValue() != null) {
+                    for (org.dataconservancy.packaging.tool.model.dprofile.Property subValue : value.getComplexValue()) {
+                        valueResource.addProperty(HAS_COMPLEX_VALUE, transformToRdf(model, subValue));
+                    }
                 }
+                
                 break;
             default:
                 throw new RDFTransformException("Property Value has an unknown value type");
@@ -627,17 +636,17 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setDescription(getLiteral(resource, RDFS.comment).getString());
         }
 
+        
         List<URI> domainTypes = new ArrayList<>();
-        List<Statement> stmts = resource.listProperties(HAS_DOMAIN_TYPE).toList();
-        if (stmts != null && !stmts.isEmpty()) {
-            for (Statement stmt : stmts) {
-                try {
-                    domainTypes.add(new URI(stmt.getLiteral().getString()));
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
+        
+        for (RDFNode dt : model.listObjectsOfProperty(resource, HAS_DOMAIN_TYPE).toList()) {
+            if (!dt.isURIResource()) {
+                throw new RDFTransformException(
+                        "Expected node " + dt + " to be a uri resource");
             }
+            domainTypes.add(URI.create(dt.asResource().getURI()));
         }
+
         nodeType.setDomainTypes(domainTypes);
 
         //We add this to the map here so that if parent constraints refer to this node type it's loaded instead of trying to be deserialized
@@ -864,16 +873,31 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             propertyType.setAllowedPropertyValues(allowedValues);
         }
 
-        if (resource.hasProperty(HAS_PROPERTY_TYPE)) {
-            List<PropertyConstraint> subTypes = new ArrayList<>();
-            for (RDFNode subTypeNode : model.listObjectsOfProperty(resource, HAS_PROPERTY_TYPE).toList()) {
-                if (!subTypeNode.isResource()) {
+        if (resource.hasProperty(HAS_PROPERTY_CONSTRAINT)) {
+            List<PropertyConstraint> constraints = new ArrayList<>();
+            
+            for (RDFNode constraint : model.listObjectsOfProperty(resource, HAS_PROPERTY_CONSTRAINT).toList()) {
+                if (!constraint.isResource()) {
                     throw new RDFTransformException(
-                        "Expected node " + subTypeNode + " to be resource");
+                        "Expected node " + constraint + " to be resource");
                 }
-                subTypes.add(transformToPropertyConstraint(subTypeNode.asResource(), profile, model));
+                constraints.add(transformToPropertyConstraint(constraint.asResource(), profile, model));
             }
-            propertyType.setPropertySubTypes(subTypes);
+            propertyType.setComplexPropertyConstraints(constraints);
+        }
+        
+        if (resource.hasProperty(HAS_DOMAIN_TYPE)) {
+            List<URI> domain_types = new ArrayList<>();
+            
+            for (RDFNode dt : model.listObjectsOfProperty(resource, HAS_DOMAIN_TYPE).toList()) {
+                if (!dt.isURIResource()) {
+                    throw new RDFTransformException(
+                        "Expected node " + dt + " to be a uri resource");
+                }
+                domain_types.add(URI.create(dt.asResource().getURI()));
+            }
+            
+            propertyType.setComplexDomainTypes(domain_types);
         }
 
         if (resource.hasProperty(HAS_PROPERTY_CATEGORY)) {
@@ -901,15 +925,16 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             } else if (resource.hasProperty(HAS_DATE_TIME_VALUE)) {
                 value.setDateTimeValue(new DateTime(getLiteral(resource, HAS_DATE_TIME_VALUE).getLong()));
             } else {
-                List<org.dataconservancy.packaging.tool.model.dprofile.Property> complexValues = new ArrayList<>();
-                for (RDFNode complexValueNode : model.listObjectsOfProperty(resource, HAS_COMPLEX_VALUE).toList()) {
-                    if (!complexValueNode.isResource()) {
+                List<org.dataconservancy.packaging.tool.model.dprofile.Property> props = new ArrayList<>();
+                for (RDFNode node : model.listObjectsOfProperty(resource, HAS_COMPLEX_VALUE).toList()) {
+                    if (!node.isResource()) {
                         throw new RDFTransformException(
-                            "Expected node " + complexValueNode + " to be resource");
+                            "Expected node " + node + " to be resource");
                     }
-                    complexValues.add(transformToPropertyValue(complexValueNode.asResource(), profile, model));
+                    props.add(transformToPropertyValue(node.asResource(), profile, model));
                 }
-                value.setComplexValue(complexValues);
+                
+                value.setComplexValue(props);
             }
         }
 
