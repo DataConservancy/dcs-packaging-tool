@@ -41,6 +41,10 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     @Override
     public void updateObject(Node node) {
+        if (node.getNodeType() == null) {
+            throw new IllegalArgumentException("No type set on node: " + node.getIdentifier());
+        }
+
         if (node.getDomainObject() == null) {
             node.setDomainObject(generate_unique_uri());
         } else {
@@ -78,10 +82,6 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         Resource object = as_resource(node.getDomainObject());
         NodeType type = node.getNodeType();
 
-        if (type == null) {
-            return;
-        }
-        
         if (type.getDomainTypes() != null) {
             type.getDomainTypes().forEach(dt -> object.addProperty(RDF.type, as_resource(dt)));
         }
@@ -135,15 +135,15 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
             if (nc.matchesNone()) {
                 continue;
             }
-            
+
             if (nc.matchesAny()) {
                 return nc;
             }
-            
+
             if (nc.getNodeType() == null) {
                 return nc;
             }
-            
+
             if (nc.getNodeType().getIdentifier().equals(parent_type.getIdentifier())) {
                 return nc;
             }
@@ -203,9 +203,15 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     @Override
     public void removeProperty(URI object, Property prop) {
         RDFNode node = find_property(as_resource(object), prop);
-        
+
         if (node != null) {
             model.remove(as_statement(object, prop.getPropertyType().getDomainPredicate(), node));
+            
+            // Remove all triples of which this blank node is the subject
+            
+            if (node.isAnon()) {
+                node.asResource().removeProperties();
+            }
         }
     }
 
@@ -216,7 +222,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
         while (iter.hasNext()) {
             RDFNode node = iter.next();
-            
+
             Property p = as_property_value(node, type);
 
             if (prop.equals(p)) {
@@ -288,28 +294,33 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return ISODateTimeFormat.dateTimeParser().parseDateTime(dt.toString());
     }
 
-    private RDFNode as_rdf_node(Property value) {
-        if (!value.hasValue()) {
+    private RDFNode as_rdf_node(Property prop) {
+        if (!prop.hasValue()) {
             throw new IllegalArgumentException("No value set on property.");
         }
 
-        PropertyType type = value.getPropertyType();
+        PropertyType type = prop.getPropertyType();
 
         switch (type.getPropertyValueType()) {
         case COMPLEX:
             Resource res = model.createResource();
 
-            for (Property subval : value.getComplexValue()) {
-                res.addProperty(as_property(subval.getPropertyType().getDomainPredicate()), as_rdf_node(subval));
+            if (prop.getComplexValue() != null) {
+               prop.getComplexValue().forEach(
+                        p -> res.addProperty(as_property(p.getPropertyType().getDomainPredicate()), as_rdf_node(p)));
+            }
+
+            if (type.getComplexDomainTypes() != null) {
+                type.getComplexDomainTypes().forEach(dt -> res.addProperty(RDF.type, as_resource(dt)));
             }
 
             return res;
         case DATE_TIME:
-            return model.createTypedLiteral(value.getDateTimeValue().toGregorianCalendar());
+            return model.createTypedLiteral(prop.getDateTimeValue().toGregorianCalendar());
         case LONG:
-            return model.createTypedLiteral(value.getLongValue());
+            return model.createTypedLiteral(prop.getLongValue());
         case STRING:
-            return model.createTypedLiteral(value.getStringValue());
+            return model.createTypedLiteral(prop.getStringValue());
         default:
             throw new RuntimeException("Unhandled value type.");
         }
@@ -318,29 +329,30 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     // Attempt to convert a given rdf node to a property value of the given
     // type. Return null on failure.
     private Property as_property_value(RDFNode rdfnode, PropertyType type) {
-        Property value = new Property(type);
+        Property prop = new Property(type);
 
         switch (type.getPropertyValueType()) {
         case COMPLEX:
             if (rdfnode.isResource()) {
-                List<Property> subvalues = new ArrayList<>();
+                List<Property> subprops = new ArrayList<>();
 
-                for (PropertyConstraint subtypecon : type.getPropertySubTypes()) {
-                    PropertyType subtype = subtypecon.getPropertyType();
-                    NodeIterator iter = model.listObjectsOfProperty(rdfnode.asResource(), as_property(subtype.getDomainPredicate()));
+                for (PropertyConstraint subpropcon : type.getComplexPropertyConstraints()) {
+                    PropertyType subtype = subpropcon.getPropertyType();
+                    NodeIterator iter = model.listObjectsOfProperty(rdfnode.asResource(),
+                            as_property(subtype.getDomainPredicate()));
 
                     while (iter.hasNext()) {
-                        Property subval = as_property_value(iter.next(), subtype);
+                        Property subprop = as_property_value(iter.next(), subtype);
 
-                        if (subval != null) {
-                            subvalues.add(subval);
+                        if (subprop != null) {
+                            subprops.add(subprop);
                         }
                     }
                 }
 
-                value.setComplexValue(subvalues);
-
-                return value;
+                prop.setComplexValue(subprops);
+                
+                return prop;
             } else {
                 return null;
             }
@@ -349,26 +361,26 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                 XSDDateTime dt = XSDDateTime.class.cast(rdfnode.asLiteral().getValue());
 
                 if (dt != null) {
-                    value.setDateTimeValue(as_date_time(dt));
+                    prop.setDateTimeValue(as_date_time(dt));
                 }
 
-                return value;
+                return prop;
             } else {
                 return null;
             }
         case LONG:
             if (rdfnode.isLiteral()) {
-                value.setLongValue(rdfnode.asLiteral().getLong());
+                prop.setLongValue(rdfnode.asLiteral().getLong());
 
-                return value;
+                return prop;
             } else {
                 return null;
             }
         case STRING:
             if (rdfnode.isLiteral()) {
-                value.setStringValue(rdfnode.asLiteral().getString());
+                prop.setStringValue(rdfnode.asLiteral().getString());
 
-                return value;
+                return prop;
             } else {
                 return null;
             }
@@ -384,17 +396,17 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     public String toString() {
         StringWriter result = new StringWriter();
-        
+
         StmtIterator iter = model.listStatements();
-        
+
         while (iter.hasNext()) {
             result.append(iter.next() + "\n");
         }
 
         result.append("\n\n");
-        
+
         RDFDataMgr.write(result, model, RDFFormat.TURTLE_PRETTY);
-        
+
         return result.toString();
     }
 }
