@@ -57,7 +57,7 @@ public class DomainProfileServiceImplTest {
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
 
-        assertTrue(validate_tree(root));
+        check_valid_tree(root);
     }
 
     /**
@@ -73,8 +73,6 @@ public class DomainProfileServiceImplTest {
 
         assertFalse(success);
         assertNull(root.getDomainObject());
-
-        assertFalse(validate_tree(root));
     }
 
     /**
@@ -97,7 +95,7 @@ public class DomainProfileServiceImplTest {
         assertNotNull(child.getNodeType());
         assertNotNull(child.getDomainObject());
 
-        assertTrue(validate_tree(root));
+        check_valid_tree(root);
     }
 
     /**
@@ -118,11 +116,11 @@ public class DomainProfileServiceImplTest {
             assertNotNull(n.getNodeType());
         });
 
-        assertTrue(validate_tree(root));
+        check_valid_tree(root);
     }
 
     /**
-     * A tree consisting of three directories and a file.
+     * A tree consisting of two directories and two files.
      */
     @Test
     public void testAssignSimple2() {
@@ -138,8 +136,8 @@ public class DomainProfileServiceImplTest {
             assertNotNull(n.getDomainObject());
             assertNotNull(n.getNodeType());
         });
-        
-        assertTrue(validate_tree(root));
+
+        check_valid_tree(root);
     }
 
     /**
@@ -163,7 +161,7 @@ public class DomainProfileServiceImplTest {
         root.walk(n -> {
             assertNotNull(n.getDomainObject());
             assertNotNull(n.getNodeType());
-            
+
             NodeType type = n.getNodeType();
 
             if (n.isLeaf()) {
@@ -175,7 +173,7 @@ public class DomainProfileServiceImplTest {
             }
         });
 
-        assertTrue(validate_tree(root));
+        check_valid_tree(root);
     }
 
     /**
@@ -229,7 +227,7 @@ public class DomainProfileServiceImplTest {
         // Missing person
         assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
 
-        Property person1 = new Property(profile.getPersonPropertyType());
+        Property person1 = new Property(profile.getFarmerPropertyType());
 
         Property name1 = new Property(profile.getNamePropertyType());
         name1.setStringValue("Farmer Jim");
@@ -247,29 +245,57 @@ public class DomainProfileServiceImplTest {
         person1.setComplexValue(Arrays.asList(name1, mbox1));
 
         // Must remove existing incorrect person property
-        service.removeProperty(node, profile.getPersonPropertyType());
+        service.removeProperty(node, profile.getFarmerPropertyType());
         service.addProperty(node, person1);
 
+        
+        System.err.println(store);
+        
         assertTrue(service.validateProperties(node, profile.getFarmNodeType()));
     }
 
     @Test
     public void testValidateValidTree() {
-        assertTrue(validate_tree(ipmfact.createSingleDirectoryTree()));
-        assertTrue(validate_tree(ipmfact.createTwoDirectoryTree()));
-        assertTrue(validate_tree(ipmfact.createSimpleTree()));
-        assertTrue(validate_tree(ipmfact.createSimpleTree2()));
-        assertTrue(validate_tree(ipmfact.createCompleteTree(3, 3)));
+        check_valid_tree(ipmfact.createSingleDirectoryTree());
+        check_valid_tree(ipmfact.createTwoDirectoryTree());
+        check_valid_tree(ipmfact.createSimpleTree());
+        check_valid_tree(ipmfact.createSimpleTree2());
+        check_valid_tree(ipmfact.createCompleteTree(3, 3));
     }
 
     @Test
-    public void testValidateInValidTree() {
+    public void testValidateInvalidTree() {
         assertFalse(service.validateTree(ipmfact.createInvalidSingleFileTree()));
     }
 
+    // Tree must have node types to be valid.
+    @Test
+    public void testValidateTreeWithoutType() {
+        Node root = ipmfact.createSimpleTree();
+
+        check_valid_tree(root);
+
+        root.setNodeType(null);
+
+        assertFalse(service.validateTree(root));
+    }
+    
+    // Tree must have domain objects to be valid
+    @Test
+    public void testValidateTreeWithoutDomainObject() {
+        Node root = ipmfact.createSimpleTree();
+
+        check_valid_tree(root);
+
+        root.setDomainObject(null);
+
+        assertFalse(service.validateTree(root));
+    }
+
     // Update objects and then validate the tree
-    private boolean validate_tree(Node node) {
+    private void check_valid_tree(Node node) {
         node.walk(store::updateObject);
-        return service.validateTree(node);
+
+        assertTrue(service.validateTree(node));
     }
 }
