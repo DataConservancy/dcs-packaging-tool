@@ -25,6 +25,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
+import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
 import java.util.List;
@@ -112,5 +113,28 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      */
     List<Node> getAllFields();
 
+    /**
+     * shows the warning popup if user is going back to the beginning.
+     *
+     */
+    void showWarningPopup();
 
+    /**
+     * gets the warning popup.
+     * @return the warning popup
+     */
+    WarningPopup getWarningPopup();
+
+    /**
+     * Similar to {@code} addDomainProfileRemovableLabel, it adds a label for profile but in a way so the user can't
+     * remove it.
+     * @param domainProfile
+     */
+    void addDomainProfileLabel(String domainProfile);
+
+    /**
+     * Allows the presenter to know whether the form needs to be drawn or not.
+     * @return boolean true or false
+     */
+    boolean isFormAlreadyDrawn();
 }

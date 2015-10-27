@@ -18,6 +18,7 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DateUtility;
@@ -27,7 +28,6 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
-import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 /**
  * Implementation for the screen that will handle package metadata.
@@ -70,12 +71,13 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     @Override
     public void setExistingValues() {
         if (getController().getPackageState().hasPackageMetadataValues()) {
+            view.clearAllFields();
             existingPackage = true;
 
             view.getPackageNameField().setText(getController().getPackageState().getPackageName());
 
             for (String domainProfile : getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE)) {
-                view.addDomainProfileRemovableLabel(domainProfile);
+                view.addDomainProfileLabel(domainProfile);
             }
             view.getDomainProfilesComboBox().setDisable(true);
             view.getAddDomainProfileButton().setDisable(true);
@@ -92,7 +94,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                             }
                         }
                     } else if (node instanceof DatePicker) {
-                        LocalDate localDate = ((DatePicker) node).getConverter().fromString(getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAGGING_DATE).get(0));
+                        LocalDate localDate = ((DatePicker) node).getConverter().fromString(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
                         ((DatePicker) node).setValue(localDate);
                     }
                 }
@@ -111,17 +113,18 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         });
 
-        view.setupRecommendedFields(packageMetadataService.getRecommendedPackageMetadata());
+        if (!view.isFormAlreadyDrawn()) {
+            view.setupRecommendedFields(packageMetadataService.getRecommendedPackageMetadata());
+            view.setupOptionalFields(packageMetadataService.getOptionalPackageMetadata());
+        }
 
-        view.setupOptionalFields(packageMetadataService.getOptionalPackageMetadata());
 
         view.getContinueButton().setOnAction(event -> {
             if (validateRequiredFields()) {
                 updatePackageState();
                 if (existingPackage) {
                     getController().goToNextPage(Page.DEFINE_RELATIONSHIPS);
-                }
-                else {
+                } else {
                     getController().goToNextPage(Page.CREATE_NEW_PACKAGE);
                 }
             } else {
@@ -129,6 +132,16 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
 
         });
+
+        view.getCancelLink().setOnAction(event -> {
+            view.showWarningPopup();
+        });
+        view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
+        view.getWarningPopup().setConfirmEventHandler(event -> {
+            view.getWarningPopup().hide();
+            getController().goToPreviousPage();
+        });
+
 
     }
 
@@ -138,8 +151,16 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     private void updatePackageState() {
 
         getController().getPackageState().setPackageName(view.getPackageNameField().getText());
+
+        // Clear the package metadata list and reset the values based on the current state of form
+        getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
+
         for (Node removableLabel : view.getDomainProfileRemovableLabelVBox().getChildren()) {
-            getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((RemovableLabel) removableLabel).getLabel().getText());
+            if (removableLabel instanceof RemovableLabel) {
+                getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((RemovableLabel) removableLabel).getLabel().getText());
+            } else {
+                getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((Label) removableLabel).getText());
+            }
         }
 
         for (Node node : view.getAllFields()) {

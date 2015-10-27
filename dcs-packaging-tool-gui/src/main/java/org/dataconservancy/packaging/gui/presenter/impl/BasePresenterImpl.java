@@ -46,8 +46,6 @@ public abstract class BasePresenterImpl implements Presenter {
         view.getHeaderViewAboutLink().setOnAction(arg0 -> view.showAboutPopup());
         
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
-        
-        view.getCancelLink().setOnAction(arg0 -> getController().goToPreviousPage());
     }
 
     @Override

@@ -45,6 +45,7 @@ public class Labels {
         CREATE_PACKAGE_PAGE("createPackage.page"),
         DEFINE_RELATIONSHIPS_PAGE("defineRelationships.page"),
         GENERATE_PACKAGE_PAGE("generatePackage.page"),
+        NEXT_BUTTON("next.button"),
         CONTINUE_BUTTON("continue.button"),
         HELP_LABEL("help.label"),
         ABOUT_LABEL("about.label"),
@@ -152,7 +153,9 @@ public class Labels {
         OPTIONAL_FIELDS_LABEL("optionalfields.label"),
         TYPE_VALUE_AND_ENTER_PROMPT("typevalueandenter.prompt"),
         PACKAGE_OUTPUT_DIRECTORY_LABEL("packageoutputdirectory.label"),
-        SELECT_ONE_OPTION_LABEL("selectoneoption.label");
+        SELECT_ONE_OPTION_LABEL("selectoneoption.label"),
+        WARNING_POPUP_TITLE("warningpopup.title"),
+        ALL_FIELDS_CLEAR_WARNING_MESSAGE("allfieldsclearwarning.message");
 
         private String property;
 

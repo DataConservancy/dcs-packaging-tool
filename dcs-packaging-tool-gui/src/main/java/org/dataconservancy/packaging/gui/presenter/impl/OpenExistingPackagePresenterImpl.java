@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 
 public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
         implements Presenter {
@@ -42,9 +43,13 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
             // TODO: Needs to be able to read the existing package metadata whether via a dir or file and set it in the
             // PackageState and move the user to the package metadata page. i.e.:
             getController().getPackageState().setPackageName("FakeLoadedPackageName");
+            // clear the current list
+            getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
             getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, "FakeProfile");
-            getController().goToNextPage(Page.PACKAGE_METADATA);
+            getController().goToNextPage(Page.EXISTING_PACKAGE_METADATA);
         });
+
+        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
 
         //Handles the user pressing the button to choose the content directory of the package
         view.getChoosePackageDirectoryButton().setOnAction(event -> {

@@ -490,4 +490,5 @@
 .FormFieldsDivision {
 	-fx-font-weight: bold;
 	-fx-font-size: 15px;
+	-fx-padding: 10 0 0 0;
 }

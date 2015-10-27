@@ -23,12 +23,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -45,8 +43,9 @@ import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.EmailValidator;
 import org.dataconservancy.packaging.gui.util.PhoneNumberValidator;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
+import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
-import org.dataconservancy.packaging.tool.impl.support.UrlPropertyValidator;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +59,7 @@ import java.util.List;
 public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresenter> implements PackageMetadataView {
 
     private static final Logger LOG = LoggerFactory.getLogger(PackageMetadataViewImpl.class);
+    private VBox bottomContent;
 
     //Controls for setting the package name and output directory
     private TextField packageNameField;
@@ -75,6 +75,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     private Labels labels;
     private List<Node> allFields;
+    private WarningPopup warningPopup;
+    private boolean formAlreadyDrawn = false;
 
     public PackageMetadataViewImpl(Labels labels) {
         super(labels);
@@ -85,6 +87,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
         content = new VBox();
+
+        warningPopup = new WarningPopup(labels);
 
         //Set up the text for the controls in the footer.
         getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -104,7 +108,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         content.getChildren().add(status);
 
-        VBox requiredLabelVBox = createLabelWithTooltipVBox(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
+        VBox requiredLabelVBox = createSectionLabel(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
         content.getChildren().add(requiredLabelVBox);
 
         // setup static fields
@@ -137,8 +141,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         domainProfileRemovableLabelVBox = new VBox(4);
         domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
-        domainProfileRemovableLabelVBox.setId("Domain-Profile");
-        allFields.add(domainProfileRemovableLabelVBox);
+        domainProfileRemovableLabelVBox.setId(GeneralParameterNames.DOMAIN_PROFILE);
 
         domainProfileAndButton.getChildren().add(domainProfilesComboBox);
         domainProfileAndButton.getChildren().add(addDomainProfileButton);
@@ -150,10 +153,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         content.getChildren().add(topRow);
 
+        bottomContent = new VBox(5);
+        content.getChildren().add(bottomContent);
+
     }
 
     /**
      * Set image on the provided label, using a String imageKey
+     *
      * @param label
      * @param imageKey
      */
@@ -216,13 +223,15 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList) {
         if (recommendedPackageMetadataList != null && !recommendedPackageMetadataList.isEmpty()) {
 
-            VBox recommendedLabelVBox = createLabelWithTooltipVBox(labels.get(LabelKey.RECOMMENDED_FIELDS_LABEL));
-            content.getChildren().add(recommendedLabelVBox);
+            VBox recommendedLabelVBox = createSectionLabel(labels.get(LabelKey.RECOMMENDED_FIELDS_LABEL));
+            bottomContent.getChildren().add(recommendedLabelVBox);
 
             for (PackageMetadata packageMetadata : recommendedPackageMetadataList) {
                 VBox fieldContainer = createFieldsView(packageMetadata);
-                content.getChildren().add(fieldContainer);
+                bottomContent.getChildren().add(fieldContainer);
             }
+
+            formAlreadyDrawn = true;
         }
     }
 
@@ -230,13 +239,15 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList) {
         if (optionalPackageMetadataList != null && !optionalPackageMetadataList.isEmpty()) {
 
-            VBox optionalLabelVBox = createLabelWithTooltipVBox(labels.get(LabelKey.OPTIONAL_FIELDS_LABEL));
-            content.getChildren().add(optionalLabelVBox);
+            VBox optionalLabelVBox = createSectionLabel(labels.get(LabelKey.OPTIONAL_FIELDS_LABEL));
+            bottomContent.getChildren().add(optionalLabelVBox);
 
             for (PackageMetadata packageMetadata : optionalPackageMetadataList) {
                 VBox fieldContainer = createFieldsView(packageMetadata);
-                content.getChildren().add(fieldContainer);
+                bottomContent.getChildren().add(fieldContainer);
             }
+
+            formAlreadyDrawn = true;
         }
     }
 
@@ -250,6 +261,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void clearAllFields() {
         packageNameField.clear();
         domainProfileRemovableLabelVBox.getChildren().clear();
+        domainProfilesComboBox.getItems().clear();
         for (Node node : allFields) {
             if (node instanceof TextField) {
                 ((TextField) node).clear();
@@ -268,8 +280,53 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         return this.allFields;
     }
 
+    @Override
+    public void showWarningPopup() {
+
+        if (warningPopup == null) {
+            warningPopup = new WarningPopup(labels);
+        }
+
+        warningPopup.setTitleText(labels.get(Labels.LabelKey.WARNING_POPUP_TITLE));
+        warningPopup.setMoveable(true);
+        warningPopup.setMessage(labels.get(Labels.LabelKey.ALL_FIELDS_CLEAR_WARNING_MESSAGE));
+
+        if (getScene() != null && getScene().getWindow() != null) {
+            double x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 - 150;
+            double y = getScene().getWindow().getY() + getScene().getHeight() / 2.0 - 150;
+            warningPopup.setOwner(getScene().getWindow());
+            warningPopup.show(x, y);
+            warningPopup.hide();
+
+            //Get the content width and height to property center the popup.
+            x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 - warningPopup.getWidth() / 2.0;
+            y = getScene().getWindow().getY() + getScene().getHeight() / 2.0 - warningPopup.getHeight() / 2.0;
+            warningPopup.setOwner(getScene().getWindow());
+            warningPopup.show(x, y);
+        }
+
+
+    }
+
+    @Override
+    public WarningPopup getWarningPopup() {
+        return warningPopup;
+    }
+
+    @Override
+    public void addDomainProfileLabel(String domainProfile) {
+        Label removableLabel = new Label(domainProfile);
+        domainProfileRemovableLabelVBox.getChildren().add(removableLabel);
+    }
+
+    @Override
+    public boolean isFormAlreadyDrawn() {
+        return formAlreadyDrawn;
+    }
+
     /**
      * Helper method that creates the field based on the given package metadata.
+     *
      * @param packageMetadata
      * @return container vbox with the field
      */
@@ -278,9 +335,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         HBox fieldLabelHbox = new HBox(4);
         Label fieldLabel = new Label(packageMetadata.getName());
-        fieldLabel.setAlignment(Pos.CENTER_LEFT);
+        fieldLabel.setPadding(new Insets(3, 0, 0, 0));
         fieldLabelHbox.getChildren().add(fieldLabel);
-
 
         if (packageMetadata.getHelpText() != null && !packageMetadata.getHelpText().isEmpty()) {
             ImageView tooltipImage = new ImageView();
@@ -317,6 +373,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             } else {
                 TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
                 textField.setEditable(packageMetadata.isEditable());
+                textField.setDisable(packageMetadata.isEditable());
                 textField.setId(packageMetadata.getName());
                 allFields.add(textField);
 
@@ -336,6 +393,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     /**
      * Helper method to createFields helper method to create the HBox for fields that need validation.
+     *
      * @param textField
      * @param validationType
      * @return container hbox with the validation
@@ -357,21 +415,23 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     /**
      * Helper method that creates labels with tooltips for a given text.
+     *
      * @param text
      * @return container vbox
      */
-    private VBox createLabelWithTooltipVBox(String text) {
-        VBox optionalLabelVBox = new VBox();
-        Label optionalLabel = new Label(text);
-        optionalLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
-        optionalLabelVBox.getChildren().add(optionalLabel);
+    private VBox createSectionLabel(String text) {
+        VBox labelVBox = new VBox();
+        Label label = new Label(text);
+        label.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
+        labelVBox.getChildren().add(label);
         Separator separator = new Separator(Orientation.HORIZONTAL);
-        optionalLabelVBox.getChildren().add(separator);
-        return optionalLabelVBox;
+        labelVBox.getChildren().add(separator);
+        return labelVBox;
     }
 
     /**
      * Listener to validate phone number.
+     *
      * @param errorMessageLabel
      * @return ChangeListener
      */
@@ -390,6 +450,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     /**
      * Listener to validate email.
+     *
      * @param errorMessageLabel
      * @return ChangeListener
      */
@@ -407,6 +468,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     /**
      * Listener to validate URL.
+     *
      * @param errorMessageLabel
      * @return ChangeListener
      */

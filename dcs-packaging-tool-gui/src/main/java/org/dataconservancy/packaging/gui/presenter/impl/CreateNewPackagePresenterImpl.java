@@ -128,7 +128,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     packageDescriptionService.setOnCancelled(event -> {
                         packageDescriptionService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
-                        controller.showHome(false);
                     });
 
                     packageDescriptionService.setOnFailed(workerStateEvent -> {
@@ -136,7 +135,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         view.getErrorMessage().setVisible(true);
                         packageDescriptionService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
-                        controller.showHome(false);
                     });
 
                     packageDescriptionService.setOnSucceeded(workerStateEvent -> {
@@ -166,6 +164,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 log.error(e.getMessage());
             }
         });
+
+        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
         
         //Handles the user pressing the button to choose a base directory to create a package from.
         view.getChooseContentDirectoryButton()

@@ -276,6 +276,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             backgroundService.execute();
             */
         });
+
+        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
     }
 
     /*

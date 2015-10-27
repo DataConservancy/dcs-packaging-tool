@@ -106,11 +106,12 @@ public class Controller {
         rootArtifactDir = null;
         packageState = new PackageState(this.toolVersion);
 
-
         if (clear) {
             clearPresenters();
         }
-        showPage();
+
+        factory.getHeaderView().highlightNextPage(currentPage);
+        show(factory.getHomepagePresenter());
     }
 
     /**
@@ -130,16 +131,17 @@ public class Controller {
      */
     private void showHomepage() {
         previousPages.clear();
-        clearPresenters();
-        show(factory.getHomepagePresenter());
+        showHome(true);
     }
 
     /**
      * Switch to package metadata
      */
-    private void showPackageMetadata() {
+    private void showPackageMetadata(boolean existing) {
         show(factory.getPackageMetadataPresenter());
-        factory.getPackageMetadataPresenter().setExistingValues();
+        if (existing) {
+            factory.getPackageMetadataPresenter().setExistingValues();
+        }
     }
 
     /**
@@ -286,7 +288,10 @@ public class Controller {
                 showHomepage();
                 break;
             case PACKAGE_METADATA:
-                showPackageMetadata();
+                showPackageMetadata(false);
+                break;
+            case EXISTING_PACKAGE_METADATA:
+                showPackageMetadata(true);
                 break;
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
