@@ -11,6 +11,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -28,6 +29,9 @@ public class FilenameValidatorService {
     private List<String> invalidFilenames;
 
     /**
+     * This service as currently implemented will test for conformance with the Bagit version 0.97 spec, section
+     * 7.2.2. The windows filenames aer hard coded in this class, but we will allow other characters to be added
+     * to the default set     < > : " / | ? *      via configuration.
      *
      * @param rootDirectoryPath the root of the filesystem tree to be checked for invalid file names
      * @return a List of invalid file names, empty if all names are valid. Each entry in the list will have an invalid
@@ -37,12 +41,16 @@ public class FilenameValidatorService {
      */
     public final List<String> findInvalidFilenames(String rootDirectoryPath) throws IOException, InterruptedException {
         invalidFilenames = new ArrayList<>();
+        String windowsBadNamesRegex = "^(CON|PRN|AUX|NUL|COM\\d|LPT\\d)$";
+
         Files.walkFileTree(Paths.get(rootDirectoryPath), new SimpleFileVisitor<Path>() {
 
             @Override
              public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                  throws IOException{
-                boolean matches = containsAny(path.getFileName().toString(), blacklist);
+                Pattern pattern = Pattern.compile(windowsBadNamesRegex);
+                Matcher matcher = pattern.matcher(path.getFileName().toString());
+                boolean matches = containsAny(path.getFileName().toString(), blacklist) || matcher.matches();
                 if (matches) {
                     invalidFilenames.add(path.toString());
                 }
@@ -52,7 +60,9 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                boolean matches = containsAny(path.getFileName().toString(), blacklist);
+                Pattern pattern = Pattern.compile(windowsBadNamesRegex);
+                Matcher matcher = pattern.matcher(path.getFileName().toString());
+                boolean matches = containsAny(path.getFileName().toString(), blacklist) || matcher.matches();
                 if (matches) {
                     invalidFilenames.add(path.toString());
                 }

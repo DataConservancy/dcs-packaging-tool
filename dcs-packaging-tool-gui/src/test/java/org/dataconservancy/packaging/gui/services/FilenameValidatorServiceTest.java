@@ -36,10 +36,12 @@ public class FilenameValidatorServiceTest {
     @Test
     public void testInvalidFileNames() throws IOException, InterruptedException {
         List<String> badnames = underTest.findInvalidFilenames(contentRootPath);
-        Assert.assertEquals(3,badnames.size());
+        Assert.assertEquals(5,badnames.size());
         Assert.assertTrue(badnames.get(0).endsWith("has:Colon"));
         Assert.assertTrue(badnames.get(1).endsWith("file?3"));
         Assert.assertTrue(badnames.get(2).endsWith("has?questionMark"));
+        Assert.assertTrue(badnames.get(3).endsWith("CON"));
+        Assert.assertTrue(badnames.get(4).endsWith("LPT8"));
     }
 
     @Test(expected = IOException.class)
