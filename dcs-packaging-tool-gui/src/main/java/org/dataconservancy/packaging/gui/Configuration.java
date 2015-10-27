@@ -202,9 +202,9 @@ public class Configuration {
     /**
      * This method gets the InputStream associated with the provided file path string, which
      * may be either a classpath resource or a filesystem path.
-     * @param filePath
-     * @return
-     * @throws IOException
+     * @param filePath  the file path
+     * @return the InputStream associated with the file path
+     * @throws IOException if there was an error obtaining the InputStream
      */
     public InputStream getConfigurationFileInputStream(String filePath) throws IOException{
         InputStream fileStream = null;
