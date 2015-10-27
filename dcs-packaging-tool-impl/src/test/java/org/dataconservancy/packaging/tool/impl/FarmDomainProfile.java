@@ -42,7 +42,7 @@ public class FarmDomainProfile extends DomainProfile {
     private PropertyType title_property_type;
     private PropertyType size_property_type;
     private PropertyType created_property_type;
-    private PropertyType person_property_type;
+    private PropertyType farmer_property_type;
     private PropertyType name_property_type;
     private PropertyType mbox_property_type;
     private PropertyType weight_property_type;
@@ -99,10 +99,11 @@ public class FarmDomainProfile extends DomainProfile {
         name_constraint.setMin(1);
         name_constraint.setMax(1);
         
-        person_property_type = new PropertyType();
-        person_property_type.setPropertyValueType(PropertyValueType.COMPLEX);
-        person_property_type.setDomainPredicate(URI.create("foaf:person"));
-        person_property_type.setPropertySubTypes(Arrays.asList(name_constraint, mbox_constraint));        
+        farmer_property_type = new PropertyType();
+        farmer_property_type.setDomainPredicate(URI.create("farm:hasFarmer"));
+        farmer_property_type.setPropertyValueType(PropertyValueType.COMPLEX);
+        farmer_property_type.setComplexDomainTypes(Arrays.asList(URI.create("foaf:person")));
+        farmer_property_type.setComplexPropertyConstraints(Arrays.asList(name_constraint, mbox_constraint));        
 
         species_property_type = new PropertyType();
         species_property_type.setPropertyValueType(PropertyValueType.STRING);
@@ -119,7 +120,7 @@ public class FarmDomainProfile extends DomainProfile {
         breed_constraint.setMax(-1);
         
         PropertyConstraint person_constraint = new PropertyConstraint();
-        person_constraint.setPropertyType(person_property_type);
+        person_constraint.setPropertyType(farmer_property_type);
         person_constraint.setMin(1);
         person_constraint.setMax(-1);
 
@@ -322,8 +323,8 @@ public class FarmDomainProfile extends DomainProfile {
         return created_property_type;
     }
     
-    public PropertyType getPersonPropertyType() {
-        return person_property_type;
+    public PropertyType getFarmerPropertyType() {
+        return farmer_property_type;
     }
     
     public PropertyType getNamePropertyType() {
