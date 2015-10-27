@@ -156,21 +156,21 @@ public class DomainProfileObjectStoreImplTest {
 
     @Test
     public void testAddAndRemoveComplexProperty() {
-        URI test_object = URI.create("test:farmcontactinfo");
+        URI test_object = URI.create("test:farm");
 
-        PropertyType type = profile.getPersonPropertyType();
+        PropertyType type = profile.getFarmerPropertyType();
         Property prop1 = new Property(type);
 
         {
-            List<Property> subvals = new ArrayList<>();
+            List<Property> subprops = new ArrayList<>();
             Property name_val = new Property(profile.getNamePropertyType());
             name_val.setStringValue("Jim Moocow Farmer");
             Property mbox_val = new Property(profile.getMboxPropertyType());
             mbox_val.setStringValue("moo@moo.moo");
-            subvals.add(name_val);
-            subvals.add(mbox_val);
+            subprops.add(name_val);
+            subprops.add(mbox_val);
 
-            prop1.setComplexValue(subvals);
+            prop1.setComplexValue(subprops);
         }
 
         store.addProperty(test_object, prop1);
@@ -200,7 +200,7 @@ public class DomainProfileObjectStoreImplTest {
         // May be multiple complex objects with same type
 
         store.addProperty(test_object, prop2);
-        
+
         assertTrue(has_property(test_object, prop2));
         assertEquals(3, store.getProperties(test_object, type).size());
         
@@ -214,6 +214,17 @@ public class DomainProfileObjectStoreImplTest {
         store.removeProperty(test_object, prop1);     
         assertTrue(has_property(test_object, prop2));
         assertEquals(1, store.getProperties(test_object, type).size());
+        
+        // Delete final property
+        
+        store.removeProperty(test_object, prop2);     
+        assertEquals(0, store.getProperties(test_object, type).size());
+        
+        // Should be no triples left
+        
+        System.err.println(store);
+        
+        assertEquals(0, model.size());
     }
 
     @Test
