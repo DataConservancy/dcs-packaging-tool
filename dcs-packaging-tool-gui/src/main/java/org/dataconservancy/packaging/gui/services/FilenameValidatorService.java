@@ -31,7 +31,7 @@ public class FilenameValidatorService {
     /**
      * This service as currently implemented will test for conformance with the Bagit version 0.97 spec, section
      * 7.2.2. The windows filenames aer hard coded in this class, but we will allow other characters to be added
-     * to the default set     < > : " / | ? *      via configuration.
+     * to the default set     &lt; &gt; : " / | ? *      via configuration.
      *
      * @param rootDirectoryPath the root of the filesystem tree to be checked for invalid file names
      * @return a List of invalid file names, empty if all names are valid. Each entry in the list will have an invalid
@@ -45,10 +45,11 @@ public class FilenameValidatorService {
 
         Files.walkFileTree(Paths.get(rootDirectoryPath), new SimpleFileVisitor<Path>() {
 
+             Pattern pattern = Pattern.compile(windowsBadNamesRegex);
+
             @Override
              public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                  throws IOException{
-                Pattern pattern = Pattern.compile(windowsBadNamesRegex);
                 Matcher matcher = pattern.matcher(path.getFileName().toString());
                 boolean matches = containsAny(path.getFileName().toString(), blacklist) || matcher.matches();
                 if (matches) {
@@ -60,7 +61,6 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                Pattern pattern = Pattern.compile(windowsBadNamesRegex);
                 Matcher matcher = pattern.matcher(path.getFileName().toString());
                 boolean matches = containsAny(path.getFileName().toString(), blacklist) || matcher.matches();
                 if (matches) {
