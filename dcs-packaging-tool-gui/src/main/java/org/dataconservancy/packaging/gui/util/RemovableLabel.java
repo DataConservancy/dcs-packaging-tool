@@ -38,7 +38,6 @@ public class RemovableLabel extends HBox implements CssConstants {
         });
 
         label = new Label(labelName);
-        label.setPadding(new Insets(4, 0, 0, 0));
 
         getChildren().add(removeImage);
         getChildren().add(label);

@@ -16,24 +16,27 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import com.hp.hpl.jena.sparql.function.library.date;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import org.dataconservancy.dcs.util.DateUtility;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 
 /**
@@ -42,6 +45,7 @@ import java.util.Arrays;
 public class PackageMetadataPresenterImpl extends BasePresenterImpl implements PackageMetadataPresenter {
     private PackageMetadataView view;
     private PackageMetadataService packageMetadataService;
+    private boolean existingPackage = false;
     private static final Logger LOG = LoggerFactory.getLogger(PackageMetadataPresenterImpl.class);
 
     public PackageMetadataPresenterImpl(PackageMetadataView view) {
@@ -68,12 +72,35 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     @Override
     public void setExistingValues() {
-        /*
         if (getController().getPackageState().hasPackageMetadataValues()) {
-            // TODO: set the existing values in the form. These need to come from package state previously set by
-            // selecting an existing package.
+            existingPackage = true;
+
+            view.getPackageNameField().setText(getController().getPackageState().getPackageName());
+
+            for (String domainProfile : getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE)) {
+                view.addDomainProfileRemovableLabel(domainProfile);
+            }
+            view.getDomainProfilesComboBox().setDisable(true);
+            view.getAddDomainProfileButton().setDisable(true);
+
+            for (Node node : view.getAllFields()) {
+                if (getController().getPackageState().getPackageMetadataValues(node.getId()) != null) {
+                    if (node instanceof TextField) {
+                        ((TextField) node).setText(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
+                    } else if (node instanceof VBox) {
+                        // don't add domain profile again.
+                        if (!node.getId().equals(GeneralParameterNames.DOMAIN_PROFILE)) {
+                            for (String value : getController().getPackageState().getPackageMetadataValues(node.getId())) {
+                                ((VBox) node).getChildren().add(new RemovableLabel(value, (VBox) node));
+                            }
+                        }
+                    } else if (node instanceof DatePicker) {
+                        LocalDate localDate = ((DatePicker) node).getConverter().fromString(getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAGGING_DATE).get(0));
+                        ((DatePicker) node).setValue(localDate);
+                    }
+                }
+            }
         }
-        */
     }
 
     private void bind() {
@@ -94,44 +121,56 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         view.getContinueButton().setOnAction(event -> {
             if (validateRequiredFields()) {
                 updatePackageState();
-                getController().goToNextPage(Page.CREATE_NEW_PACKAGE);
+                if (existingPackage) {
+                    getController().goToNextPage(Page.DEFINE_RELATIONSHIPS);
+                }
+                else {
+                    getController().goToNextPage(Page.CREATE_NEW_PACKAGE);
+                }
             } else {
-                view.showStatus(errors.get(ErrorKey.PACKAGE_NAME_MISSING));
+                view.showStatus(errors.get(ErrorKey.PACKAGE_NAME_OR_DOMAIN_PROFILE_MISSING));
             }
 
         });
 
     }
 
+    /**
+     * helper method that updates the PackageState in the controller with the values in the form.
+     */
     private void updatePackageState() {
 
         getController().getPackageState().setPackageName(view.getPackageNameField().getText());
+        for (Node removableLabel : view.getDomainProfileRemovableLabelVBox().getChildren()) {
+            getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((RemovableLabel) removableLabel).getLabel().getText());
+        }
 
         for (Node node : view.getAllFields()) {
             if (node instanceof TextField) {
                 getController().getPackageState().addPackageMetadata(node.getId(), ((TextField) node).getText());
-            }
-            else if (node instanceof VBox) {
+            } else if (node instanceof VBox) {
                 for (Node removableLabel : ((VBox) node).getChildren()) {
                     getController().getPackageState().addPackageMetadata(node.getId(), ((RemovableLabel) removableLabel).getLabel().getText());
                 }
-            }
-            else if (node instanceof DatePicker) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-                LocalDate date = ((DatePicker) node).getValue();
-                if (date != null) {
-                    String dateString = formatter.format(date);
-                    getController().getPackageState().addPackageMetadata(node.getId(), dateString);
+            } else if (node instanceof DatePicker) {
+                if (((DatePicker) node).getValue() != null) {
+                    DateTime dateTime = new DateTime(((DatePicker) node).getValue());
+                    getController().getPackageState().addPackageMetadata(node.getId(), DateUtility.toCommonUSDate(dateTime));
                 }
             }
         }
     }
 
+    /**
+     * Helper method that makes sure required fields are entered before letting the user move on to the next page.
+     *
+     * @return true or false based on validation
+     */
     private boolean validateRequiredFields() {
-        if (view.getPackageNameField().getText() != null) {
+        if (view.getPackageNameField().getText() != null && (view.getDomainProfileRemovableLabelVBox().getChildren() != null &&
+                !view.getDomainProfileRemovableLabelVBox().getChildren().isEmpty())) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

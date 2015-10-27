@@ -57,4 +57,6 @@ public interface CssConstants {
     public static final String CLICKABLE = "Clickable";
     public static final String VBOX_BORDER = "VBoxBorder";
     public static final String TRASH_IMAGE = "TrashImage";
+    public static final String TOOLTIP_IMAGE = "TooltipImage";
+    public static final String FORM_FIELDS_DIVISION_CLASS = "FormFieldsDivision";
 }

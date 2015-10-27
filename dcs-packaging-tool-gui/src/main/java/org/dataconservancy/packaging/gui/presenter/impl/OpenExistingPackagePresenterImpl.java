@@ -3,8 +3,11 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.scene.Node;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +41,17 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
         view.getContinueButton().setOnAction(event -> {
             // TODO: Needs to be able to read the existing package metadata whether via a dir or file and set it in the
             // PackageState and move the user to the package metadata page. i.e.:
-            // getController().goToNextPage(Page.PACKAGE_METADATA);
-            // This sets a flag for the presenter
+            getController().getPackageState().setPackageName("FakeLoadedPackageName");
+            getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, "FakeProfile");
+            getController().goToNextPage(Page.PACKAGE_METADATA);
         });
 
         //Handles the user pressing the button to choose the content directory of the package
-        view.getChooseContentDirectoryButton().setOnAction(event -> {
+        view.getChoosePackageDirectoryButton().setOnAction(event -> {
            // TODO: Handle choosing a directory and validating the dir.
         });
 
-        view.getChooseFileButton().setOnAction(event -> {
+        view.getChooseInProgressPackageFileButton().setOnAction(event -> {
             // TODO: Handle choosing a package file and validating it. Also need to ask for a dir to decompress if the file is compressed.
 
             /* Here's some existing code that may be reused.
@@ -85,7 +89,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
     @Override
     public void clear() {
         // Default method body
-        view.getSelectedContentDirectoryTextField().setText("");
+        view.getPackageDirectoryTextField().setText("");
         view.getErrorMessage().setText("");
 
         contentDir = null;

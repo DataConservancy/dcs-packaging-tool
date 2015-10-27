@@ -27,24 +27,10 @@ import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePrese
 public interface OpenExistingPackageView extends View<OpenExistingPackagePresenterImpl> {
 
     /**
-     * The button for choosing a content directory that is the location of the package contents.
+     * The button for choosing an in progress package file.
      * @return The button for choosing the content directory
      */
-    Button getChooseContentDirectoryButton();
-
-    /**
-     * A text field that is used for displaying the currently selected directory. Note a text field
-     * is used here to allow the user to scroll the text to see the entire path. The text field however is not
-     * editable.
-     * @return The TextField to use for entering the in content directory.
-     */
-    TextField getSelectedContentDirectoryTextField();
-
-    /**
-     * The button for choosing a package file.
-     * @return The button for choosing the content directory
-     */
-    Button getChooseFileButton();
+    Button getChooseInProgressPackageFileButton();
 
     /**
      * A text field that is used for displaying the currently selected file. Note a text field
@@ -52,7 +38,35 @@ public interface OpenExistingPackageView extends View<OpenExistingPackagePresent
      * editable.
      * @return The TextField to use for entering the in content directory.
      */
-    TextField getChooseFileTextField();
+    TextField getChooseInProgressFileTextField();
+
+    /**
+     * The button for choosing a content directory that is the location of the package contents.
+     * @return The button for choosing the content directory
+     */
+    Button getChoosePackageDirectoryButton();
+
+    /**
+     * A text field that is used for displaying the currently selected directory. Note a text field
+     * is used here to allow the user to scroll the text to see the entire path. The text field however is not
+     * editable.
+     * @return The TextField to use for entering the in content directory.
+     */
+    TextField getPackageDirectoryTextField();
+
+    /**
+     * The button for choosing a package file.
+     * @return The button for choosing the content directory
+     */
+    Button getChoosePackageFileButton();
+
+    /**
+     * A text field that is used for displaying the currently selected file. Note a text field
+     * is used here to allow the user to scroll the text to see the entire path. The text field however is not
+     * editable.
+     * @return The TextField to use for entering the in content directory.
+     */
+    TextField getChoosePackageFileTextField();
 
     /**
      * Label for displaying an error message to the user, typically when a required field has not been selected.

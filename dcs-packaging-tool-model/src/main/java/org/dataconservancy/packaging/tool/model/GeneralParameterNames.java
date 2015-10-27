@@ -26,6 +26,7 @@ public class GeneralParameterNames {
 	public static final String COMPRESSION_FORMAT = "Compression-Format";
 	public static final String ARCHIVING_FORMAT = "Archiving-Format";
     public static final String EXTERNAL_PROJECT_ID = "External-Project-Id";
+	public static final String DOMAIN_PROFILE = "Domain-Profile";
 
 	/**
 	 * Parameter to indicate whether a PackageDescription shall be validated

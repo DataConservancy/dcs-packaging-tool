@@ -483,3 +483,11 @@
 	-fx-image: url("../images/trash.png");
 }
 
+.TooltipImage {
+	-fx-image: url("../images/Button-info-icon-gray.png");
+}
+
+.FormFieldsDivision {
+	-fx-font-weight: bold;
+	-fx-font-size: 15px;
+}

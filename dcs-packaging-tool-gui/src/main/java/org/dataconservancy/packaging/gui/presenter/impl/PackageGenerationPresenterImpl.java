@@ -381,6 +381,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
     private void updateParamsFromPackageMetadataList() {
         updateParams(GeneralParameterNames.PACKAGE_NAME, Arrays.asList(getController().getPackageState().getPackageName()));
+        updateParams(GeneralParameterNames.DOMAIN_PROFILE, getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE));
         updateParams(BagItParameterNames.CONTACT_NAME, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_NAME));
         updateParams(BagItParameterNames.CONTACT_PHONE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_PHONE));
         updateParams(BagItParameterNames.CONTACT_EMAIL, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_EMAIL));
@@ -614,7 +615,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             if (hasPackageName) {
                 errorText = errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING);
             } else if (controller.getPackageState().getOutputDirectory() != null) {
-                errorText = errors.get(ErrorKey.PACKAGE_NAME_MISSING);
+                errorText = errors.get(ErrorKey.PACKAGE_NAME_OR_DOMAIN_PROFILE_MISSING);
             } else {
                 errorText = errors.get(ErrorKey.OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING);
             }

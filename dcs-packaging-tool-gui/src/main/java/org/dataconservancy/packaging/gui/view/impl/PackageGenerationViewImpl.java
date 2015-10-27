@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui.view.impl;
 
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
@@ -137,14 +139,12 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         content.getChildren().add(status);
 
-        Label requiredLabel = new Label(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
-        content.getChildren().add(requiredLabel);
-
         //Create a section for setting the packaging options.
-        VBox packagingSection = new VBox(16);
+        VBox packagingSection = new VBox(4);
         Label packagingOptionsLabel = new Label(labels.get(LabelKey.PACKAGING_OPTIONS_LABEL));
-        packagingOptionsLabel.getStyleClass().add(SECTION_LABEL);
+        packagingOptionsLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
         packagingSection.getChildren().add(packagingOptionsLabel);
+        packagingSection.getChildren().add(new Separator(Orientation.HORIZONTAL));
 
         HBox packagingOptions = new HBox(40);
         packagingOptions.setAlignment(Pos.TOP_LEFT);
@@ -263,7 +263,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         VBox outputDirectoryBox = new VBox(4);
         outputDirectoryBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label outputDirectoryLabel = new Label(labels.get(LabelKey.OUTPUT_DIRECTORY_LABEL_KEY) + "*");
+        Label outputDirectoryLabel = new Label(labels.get(LabelKey.PACKAGE_OUTPUT_DIRECTORY_LABEL));
         outputDirectoryBox.getChildren().add(outputDirectoryLabel);
 
         HBox directorySelectionBox = new HBox(8);

@@ -23,6 +23,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
@@ -73,6 +74,13 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * @param domainProfile
      */
     void addDomainProfileRemovableLabel(String domainProfile);
+
+    /**
+     * the VBox that contains removable lables.
+     *
+     * @return the vbox containing removablelabels.
+     */
+    VBox getDomainProfileRemovableLabelVBox();
 
     /**
      * Sets up the recommended fields in the form.

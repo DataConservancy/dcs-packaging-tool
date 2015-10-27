@@ -134,6 +134,14 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
+    /**
+     * Determines whether this package state currently has any metadata or not, mainly used for opening existing packages.
+     * @return true or false based on availability.
+     */
+    public boolean hasPackageMetadataValues() {
+        return packageMetadataList != null && !packageMetadataList.isEmpty();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -160,4 +168,5 @@ public class PackageState {
         result = 31 * result + (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;
     }
+
 }

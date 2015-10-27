@@ -91,7 +91,6 @@ public class Labels {
         BUILD_NUMBER_LABEL("buildnumber.label"),
         BUILD_REVISION_LABEL("buildrevision.label"),
         BUILD_TIMESTAMP_LABEL("buildtimestamp.label"),
-        REQUIRED_FIELDS_LABEL("requiredfields.label"),
         APPLY_FIELD_INHERITANCE_BUTTON("applyInheritance.button"),
         INHERITANCE_TAB_INTRO("inheritanceTabIntro.label"),
         INHERITANCE_BUTTON_EXPLAINED("inheritanceButtonExplained.label"),
@@ -123,7 +122,8 @@ public class Labels {
         SHOW_FULL_PATHS_TIP("showfullpaths.tip"),
         SHOW_IGNORED("showignored.label"),
         SHOW_IGNORED_TIP("showignored.tip"),
-        CONTENT_DIRECTORY_LABEL("contentdirectory.label"),
+        PACKAGE_DIRECTORY_LABEL("packagedirectory.label"),
+        SELECT_IN_PROGRESS_PACKAGE_FILE_LABEL("inprogresspackagefile.label"),
         CREATE_NEW_PACKAGE("createnewpackage.label"),
         OPEN_EXISTING_PACKAGE("openexistingpackage.label"),
         HOMEPAGE_PAGE("homepage.page"),
@@ -146,7 +146,13 @@ public class Labels {
         JSON_BUTTON("json.button"),
         XML_BUTTON("xml.button"),
         TURTLE_BUTTON("turtle.button"),
-        SELECT_PACKAGE_FILE_LABEL("selectpackagefile.label");
+        SELECT_PACKAGE_FILE_LABEL("selectpackagefile.label"),
+        REQUIRED_FIELDS_LABEL("requiredfields.label"),
+        RECOMMENDED_FIELDS_LABEL("recommendedfields.label"),
+        OPTIONAL_FIELDS_LABEL("optionalfields.label"),
+        TYPE_VALUE_AND_ENTER_PROMPT("typevalueandenter.prompt"),
+        PACKAGE_OUTPUT_DIRECTORY_LABEL("packageoutputdirectory.label"),
+        SELECT_ONE_OPTION_LABEL("selectoneoption.label");
 
         private String property;
 
