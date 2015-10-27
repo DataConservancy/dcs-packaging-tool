@@ -37,9 +37,9 @@ public class FilenameValidatorServiceTest {
     public void testInvalidFileNames() throws IOException, InterruptedException {
         List<String> badnames = underTest.findInvalidFilenames(contentRootPath);
         Assert.assertEquals(3,badnames.size());
-        Assert.assertTrue(badnames.contains("has:Colon"));
-        Assert.assertTrue(badnames.contains("file?3"));
-        Assert.assertTrue(badnames.contains("has?questionMark"));
+        Assert.assertTrue(badnames.get(0).endsWith("has:Colon"));
+        Assert.assertTrue(badnames.get(1).endsWith("file?3"));
+        Assert.assertTrue(badnames.get(2).endsWith("has?questionMark"));
     }
 
     @Test(expected = IOException.class)

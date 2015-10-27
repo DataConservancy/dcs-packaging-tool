@@ -30,7 +30,8 @@ public class FilenameValidatorService {
     /**
      *
      * @param rootDirectoryPath the root of the filesystem tree to be checked for invalid file names
-     * @return a List of invalid file names, empty if all names are valid
+     * @return a List of invalid file names, empty if all names are valid. Each entry in the list will have an invalid
+     *  character in the final path component. There will be one entry for each error to be fixed.
      * @throws IOException if the file at rootDirectoryPath cannot be found
      * @throws InterruptedException if the walk is interrupted
      */
@@ -43,7 +44,7 @@ public class FilenameValidatorService {
                  throws IOException{
                 boolean matches = containsAny(path.getFileName().toString(), blacklist);
                 if (matches) {
-                    invalidFilenames.add(path.getFileName().toString());
+                    invalidFilenames.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
              }
@@ -53,7 +54,7 @@ public class FilenameValidatorService {
                     throws IOException {
                 boolean matches = containsAny(path.getFileName().toString(), blacklist);
                 if (matches) {
-                    invalidFilenames.add(path.getFileName().toString());
+                    invalidFilenames.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
             }
