@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- This file informs the GUI about properties of PackageMetadata objects. In addition to the name, there are other properties we may set:
+-helpText - a String which may be used by the GUI to describe the purpose of the field.
+- requiredness -  REQUIRED, RECOMMENDED or OPTIONAL. This comes from an enum field on PackageMetadata. If this is missing or
+    an invalid value is provided, this defaults to OPTIONAL.
+- validationType - PHONE, EMAIL, URL, DATA, FILENAME or NONE. This comes from an enum field on PackageMetadata. If this is
+    missing or an invalid value is provided, this defaults to  NONE.
+- editable - true or false. This comes from a boolean field on Package metadata. If this is
+    missing or an invalid value is provided, this defaults to false.
+-repeatable - true or false. This comes from a boolean field on Package metadata. If this is
+    missing or an invalid value is provided, this defaults to false.
+-->
 <packageMetadataList>
     <packageMetadata>
         <name>Package-Metadata-Required</name>
