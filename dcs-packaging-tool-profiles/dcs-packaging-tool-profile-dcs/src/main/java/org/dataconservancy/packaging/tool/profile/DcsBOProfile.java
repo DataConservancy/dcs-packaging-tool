@@ -505,12 +505,15 @@ public class DcsBOProfile
         /* Now we do "complex properties */
 
         /* XXX No properties defined in ontology */
-        hasContact.setPropertySubTypes(Arrays.asList(exactlyOne(name),
+        
+        hasContact.setComplexDomainTypes(Arrays.asList(URI.create(FOAF_BASE + "person")));
+        hasContact.setComplexPropertyConstraints(Arrays.asList(exactlyOne(name),
                                                      zeroOrMore(phone),
                                                      zeroOrMore(mbox)));
 
         /* XXX No properties defined in the ontology */
-        hasCreator.setPropertySubTypes(Arrays.asList(exactlyOne(name),
+        hasCreator.setComplexDomainTypes(Arrays.asList(URI.create(FOAF_BASE + "person")));
+        hasCreator.setComplexPropertyConstraints(Arrays.asList(exactlyOne(name),
                                                      zeroOrMore(phone),
                                                      zeroOrMore(homepage),
                                                      zeroOrMore(mbox)));
