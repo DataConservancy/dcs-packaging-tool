@@ -8,9 +8,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -29,11 +32,11 @@ public class DomainProfileServiceImplTest {
     private DomainProfileObjectStoreImpl store;
     private FarmIpmFactory ipmfact;
     private FarmDomainProfile profile;
-
+    private Model model;
+    
     @Before
     public void setup() {
-        Model model = ModelFactory.createDefaultModel();
-
+        model = ModelFactory.createDefaultModel();
         store = new DomainProfileObjectStoreImpl(model);
         service = new DomainProfileServiceImpl(store);
         ipmfact = new FarmIpmFactory();
@@ -248,9 +251,6 @@ public class DomainProfileServiceImplTest {
         service.removeProperty(node, profile.getFarmerPropertyType());
         service.addProperty(node, person1);
 
-        
-        System.err.println(store);
-        
         assertTrue(service.validateProperties(node, profile.getFarmNodeType()));
     }
 
@@ -297,5 +297,65 @@ public class DomainProfileServiceImplTest {
         node.walk(store::updateObject);
 
         assertTrue(service.validateTree(node));
+    }
+    
+    private void update_object_and_get_transforms(Node node) {
+        node.walk(store::updateObject);
+        node.walk(service::getNodeTransforms);
+    }
+    
+    /**
+     * Test that checking for node transforms does not throw exceptions
+     */
+    @Test
+    public void testGetNodeTransformsNoException() {
+        ipmfact.createSimpleTree().walk(this::update_object_and_get_transforms);
+        ipmfact.createSimpleTree2().walk(this::update_object_and_get_transforms);
+        ipmfact.createSingleDirectoryTree().walk(this::update_object_and_get_transforms);
+        ipmfact.createTwoDirectoryTree().walk(this::update_object_and_get_transforms);
+        ipmfact.createCompleteTree(3, 2).walk(this::update_object_and_get_transforms);
+    }
+    
+    @Test
+    public void testGetNodeTransforms() {
+        Node root = ipmfact.createSimpleTree();
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+
+        root.walk(store::updateObject);
+        
+        // No transform because cow has media child
+        assertEquals(0, service.getNodeTransforms(cow).size());
+        
+        // Remove child, now has transform available
+        cow.setChildren(null);
+        model.removeAll();
+        root.walk(store::updateObject);
+        
+        List<NodeTransform> result = service.getNodeTransforms(cow);
+        assertEquals(1, result.size());
+        assertEquals(profile.getCowToStockpileTransform(), result.get(0));
+        
+        // No transform for barn because has cow child
+        assertEquals(0, service.getNodeTransforms(barn).size());
+        
+        // Remove child, now has transform available
+        barn.setChildren(null);
+        model.removeAll();
+        root.walk(store::updateObject);
+        
+        result = service.getNodeTransforms(barn);
+        assertEquals(1, result.size());
+        assertEquals(profile.getBarnNoChildToFarmTransform(), result.get(0));
+        
+        // Add media child to barn, now has different transform available
+        barn.addChild(media);
+        model.removeAll();
+        root.walk(store::updateObject);
+        
+        result = service.getNodeTransforms(barn);
+        assertEquals(1, result.size());
+        assertEquals(profile.getBarnMediaChildToFarmTransform(), result.get(0));
     }
 }

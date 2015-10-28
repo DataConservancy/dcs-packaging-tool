@@ -90,7 +90,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (vals == null) {
             return true;
         }
-        
+
         for (Property val : vals) {
             if (val.getPropertyType().getPropertyValueType() == PropertyValueType.COMPLEX) {
                 if (!validate_complex_property_cardinality(val)) {
@@ -122,12 +122,20 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         // Recurse to check sub-properties that are themselves complex
- 
+
         return validate_complex_property_cardinality(prop.getComplexValue());
     }
 
     @Override
     public void transformNode(Node node, NodeTransform tr) {
+        if (node.getNodeType() == null) {
+            throw new IllegalArgumentException("No node type: " + node);
+        }
+
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("No domain object: " + node);
+        }
+
         if (!can_transform(node, tr)) {
             throw new IllegalArgumentException("Transform not available.");
         }
@@ -174,6 +182,14 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public List<NodeTransform> getNodeTransforms(Node node) {
+        if (node.getNodeType() == null) {
+            throw new IllegalArgumentException("No node type: " + node);
+        }
+
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("No domain object: " + node);
+        }
+
         ArrayList<NodeTransform> result = new ArrayList<>();
 
         for (NodeTransform tr : node.getNodeType().getDomainProfile().getNodeTransforms()) {
@@ -186,7 +202,8 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean can_transform(Node node, NodeTransform tr) {
-        if (!node.getNodeType().getIdentifier().equals(tr.getSourceNodeType().getIdentifier())) {
+        if (tr.getSourceNodeType() != null
+                && !node.getNodeType().getIdentifier().equals(tr.getSourceNodeType().getIdentifier())) {
             return false;
         }
 
@@ -195,26 +212,35 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         NodeConstraint child_constraint = tr.getSourceChildConstraint();
 
-        // TODO one or all?
-
-        if (node.hasChildren()) {
+        if (node.isLeaf()) {
+            if (!child_constraint.matchesNone()) {
+                return false;
+            }
+        } else {
             for (Node child : node.getChildren()) {
-                // TODO
+                if (!meets_type_constraint(child, child_constraint)
+                        || !meets_parent_relation_constraint(child, node, child_constraint)) {
+                    return false;
+                }
             }
         }
 
         NodeConstraint parent_constraint = tr.getSourceParentConstraint();
 
-        if (!meets_parent_type_constraint(node, parent, parent_constraint)
-                || !meets_parent_relation_constraint(node, parent, parent_constraint)) {
-            return false;
+        if (parent_constraint != null) {
+            if (!meets_type_constraint(parent, parent_constraint)
+                    || !meets_parent_relation_constraint(node, parent, parent_constraint)) {
+                return false;
+            }
         }
 
         NodeConstraint grandparent_constraint = tr.getSourceGrandParentConstraint();
 
-        if (!meets_parent_type_constraint(parent, grandparent, grandparent_constraint)
-                || !meets_parent_relation_constraint(parent, grandparent, grandparent_constraint)) {
-            return false;
+        if (grandparent_constraint != null) {
+            if (!meets_type_constraint(grandparent, grandparent_constraint)
+                    || !meets_parent_relation_constraint(parent, grandparent, grandparent_constraint)) {
+                return false;
+            }
         }
 
         return true;
@@ -239,7 +265,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         return true;
     }
 
-    private boolean meets_parent_type_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
+    private boolean meets_type_constraint(Node parent, NodeConstraint parent_constraint) {
         if (parent_constraint.matchesNone()) {
             return parent == null;
         }
@@ -260,10 +286,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     // Check that existing domain objects have the required relations
-    // Must first pass meets_parent_type_constraint
+    // Must first pass meets_type_constraint
     private boolean meets_parent_relation_constraint(Node node, Node parent, NodeConstraint parent_constraint) {
         if (parent == null) {
-            // Handled by meets_parent_type_constraint.
+            // Handled by meets_type_constraint.
             return true;
         }
 
@@ -272,6 +298,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         StructuralRelation rel = parent_constraint.getStructuralRelation();
+
+        if (rel == null) {
+            return true;
+        }
 
         if (rel.getHasParentPredicate() != null) {
             if (!objstore.hasRelationship(node.getDomainObject(), rel.getHasParentPredicate(),
@@ -326,7 +356,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         Node parent = node.getParent();
 
         for (NodeConstraint c : constraints) {
-            if (meets_parent_type_constraint(node, parent, c)) {
+            if (meets_type_constraint(parent, c)) {
                 return true;
             }
         }
@@ -357,7 +387,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         Node parent = node.getParent();
 
         for (NodeConstraint c : constraints) {
-            if (meets_parent_type_constraint(node, parent, c) && meets_parent_relation_constraint(node, parent, c)) {
+            if (meets_type_constraint(parent, c) && meets_parent_relation_constraint(node, parent, c)) {
                 return true;
             }
         }

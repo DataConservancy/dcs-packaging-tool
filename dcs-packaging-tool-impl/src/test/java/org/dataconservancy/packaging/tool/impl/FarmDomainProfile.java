@@ -50,6 +50,9 @@ public class FarmDomainProfile extends DomainProfile {
     private StructuralRelation has_part_rel;
     private StructuralRelation has_occupant_rel;
     private StructuralRelation has_data_rel;
+    private NodeTransform cowToStockpileTransform;
+    private NodeTransform barnNoChildToFarmTransform;
+    private NodeTransform barnMediaChildToFarmTransform;
     
     public FarmDomainProfile() {
         farm_node_type = new NodeType();
@@ -232,6 +235,14 @@ public class FarmDomainProfile extends DomainProfile {
         NodeConstraint cow_data_parent_constraint = new NodeConstraint();
         cow_data_parent_constraint.setNodeType(cow_node_type);
         cow_data_parent_constraint.setStructuralRelation(has_data_rel);
+        
+        NodeConstraint farm_data_parent_constraint = new NodeConstraint();
+        farm_data_parent_constraint.setNodeType(farm_node_type);
+        farm_data_parent_constraint.setStructuralRelation(has_data_rel);
+        
+        NodeConstraint barn_data_parent_constraint = new NodeConstraint();
+        barn_data_parent_constraint.setNodeType(barn_node_type);
+        barn_data_parent_constraint.setStructuralRelation(has_data_rel);
 
         media_node_type.setIdentifier(URI.create("fdp:media"));
         media_node_type.setLabel("Media");
@@ -239,7 +250,7 @@ public class FarmDomainProfile extends DomainProfile {
         media_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Media")));
         media_node_type.setPropertyConstraints(Arrays.asList(title_constraint, size_constraint));
         media_node_type.setDefaultPropertyValues(Arrays.asList());
-        media_node_type.setParentConstraints(Arrays.asList(cow_data_parent_constraint, farm_parent_constraint, barn_parent_constraint));
+        media_node_type.setParentConstraints(Arrays.asList(cow_data_parent_constraint, farm_data_parent_constraint, barn_data_parent_constraint));
         media_node_type.setSuppliedProperties(supplied_media_properties);
         media_node_type.setFileAssociation(FileAssociation.REGULAR_FILE);
         media_node_type.setDomainProfile(this);
@@ -250,39 +261,48 @@ public class FarmDomainProfile extends DomainProfile {
         saleCategory.setDescription("Properties relevant to the sale of animals.");
         setPropertyCategories(Collections.singletonList(saleCategory));
 
-        NodeTransform locationTransform = new NodeTransform();
-        locationTransform.setLabel("Location transform");
-        locationTransform.setDescription("Handles node transformation between different farm places.");
-        locationTransform.setSourceNodeType(trough_node_type);
-        locationTransform.setSourceParentConstraint(trough_parent_constraint);
-        locationTransform.setSourceGrandparentConstraint(null);
-        locationTransform.setSourceChildConstraint(null);
-        locationTransform.setResultNodeType(barn_node_type);
-        locationTransform.setResultParentConstraint(farm_parent_constraint);
-        locationTransform.setInsertParent(false);
-        locationTransform.setRemoveEmptyParent(false);
-        locationTransform.setMoveResultToGrandParent(false);
+        NodeConstraint no_child_constraint = new NodeConstraint();
+        no_child_constraint.setMatchesNone(true);
+        
+        NodeConstraint media_constraint = new NodeConstraint();
+        media_constraint.setNodeType(media_node_type);
+        media_constraint.setStructuralRelation(has_data_rel);
+        
+        // TODO Need parent constraint? Just specify str
+        
+        // Transform cow to stockpile
+        cowToStockpileTransform = new NodeTransform();
+        cowToStockpileTransform.setLabel("Cow -> Stockpile");
+        cowToStockpileTransform.setDescription("Tranform a cow into a stockpile.");
+        cowToStockpileTransform.setSourceNodeType(cow_node_type);
+        // Cannot transform cow with a Media child
+        cowToStockpileTransform.setSourceChildConstraint(no_child_constraint);
+        cowToStockpileTransform.setResultNodeType(stockpile_node_type);
                 
-        // Move feed to the stockpile
-        NodeTransform feedTransform = new NodeTransform();
-        feedTransform.setLabel("Feed transform");
-        feedTransform.setDescription("Handles moving feed from trough to barn");
-        feedTransform.setSourceNodeType(feed_node_type);
-        feedTransform.setSourceParentConstraint(farm_parent_constraint);
-        feedTransform.setSourceGrandparentConstraint(trough_parent_constraint);
-        feedTransform.setSourceChildConstraint(null);
-        feedTransform.setResultNodeType(stockpile_node_type);
-        feedTransform.setResultParentConstraint(stockpile_parent_constraint);
-        feedTransform.setInsertParent(false);
-        feedTransform.setRemoveEmptyParent(true);
-        feedTransform.setMoveResultToGrandParent(false);
+        // Transform barn to farm
+        
+        // No child
+        barnNoChildToFarmTransform = new NodeTransform();
+        barnNoChildToFarmTransform.setLabel("Barn -> Farm (no media)");
+        barnNoChildToFarmTransform.setDescription("Transform an empty barn into a farm.");
+        barnNoChildToFarmTransform.setSourceNodeType(barn_node_type);
+        barnNoChildToFarmTransform.setSourceChildConstraint(no_child_constraint);
+        barnNoChildToFarmTransform.setResultNodeType(farm_node_type);
+
+        // Media child
+        barnMediaChildToFarmTransform = new NodeTransform();
+        barnMediaChildToFarmTransform.setLabel("Barn -> Farm (with media)");
+        barnMediaChildToFarmTransform.setDescription("Transform a barn with media into a farm.");
+        barnMediaChildToFarmTransform.setSourceNodeType(barn_node_type);
+        barnMediaChildToFarmTransform.setSourceChildConstraint(media_constraint);
+        barnMediaChildToFarmTransform.setResultNodeType(farm_node_type);
 
         setIdentifier(URI.create("http://example.com/farm"));
         setLabel("Farm");
         setDescription("Vocabulary for describing a farm");
         setNodeTypes(Arrays.asList(trough_node_type, media_node_type, cow_node_type, barn_node_type, feed_node_type, stockpile_node_type, farm_node_type));
         setPropertyTypes(Arrays.asList(species_property_type, weight_property_type, title_property_type, breed));
-        setNodeTransforms(Arrays.asList(locationTransform, feedTransform));
+        setNodeTransforms(Arrays.asList(cowToStockpileTransform, barnNoChildToFarmTransform, barnMediaChildToFarmTransform));
     }
 
     public NodeType getFarmNodeType() {
@@ -349,5 +369,17 @@ public class FarmDomainProfile extends DomainProfile {
     
     public StructuralRelation getOccupantRelation() {
         return has_occupant_rel;
+    }
+    
+    public NodeTransform getCowToStockpileTransform() {
+        return cowToStockpileTransform;
+    }
+    
+    public NodeTransform getBarnNoChildToFarmTransform() {
+        return barnNoChildToFarmTransform;
+    }
+    
+    public NodeTransform getBarnMediaChildToFarmTransform() {
+        return barnMediaChildToFarmTransform;
     }
 }
