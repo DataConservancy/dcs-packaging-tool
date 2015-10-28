@@ -693,7 +693,7 @@ public class DcsBOProfile
         return dataItem;
     }
 
-    public NodeType getFile() {
+    public NodeType getFileNodeType() {
         return file;
     }
 

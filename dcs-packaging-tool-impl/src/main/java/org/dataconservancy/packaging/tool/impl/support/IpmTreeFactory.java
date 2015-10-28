@@ -100,7 +100,7 @@ public class IpmTreeFactory {
 
         if (++depth < maxDepth) {
 
-            if (!allowMidLevelFiles || random.nextInt(1000) % 2 == 0) {
+            if (!allowMidLevelFiles || random.nextBoolean()) {
                 node.setFileInfo(createDirectoryInfo(
                     "/" + depth + "/" + nodeId + "/", randomString(5)));
 
