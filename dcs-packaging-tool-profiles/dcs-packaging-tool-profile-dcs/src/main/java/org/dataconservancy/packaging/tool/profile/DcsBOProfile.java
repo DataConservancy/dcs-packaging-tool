@@ -681,6 +681,22 @@ public class DcsBOProfile
         return constraint;
     }
 
+    public NodeType getProjectNodeType() {
+        return project;
+    }
+
+    public NodeType getCollectionNodeType() {
+        return collection;
+    }
+
+    public NodeType getDataItemNodeType() {
+        return dataItem;
+    }
+
+    public NodeType getFile() {
+        return file;
+    }
+
     /**
      * Serialize the profile to a file.
      * 
