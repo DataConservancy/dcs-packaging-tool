@@ -4,6 +4,7 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 
+import org.dataconservancy.packaging.tool.impl.support.IpmTreeFactory;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo.Algorithm;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -13,9 +14,11 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
  */
 public class FarmIpmFactory {
     private final FarmDomainProfile profile;
+    private final IpmTreeFactory treeFactory;
 
     public FarmIpmFactory() {
         this.profile = new FarmDomainProfile();
+        this.treeFactory = new IpmTreeFactory();
     }
 
     /**
@@ -28,10 +31,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createSingleDirectoryTree() {
-        Node root = new Node(URI.create("test:bestfarm"));
-
-        root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(create_directory_info("/bestfarm", "best farm"));
+        Node root = treeFactory.createSingleDirectoryTree(profile.getFarmNodeType());
 
         return root;
     }
@@ -46,10 +46,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createInvalidSingleFileTree() {
-        Node root = new Node(URI.create("test:moo"));
-
-        root.setNodeType(profile.getMediaNodeType());
-        root.setFileInfo(create_file_info("/moo.wav", "Moo!"));
+        Node root = treeFactory.createSingleFileTree(profile.getMediaNodeType());
 
         return root;
     }
@@ -66,16 +63,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createTwoDirectoryTree() {
-        Node root = new Node(URI.create("test:farm"));
-
-        root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(create_directory_info("/farm", "farm"));
-
-        Node barn = new Node(URI.create("test:barn"));
-        barn.setNodeType(profile.getBarnNodeType());
-        barn.setFileInfo(create_directory_info("/farm/barn", "barn"));
-
-        root.addChild(barn);
+        Node root = treeFactory.createTwoDirectoryTree(profile.getFarmNodeType(), profile.getBarnNodeType());
 
         return root;
     }
@@ -93,27 +81,31 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createSimpleTree() {
-        Node root = new Node(URI.create("test:farm"));
+        IpmTreeFactory.NodeTypeSetter nodeTypeSetter = new IpmTreeFactory.NodeTypeSetter() {
+            @Override
+            public void setNodeType(Node node, int depth) {
+                switch (depth) {
+                    case 0:
+                        node.setNodeType(profile.getFarmNodeType());
+                        break;
+                    case 1:
+                        node.setNodeType(profile.getBarnNodeType());
+                        break;
+                    case 2:
+                        node.setNodeType(profile.getCowNodeType());
+                        break;
+                    case 3:
+                        node.setNodeType(profile.getMediaNodeType());
+                        break;
+                }
 
-        root.setNodeType(profile.getFarmNodeType());
-        root.setFileInfo(create_directory_info("/farm", "farm"));
+            }
+        };
+        treeFactory.setNodeTypeSetter(nodeTypeSetter);
 
-        Node barn = new Node(URI.create("test:barn1"));
-        barn.setNodeType(profile.getBarnNodeType());
-        barn.setFileInfo(create_directory_info("/farm/barn1", "barn1"));
+        Node root = treeFactory.createTree(4, 1, false);
 
-        Node cow = new Node(URI.create("test:cow1"));
-        cow.setNodeType(profile.getCowNodeType());
-        cow.setFileInfo(create_directory_info("/farm/barn1/cow1", "cow1"));
-
-        Node video = new Node(URI.create("test:cow1_video"));
-        video.setNodeType(profile.getMediaNodeType());
-        video.setFileInfo(create_file_info("/farm/barn1/cow1/lastgoodbye.mp4", "lastgoodbye.mp4"));
-
-        root.addChild(barn);
-        barn.addChild(cow);
-        cow.addChild(video);
-
+        treeFactory.setNodeTypeSetter(null);
         return root;
     }
 
@@ -130,6 +122,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createSimpleTree2() {
+        //TODO Create a method in tree factory that can do this
         Node root = new Node(URI.create("test:farm"));
 
         root.setNodeType(profile.getFarmNodeType());
@@ -161,26 +154,20 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createCompleteTree(int depth, int branching) {
-        return create_large_tree(0, depth, branching, 0);
-    }
-
-    private Node create_large_tree(int depth, int max_depth, int branching, int node_id) {
-        Node node = new Node(URI.create("test:" + depth + "," + node_id));
-
-        if (++depth < max_depth) {
-            node.setFileInfo(create_directory_info("/" + depth + "/" + node_id + "/", "dir"));
-            node.setNodeType(profile.getFarmNodeType());
-            
-            for (int branch = 0; branch < branching; branch++) {
-                node.addChild(create_large_tree(depth, max_depth, branching, branch));
+        IpmTreeFactory.NodeTypeSetter nodeTypeSetter = (node, depth1) -> {
+            if (node.isLeaf()) {
+                node.setNodeType(profile.getMediaNodeType());
+            } else {
+                node.setNodeType(profile.getFarmNodeType());
             }
-        } else {
-            node.setFileInfo(create_file_info("/" + depth + "/" + node_id, "file"));
-            node.setNodeType(profile.getMediaNodeType());
-        }
 
+        };
 
-        return node;
+        treeFactory.setNodeTypeSetter(nodeTypeSetter);
+        Node root = treeFactory.createTree(depth, branching, false);
+
+        treeFactory.setNodeTypeSetter(null);
+        return root;
     }
 
     private FileInfo create_directory_info(String path, String name) {
