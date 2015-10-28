@@ -41,7 +41,7 @@ public class FilenameValidatorService {
      */
     public final List<String> findInvalidFilenames(String rootDirectoryPath) throws IOException, InterruptedException {
         invalidFilenames = new ArrayList<>();
-        String windowsBadNamesRegex = "^(CON|PRN|AUX|NUL|COM\\d|LPT\\d)$";
+        String windowsBadNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$";
 
         Files.walkFileTree(Paths.get(rootDirectoryPath), new SimpleFileVisitor<Path>() {
 
