@@ -34,7 +34,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Created by jrm on 10/20/15.
+ * Test class for the PackageMetadataService.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath*:/org/dataconservancy/config/applicationContext-test.xml"})
@@ -90,7 +90,7 @@ public class PackageMetadataServiceTest {
     public void testGetOptionalPackageMetadata(){
         List<PackageMetadata> optionalMetadata = underTest.getOptionalPackageMetadata();
         Assert.assertNotNull(optionalMetadata);
-        Assert.assertEquals(3, optionalMetadata.size());
+        Assert.assertEquals(7, optionalMetadata.size());
         PackageMetadata pm = optionalMetadata.get(0);
         Assert.assertEquals("Package-Metadata-Optional", pm.getName());
         Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
@@ -117,6 +117,28 @@ public class PackageMetadataServiceTest {
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertTrue(pm.isEditable());
         Assert.assertNull(pm.getHelpText());
+        Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
+    }
+
+    @Test
+    public void testGetAllPackageMetadata(){
+        List<PackageMetadata> allMetadata = underTest.getAllPackageMetadata();
+        Assert.assertNotNull(allMetadata);
+        Assert.assertEquals(11,allMetadata.size());
+
+        PackageMetadata pm = allMetadata.get(7);//visible
+        Assert.assertTrue(pm.isVisible());
+
+        pm = allMetadata.get(8);//not visible
+        Assert.assertFalse(pm.isVisible());
+
+        pm = allMetadata.get(9);//missing booleans default to false
+        Assert.assertFalse(pm.isEditable());
+        Assert.assertFalse(pm.isRepeatable());
+        Assert.assertFalse(pm.isVisible());
+
+        pm = allMetadata.get(10);//missing enums are set in the service
+        Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
         Assert.assertEquals(PackageMetadata.ValidationType.NONE, pm.getValidationType());
     }
 }

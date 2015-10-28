@@ -9,6 +9,8 @@
     missing or an invalid value is provided, this defaults to false.
 -repeatable - true or false. This comes from a boolean field on Package metadata. If this is
     missing or an invalid value is provided, this defaults to false.
+-visible - true or false. This comes from a boolean field on Package metadata. If this is
+    missing or an invalid value is provided, this defaults to false.
 -->
 <packageMetadataList>
     <packageMetadata>
@@ -45,5 +47,19 @@
     <packageMetadata>
         <name>Editable-Metadata</name>
         <editable>true</editable>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Visible-Metadata</name>
+        <visible>true</visible>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Invisible-Metadata</name>
+        <visible>false</visible>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Missing-Booleans</name>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Missing-Enums</name>
     </packageMetadata>
 </packageMetadataList>
