@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -33,12 +32,15 @@ public class DomainProfileServiceImplTest {
     private FarmIpmFactory ipmfact;
     private FarmDomainProfile profile;
     private Model model;
-    
+
     @Before
     public void setup() {
         model = ModelFactory.createDefaultModel();
-        store = new DomainProfileObjectStoreImpl(model);
-        service = new DomainProfileServiceImpl(store);
+        
+        URIGenerator urigen = new SimpleURIGenerator();
+        
+        store = new DomainProfileObjectStoreImpl(model, urigen);
+        service = new DomainProfileServiceImpl(store, urigen);
         ipmfact = new FarmIpmFactory();
         profile = ipmfact.getProfile();
     }
@@ -279,7 +281,7 @@ public class DomainProfileServiceImplTest {
 
         assertFalse(service.validateTree(root));
     }
-    
+
     // Tree must have domain objects to be valid
     @Test
     public void testValidateTreeWithoutDomainObject() {
@@ -298,12 +300,12 @@ public class DomainProfileServiceImplTest {
 
         assertTrue(service.validateTree(node));
     }
-    
+
     private void update_object_and_get_transforms(Node node) {
         node.walk(store::updateObject);
         node.walk(service::getNodeTransforms);
     }
-    
+
     /**
      * Test that checking for node transforms does not throw exceptions
      */
@@ -315,7 +317,7 @@ public class DomainProfileServiceImplTest {
         ipmfact.createTwoDirectoryTree().walk(this::update_object_and_get_transforms);
         ipmfact.createCompleteTree(3, 2).walk(this::update_object_and_get_transforms);
     }
-    
+
     @Test
     public void testGetNodeTransforms() {
         Node root = ipmfact.createSimpleTree();
@@ -324,38 +326,64 @@ public class DomainProfileServiceImplTest {
         Node media = cow.getChildren().get(0);
 
         root.walk(store::updateObject);
-        
+
         // No transform because cow has media child
         assertEquals(0, service.getNodeTransforms(cow).size());
-        
+
         // Remove child, now has transform available
         cow.setChildren(null);
         model.removeAll();
         root.walk(store::updateObject);
-        
+
         List<NodeTransform> result = service.getNodeTransforms(cow);
         assertEquals(1, result.size());
         assertEquals(profile.getCowToStockpileTransform(), result.get(0));
-        
+
         // No transform for barn because has cow child
         assertEquals(0, service.getNodeTransforms(barn).size());
-        
+
         // Remove child, now has transform available
         barn.setChildren(null);
         model.removeAll();
         root.walk(store::updateObject);
-        
+
         result = service.getNodeTransforms(barn);
         assertEquals(1, result.size());
         assertEquals(profile.getBarnNoChildToFarmTransform(), result.get(0));
-        
+
         // Add media child to barn, now has different transform available
         barn.addChild(media);
         model.removeAll();
         root.walk(store::updateObject);
-        
+
         result = service.getNodeTransforms(barn);
         assertEquals(1, result.size());
         assertEquals(profile.getBarnMediaChildToFarmTransform(), result.get(0));
+    }
+
+    @Test
+    public void testTransformNode() {
+        Node root = ipmfact.createSimpleTree2();
+        Node barn = root.getChildren().stream().filter(n -> n.getNodeType() == profile.getBarnNodeType()).findFirst()
+                .get();
+        Node barn_file = barn.getChildren().get(0);
+
+        root.walk(store::updateObject);
+        
+        List<NodeTransform> trs = service.getNodeTransforms(barn);
+        assertEquals(1, trs.size());
+        assertEquals(profile.getBarnMediaChildToFarmTransform(), trs.get(0));
+        
+        // Transform barn -> farm
+        
+        service.transformNode(barn, profile.getBarnMediaChildToFarmTransform());
+
+        assertEquals(barn.getNodeType().getIdentifier(), profile.getFarmNodeType().getIdentifier());
+        
+        assertEquals(root.getIdentifier(), barn.getParent().getIdentifier());
+        assertEquals(1, barn.getChildren().size());
+        assertEquals(barn_file.getIdentifier(), barn.getChildren().get(0).getIdentifier());
+
+        assertTrue(service.validateTree(root));
     }
 }

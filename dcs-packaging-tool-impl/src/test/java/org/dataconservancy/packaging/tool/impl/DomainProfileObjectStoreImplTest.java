@@ -35,8 +35,10 @@ public class DomainProfileObjectStoreImplTest {
 
     @Before
     public void setup() {
+        URIGenerator urigen = new SimpleURIGenerator();
+        
         model = ModelFactory.createDefaultModel();
-        store = new DomainProfileObjectStoreImpl(model);
+        store = new DomainProfileObjectStoreImpl(model, urigen);
         ipmfactory = new FarmIpmFactory();
         profile = ipmfactory.getProfile();
     }
@@ -239,8 +241,6 @@ public class DomainProfileObjectStoreImplTest {
         
         assertEquals(0, model.size());
     }
-    
-    
 
     @Test
     public void testRemoveSimplePropertyByValue() {

@@ -4,7 +4,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.rdf.model.Model;
@@ -34,9 +33,15 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     private final Model model;
-
-    public DomainProfileObjectStoreImpl(Model model) {
+    private final URIGenerator urigen;
+    
+    /**
+     * @param model Model used to store domain objects.
+     * @param urigen Used to generate URI for the domain object of a Node.
+     */
+    public DomainProfileObjectStoreImpl(Model model, URIGenerator urigen) {
         this.model = model;
+        this.urigen = urigen;
     }
 
     @Override
@@ -46,7 +51,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         }
 
         if (node.getDomainObject() == null) {
-            node.setDomainObject(generate_unique_uri());
+            node.setDomainObject(urigen.generateDomainObjectURI(node));
         } else {
             clear_types(node.getDomainObject());
 
@@ -63,10 +68,6 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         if (node.getSubNodeTypes() != null) {
             node.getSubNodeTypes().forEach(type -> create_properties(node));
         }
-    }
-
-    private URI generate_unique_uri() {
-        return URI.create("urn:uuid:" + UUID.randomUUID().toString());
     }
 
     private void clear_types(URI subject) {

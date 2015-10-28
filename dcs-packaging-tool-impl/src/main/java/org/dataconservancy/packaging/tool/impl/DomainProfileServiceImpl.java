@@ -21,9 +21,11 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 public class DomainProfileServiceImpl implements DomainProfileService {
     private final DomainProfileObjectStore objstore;
-
-    public DomainProfileServiceImpl(DomainProfileObjectStore objstore) {
+    private final URIGenerator urigen;
+    
+    public DomainProfileServiceImpl(DomainProfileObjectStore objstore, URIGenerator urigen) {
         this.objstore = objstore;
+        this.urigen = urigen;
     }
 
     @Override
@@ -149,7 +151,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         if (tr.insertParent()) {
             // TODO Get node uri. Add URI gen service for here and object store.
-            Node new_parent = new Node(null);
+            Node new_parent = new Node(urigen.generateNodeURI());
 
             parent.getChildren().remove(node);
             new_parent.addChild(node);
@@ -447,20 +449,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         boolean success = assign_node_types(profile, node);
 
         if (success) {
-            update_domain_objects(node);
+            node.walk(objstore::updateObject);
         }
 
         return success;
-    }
-
-    private void update_domain_objects(Node node) {
-        objstore.updateObject(node);
-
-        if (!node.isLeaf()) {
-            for (Node child : node.getChildren()) {
-                update_domain_objects(child);
-            }
-        }
     }
 
     private boolean assign_node_types(DomainProfile profile, Node node) {
