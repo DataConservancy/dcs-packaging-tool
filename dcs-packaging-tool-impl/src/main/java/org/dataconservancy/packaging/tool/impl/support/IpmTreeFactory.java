@@ -152,7 +152,7 @@ public class IpmTreeFactory {
     private String randomString(final int length) {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < length; i++) {
-            char c = (char)(random.nextInt((int)(Character.MAX_VALUE)));
+            char c = (char)('A' + random.nextInt('Z' - 'A'));
             sb.append(c);
         }
         return sb.toString();
