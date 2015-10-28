@@ -50,6 +50,8 @@ public class PackageMetadata {
     private boolean isEditable;
     @XmlAttribute(name = "repeatable")
     private boolean isRepeatable;
+    @XmlAttribute(name = "visible")
+    private boolean isVisible;
     private Requiredness requiredness;
 
     /**
@@ -103,7 +105,7 @@ public class PackageMetadata {
     }
 
     /**
-     * Indicate whether this package metadata field is repeatable.
+     * Indicates whether this package metadata field is repeatable.
      * @return bollean idicating whether this package metadata is repeatable
      */
     public boolean isRepeatable() {
@@ -112,6 +114,18 @@ public class PackageMetadata {
 
     public void setRepeatable(boolean isRepeatable) {
         this.isRepeatable = isRepeatable;
+    }
+
+    /**
+     * Indicates whether this package metadata field should be visible on the GUI
+     * @return
+     */
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean isVisible) {
+        this.isVisible = isVisible;
     }
 
     /**
@@ -134,6 +148,7 @@ public class PackageMetadata {
 
         if (isEditable != that.isEditable) return false;
         if (isRepeatable != that.isRepeatable) return false;
+        if (isVisible != that.isVisible) return false;
         if (helpText != null ? !helpText.equals(that.helpText) : that.helpText != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (requiredness != that.requiredness) return false;
@@ -149,6 +164,7 @@ public class PackageMetadata {
         result = 31 * result + (helpText != null ? helpText.hashCode() : 0);
         result = 31 * result + (isEditable ? 1 : 0);
         result = 31 * result + (isRepeatable ? 1 : 0);
+        result = 31 * result + (isVisible ? 1 : 0);
         result = 31 * result + (requiredness != null ? requiredness.hashCode() : 0);
         return result;
     }
