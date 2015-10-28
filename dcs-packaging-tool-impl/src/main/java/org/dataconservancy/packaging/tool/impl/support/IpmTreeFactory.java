@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.tool.impl.support;
 
+import org.dataconservancy.packaging.tool.impl.SimpleURIGenerator;
+import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -8,13 +10,13 @@ import java.net.URI;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Random;
-import java.util.UUID;
 
 public class IpmTreeFactory {
 
     //Callback used for setting types when building large trees
     private NodeTypeSetter typeSetter;
     private Random random = new Random();
+    private URIGenerator uriGenerator = new SimpleURIGenerator();
 
     /**
      * Creates a single Node tree that is backed by a directory
@@ -22,7 +24,7 @@ public class IpmTreeFactory {
      * @return The root node of the single node tree.
      */
     public Node createSingleDirectoryTree(NodeType type) {
-        Node root = new Node(URI.create(UUID.randomUUID().toString()));
+        Node root = new Node(uriGenerator.generateNodeURI());
         root.setFileInfo(createDirectoryInfo("/" + randomString(5), randomString(8)));
         root.setNodeType(type);
         return root;
@@ -34,7 +36,7 @@ public class IpmTreeFactory {
      * @return The root node of the single node tree.
      */
     public Node createSingleFileTree(NodeType type) {
-        Node root = new Node(URI.create(UUID.randomUUID().toString()));
+        Node root = new Node(uriGenerator.generateNodeURI());
         root.setFileInfo(createFileInfo("/" + randomString(5), randomString(8)));
         root.setNodeType(type);
         return root;
@@ -47,13 +49,13 @@ public class IpmTreeFactory {
      * @return The root node of the tree.
      */
     public Node createSingleDirectoryFileTree(NodeType directoryType, NodeType fileType) {
-        Node root = new Node(URI.create(UUID.randomUUID().toString()));
+        Node root = new Node(uriGenerator.generateNodeURI());
 
         String rootPath = "/" + randomString(5);
         root.setFileInfo(createDirectoryInfo(rootPath, randomString(6)));
         root.setNodeType(directoryType);
 
-        Node child = new Node(URI.create(UUID.randomUUID().toString()));
+        Node child = new Node(uriGenerator.generateNodeURI());
         child.setFileInfo(createFileInfo(rootPath + "/" + randomString(4), randomString(9)));
         child.setNodeType(fileType);
         root.addChild(child);
@@ -68,13 +70,13 @@ public class IpmTreeFactory {
      * @return The root node of the tree.
      */
     public Node createTwoDirectoryTree(NodeType parentDirectoryType, NodeType childDirectoryType) {
-        Node root = new Node(URI.create(UUID.randomUUID().toString()));
+        Node root = new Node(uriGenerator.generateNodeURI());
 
         String rootPath = "/" + randomString(5);
         root.setFileInfo(createDirectoryInfo(rootPath, randomString(6)));
         root.setNodeType(parentDirectoryType);
 
-        Node child = new Node(URI.create(UUID.randomUUID().toString()));
+        Node child = new Node(uriGenerator.generateNodeURI());
         child.setFileInfo(createDirectoryInfo(rootPath + "/" + randomString(4), randomString(9)));
         child.setNodeType(childDirectoryType);
         root.addChild(child);

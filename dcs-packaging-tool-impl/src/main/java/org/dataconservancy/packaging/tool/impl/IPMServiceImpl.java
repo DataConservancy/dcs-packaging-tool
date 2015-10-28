@@ -15,10 +15,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class IPMServiceImpl implements IPMService {
     private Set<Path> visitedFiles = new HashSet<>();
+    private final URIGenerator uriGenerator = new SimpleURIGenerator();
 
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
@@ -56,7 +56,7 @@ public class IPMServiceImpl implements IPMService {
                 "Error determining canonical path of " + path.toFile(), e);
         }
 
-        Node node = new Node(URI.create("urn:uuid:" + UUID.randomUUID()));
+        Node node = new Node(uriGenerator.generateNodeURI());
 
         FileInfo info = new FileInfo(path);
         node.setFileInfo(info);

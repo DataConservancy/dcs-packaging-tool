@@ -33,6 +33,7 @@ public class IPMServiceTest {
 
     private IPMService underTest;
 
+    private final URIGenerator uriGenerator = new SimpleURIGenerator();
     @Before
     public void setup() {
         underTest = new IPMServiceImpl();
@@ -472,7 +473,7 @@ public class IPMServiceTest {
 
     //Used to update node ids of the FarmIpmTree so it's a different tree from the original
     private void updateNodeId(Node node) {
-        node.setIdentifier(URI.create("test:" + UUID.randomUUID()));
+        node.setIdentifier(uriGenerator.generateNodeURI());
         if (node.getChildren() != null) {
             node.getChildren().forEach(this::updateNodeId);
         }
