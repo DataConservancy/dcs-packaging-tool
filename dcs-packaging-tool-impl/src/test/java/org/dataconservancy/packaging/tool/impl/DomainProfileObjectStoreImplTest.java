@@ -222,10 +222,25 @@ public class DomainProfileObjectStoreImplTest {
         
         // Should be no triples left
         
-        System.err.println(store);
+        assertEquals(0, model.size());
+        
+        // Test Removing by type
+        
+        store.addProperty(test_object, prop1);
+        store.addProperty(test_object, prop2);
+        
+        assertTrue(has_property(test_object, prop1));
+        assertTrue(has_property(test_object, prop2));
+        
+        store.removeProperty(test_object, profile.getFarmerPropertyType());
+        
+        assertFalse(has_property(test_object, prop1));
+        assertFalse(has_property(test_object, prop2));
         
         assertEquals(0, model.size());
     }
+    
+    
 
     @Test
     public void testRemoveSimplePropertyByValue() {
@@ -266,11 +281,7 @@ public class DomainProfileObjectStoreImplTest {
     }
 
     private void test_update_object(Node node) {
-        // System.err.println("Node: " + node.getIdentifier());
-
         store.updateObject(node);
-
-        // System.err.println("Domain object: " + node.getDomainObject());
 
         check_properties(node.getDomainObject(), node.getNodeType());
 

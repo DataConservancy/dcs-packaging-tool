@@ -205,13 +205,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         RDFNode node = find_property(as_resource(object), prop);
 
         if (node != null) {
-            model.remove(as_statement(object, prop.getPropertyType().getDomainPredicate(), node));
-            
-            // Remove all triples of which this blank node is the subject
-            
-            if (node.isAnon()) {
-                node.asResource().removeProperties();
-            }
+            remove_property(as_resource(object), as_property(prop.getPropertyType().getDomainPredicate()), node);
         }
     }
 
@@ -233,11 +227,22 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return null;
     }
 
+    private void remove_property(Resource res, org.apache.jena.rdf.model.Property jena_prop, RDFNode node) {
+        model.remove(res, jena_prop, node);
+
+        // Remove all triples of which this blank node is the subject
+
+        if (node.isAnon()) {
+            node.asResource().removeProperties();
+        }
+    }
+
     @Override
     public void removeProperty(URI object, PropertyType type) {
-        Resource obj = model.createResource(object.toString());
+        Resource res = as_resource(object);
+        org.apache.jena.rdf.model.Property jena_prop = as_property(type.getDomainPredicate());
 
-        obj.removeAll(as_property(type.getDomainPredicate()));
+        model.listObjectsOfProperty(res, jena_prop).forEachRemaining(n -> remove_property(res, jena_prop, n));
     }
 
     @Override
@@ -286,10 +291,6 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         return model.createStatement(as_resource(subject), as_property(predicate), as_resource(object));
     }
 
-    private Statement as_statement(URI subject, URI predicate, RDFNode node) {
-        return model.createStatement(as_resource(subject), as_property(predicate), node);
-    }
-
     private DateTime as_date_time(XSDDateTime dt) {
         return ISODateTimeFormat.dateTimeParser().parseDateTime(dt.toString());
     }
@@ -306,7 +307,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
             Resource res = model.createResource();
 
             if (prop.getComplexValue() != null) {
-               prop.getComplexValue().forEach(
+                prop.getComplexValue().forEach(
                         p -> res.addProperty(as_property(p.getPropertyType().getDomainPredicate()), as_rdf_node(p)));
             }
 
@@ -351,7 +352,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
                 }
 
                 prop.setComplexValue(subprops);
-                
+
                 return prop;
             } else {
                 return null;
