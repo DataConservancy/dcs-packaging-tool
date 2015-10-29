@@ -67,6 +67,23 @@ public class FarmIpmFactory {
 
         return root;
     }
+    
+    /**
+     * Return a tree with types assigned of a single directory with a single
+     * subdirectory.
+     * 
+     * <pre>
+     *  /farm                (Farm)
+     *  /far/trough/         (Trough)
+     * </pre>
+     * 
+     * @return root of tree.
+     */
+    public Node createTwoDirectoryTree2() {
+        Node root = treeFactory.createTwoDirectoryTree(profile.getFarmNodeType(), profile.getTroughNodeType());
+
+        return root;
+    }
 
     /**
      * Return a tree with types assigned.
