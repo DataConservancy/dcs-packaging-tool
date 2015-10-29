@@ -26,7 +26,8 @@ public class FilenameValidatorService {
     }
 
     private String blacklist;
-    private List<String> invalidFilenames;
+    private String windowsReservedNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$";
+    private Pattern pattern = Pattern.compile(windowsReservedNamesRegex);
 
     /**
      * This service as currently implemented will test for conformance with the Bagit version 0.97 spec, section
@@ -40,19 +41,14 @@ public class FilenameValidatorService {
      * @throws InterruptedException if the walk is interrupted
      */
     public final List<String> findInvalidFilenames(String rootDirectoryPath) throws IOException, InterruptedException {
-        invalidFilenames = new ArrayList<>();
-        String windowsBadNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$";
+        List<String> invalidFilenames = new ArrayList<>();
 
         Files.walkFileTree(Paths.get(rootDirectoryPath), new SimpleFileVisitor<Path>() {
-
-             Pattern pattern = Pattern.compile(windowsBadNamesRegex);
 
             @Override
              public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                  throws IOException{
-                Matcher matcher = pattern.matcher(path.getFileName().toString());
-                boolean matches = containsAny(path.getFileName().toString(), blacklist) || matcher.matches();
-                if (matches) {
+                if (isInvalidPathComponent(path.getFileName().toString())) {
                     invalidFilenames.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
@@ -61,9 +57,7 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                Matcher matcher = pattern.matcher(path.getFileName().toString());
-                boolean matches = containsAny(path.getFileName().toString(), blacklist) || matcher.matches();
-                if (matches) {
+                if (isInvalidPathComponent(path.getFileName().toString())) {
                     invalidFilenames.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
@@ -72,15 +66,20 @@ public class FilenameValidatorService {
         return invalidFilenames;
     }
 
-     private static boolean containsAny(String fileName, String blacklist) {
-      for (int i = 0; i < fileName.length(); i++) {
-          char c = fileName.charAt(i);
-          for (int j = 0; j < blacklist.length(); j++) {
-              if ( blacklist.charAt(j) == c) {
-                  return true;
-              }
-          }
-      }
-      return false;
-  }
+    protected boolean isInvalidPathComponent(String fileName){
+        Matcher matcher = pattern.matcher(fileName);
+        return containsAny(fileName, blacklist) || matcher.matches();
+    }
+
+    private static boolean containsAny(String fileName, String blacklist) {
+        for (int i = 0; i < fileName.length(); i++) {
+            char c = fileName.charAt(i);
+            for (int j = 0; j < blacklist.length(); j++) {
+                if ( blacklist.charAt(j) == c) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

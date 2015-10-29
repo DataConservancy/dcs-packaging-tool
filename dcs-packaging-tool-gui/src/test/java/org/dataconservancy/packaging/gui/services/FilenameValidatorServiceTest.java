@@ -19,32 +19,29 @@ import java.util.List;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath*:/org/dataconservancy/config/applicationContext-test.xml"})
-@Ignore("Ignored until file situation is straightened out.")
 public class FilenameValidatorServiceTest {
 
     @Autowired
     private Configuration configuration;
 
     private FilenameValidatorService underTest;
-    private String contentRootPath;
 
     @Before
-    public void setup(){
+    public void setup() {
         underTest = new FilenameValidatorService(configuration);
-        //TODO Fix this when windows file issue is resolved
-        //contentRootPath = this.getClass().getResource("/FileNameTest/").getPath();
     }
 
 
     @Test
-    public void testInvalidFileNames() throws IOException, InterruptedException {
-        List<String> badnames = underTest.findInvalidFilenames(contentRootPath);
-        Assert.assertEquals(5,badnames.size());
-        Assert.assertTrue(badnames.get(0).endsWith("has:Colon"));
-        Assert.assertTrue(badnames.get(1).endsWith("file?3"));
-        Assert.assertTrue(badnames.get(2).endsWith("has?questionMark"));
-        Assert.assertTrue(badnames.get(3).endsWith("CON"));
-        Assert.assertTrue(badnames.get(4).endsWith("LPT8"));
+    public void testIsInvalidPathComponent() throws IOException, InterruptedException {
+        Assert.assertTrue(underTest.isInvalidPathComponent("has:Colon"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("file?3"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("has?questionMark"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("CON"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("LPT8"));
+
+        Assert.assertFalse(underTest.isInvalidPathComponent("LPT0"));
+        Assert.assertFalse(underTest.isInvalidPathComponent("LPT11"));
     }
 
     @Test(expected = IOException.class)
