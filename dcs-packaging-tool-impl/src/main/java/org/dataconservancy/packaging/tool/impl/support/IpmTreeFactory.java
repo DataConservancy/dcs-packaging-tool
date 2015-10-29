@@ -106,20 +106,30 @@ public class IpmTreeFactory {
      * @return The root node of the tree.
      */
     public Node createTree(int maxDepth, int branching, boolean allowMidLevelFiles) {
-        return createTree(0, maxDepth, branching, 0, allowMidLevelFiles);
+        if (branching == 1) {
+            allowMidLevelFiles = false;
+        }
+        return createTree(0, maxDepth, branching, 0, allowMidLevelFiles, true);
     }
 
-    private Node createTree(int depth, int maxDepth, int branching, int nodeId, boolean allowMidLevelFiles) {
+    private Node createTree(int depth, int maxDepth, int branching, int nodeId, boolean allowMidLevelFiles, boolean directoryNode) {
         Node node = new Node(URI.create("test:" + depth + "," + nodeId));
 
         if (++depth < maxDepth) {
 
-            if (!allowMidLevelFiles || random.nextBoolean()) {
+            if (directoryNode) {
                 node.setFileInfo(createDirectoryInfo(
                     "/" + depth + "/" + nodeId + "/", randomString(5)));
 
                 for (int branch = 0; branch < branching; branch++) {
-                    node.addChild(createTree(depth, maxDepth, branching, branch, allowMidLevelFiles));
+                    boolean childIsDirectory = false;
+                    //Make the first branch a directory, so we always have at least one node to branch off of
+                    //Otherwise if we don't allow mid level files it's a directory or if randome next boolean is true
+                    if (branch == 0 || !allowMidLevelFiles || random.nextBoolean()) {
+                        childIsDirectory = true;
+                    }
+
+                    node.addChild(createTree(depth, maxDepth, branching, branch, allowMidLevelFiles, childIsDirectory));
                 }
             } else {
                 node.setFileInfo(createFileInfo("/" + depth + "/" + nodeId, randomString(6)));
