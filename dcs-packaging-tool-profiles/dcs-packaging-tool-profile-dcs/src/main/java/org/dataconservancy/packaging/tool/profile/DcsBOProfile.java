@@ -73,11 +73,15 @@ public class DcsBOProfile
     /* Transforms */
     private final NodeTransform collection_to_project = new NodeTransform();
 
+    private final NodeTransform collectionToProjectNoChildren = new NodeTransform();
+
     private final NodeTransform project_to_collection = new NodeTransform();
 
     private final NodeTransform dataItem_to_collection = new NodeTransform();
 
     private final NodeTransform collection_to_dataItem = new NodeTransform();
+
+    private final NodeTransform collectionToDataItemNoChildren = new NodeTransform();
 
     private final NodeTransform metadata_to_file = new NodeTransform();
 
@@ -522,15 +526,15 @@ public class DcsBOProfile
 
     private void setRelationshipConstraints() {
 
-        project.setParentConstraints(Collections.singletonList(noParent()));
+        project.setParentConstraints(Collections.singletonList(noNodeConstraint()));
 
         collection.setParentConstraints(Arrays
-                .asList(noParent(),
+                .asList(noNodeConstraint(),
                         allowRelationshipTo(collection, memberRel),
                         allowRelationshipTo(project, memberRel)));
 
         dataItem.setParentConstraints(Arrays
-                .asList(noParent(),
+                .asList(noNodeConstraint(),
                         allowRelationshipTo(collection, memberRel)));
 
         file.setParentConstraints(Arrays.asList(allowRelationshipTo(dataItem,
@@ -560,9 +564,22 @@ public class DcsBOProfile
         collection_to_project.setRemoveEmptyParent(false);
         collection_to_project.setSourceNodeType(collection);
         collection_to_project
-                .setSourceParentConstraint(disallowRelationshipTo(collection,
-                                                                  memberRel));
+                .setSourceParentConstraint(noNodeConstraint());
         collection_to_project.setResultNodeType(project);
+
+        /*
+         * Collection can be transformed to projects if they have no parent and have no children
+         */
+        collectionToProjectNoChildren.setLabel("Collection to Project");
+        collectionToProjectNoChildren
+                .setDescription("Transform a Collection to a Project");
+        collectionToProjectNoChildren.setInsertParent(false);
+        collectionToProjectNoChildren.setRemoveEmptyParent(false);
+        collectionToProjectNoChildren.setSourceNodeType(collection);
+        collectionToProjectNoChildren
+                .setSourceParentConstraint(noNodeConstraint());
+        collectionToProjectNoChildren.setSourceChildConstraint(noNodeConstraint());
+        collectionToProjectNoChildren.setResultNodeType(project);
 
         /* Projects can always be transformed to collections */
         project_to_collection.setLabel("Project to Collection");
@@ -584,11 +601,25 @@ public class DcsBOProfile
         collection_to_dataItem.setRemoveEmptyParent(false);
         collection_to_dataItem.setSourceNodeType(collection);
         collection_to_dataItem
-                .setSourceParentConstraint(disallowRelationshipTo(project,
+                .setSourceParentConstraint(allowRelationshipTo(collection,
                                                                   memberRel));
         collection_to_dataItem
-                .setSourceChildConstraint(disallowRelationshipTo(collection,
+                .setSourceChildConstraint(allowRelationshipTo(file,
                                                                  memberRel));
+        collection_to_dataItem.setResultNodeType(dataItem);
+
+        collectionToDataItemNoChildren.setLabel("Collection to DataItem");
+        collectionToDataItemNoChildren
+                .setDescription("Transforms a Collection into a DataItem");
+        collectionToDataItemNoChildren.setInsertParent(false);
+        collectionToDataItemNoChildren.setRemoveEmptyParent(false);
+        collectionToDataItemNoChildren.setSourceNodeType(collection);
+        collectionToDataItemNoChildren
+                .setSourceParentConstraint(allowRelationshipTo(collection,
+                                                                  memberRel));
+        collectionToDataItemNoChildren
+                .setSourceChildConstraint(noNodeConstraint());
+        collectionToDataItemNoChildren.setResultNodeType(dataItem);
 
         /* DataItem can always be changed to Collection */
         dataItem_to_collection.setLabel("DataItem to Collection");
@@ -596,6 +627,8 @@ public class DcsBOProfile
                 .setDescription("Transforms a DataItem into a Collection");
         dataItem_to_collection.setInsertParent(false);
         dataItem_to_collection.setRemoveEmptyParent(false);
+        dataItem_to_collection.setSourceParentConstraint(allowRelationshipTo(collection, memberRel));
+        dataItem_to_collection.setResultNodeType(collection);
 
         /* MetadataFile can be changed to a DataFile */
         metadata_to_file.setLabel("MetadataFile to DataFile");
@@ -670,15 +703,6 @@ public class DcsBOProfile
         return constraint;
     }
 
-    private static NodeConstraint disallowRelationshipTo(NodeType parentType,
-                                                         StructuralRelation rel) {
-        NodeConstraint constraint = new NodeConstraint();
-        constraint.setNodeType(parentType);
-        constraint.setStructuralRelation(rel);
-        constraint.setMatchesNone(true);
-        return constraint;
-    }
-
     private static NodeConstraint allowAll(StructuralRelation rel) {
         NodeConstraint constraint = new NodeConstraint();
         constraint.setMatchesAny(true);
@@ -686,7 +710,7 @@ public class DcsBOProfile
         return constraint;
     }
 
-    private static NodeConstraint noParent() {
+    private static NodeConstraint noNodeConstraint() {
         NodeConstraint noParentConstraint = new NodeConstraint();
         noParentConstraint.setMatchesNone(true);
 
@@ -713,6 +737,10 @@ public class DcsBOProfile
         return collection_to_project;
     }
 
+    public NodeTransform getCollectionToProjectNoChildrenTransform() {
+        return collectionToProjectNoChildren;
+    }
+
     public NodeTransform getProjectToCollectionTransform() {
         return project_to_collection;
     }
@@ -723,6 +751,10 @@ public class DcsBOProfile
 
     public NodeTransform getCollectionToDataItemTransform() {
         return collection_to_dataItem;
+    }
+
+    public NodeTransform getCollectionToDataItemNoChildrenTransform() {
+        return collectionToDataItemNoChildren;
     }
 
     public NodeTransform getMetadataToFileTransform() {
