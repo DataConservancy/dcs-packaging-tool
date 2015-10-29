@@ -442,7 +442,7 @@ public class DcsBOProfile
         phone.setPropertyValueType(PropertyValueType.STRING);
         phone.setPropertyValueHint(PropertyValueHint.PHONE_NUMBER);
 
-        mbox.setLabel("Eail");
+        mbox.setLabel("Email");
         mbox.setDescription("E-mail address");
         mbox.setDomainPredicate(URI.create(FOAF_BASE + "mbox"));
         mbox.setPropertyValueType(PropertyValueType.STRING);
