@@ -127,6 +127,7 @@ public class PackageState {
     public void setPackageMetadataList(LinkedHashMap <String, List<String>> metadataList) {
         this.packageMetadataList = metadataList;
     }
+
     /**
      * Returns version information about the tool used to create this package.
      */
