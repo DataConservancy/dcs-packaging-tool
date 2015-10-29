@@ -87,6 +87,37 @@ public class DcBoProfileServiceTest {
         checkValidTree(root);
     }
 
+    @Test
+    public void testSmallTreeAssignment() {
+        Node root = treeFactory.createTree(4, 2, true);
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertTrue(success);
+        assertNotNull(root.getNodeType());
+        assertNotNull(root.getDomainObject());
+
+        checkValidTree(root);
+    }
+
+    @Test
+    public void testSubCollectionToDataItemNoChildrenTransform() {
+        Node root = boIpmFactory.createSubCollectionTree();
+        root.walk(store::updateObject);
+
+        Node subCollection = root.getChildren().get(0);
+        service.transformNode(subCollection, profile.getCollectionToDataItemNoChildrenTransform());
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), subCollection.getNodeType().getIdentifier());
+        assertEquals(root.getIdentifier(), subCollection.getParent().getIdentifier());
+
+        assertTrue(service.validateTree(root));
+    }
+
+    @Test
+    public void testDataItemToSubCollectionTransformWithFile() {
+
+    }
+
     // Update objects and then validate the tree
     private void checkValidTree(Node node) {
         node.walk(store::updateObject);
