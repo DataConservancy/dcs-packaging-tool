@@ -709,6 +709,30 @@ public class DcsBOProfile
         return file;
     }
 
+    public NodeTransform getCollectionToProjectTransform() {
+        return collection_to_project;
+    }
+
+    public NodeTransform getProjectToCollectionTransform() {
+        return project_to_collection;
+    }
+
+    public NodeTransform getDataItemToCollectionTransform() {
+        return dataItem_to_collection;
+    }
+
+    public NodeTransform getCollectionToDataItemTransform() {
+        return collection_to_dataItem;
+    }
+
+    public NodeTransform getMetadataToFileTransform() {
+        return metadata_to_file;
+    }
+
+    public NodeTransform getFileToMetadataTransform() {
+        return file_to_metadata;
+    }
+
     /**
      * Serialize the profile to a file.
      * 
