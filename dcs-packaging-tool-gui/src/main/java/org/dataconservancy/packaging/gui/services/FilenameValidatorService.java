@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -40,10 +39,10 @@ public class FilenameValidatorService {
      * @throws IOException if the file at rootDirectoryPath cannot be found
      * @throws InterruptedException if the walk is interrupted
      */
-    public final List<String> findInvalidFilenames(String rootDirectoryPath) throws IOException, InterruptedException {
+    public final List<String> findInvalidFilenames(Path rootDirectoryPath) throws IOException, InterruptedException {
         List<String> invalidFilenames = new ArrayList<>();
 
-        Files.walkFileTree(Paths.get(rootDirectoryPath), new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(rootDirectoryPath, new SimpleFileVisitor<Path>() {
 
             @Override
              public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)

@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -46,6 +47,6 @@ public class FilenameValidatorServiceTest {
 
     @Test(expected = IOException.class)
     public void testNoSuchPath() throws IOException, InterruptedException {
-        List<String> badnames = underTest.findInvalidFilenames("noSuchFilePath");
+        List<String> badnames = underTest.findInvalidFilenames(Paths.get("noSuchFilePath"));
     }
 }
