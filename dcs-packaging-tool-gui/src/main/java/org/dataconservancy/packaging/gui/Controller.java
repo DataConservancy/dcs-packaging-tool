@@ -66,14 +66,20 @@ public class Controller {
     private PackageToolPopup crossPageProgressIndicatorPopUp;
     private Page currentPage;
     private Stack<Page> previousPages;
+    private Stack<Page> createNewPackagePagesStack;
+    private Stack<Page> openExistingPackagePagesStack;
+    private boolean createNewPackage;
 
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
     private final ConcurrentHashMap<Object, Semaphore> locks = new ConcurrentHashMap<>();
+
 
     public Controller() {
         this.container = new BorderPane();
         container.getStyleClass().add(CssConstants.ROOT_CLASS);
         previousPages = new Stack<>();
+        createNewPackagePagesStack = new Stack<>();
+        openExistingPackagePagesStack = new Stack<>();
         toolVersion = new ApplicationVersion();
     }
 
@@ -100,6 +106,7 @@ public class Controller {
     public void showHome(boolean clear) {
         container.setTop((VBox) factory.getHeaderView());
         currentPage = Page.HOMEPAGE;
+        initiatePagesStacks();
         packageDescription = null;
         packageDescriptionFile = null;
         contentRoot = null;
@@ -112,6 +119,20 @@ public class Controller {
 
         factory.getHeaderView().highlightNextPage(currentPage);
         show(factory.getHomepagePresenter());
+    }
+
+    private void initiatePagesStacks() {
+        createNewPackagePagesStack.clear();
+        createNewPackagePagesStack.add(Page.GENERATE_PACKAGE);
+        createNewPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        createNewPackagePagesStack.add(Page.CREATE_NEW_PACKAGE);
+        createNewPackagePagesStack.add(Page.PACKAGE_METADATA);
+
+        openExistingPackagePagesStack.clear();
+        openExistingPackagePagesStack.add(Page.GENERATE_PACKAGE);
+        openExistingPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        openExistingPackagePagesStack.add(Page.EXISTING_PACKAGE_METADATA);
+        openExistingPackagePagesStack.add(Page.OPEN_EXISTING_PACKAGE);
     }
 
     /**
@@ -161,7 +182,7 @@ public class Controller {
     /**
      * Switch to the screen for selecting a package directory.
      */
-    public void showSelectPackageDirectory() {
+    public void showOpenExistingPackage() {
         show(factory.getOpenExistingPackagePresenter());
     }
 
@@ -264,15 +285,26 @@ public class Controller {
     }
 
     //Advances the application to the next page. Or redisplays the current page if it's the last page.
-    public void goToNextPage(Page nextPage) {
+    public void goToNextPage() {
         previousPages.push(currentPage);
-        currentPage = nextPage;
+        if (createNewPackage) {
+            currentPage = createNewPackagePagesStack.pop();
+        }
+        else {
+            currentPage = openExistingPackagePagesStack.pop();
+        }
         showPage();
     }
 
     //Returns the application to the previous page, or redisplays the current page if it's the first page. 
     public void goToPreviousPage() {
         if (previousPages != null && !previousPages.isEmpty()) {
+            if (createNewPackage) {
+                createNewPackagePagesStack.push(currentPage);
+            }
+            else {
+                openExistingPackagePagesStack.push(currentPage);
+            }
             currentPage = previousPages.pop();
             showPage();
         }
@@ -302,11 +334,8 @@ public class Controller {
             case GENERATE_PACKAGE:
                 showGeneratePackage();
                 break;
-            case SELECT_CONTENT_DIRECTORY:
-                showSelectContentDirectory();
-                break;
-            case SELECT_PACKAGE_DIRECTORY:
-                showSelectPackageDirectory();
+            case OPEN_EXISTING_PACKAGE:
+                showOpenExistingPackage();
                 break;
             default:
                 //There is no next page do nothing
@@ -392,5 +421,9 @@ public class Controller {
 
     public String getDefaultPackageGenerationParametersFilePath() {
         return defaultPackageGenerationParametersFilePath;
+    }
+
+    public void setCreateNewPackage(boolean createNewPackage) {
+        this.createNewPackage = createNewPackage;
     }
 }

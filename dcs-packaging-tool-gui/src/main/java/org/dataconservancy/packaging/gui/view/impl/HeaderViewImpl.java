@@ -104,6 +104,20 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                 locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
                 locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
                 break;
+            case EXISTING_PACKAGE_METADATA:
+                locationBar.setVisible(true);
+                //Remove the old selection, occurs on cancel or finish
+                locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
+                locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
+
+                //This happens if cancel was selected
+                locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
+                locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
+
+                //Select the new page
+                locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
+                locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
+                break;
             case CREATE_NEW_PACKAGE:
                 locationBar.setVisible(true);
                 //Remove the old selection, occurs on cancel or finish
@@ -141,6 +155,20 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                 //Select the new page
                 locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_UNSELECTED);
                 locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_SELECTED);
+                break;
+            case OPEN_EXISTING_PACKAGE:
+                locationBar.setVisible(true);
+                //Remove the old selection, occurs on cancel or finish
+                locationBar.getChildren().get(2).getStyleClass().removeAll(PAGE_THREE_SELECTED);
+                locationBar.getChildren().get(2).getStyleClass().add(PAGE_THREE_UNSELECTED);
+
+                //This happens if cancel was selected
+                locationBar.getChildren().get(1).getStyleClass().removeAll(PAGE_TWO_SELECTED);
+                locationBar.getChildren().get(1).getStyleClass().add(PAGE_TWO_UNSELECTED);
+
+                //Select the new page
+                locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
+                locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
                 break;
             default:
                 //Set no style if we don't have a page for it

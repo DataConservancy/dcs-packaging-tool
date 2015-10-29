@@ -29,10 +29,13 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TooltipBuilder;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
@@ -59,7 +62,6 @@ import java.util.List;
 public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresenter> implements PackageMetadataView {
 
     private static final Logger LOG = LoggerFactory.getLogger(PackageMetadataViewImpl.class);
-    private VBox bottomContent;
 
     //Controls for setting the package name and output directory
     private TextField packageNameField;
@@ -72,11 +74,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private Label statusLabel;
     private ScrollPane contentScrollPane;
     private VBox content;
+    private VBox requiredVBox;
+    private VBox bottomContent;
 
     private Labels labels;
     private List<Node> allFields;
     private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
+    private FileChooser packageMetadataFileChooser;
 
     public PackageMetadataViewImpl(Labels labels) {
         super(labels);
@@ -90,9 +95,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         warningPopup = new WarningPopup(labels);
 
+        packageMetadataFileChooser = new FileChooser();
+
         //Set up the text for the controls in the footer.
         getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
+        getSaveButton().setText(labels.get(LabelKey.SAVE_BUTTON));
+        getSaveButton().setVisible(true);
 
         content.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
         contentScrollPane.setContent(content);
@@ -103,13 +112,16 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         statusLabel = new Label();
         statusLabel.setVisible(false);
         statusLabel.setWrapText(true);
+        statusLabel.setTextFill(Color.web("#C00000"));
         status.getChildren().add(statusLabel);
         status.setAlignment(Pos.TOP_CENTER);
 
         content.getChildren().add(status);
 
+        requiredVBox = new VBox(5);
+
         VBox requiredLabelVBox = createSectionLabel(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
-        content.getChildren().add(requiredLabelVBox);
+        requiredVBox.getChildren().add(requiredLabelVBox);
 
         // setup static fields
         HBox topRow = new HBox(40);
@@ -133,7 +145,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         HBox domainProfileAndButton = new HBox(4);
         domainProfilesComboBox = new ComboBox<>();
-        domainProfilesComboBox.setPrefWidth(260);
+        domainProfilesComboBox.setPrefWidth(267);
 
         addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
         addDomainProfileButton.setPrefHeight(28);
@@ -151,9 +163,12 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         topRow.getChildren().add(domainProfileVBox);
 
-        content.getChildren().add(topRow);
+        requiredVBox.getChildren().add(topRow);
+
+        content.getChildren().add(requiredVBox);
 
         bottomContent = new VBox(5);
+
         content.getChildren().add(bottomContent);
 
     }
@@ -220,6 +235,19 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
+    public void setupRequiredFields(List<PackageMetadata> requiredPackageMetadataList) {
+        if (requiredPackageMetadataList != null && !requiredPackageMetadataList.isEmpty()) {
+
+            for (PackageMetadata packageMetadata : requiredPackageMetadataList) {
+                VBox fieldContainer = createFieldsView(packageMetadata);
+                requiredVBox.getChildren().add(fieldContainer);
+            }
+
+            formAlreadyDrawn = true;
+        }
+    }
+
+    @Override
     public void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList) {
         if (recommendedPackageMetadataList != null && !recommendedPackageMetadataList.isEmpty()) {
 
@@ -262,6 +290,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         packageNameField.clear();
         domainProfileRemovableLabelVBox.getChildren().clear();
         domainProfilesComboBox.getItems().clear();
+        domainProfilesComboBox.setDisable(false);
+        addDomainProfileButton.setDisable(false);
         for (Node node : allFields) {
             if (node instanceof TextField) {
                 ((TextField) node).clear();
@@ -324,6 +354,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         return formAlreadyDrawn;
     }
 
+    @Override
+    public FileChooser getPackageMetadataFileChooser() {
+        return packageMetadataFileChooser;
+    }
+
     /**
      * Helper method that creates the field based on the given package metadata.
      *
@@ -341,7 +376,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         if (packageMetadata.getHelpText() != null && !packageMetadata.getHelpText().isEmpty()) {
             ImageView tooltipImage = new ImageView();
             tooltipImage.getStyleClass().add(TOOLTIP_IMAGE);
-            Tooltip.install(tooltipImage, new Tooltip(packageMetadata.getHelpText()));
+            Tooltip tooltip = new Tooltip(packageMetadata.getHelpText());
+            tooltip.setPrefWidth(350);
+            tooltip.setWrapText(true);
+            Tooltip.install(tooltipImage, tooltip);
             fieldLabelHbox.getChildren().add(tooltipImage);
         }
 
@@ -373,7 +411,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             } else {
                 TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
                 textField.setEditable(packageMetadata.isEditable());
-                textField.setDisable(packageMetadata.isEditable());
+                textField.setDisable(!packageMetadata.isEditable());
                 textField.setId(packageMetadata.getName());
                 allFields.add(textField);
 
@@ -399,8 +437,9 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
      * @return container hbox with the validation
      */
     private HBox createHBoxForType(TextField textField, PackageMetadata.ValidationType validationType) {
-        HBox horizontalBox = new HBox(4);
+        HBox horizontalBox = new HBox();
         Label inputVerificationLabel = new Label();
+        inputVerificationLabel.setPadding(new Insets(3, 0, 0, 3));
         if (validationType.equals(PackageMetadata.ValidationType.URL)) {
             textField.textProperty().addListener(getNewChangeListenerForUrl(inputVerificationLabel));
         } else if (validationType.equals(PackageMetadata.ValidationType.PHONE)) {

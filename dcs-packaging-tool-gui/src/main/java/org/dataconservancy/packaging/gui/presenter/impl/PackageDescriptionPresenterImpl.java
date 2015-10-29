@@ -212,7 +212,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
                 controller.setPackageDescriptionFile(packageDescriptionFile);
                 controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
-                controller.goToNextPage(Page.GENERATE_PACKAGE);
+                controller.goToNextPage();
             }
         });
 

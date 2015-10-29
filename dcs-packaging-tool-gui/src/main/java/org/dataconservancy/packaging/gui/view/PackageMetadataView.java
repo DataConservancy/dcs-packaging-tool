@@ -24,6 +24,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
@@ -84,6 +85,12 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     VBox getDomainProfileRemovableLabelVBox();
 
     /**
+     * Sets up the required fields in the form.
+     * @param requiredPackageMetadataList
+     */
+    void setupRequiredFields(List<PackageMetadata> requiredPackageMetadataList);
+
+    /**
      * Sets up the recommended fields in the form.
      * @param recommendedPackageMetadataList
      */
@@ -137,4 +144,10 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * @return boolean true or false
      */
     boolean isFormAlreadyDrawn();
+
+    /**
+     * Gets the file chooser where the user saves the package metadata
+     * @return file chooser
+     */
+    FileChooser getPackageMetadataFileChooser();
 }

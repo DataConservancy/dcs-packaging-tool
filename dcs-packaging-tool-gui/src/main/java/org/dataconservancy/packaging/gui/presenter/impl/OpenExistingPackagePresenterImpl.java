@@ -46,7 +46,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
             // clear the current list
             getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
             getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, "FakeProfile");
-            getController().goToNextPage(Page.EXISTING_PACKAGE_METADATA);
+            getController().goToNextPage();
         });
 
         view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());

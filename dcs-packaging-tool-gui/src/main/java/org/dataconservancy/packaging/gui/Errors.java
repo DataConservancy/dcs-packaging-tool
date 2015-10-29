@@ -28,7 +28,7 @@ public class Errors {
         PACKAGE_GENERATION_CREATION_ERROR("packagegeneration.packagecreation.error"), 
         PACKAGE_PARAMS_CREATION_ERROR("packageparamscreation.error"), 
         PACKAGE_GENERATION_SAVE("packagegeneration.save.error"),
-        PACKAGE_NAME_OR_DOMAIN_PROFILE_MISSING("packagenamemissing.error"),
+        MISSING_REQUIRED_FIELDS("packagenamemissing.error"),
         EMAIL_MISSING("emailmissing.error"),
         BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED("basedirectoryordescriptionnotselected.error"),
         OUTPUT_DIRECTORY_MISSING("outputdirectorymissing.error"),

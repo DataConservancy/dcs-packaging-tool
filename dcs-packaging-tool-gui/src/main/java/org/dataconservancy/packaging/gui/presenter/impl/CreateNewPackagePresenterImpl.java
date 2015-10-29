@@ -142,7 +142,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         controller.setPackageDescription(packageDescription);
                         controller.setPackageDescriptionFile(null);
                         packageDescriptionService.reset();
-                        controller.goToNextPage(Page.DEFINE_RELATIONSHIPS);
+                        controller.goToNextPage();
                     });
 
                     packageDescriptionService.start();
@@ -153,7 +153,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
                     view.getErrorMessage().setVisible(true);
                 } else if (controller.getPackageDescription() != null) {
-                    controller.goToNextPage(Page.DEFINE_RELATIONSHIPS);
+                    controller.goToNextPage();
                 } else {
                     view.getErrorMessage().setText(errors.get(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
                     view.getErrorMessage().setVisible(true);

@@ -44,7 +44,10 @@ public class ControlFactory {
                 control.setOnMouseEntered(event -> {
                     if (helpText != null && !helpText.isEmpty()) {
                         if (control.getTooltip() == null) {
-                            control.setTooltip(new Tooltip(helpText));
+                            Tooltip tooltip = new Tooltip(helpText);
+                            tooltip.setPrefWidth(350);
+                            tooltip.setWrapText(true);
+                            control.setTooltip(tooltip);
                         } else {
                             control.getTooltip().setText(helpText);
                         }
@@ -63,7 +66,10 @@ public class ControlFactory {
                 control.setOnMouseEntered(event -> {
                     if (helpText != null && !helpText.isEmpty()) {
                         if (control.getTooltip() == null) {
-                            control.setTooltip(new Tooltip(helpText));
+                            Tooltip tooltip = new Tooltip(helpText);
+                            tooltip.setPrefWidth(350);
+                            tooltip.setWrapText(true);
+                            control.setTooltip(tooltip);
                         } else {
                             control.getTooltip().setText(helpText);
                         }
@@ -80,7 +86,10 @@ public class ControlFactory {
                 control.setOnMouseEntered(event -> {
                     if (helpText != null && !helpText.isEmpty()) {
                         if (control.getTooltip() == null) {
-                            control.setTooltip(new Tooltip(helpText));
+                            Tooltip tooltip = new Tooltip(helpText);
+                            tooltip.setPrefWidth(350);
+                            tooltip.setWrapText(true);
+                            control.setTooltip(tooltip);
                         } else {
                             control.getTooltip().setText(helpText);
                         }
@@ -107,7 +116,10 @@ public class ControlFactory {
                 control.setOnMouseEntered(event -> {
                     if (helpText != null && !helpText.isEmpty()) {
                         if (control.getTooltip() == null) {
-                            control.setTooltip(new Tooltip(helpText));
+                            Tooltip tooltip = new Tooltip(helpText);
+                            tooltip.setPrefWidth(350);
+                            tooltip.setWrapText(true);
+                            control.setTooltip(tooltip);
                         } else {
                             control.getTooltip().setText(helpText);
                         }
