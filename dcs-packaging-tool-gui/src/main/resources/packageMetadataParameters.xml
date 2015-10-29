@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- This file informs the GUI about properties of PackageMetadata objects. In addition to the name, there are other properties we may set:
--helpText - a String which may be used by the GUI to describe the purpose of the field.
-- requiredness -  REQUIRED, RECOMMENDED or OPTIONAL. This comes from an enum field on PackageMetadata. If this is missing or
-    an invalid value is provided, this defaults to OPTIONAL.
-- validationType - PHONE, EMAIL, URL, DATA, FILENAME or NONE. This comes from an enum field on PackageMetadata. If this is
-    missing or an invalid value is provided, this defaults to  NONE.
-- editable - true or false. This comes from a boolean field on Package metadata. If this is
-    missing or an invalid value is provided, this defaults to false.
--repeatable - true or false. This comes from a boolean field on Package metadata. If this is
-    missing or an invalid value is provided, this defaults to false.
--visible - true or false. This comes from a boolean field on Package metadata. If this is
-    missing or an invalid value is provided, this defaults to false.
+<!-- This file informs the GUI about the requirements for package metadata according to Data Conservancy BagIt Profile
+v1.0. In addition to the name, the following properties can be used to describe a package metadata field:
+- helpText - provides additional information about the field, such as its use, possible values.
+- requiredness -  indicates whether a field is REQUIRED, RECOMMENDED or OPTIONAL. This comes from an enum field on
+    PackageMetadata. If this is missing or an invalid value is provided, this defaults to OPTIONAL.
+- validationType - suggests the type of validation that can/should be done on the field's value: PHONE, EMAIL, URL,
+    DATA, FILENAME or NONE. This comes from an enum field on PackageMetadata. If this is missing or an invalid value is
+    provided, this defaults to  NONE.
+- editable - indicates whether the field should be editable by user. Possible values: true or false. This comes from a
+    boolean field on Package metadata. If this is missing or an invalid value is provided, this defaults to false.
+- repeatable - indicates whether the field can have multiple values. Possible values: true or false. This comes from a
+    boolean field on Package metadata. If this is missing or an invalid value is provided, this defaults to false.
+- visible - indicates whether the field should be displayed to the user on the GUI (Some package metadata fields are
+    meant for machine operations and do not need to be displayed to user. Possible values: true or false. This comes
+    from a boolean field on Package metadata. If this is missing or an invalid value is provided, this defaults to false.
 -->
 <packageMetadataList>
     <packageMetadata>
-        <name>Package-Name</name>
+        <name>BagIt-Profile-Identifier</name>
         <requiredness>REQUIRED</requiredness>
-        <editable>true</editable>
-        <visible>true</visible>
+        <editable>false</editable>
+        <visible>false</visible>
+    </packageMetadata>
+    <packageMetadata>
+        <name>Package-Manifest</name>
+        <requiredness>RECOMMENDED</requiredness>
+        <editable>false</editable>
+        <visible>false</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Name</name>
-        <requiredness>RECOMMENDED</requiredness>
+        <requiredness>REQUIRED</requiredness>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
@@ -34,7 +43,7 @@
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Email</name>
-        <requiredness>RECOMMENDED</requiredness>
+        <requiredness>REQUIRED</requiredness>
         <validationType>EMAIL</validationType>
         <editable>true</editable>
         <visible>true</visible>
