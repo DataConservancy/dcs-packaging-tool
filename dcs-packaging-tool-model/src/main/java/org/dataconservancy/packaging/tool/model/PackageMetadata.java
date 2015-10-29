@@ -56,8 +56,7 @@ public class PackageMetadata {
 
     /**
      * Indicates whether the field is editable.
-     * @return {@code true} if the field is editable by user.
-     * @return {@code false} if the field is not editable by user.
+     * @return {@code true} if the field is editable by user. {@code false} if the field is not editable by user.
      */
     public boolean isEditable() {
         return isEditable;
@@ -117,8 +116,7 @@ public class PackageMetadata {
     }
 
     /**
-     * Indicates whether this package metadata field should be visible on the GUI
-     * @return
+     * @return Indication of whether this package metadata field should be visible on the GUI
      */
     public boolean isVisible() {
         return isVisible;
