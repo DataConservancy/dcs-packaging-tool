@@ -70,6 +70,8 @@ public class DcsBOProfile
 
     private final NodeType person = new NodeType();
 
+    private final NodeType metadata = new NodeType();
+
     /* Transforms */
     private final NodeTransform collection_to_project = new NodeTransform();
 
@@ -194,7 +196,7 @@ public class DcsBOProfile
 
         setIdentifier(URI.create(BO_PROFILE_ID));
 
-        setNodeTypes(Arrays.asList(project, collection, dataItem, file));
+        setNodeTypes(Arrays.asList(project, collection, dataItem, file, metadata));
 
         setNodeTransforms(Arrays.asList(project_to_collection,
                                         collection_to_project,
@@ -247,10 +249,16 @@ public class DcsBOProfile
         dataItem.setDomainProfile(this);
 
         file.setIdentifier(URI.create(BO_PROFILE_BASE + "File"));
-        file.setLabel("File");
+        file.setLabel("DataFile");
         file.setDescription("File business object");
         file.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE + "File")));
         file.setDomainProfile(this);
+
+        metadata.setIdentifier(URI.create(BO_PROFILE_BASE + "File"));
+        metadata.setLabel("Metadata File");
+        metadata.setDescription("File business object representing metadata");
+        metadata.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE + "Metadata")));
+        metadata.setDomainProfile(this);
 
         person.setIdentifier(URI.create(BO_PROFILE_BASE + "Person"));
         person.setLabel("Person");
@@ -507,6 +515,13 @@ public class DcsBOProfile
                                                   exactlyOne(hasFormat),
                                                   exactlyOne(hasSize)));
 
+        metadata.setPropertyConstraints(Arrays.asList(exactlyOne(hasTitle),
+                                                   exactlyOne(hasDescription),
+                                                   exactlyOne(hasCreateDate),
+                                                   exactlyOne(hasModifiedDate),
+                                                   exactlyOne(hasFormat),
+                                                   exactlyOne(hasSize)));
+
         /* Now we do "complex properties */
 
         /* XXX No properties defined in ontology */
@@ -537,18 +552,17 @@ public class DcsBOProfile
                 .asList(noNodeConstraint(),
                         allowRelationshipTo(collection, memberRel)));
 
-        file.setParentConstraints(Arrays.asList(allowRelationshipTo(dataItem,
-                                                                    memberRel),
-                                                allowAll(metadataRel)));
+        file.setParentConstraints(Collections.singletonList(allowRelationshipTo(dataItem, memberRel)));
+
+        metadata.setParentConstraints(Collections.singletonList(allowAll(metadataRel)));
     }
 
     private void setFileAssociations() {
-
         project.setFileAssociation(FileAssociation.DIRECTORY);
         collection.setFileAssociation(FileAssociation.DIRECTORY);
         dataItem.setFileAssociation(FileAssociation.DIRECTORY);
         file.setFileAssociation(FileAssociation.REGULAR_FILE);
-
+        metadata.setFileAssociation(FileAssociation.REGULAR_FILE);
     }
 
     private void defineNodeTransforms() {
@@ -604,8 +618,8 @@ public class DcsBOProfile
                 .setSourceParentConstraint(allowRelationshipTo(collection,
                                                                   memberRel));
         collection_to_dataItem
-                .setSourceChildConstraint(allowRelationshipTo(file,
-                                                                 memberRel));
+                .setSourceChildConstraint(allowRelationshipTo(metadata,
+                                                                 metadataRel));
         collection_to_dataItem.setResultNodeType(dataItem);
 
         collectionToDataItemNoChildren.setLabel("Collection to DataItem");
@@ -635,7 +649,7 @@ public class DcsBOProfile
         metadata_to_file.setDescription("MetadataFile to DataFile");
         metadata_to_file.setInsertParent(false);
         metadata_to_file.setRemoveEmptyParent(false);
-        metadata_to_file.setSourceNodeType(file);
+        metadata_to_file.setSourceNodeType(metadata);
         metadata_to_file.setSourceParentConstraint(allowAll(metadataRel));
         metadata_to_file.setResultNodeType(file);
         metadata_to_file
@@ -651,7 +665,7 @@ public class DcsBOProfile
         file_to_metadata
                 .setSourceChildConstraint(allowRelationshipTo(dataItem,
                                                               memberRel));
-        file_to_metadata.setResultNodeType(file);
+        file_to_metadata.setResultNodeType(metadata);
         file_to_metadata.setResultParentConstraint(allowAll(metadataRel));
 
     }
@@ -669,6 +683,7 @@ public class DcsBOProfile
         collection.setSuppliedProperties(supplied);
         dataItem.setSuppliedProperties(supplied);
         file.setSuppliedProperties(supplied);
+        metadata.setSuppliedProperties(supplied);
     }
 
     private static PropertyConstraint exactlyOne(PropertyType prop) {
@@ -732,6 +747,8 @@ public class DcsBOProfile
     public NodeType getFileNodeType() {
         return file;
     }
+
+    public NodeType getMetadataNodeType() { return metadata; }
 
     public NodeTransform getCollectionToProjectTransform() {
         return collection_to_project;
