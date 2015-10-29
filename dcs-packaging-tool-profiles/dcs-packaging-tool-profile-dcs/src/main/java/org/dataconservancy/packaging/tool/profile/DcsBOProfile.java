@@ -639,35 +639,19 @@ public class DcsBOProfile
         dataItem_to_collection.setLabel("DataItem to Collection");
         dataItem_to_collection
                 .setDescription("Transforms a DataItem into a Collection");
-        dataItem_to_collection.setInsertParent(false);
-        dataItem_to_collection.setRemoveEmptyParent(false);
-        dataItem_to_collection.setSourceParentConstraint(allowRelationshipTo(collection, memberRel));
         dataItem_to_collection.setResultNodeType(collection);
 
         /* MetadataFile can be changed to a DataFile */
         metadata_to_file.setLabel("MetadataFile to DataFile");
         metadata_to_file.setDescription("MetadataFile to DataFile");
-        metadata_to_file.setInsertParent(false);
-        metadata_to_file.setRemoveEmptyParent(false);
         metadata_to_file.setSourceNodeType(metadata);
-        metadata_to_file.setSourceParentConstraint(allowAll(metadataRel));
         metadata_to_file.setResultNodeType(file);
-        metadata_to_file
-                .setResultParentConstraint(allowRelationshipTo(dataItem,
-                                                               memberRel));
 
         /* DataFile can be changed to MetadataFile */
         file_to_metadata.setLabel("DataFile to MetadataFile");
         file_to_metadata.setDescription("DataFile to MetadataFile");
-        file_to_metadata.setInsertParent(false);
-        file_to_metadata.setRemoveEmptyParent(false);
         file_to_metadata.setSourceNodeType(file);
-        file_to_metadata
-                .setSourceChildConstraint(allowRelationshipTo(dataItem,
-                                                              memberRel));
         file_to_metadata.setResultNodeType(metadata);
-        file_to_metadata.setResultParentConstraint(allowAll(metadataRel));
-
     }
 
     private void setSuppliedValues() {

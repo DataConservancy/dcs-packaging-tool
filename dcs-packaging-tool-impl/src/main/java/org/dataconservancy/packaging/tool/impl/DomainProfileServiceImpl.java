@@ -144,7 +144,6 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         NodeType result_type = tr.getResultNodeType();
         Node parent = node.getParent();
-        NodeConstraint result_parent_constraint = tr.getResultParentConstraint();
 
         if (tr.insertParent()) {
             Node new_parent = new Node(urigen.generateNodeURI());
@@ -176,8 +175,8 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         // Modify types of node and parent and update corresponding domain objects.
 
-        if (parent != null && result_parent_constraint != null) {
-            change_object_type(parent, result_parent_constraint.getNodeType());
+        if (parent != null) {
+            change_object_type(parent, tr.getResultParentNodeType());
         }
 
         change_object_type(node, result_type);

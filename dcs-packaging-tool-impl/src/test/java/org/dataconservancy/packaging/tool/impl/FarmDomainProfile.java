@@ -307,14 +307,14 @@ public class FarmDomainProfile extends DomainProfile {
         troughToCowTransform.setSourceNodeType(trough_node_type);
         troughToCowTransform.setSourceChildConstraint(no_child_constraint);
         troughToCowTransform.setResultNodeType(cow_node_type);
-        troughToCowTransform.setResultParentConstraint(barn_occ_parent_constraint);
+        troughToCowTransform.setResultParentNodeType(barn_node_type);
         troughToCowTransform.setInsertParent(true);
 
         moveMediaFromCowToBarnTransform = new NodeTransform();
         moveMediaFromCowToBarnTransform.setLabel("Media moves from Cow to Barn.");
         moveMediaFromCowToBarnTransform.setDescription("Move media file from Cow to Barn grandparent and remove the original cow parent if it has no media.");
         moveMediaFromCowToBarnTransform.setSourceParentConstraint(cow_data_parent_constraint);
-        moveMediaFromCowToBarnTransform.setResultParentConstraint(farm_data_parent_constraint);
+        moveMediaFromCowToBarnTransform.setResultParentNodeType(farm_node_type);
         moveMediaFromCowToBarnTransform.setMoveResultToGrandParent(true);
         moveMediaFromCowToBarnTransform.setRemoveEmptyParent(true);
         
