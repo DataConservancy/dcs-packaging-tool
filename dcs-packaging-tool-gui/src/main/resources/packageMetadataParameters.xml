@@ -1,85 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- This file informs the GUI about properties of PackageMetadata objects. In addition to the name, there are other properties we may set:
+-helpText - a String which may be used by the GUI to describe the purpose of the field.
+- requiredness -  REQUIRED, RECOMMENDED or OPTIONAL. This comes from an enum field on PackageMetadata. If this is missing or
+    an invalid value is provided, this defaults to OPTIONAL.
+- validationType - PHONE, EMAIL, URL, DATA, FILENAME or NONE. This comes from an enum field on PackageMetadata. If this is
+    missing or an invalid value is provided, this defaults to  NONE.
+- editable - true or false. This comes from a boolean field on Package metadata. If this is
+    missing or an invalid value is provided, this defaults to false.
+-repeatable - true or false. This comes from a boolean field on Package metadata. If this is
+    missing or an invalid value is provided, this defaults to false.
+-visible - true or false. This comes from a boolean field on Package metadata. If this is
+    missing or an invalid value is provided, this defaults to false.
+-->
 <packageMetadataList>
     <packageMetadata>
         <name>Package-Name</name>
         <requiredness>REQUIRED</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Name</name>
         <requiredness>RECOMMENDED</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Phone</name>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>PHONE</validationType>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Email</name>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>EMAIL</validationType>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Keyword</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>A keyword string</helpText>
         <repeatable>true</repeatable>
-         <editable>true</editable>
+        <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>External-Identifier</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>Sender-provided Identifier of the package. There should be a one-to-one mapping between the External-Identifier and the Bag-Group-Identifier.</helpText>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>External-Description</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>Description of A brief explanation of the contents and provenance.</helpText>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Internal-Sender-Identifier</name>
         <requiredness>OPTIONAL</requiredness>
         <repeatable>true</repeatable>
         <editable>true</editable>
+        <visible>true</visible>
         <helpText>An alternate sender-specific identifier for the content and/or bag.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Internal-Sender-Description</name>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
         <helpText>A sender-local prose description of the contents of the bag.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Source-Organization</name>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Organization-Address</name>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Count</name>
         <requiredness>RECOMMENDED</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
         <helpText>Sequence number of a given bag within a bag group. The format is "&lt;n&gt; of &lt;m&gt;", where &lt;n&gt; is the sequence number within the group and &lt;m&gt; is the total number of bags in the group. If the latter is not known, the value of &lt;m&gt; should be '?'. "Bag-Count: 1 of 1" should be specified if the entire package will be captured in a single bag. This mechanism allows a package to be split across multiple bags.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Group-Identifier</name>
         <requiredness>RECOMMENDED</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
         <helpText>A sender-provided identifier for a bag group. For DCS packages, the bag group identifier should uniquely identify a package and when combined with the sequence number ('&lt;n&gt;') from the Bag-Count should uniquely identify a bag.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Rights-String</name>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
+        <visible>true</visible>
         <helpText>A rights/use statement.</helpText>
     </packageMetadata>
     <packageMetadata>
@@ -87,11 +114,13 @@
         <requiredness>OPTIONAL</requiredness>
         <repeatable>true</repeatable>
         <editable>true</editable>
+        <visible>true</visible>
         <helpText>A URI representing rights/use information.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Bagging-Date</name>
         <requiredness>RECOMMENDED</requiredness>
+        <visible>true</visible>
         <validationType>DATE</validationType>
     </packageMetadata>
     <packageMetadata>
