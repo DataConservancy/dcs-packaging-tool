@@ -22,7 +22,7 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 public class DomainProfileServiceImpl implements DomainProfileService {
     private final DomainProfileObjectStore objstore;
     private final URIGenerator urigen;
-    
+
     public DomainProfileServiceImpl(DomainProfileObjectStore objstore, URIGenerator urigen) {
         this.objstore = objstore;
         this.urigen = urigen;
@@ -142,44 +142,57 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             throw new IllegalArgumentException("Transform not available.");
         }
 
-        // TODO order of operations
-
         NodeType result_type = tr.getResultNodeType();
         Node parent = node.getParent();
-        Node grandparent = parent == null ? null : parent.getParent();
         NodeConstraint result_parent_constraint = tr.getResultParentConstraint();
 
         if (tr.insertParent()) {
-            // TODO Get node uri. Add URI gen service for here and object store.
             Node new_parent = new Node(urigen.generateNodeURI());
 
-            parent.getChildren().remove(node);
+            if (parent != null) {
+                parent.removeChild(node);
+                parent.addChild(new_parent);
+            }
+
             new_parent.addChild(node);
             parent = new_parent;
         } else if (tr.moveResultToGrandParent()) {
+            Node grandparent = parent == null ? null : parent.getParent();
+            
+            if (grandparent == null) {
+                throw new IllegalStateException("No grandparent for: " + node.getIdentifier());
+            }
+            
             parent.removeChild(node);
             grandparent.addChild(node);
 
-            if (tr.removeEmptyParent()) {
-                if (parent.isIgnored()) {
-                    grandparent.removeChild(node);
-                }
+            if (tr.removeEmptyParent() && parent.isLeaf()) {
+                grandparent.removeChild(parent);
+                // TODO Update object store to have method to remove domain object?
             }
 
             parent = grandparent;
         }
 
+        // If parent type changes or parent is new, must update parent object.
+        
         if (parent != null && result_parent_constraint != null) {
             if (result_parent_constraint.getNodeType() != null) {
-                parent.setNodeType(result_parent_constraint.getNodeType());
-                objstore.updateObject(parent);
+                if (parent.getNodeType() == null || !parent.getNodeType().getIdentifier()
+                        .equals(result_parent_constraint.getNodeType().getIdentifier())) {
+                    parent.setNodeType(result_parent_constraint.getNodeType());
+                    objstore.updateObject(parent);
+                }
             }
         }
 
         if (result_type != null) {
             node.setNodeType(result_type);
-            objstore.updateObject(node);
         }
+        
+        // Always update node in case parent or node type changed changed
+        
+        objstore.updateObject(node);
     }
 
     @Override
@@ -215,7 +228,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         NodeConstraint child_constraint = tr.getSourceChildConstraint();
 
         if (node.isLeaf()) {
-            if (!child_constraint.matchesNone()) {
+            if (child_constraint != null && !child_constraint.matchesNone()) {
                 return false;
             }
         } else {
