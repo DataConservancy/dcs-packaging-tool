@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 Johns Hopkins University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.dataconservancy.packaging.gui.services;
 
 import org.dataconservancy.packaging.gui.Configuration;
@@ -16,7 +32,9 @@ import java.util.regex.Pattern;
 /**
  * This service is responsible for checking all filenames in a filesystem tree which is being
  * considered for processing into a package, and flagging all filenames which violate naming conventions
- * which have been implemented in the interest of cross-platform compatibility.
+ * which have been implemented in the interest of cross-platform compatibility.  This service as currently implemented
+ * will test for conformance with the Bagit version 0.97 specification section 7.2.2. The windows filenames are hard coded in
+ * this class, but we will allow other characters to differ from the default set &lt; &gt; : " / | ? *  via configuration.
  */
 public class FilenameValidatorService {
 
@@ -29,11 +47,9 @@ public class FilenameValidatorService {
     private Pattern pattern = Pattern.compile(windowsReservedNamesRegex);
 
     /**
-     * This service as currently implemented will test for conformance with the Bagit version 0.97 spec, section
-     * 7.2.2. The windows filenames are hard coded in this class, but we will allow other characters to be added
-     * to the default set     &lt; &gt; : " / | ? *      via configuration.
+     * This method takes a root path and checks for invalid names in the tree headed by the given path
      *
-     * @param rootDirectoryPath the root of the filesystem tree to be checked for invalid file names
+     * @param rootDirectoryPath the root path of the filesystem tree to be checked for invalid file names
      * @return a List of invalid file names, empty if all names are valid. Each entry in the list will have an invalid
      *  character or reserved filename in the final path component. There will be one entry for each error to be fixed.
      * @throws IOException if the file at rootDirectoryPath cannot be found
