@@ -158,40 +158,52 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             parent = new_parent;
         } else if (tr.moveResultToGrandParent()) {
             Node grandparent = parent == null ? null : parent.getParent();
-            
+
             if (grandparent == null) {
                 throw new IllegalStateException("No grandparent for: " + node.getIdentifier());
             }
-            
+
             parent.removeChild(node);
             grandparent.addChild(node);
 
             if (tr.removeEmptyParent() && parent.isLeaf()) {
                 grandparent.removeChild(parent);
-                // TODO Update object store to have method to remove domain object?
+                // TODO Need ability to remove domain object?
             }
 
             parent = grandparent;
         }
 
-        // If parent type changes or parent is new, must update parent object.
-        
+        // Modify types of node and parent and update corresponding domain objects.
+
         if (parent != null && result_parent_constraint != null) {
-            if (result_parent_constraint.getNodeType() != null) {
-                if (parent.getNodeType() == null || !parent.getNodeType().getIdentifier()
-                        .equals(result_parent_constraint.getNodeType().getIdentifier())) {
-                    parent.setNodeType(result_parent_constraint.getNodeType());
-                    objstore.updateObject(parent);
-                }
-            }
+            change_object_type(parent, result_parent_constraint.getNodeType());
         }
 
-        if (result_type != null) {
-            node.setNodeType(result_type);
+        change_object_type(node, result_type);
+        
+        // Type assignment of all nodes in trees should now be valid.
+        // Children of type changed nodes must have domain objects updated.
+        
+        if (parent != null) {
+            parent.getChildren().forEach(objstore::updateObject);
         }
         
-        // Always update node in case parent or node type changed changed
-        
+        if (node.hasChildren()) {
+            node.getChildren().forEach(objstore::updateObject);
+        }
+    }
+    
+    private void change_object_type(Node node, NodeType type) {
+        if (type == null) {
+            return;
+        }
+
+        if (node.getNodeType() != null && type.getIdentifier().equals(node.getNodeType().getIdentifier())) {
+            return;
+        }
+
+        node.setNodeType(type);
         objstore.updateObject(node);
     }
 
