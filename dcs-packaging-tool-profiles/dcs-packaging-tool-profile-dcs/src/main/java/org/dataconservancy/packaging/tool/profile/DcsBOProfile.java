@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.net.URI;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -521,12 +522,16 @@ public class DcsBOProfile
 
     private void setRelationshipConstraints() {
 
+        project.setParentConstraints(Collections.singletonList(noParent()));
+
         collection.setParentConstraints(Arrays
-                .asList(allowRelationshipTo(collection, memberRel),
+                .asList(noParent(),
+                        allowRelationshipTo(collection, memberRel),
                         allowRelationshipTo(project, memberRel)));
 
         dataItem.setParentConstraints(Arrays
-                .asList(allowRelationshipTo(collection, memberRel)));
+                .asList(noParent(),
+                        allowRelationshipTo(collection, memberRel)));
 
         file.setParentConstraints(Arrays.asList(allowRelationshipTo(dataItem,
                                                                     memberRel),
@@ -679,6 +684,13 @@ public class DcsBOProfile
         constraint.setMatchesAny(true);
         constraint.setStructuralRelation(rel);
         return constraint;
+    }
+
+    private static NodeConstraint noParent() {
+        NodeConstraint noParentConstraint = new NodeConstraint();
+        noParentConstraint.setMatchesNone(true);
+
+        return noParentConstraint;
     }
 
     public NodeType getProjectNodeType() {
