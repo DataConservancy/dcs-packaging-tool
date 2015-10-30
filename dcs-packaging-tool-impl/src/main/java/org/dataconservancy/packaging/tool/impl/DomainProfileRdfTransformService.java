@@ -98,15 +98,17 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
     public static final Property HAS_SOURCE_CHILD_CONSTRAINT = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasSourceChildConstraint");
     public static final Property HAS_RESULT_NODE_TYPE = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "hasResultNodeType");
+            DC_DP_NS_URI, "hasResultNodeType");
+    public static final Property HAS_RESULT_CHILD_NODE_TYPE = ResourceFactory.createProperty(
+            DC_DP_NS_URI, "hasResultChildNodeType");
     public static final Property HAS_RESULT_PARENT_NODE_TYPE= ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasResultParentNodeType");
-    public static final Property INSERT_PARENT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "insertParent");
-    public static final Property MOVE_RESULT_GRANDPARENT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "moveResultGrandparent");
-    public static final Property REMOVE_EMPTY_PARENT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "removeEmptyParent");
+    public static final Property INSERT_PARENT_NODE_TYPE = ResourceFactory.createProperty(
+        DC_DP_NS_URI, "insertParentNodeType");
+    public static final Property MOVE_CHILDREN_TO_PARENT = ResourceFactory.createProperty(
+        DC_DP_NS_URI, "moveChildrenToParent");
+    public static final Property REMOVE_EMPTY_RESULT = ResourceFactory.createProperty(
+        DC_DP_NS_URI, "removeEmptyResult");
     public static final Property HAS_NODE_TYPE = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasNodeType");
     public static final Property MATCHES_ANY = ResourceFactory.createProperty(
@@ -491,10 +493,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             transformResource.addProperty(HAS_SOURCE_PARENT_CONSTRAINT, transformToRdf(model, transform.getSourceParentConstraint(), domainProfileResource, null));
         }
 
-        if (transform.getSourceGrandParentConstraint() != null) {
-            transformResource.addProperty(HAS_SOURCE_GRANDPARENT_CONSTRAINT, transformToRdf(model, transform.getSourceGrandParentConstraint(), domainProfileResource, null));
-        }
-
         if (transform.getSourceChildConstraint() != null) {
             transformResource.addProperty(HAS_SOURCE_CHILD_CONSTRAINT, transformToRdf(model, transform.getSourceChildConstraint(), domainProfileResource, null));
         }
@@ -503,13 +501,16 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             transformResource.addProperty(HAS_RESULT_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
         }
 
-        if (transform.getResultParentNodeType() != null) {
-            transformResource.addProperty(HAS_RESULT_PARENT_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
+        if (transform.getResultChildNodeType() != null) {
+            transformResource.addProperty(HAS_RESULT_CHILD_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
+        }
+        
+        if (transform.getInsertParentNodeType() != null) {
+            transformResource.addProperty(INSERT_PARENT_NODE_TYPE, transformToRdf(model, transform.getInsertParentNodeType(), domainProfileResource));
         }
 
-        transformResource.addLiteral(INSERT_PARENT, transform.insertParent());
-        transformResource.addLiteral(MOVE_RESULT_GRANDPARENT, transform.moveResultToGrandParent());
-        transformResource.addLiteral(REMOVE_EMPTY_PARENT, transform.removeEmptyParent());
+        transformResource.addLiteral(MOVE_CHILDREN_TO_PARENT, transform.moveChildrenToParent());
+        transformResource.addLiteral(REMOVE_EMPTY_RESULT, transform.removeEmptyResult());
 
         return transformResource;
     }
@@ -761,10 +762,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeTransform.setSourceParentConstraint(transformToNodeConstraint(resource.getPropertyResourceValue(HAS_SOURCE_PARENT_CONSTRAINT), profile, model));
         }
 
-        if (resource.hasProperty(HAS_SOURCE_GRANDPARENT_CONSTRAINT)) {
-            nodeTransform.setSourceGrandparentConstraint(transformToNodeConstraint(resource.getPropertyResourceValue(HAS_SOURCE_GRANDPARENT_CONSTRAINT), profile, model));
-        }
-
         if (resource.hasProperty(HAS_SOURCE_CHILD_CONSTRAINT)) {
             nodeTransform.setSourceChildConstraint(transformToNodeConstraint(resource.getPropertyResourceValue(HAS_SOURCE_CHILD_CONSTRAINT), profile, model));
         }
@@ -773,20 +770,20 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeTransform.setResultNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_NODE_TYPE), profile, model));
         }
 
-        if (resource.hasProperty(HAS_RESULT_PARENT_NODE_TYPE)) {
-            nodeTransform.setResultParentNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_PARENT_NODE_TYPE), profile, model));
+        if (resource.hasProperty(HAS_RESULT_CHILD_NODE_TYPE)) {
+            nodeTransform.setResultChildNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_CHILD_NODE_TYPE), profile, model));
         }
 
-        if (resource.hasProperty(INSERT_PARENT)) {
-            nodeTransform.setInsertParent(getLiteral(resource, INSERT_PARENT).getBoolean());
+        if (resource.hasProperty(INSERT_PARENT_NODE_TYPE)) {
+            nodeTransform.setResultChildNodeType(transformToNodeType(resource.getPropertyResourceValue(INSERT_PARENT_NODE_TYPE), profile, model));
         }
 
-        if (resource.hasProperty(MOVE_RESULT_GRANDPARENT)) {
-            nodeTransform.setMoveResultToGrandParent(getLiteral(resource, MOVE_RESULT_GRANDPARENT).getBoolean());
+        if (resource.hasProperty(MOVE_CHILDREN_TO_PARENT)) {
+            nodeTransform.setMoveChildrenToParent(getLiteral(resource, MOVE_CHILDREN_TO_PARENT).getBoolean());
         }
 
-        if (resource.hasProperty(REMOVE_EMPTY_PARENT)) {
-            nodeTransform.setRemoveEmptyParent(getLiteral(resource, REMOVE_EMPTY_PARENT).getBoolean());
+        if (resource.hasProperty(REMOVE_EMPTY_RESULT)) {
+            nodeTransform.setRemoveEmptyResult(getLiteral(resource, REMOVE_EMPTY_RESULT).getBoolean());
         }
         return nodeTransform;
     }

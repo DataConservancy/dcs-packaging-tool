@@ -307,16 +307,15 @@ public class FarmDomainProfile extends DomainProfile {
         troughToCowTransform.setSourceNodeType(trough_node_type);
         troughToCowTransform.setSourceChildConstraint(no_child_constraint);
         troughToCowTransform.setResultNodeType(cow_node_type);
-        troughToCowTransform.setResultParentNodeType(barn_node_type);
-        troughToCowTransform.setInsertParent(true);
+        troughToCowTransform.setInsertParentNodeType(barn_node_type);
 
         moveMediaFromCowToBarnTransform = new NodeTransform();
-        moveMediaFromCowToBarnTransform.setLabel("Media moves from Cow to Barn.");
-        moveMediaFromCowToBarnTransform.setDescription("Move media file from Cow to Barn grandparent and remove the original cow parent if it has no media.");
-        moveMediaFromCowToBarnTransform.setSourceParentConstraint(cow_data_parent_constraint);
-        moveMediaFromCowToBarnTransform.setResultParentNodeType(farm_node_type);
-        moveMediaFromCowToBarnTransform.setMoveResultToGrandParent(true);
-        moveMediaFromCowToBarnTransform.setRemoveEmptyParent(true);
+        moveMediaFromCowToBarnTransform.setLabel("Media child moves from Cow to Barn.");
+        moveMediaFromCowToBarnTransform.setDescription("Move media file of Cow to Barn parent and remove the original cow if it has no media.");
+        moveMediaFromCowToBarnTransform.setSourceNodeType(cow_node_type);
+        moveMediaFromCowToBarnTransform.setMoveChildrenToParent(true);
+        moveMediaFromCowToBarnTransform.setRemoveEmptyResult(true);
+        moveMediaFromCowToBarnTransform.setSourceChildConstraint(media_constraint);
         
         setIdentifier(URI.create("http://example.com/farm"));
         setLabel("Farm");

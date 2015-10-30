@@ -574,8 +574,6 @@ public class DcsBOProfile
         collection_to_project.setLabel("Collection to Project");
         collection_to_project
                 .setDescription("Transform a Collection to a Project");
-        collection_to_project.setInsertParent(false);
-        collection_to_project.setRemoveEmptyParent(false);
         collection_to_project.setSourceNodeType(collection);
         collection_to_project
                 .setSourceParentConstraint(noNodeConstraint());
@@ -587,8 +585,6 @@ public class DcsBOProfile
         collectionToProjectNoChildren.setLabel("Collection to Project");
         collectionToProjectNoChildren
                 .setDescription("Transform a Collection to a Project");
-        collectionToProjectNoChildren.setInsertParent(false);
-        collectionToProjectNoChildren.setRemoveEmptyParent(false);
         collectionToProjectNoChildren.setSourceNodeType(collection);
         collectionToProjectNoChildren
                 .setSourceParentConstraint(noNodeConstraint());
@@ -599,8 +595,6 @@ public class DcsBOProfile
         project_to_collection.setLabel("Project to Collection");
         project_to_collection
                 .setDescription("Transforms a project into a collection");
-        project_to_collection.setInsertParent(false);
-        project_to_collection.setRemoveEmptyParent(false);
         project_to_collection.setSourceNodeType(project);
         project_to_collection.setResultNodeType(collection);
 
@@ -611,8 +605,6 @@ public class DcsBOProfile
         collection_to_dataItem.setLabel("Collection to DataItem");
         collection_to_dataItem
                 .setDescription("Transforms a Collection into a DataItem");
-        collection_to_dataItem.setInsertParent(false);
-        collection_to_dataItem.setRemoveEmptyParent(false);
         collection_to_dataItem.setSourceNodeType(collection);
         collection_to_dataItem
                 .setSourceParentConstraint(allowRelationshipTo(collection,
@@ -625,8 +617,6 @@ public class DcsBOProfile
         collectionToDataItemNoChildren.setLabel("Collection to DataItem");
         collectionToDataItemNoChildren
                 .setDescription("Transforms a Collection into a DataItem");
-        collectionToDataItemNoChildren.setInsertParent(false);
-        collectionToDataItemNoChildren.setRemoveEmptyParent(false);
         collectionToDataItemNoChildren.setSourceNodeType(collection);
         collectionToDataItemNoChildren
                 .setSourceParentConstraint(allowRelationshipTo(collection,

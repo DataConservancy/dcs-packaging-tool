@@ -1,6 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
@@ -142,68 +143,39 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             throw new IllegalArgumentException("Transform not available.");
         }
 
-        NodeType result_type = tr.getResultNodeType();
-        Node parent = node.getParent();
-
-        if (tr.insertParent()) {
+        if (tr.getInsertParentNodeType() != null) {
             Node new_parent = new Node(urigen.generateNodeURI());
 
-            if (parent != null) {
-                parent.removeChild(node);
-                parent.addChild(new_parent);
+            objstore.moveObject(new_parent, tr.getInsertParentNodeType(), node.getParent());
+            objstore.moveObject(node, tr.getResultNodeType(), new_parent);
+        }
+
+        if (tr.moveChildrenToParent()) {
+            Node parent = node.getParent();
+
+            if (parent == null) {
+                throw new IllegalStateException("No parent for: " + node.getIdentifier());
             }
 
-            new_parent.addChild(node);
-            parent = new_parent;
-        } else if (tr.moveResultToGrandParent()) {
-            Node grandparent = parent == null ? null : parent.getParent();
+            // Move children to parent, avoiding concurrent modification of
+            // children list
 
-            if (grandparent == null) {
-                throw new IllegalStateException("No grandparent for: " + node.getIdentifier());
+            if (node.hasChildren()) {
+                new ArrayList<>(node.getChildren())
+                        .forEach(child -> objstore.moveObject(child, tr.getResultChildNodeType(), parent));
             }
-
-            parent.removeChild(node);
-            grandparent.addChild(node);
-
-            if (tr.removeEmptyParent() && parent.isLeaf()) {
-                grandparent.removeChild(parent);
-                // TODO Need ability to remove domain object?
-            }
-
-            parent = grandparent;
         }
 
-        // Modify types of node and parent and update corresponding domain objects.
+        if (tr.removeEmptyResult() && node.isLeaf() && !node.isRoot()) {
+            node.getParent().removeChild(node);
+            objstore.removeObject(node.getDomainObject());
+        } else if (tr.getResultNodeType() != null
+                && !tr.getResultNodeType().getIdentifier().equals(node.getNodeType().getIdentifier())) {
+            // Do result node transform if not removed and not already done
 
-        if (parent != null) {
-            change_object_type(parent, tr.getResultParentNodeType());
+            node.setNodeType(tr.getResultNodeType());
+            objstore.updateObject(node);
         }
-
-        change_object_type(node, result_type);
-        
-        // Type assignment of all nodes in trees should now be valid.
-        // Children of type changed nodes must have domain objects updated.
-        
-        if (parent != null) {
-            parent.getChildren().forEach(objstore::updateObject);
-        }
-        
-        if (node.hasChildren()) {
-            node.getChildren().forEach(objstore::updateObject);
-        }
-    }
-    
-    private void change_object_type(Node node, NodeType type) {
-        if (type == null) {
-            return;
-        }
-
-        if (node.getNodeType() != null && type.getIdentifier().equals(node.getNodeType().getIdentifier())) {
-            return;
-        }
-
-        node.setNodeType(type);
-        objstore.updateObject(node);
     }
 
     @Override
@@ -234,8 +206,6 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         Node parent = node.getParent();
-        Node grandparent = parent == null ? null : parent.getParent();
-
         NodeConstraint child_constraint = tr.getSourceChildConstraint();
 
         if (child_constraint != null) {
@@ -245,7 +215,8 @@ public class DomainProfileServiceImpl implements DomainProfileService {
                 }
             } else {
                 for (Node child : node.getChildren()) {
-                    if (!meets_type_constraint(child, child_constraint) || !meets_parent_relation_constraint(child, node, child_constraint)) {
+                    if (!meets_type_constraint(child, child_constraint)
+                            || !meets_parent_relation_constraint(child, node, child_constraint)) {
                         return false;
                     }
                 }
@@ -257,15 +228,6 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (parent_constraint != null) {
             if (!meets_type_constraint(parent, parent_constraint)
                     || !meets_parent_relation_constraint(node, parent, parent_constraint)) {
-                return false;
-            }
-        }
-
-        NodeConstraint grandparent_constraint = tr.getSourceGrandParentConstraint();
-
-        if (grandparent_constraint != null) {
-            if (!meets_type_constraint(grandparent, grandparent_constraint)
-                    || !meets_parent_relation_constraint(parent, grandparent, grandparent_constraint)) {
                 return false;
             }
         }
