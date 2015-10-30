@@ -122,9 +122,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         view.getContinueButton().setOnAction(event -> {
             updatePackageState();
             if (validateRequiredFields()) {
+                view.getErrorLabel().setVisible(false);
                 getController().goToNextPage();
             } else {
-                view.showStatus(errors.get(ErrorKey.MISSING_REQUIRED_FIELDS));
+                view.getErrorLabel().setText(errors.get(ErrorKey.MISSING_REQUIRED_FIELDS));
+                view.getErrorLabel().setVisible(true);
             }
 
         });

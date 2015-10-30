@@ -20,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -106,7 +107,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * Shows any status messages.
      * @param status
      */
-    void showStatus(String status);
+    Label getErrorLabel();
 
     /**
      * Clears all the fields

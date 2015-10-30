@@ -29,7 +29,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.TooltipBuilder;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -71,7 +70,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private Button addDomainProfileButton;
     private VBox domainProfileRemovableLabelVBox;
 
-    private Label statusLabel;
+    private Label errorLabel;
     private ScrollPane contentScrollPane;
     private VBox content;
     private VBox requiredVBox;
@@ -109,11 +108,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         //Create a label to show any status messages at the top of the screen.
         HBox status = new HBox();
-        statusLabel = new Label();
-        statusLabel.setVisible(false);
-        statusLabel.setWrapText(true);
-        statusLabel.setTextFill(Color.web("#C00000"));
-        status.getChildren().add(statusLabel);
+        errorLabel = new Label();
+        errorLabel.setVisible(false);
+        errorLabel.setWrapText(true);
+        errorLabel.setTextFill(Color.web("#C00000"));
+        status.getChildren().add(errorLabel);
         status.setAlignment(Pos.TOP_CENTER);
 
         content.getChildren().add(status);
@@ -280,9 +279,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public void showStatus(String status) {
-        statusLabel.setText(status);
-        statusLabel.setVisible(true);
+    public Label getErrorLabel() {
+        return this.errorLabel;
     }
 
     @Override

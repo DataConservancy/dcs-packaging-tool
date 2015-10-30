@@ -488,10 +488,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
      */
     private void loadDefaultParams() {
 
-        view.getStatusLabel().setText(errors.get(ErrorKey.PARAM_LOADING_ERROR));
-        view.getStatusLabel().setTextFill(Color.BLACK);
-        view.getStatusLabel().setVisible(true);
-
         generationParams = new PackageGenerationParameters();
         generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
 
