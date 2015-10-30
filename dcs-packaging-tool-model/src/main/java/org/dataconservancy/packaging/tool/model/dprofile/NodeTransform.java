@@ -5,9 +5,12 @@ package org.dataconservancy.packaging.tool.model.dprofile;
  * possibly an action, and a description.
  * 
  * A node having the characteristics of the source node may be transformed to
- * the result. The modification may be the type of the node or the predicates
- * connecting the node to its parent. The action may be inserting a parent node
+ * the result. The modification may be the type of the node and/or the type
+ * of the parent. The action may be inserting a parent node
  * or moving a node to its grandparent.
+ * 
+ * Changing the type of a node will change the relations between the node and its parent and
+ * children to allowed structural relations of the new node type.
  */
 public class NodeTransform extends AbstractDescribedObject {
     private NodeType source_type;
@@ -15,7 +18,7 @@ public class NodeTransform extends AbstractDescribedObject {
     private NodeConstraint source_grandparent_constraint;
     private NodeConstraint source_child_constraint;
     private NodeType result_node_type;
-    private NodeConstraint result_parent_constraint;
+    private NodeType result_parent_node_type;
     private boolean insert_parent;
     private boolean move_result_grandparent;
     private boolean remove_empty_parent;
@@ -104,16 +107,17 @@ public class NodeTransform extends AbstractDescribedObject {
      * @return Constraints that parent will be transformed to meet. May be null
      *         to indicate no change.
      */
-    public NodeConstraint getResultParentConstraint() {
-        return result_parent_constraint;
+    public NodeType getResultParentNodeType() {
+        return result_parent_node_type;
     }
 
     /**
-     * Sets the NodeConstraint on the parent of the result.
-     * @param resultParentConstraint The NodeConstraint for the parent of the result of the transform.
+     * Sets the NodeType on the parent of the result.
+     * 
+     * @param resultParentType The NodeType for the parent of the result of the transform.
      */
-    public void setResultParentConstraint(NodeConstraint resultParentConstraint) {
-        this.result_parent_constraint = resultParentConstraint;
+    public void setResultParentNodeType(NodeType resultParentType) {
+        this.result_parent_node_type = resultParentType;
     }
 
     /**
@@ -175,7 +179,7 @@ public class NodeTransform extends AbstractDescribedObject {
         result = prime * result + (move_result_grandparent ? 1231 : 1237);
         result = prime * result + (remove_empty_parent ? 1231 : 1237);
         result = prime * result + ((result_node_type == null) ? 0 : result_node_type.hashCode());
-        result = prime * result + ((result_parent_constraint == null) ? 0 : result_parent_constraint.hashCode());
+        result = prime * result + ((result_parent_node_type == null) ? 0 : result_parent_node_type.hashCode());
         result = prime * result + ((source_child_constraint == null) ? 0 : source_child_constraint.hashCode());
         result = prime * result
                 + ((source_grandparent_constraint == null) ? 0 : source_grandparent_constraint.hashCode());
@@ -216,10 +220,10 @@ public class NodeTransform extends AbstractDescribedObject {
                 return false;
         } else if (!result_node_type.equals(other.result_node_type))
             return false;
-        if (result_parent_constraint == null) {
-            if (other.result_parent_constraint != null)
+        if (result_parent_node_type == null) {
+            if (other.result_parent_node_type != null)
                 return false;
-        } else if (!result_parent_constraint.equals(other.result_parent_constraint))
+        } else if (!result_parent_node_type.equals(other.result_parent_node_type))
             return false;
         if (source_child_constraint == null) {
             if (other.source_child_constraint != null)
@@ -249,7 +253,7 @@ public class NodeTransform extends AbstractDescribedObject {
         return "NodeTransform [source_type=" + (source_type == null ? "" : source_type.getIdentifier()) + ", source_parent_constraint=" + source_parent_constraint
                 + ", source_grandparent_constraint=" + source_grandparent_constraint + ", source_child_constraint="
                 + source_child_constraint + ", result_node_type=" + (result_node_type == null ? "" : result_node_type.getIdentifier()) + ", result_parent_constraint="
-                + result_parent_constraint + ", insert_parent=" + insert_parent + ", move_result_grandparent="
+                + result_parent_node_type + ", insert_parent=" + insert_parent + ", move_result_grandparent="
                 + move_result_grandparent + ", remove_empty_parent=" + remove_empty_parent + "]";
     }
 }

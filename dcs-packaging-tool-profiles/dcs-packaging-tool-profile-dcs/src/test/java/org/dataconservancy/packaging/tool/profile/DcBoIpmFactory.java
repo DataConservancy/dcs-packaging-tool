@@ -126,19 +126,19 @@ public class DcBoIpmFactory {
 
         treeFactory.setNodeTypeSetter(null);
 
-        return null;
+        return root;
     }
 
     private IpmTreeFactory.NodeTypeSetter dcBoSetter = new IpmTreeFactory.NodeTypeSetter() {
         @Override
         public void setNodeType(Node node, int depth) {
             if (node.getFileInfo().isFile()) {
-                node.setNodeType(profile.getFileNodeType());
+                node.setNodeType(profile.getMetadataNodeType());
             } else {
                 if (!node.isLeaf()) {
                     boolean containsDirectory = false;
                     for (Node child : node.getChildren()) {
-                        if (!child.getNodeType().equals(profile.getFileNodeType())) {
+                        if (!child.getNodeType().equals(profile.getMetadataNodeType())) {
                             containsDirectory = true;
                             break;
                         }

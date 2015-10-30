@@ -20,32 +20,36 @@ public class IpmTreeFactory {
 
     /**
      * Creates a single Node tree that is backed by a directory
-     * @param type The type to assign to the node
+     * @param type The type to assign to the node, or null if none should be set.
      * @return The root node of the single node tree.
      */
     public Node createSingleDirectoryTree(NodeType type) {
         Node root = new Node(uriGenerator.generateNodeURI());
         root.setFileInfo(createDirectoryInfo("/" + randomString(5), randomString(8)));
-        root.setNodeType(type);
+        if (type != null) {
+            root.setNodeType(type);
+        }
         return root;
     }
 
     /**
      * Creates a single Node tree that is backed by a file
-     * @param type The type to assign to the node
+     * @param type The type to assign to the node, or null if none should be set.
      * @return The root node of the single node tree.
      */
     public Node createSingleFileTree(NodeType type) {
         Node root = new Node(uriGenerator.generateNodeURI());
         root.setFileInfo(createFileInfo("/" + randomString(5), randomString(8)));
-        root.setNodeType(type);
+        if (type != null) {
+            root.setNodeType(type);
+        }
         return root;
     }
 
     /**
      * Creates a tree that has two nodes a root backed by a directory and a child backed by a file
-     * @param directoryType The type to assign to the root/directory node.
-     * @param fileType The type to assign to the child/file node.
+     * @param directoryType The type to assign to the root/directory node, or null if none should be set.
+     * @param fileType The type to assign to the child/file node, or null if none should be set.
      * @return The root node of the tree.
      */
     public Node createSingleDirectoryFileTree(NodeType directoryType, NodeType fileType) {
@@ -53,11 +57,15 @@ public class IpmTreeFactory {
 
         String rootPath = "/" + randomString(5);
         root.setFileInfo(createDirectoryInfo(rootPath, randomString(6)));
-        root.setNodeType(directoryType);
+        if (directoryType != null) {
+            root.setNodeType(directoryType);
+        }
 
         Node child = new Node(uriGenerator.generateNodeURI());
         child.setFileInfo(createFileInfo(rootPath + "/" + randomString(4), randomString(9)));
-        child.setNodeType(fileType);
+        if (fileType != null) {
+            child.setNodeType(fileType);
+        }
         root.addChild(child);
 
         return root;
@@ -65,8 +73,8 @@ public class IpmTreeFactory {
 
     /**
      * Creates a tree that has two nodes both backed by directories
-     * @param parentDirectoryType The type to assign the root node.
-     * @param childDirectoryType The type to assign the child node.
+     * @param parentDirectoryType The type to assign the root node, or null if none should be set.
+     * @param childDirectoryType The type to assign the child node, or null if none should be set.
      * @return The root node of the tree.
      */
     public Node createTwoDirectoryTree(NodeType parentDirectoryType, NodeType childDirectoryType) {
@@ -74,11 +82,15 @@ public class IpmTreeFactory {
 
         String rootPath = "/" + randomString(5);
         root.setFileInfo(createDirectoryInfo(rootPath, randomString(6)));
-        root.setNodeType(parentDirectoryType);
+        if (parentDirectoryType != null) {
+            root.setNodeType(parentDirectoryType);
+        }
 
         Node child = new Node(uriGenerator.generateNodeURI());
         child.setFileInfo(createDirectoryInfo(rootPath + "/" + randomString(4), randomString(9)));
-        child.setNodeType(childDirectoryType);
+        if (childDirectoryType != null) {
+            child.setNodeType(childDirectoryType);
+        }
         root.addChild(child);
 
         return root;
@@ -94,20 +106,30 @@ public class IpmTreeFactory {
      * @return The root node of the tree.
      */
     public Node createTree(int maxDepth, int branching, boolean allowMidLevelFiles) {
-        return createTree(0, maxDepth, branching, 0, allowMidLevelFiles);
+        if (branching == 1) {
+            allowMidLevelFiles = false;
+        }
+        return createTree(0, maxDepth, branching, 0, allowMidLevelFiles, true);
     }
 
-    private Node createTree(int depth, int maxDepth, int branching, int nodeId, boolean allowMidLevelFiles) {
+    private Node createTree(int depth, int maxDepth, int branching, int nodeId, boolean allowMidLevelFiles, boolean directoryNode) {
         Node node = new Node(URI.create("test:" + depth + "," + nodeId));
 
         if (++depth < maxDepth) {
 
-            if (!allowMidLevelFiles || random.nextBoolean()) {
+            if (directoryNode) {
                 node.setFileInfo(createDirectoryInfo(
                     "/" + depth + "/" + nodeId + "/", randomString(5)));
 
                 for (int branch = 0; branch < branching; branch++) {
-                    node.addChild(createTree(depth, maxDepth, branching, branch, allowMidLevelFiles));
+                    boolean childIsDirectory = false;
+                    //Make the first branch a directory, so we always have at least one node to branch off of
+                    //Otherwise if we don't allow mid level files it's a directory or if randome next boolean is true
+                    if (branch == 0 || !allowMidLevelFiles || random.nextBoolean()) {
+                        childIsDirectory = true;
+                    }
+
+                    node.addChild(createTree(depth, maxDepth, branching, branch, allowMidLevelFiles, childIsDirectory));
                 }
             } else {
                 node.setFileInfo(createFileInfo("/" + depth + "/" + nodeId, randomString(6)));

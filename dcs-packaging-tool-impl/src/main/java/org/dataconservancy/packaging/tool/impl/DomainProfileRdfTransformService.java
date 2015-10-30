@@ -99,8 +99,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         DC_DP_NS_URI, "hasSourceChildConstraint");
     public static final Property HAS_RESULT_NODE_TYPE = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasResultNodeType");
-    public static final Property HAS_RESULT_PARENT_CONSTRAINT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "hasResultParentConstraint");
+    public static final Property HAS_RESULT_PARENT_NODE_TYPE= ResourceFactory.createProperty(
+        DC_DP_NS_URI, "hasResultParentNodeType");
     public static final Property INSERT_PARENT = ResourceFactory.createProperty(
         DC_DP_NS_URI, "insertParent");
     public static final Property MOVE_RESULT_GRANDPARENT = ResourceFactory.createProperty(
@@ -503,8 +503,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             transformResource.addProperty(HAS_RESULT_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
         }
 
-        if (transform.getResultParentConstraint() != null) {
-            transformResource.addProperty(HAS_RESULT_PARENT_CONSTRAINT, transformToRdf(model, transform.getResultParentConstraint(), domainProfileResource, null));
+        if (transform.getResultParentNodeType() != null) {
+            transformResource.addProperty(HAS_RESULT_PARENT_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
         }
 
         transformResource.addLiteral(INSERT_PARENT, transform.insertParent());
@@ -773,8 +773,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeTransform.setResultNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_NODE_TYPE), profile, model));
         }
 
-        if (resource.hasProperty(HAS_RESULT_PARENT_CONSTRAINT)) {
-            nodeTransform.setResultParentConstraint(transformToNodeConstraint(resource.getPropertyResourceValue(HAS_RESULT_PARENT_CONSTRAINT), profile, model));
+        if (resource.hasProperty(HAS_RESULT_PARENT_NODE_TYPE)) {
+            nodeTransform.setResultParentNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_PARENT_NODE_TYPE), profile, model));
         }
 
         if (resource.hasProperty(INSERT_PARENT)) {

@@ -160,19 +160,21 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         switch (sup) {
         case FILE_CREATED_DATE:
             value = new Property(type);
-            value.setDateTimeValue(new DateTime(info.getCreationTime()));
+            value.setDateTimeValue(new DateTime(info.getCreationTime().toMillis()));
             result.add(value);
             break;
         case FILE_FORMAT_URI:
-            for (String fmt : info.getFormats()) {
-                value = new Property(type);
-                value.setStringValue(fmt);
-                result.add(value);
+            if (info.getFormats() != null) {
+                for (String fmt : info.getFormats()) {
+                    value = new Property(type);
+                    value.setStringValue(fmt);
+                    result.add(value);
+                }
             }
             break;
         case FILE_MODIFIED_DATE:
             value = new Property(type);
-            value.setDateTimeValue(new DateTime(info.getLastModifiedTime()));
+            value.setDateTimeValue(new DateTime(info.getLastModifiedTime().toMillis()));
             result.add(value);
             break;
         case FILE_NAME:

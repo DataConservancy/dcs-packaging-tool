@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.gui.services;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -24,28 +26,27 @@ public class FilenameValidatorServiceTest {
     private Configuration configuration;
 
     private FilenameValidatorService underTest;
-    private String contentRootPath;
 
     @Before
-    public void setup(){
+    public void setup() {
         underTest = new FilenameValidatorService(configuration);
-        contentRootPath = this.getClass().getResource("/FileNameTest/").getPath();
     }
 
 
     @Test
-    public void testInvalidFileNames() throws IOException, InterruptedException {
-        List<String> badnames = underTest.findInvalidFilenames(contentRootPath);
-        Assert.assertEquals(5,badnames.size());
-        Assert.assertTrue(badnames.get(0).endsWith("has:Colon"));
-        Assert.assertTrue(badnames.get(1).endsWith("file?3"));
-        Assert.assertTrue(badnames.get(2).endsWith("has?questionMark"));
-        Assert.assertTrue(badnames.get(3).endsWith("CON"));
-        Assert.assertTrue(badnames.get(4).endsWith("LPT8"));
+    public void testIsInvalidPathComponent() throws IOException, InterruptedException {
+        Assert.assertTrue(underTest.isInvalidPathComponent("has:Colon"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("file?3"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("has?questionMark"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("CON"));
+        Assert.assertTrue(underTest.isInvalidPathComponent("LPT8"));
+
+        Assert.assertFalse(underTest.isInvalidPathComponent("LPT0"));
+        Assert.assertFalse(underTest.isInvalidPathComponent("LPT11"));
     }
 
     @Test(expected = IOException.class)
     public void testNoSuchPath() throws IOException, InterruptedException {
-        List<String> badnames = underTest.findInvalidFilenames("noSuchFilePath");
+        List<String> badnames = underTest.findInvalidFilenames(Paths.get("noSuchFilePath"));
     }
 }
