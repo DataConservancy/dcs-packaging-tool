@@ -1,28 +1,34 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
 /**
- * Represents a transform of a node.Each transform has a source, a result,
- * possibly an action, and a description.
+ * Represents a transform of a node Each transform has a source, a result,
+ * possibly an action, and a description. The result of the transform must
+ * result in a valid tree.
  * 
- * A node having the characteristics of the source node may be transformed to
- * the result. The modification may be the type of the node and/or the type
- * of the parent. The action may be inserting a parent node
- * or moving a node to its grandparent.
+ * A node having meeting all the specified constraints on the source node may be
+ * transformed to the result node. The source node must have the specified type.
+ * If a constraint is specified for the source parent, it must be met. If a
+ * constraint is specified on the source node children, it must be met by all
+ * children.
  * 
- * Changing the type of a node will change the relations between the node and its parent and
- * children to allowed structural relations of the new node type.
+ * The node and its children may have their types changed. Changing the type of
+ * a node will change the relations between the node and its parent and children
+ * to allowed structural relations of the new node type.
+ * 
+ * In addition actions can be performed on the structure of the tree. A parent
+ * node may be inserted. Child nodes may be moved to their parent. If the
+ * resulting node is a leaf, it may be removed.
  */
 public class NodeTransform extends AbstractDescribedObject {
     private NodeType source_type;
     private NodeConstraint source_parent_constraint;
-    private NodeConstraint source_grandparent_constraint;
     private NodeConstraint source_child_constraint;
     private NodeType result_node_type;
-    private NodeType result_parent_node_type;
-    private boolean insert_parent;
-    private boolean move_result_grandparent;
-    private boolean remove_empty_parent;
-    
+    private NodeType result_child_node_type;
+    private NodeType insert_parent_node_type;
+    private boolean move_children_to_parent;
+    private boolean remove_empty_result;
+
     /**
      * @return Required node type of the transform source.
      */
@@ -32,7 +38,9 @@ public class NodeTransform extends AbstractDescribedObject {
 
     /**
      * Sets the NodeType of the transform source.
-     * @param sourceNodeType The NodeType of the transform source.
+     * 
+     * @param sourceNodeType
+     *            The NodeType of the transform source.
      */
     public void setSourceNodeType(NodeType sourceNodeType) {
         this.source_type = sourceNodeType;
@@ -48,26 +56,12 @@ public class NodeTransform extends AbstractDescribedObject {
 
     /**
      * Sets the NodeConstraint of the source parent.
-     * @param sourceParentConstraint The NodeConstraint on the source parent.
+     * 
+     * @param sourceParentConstraint
+     *            The NodeConstraint on the source parent.
      */
     public void setSourceParentConstraint(NodeConstraint sourceParentConstraint) {
         this.source_parent_constraint = sourceParentConstraint;
-    }
-
-    /**
-     * @return Required constraint on source grandparent. May be null to
-     *         indicate no constraint.
-     */
-    public NodeConstraint getSourceGrandParentConstraint() {
-        return source_grandparent_constraint;
-    }
-
-    /**
-     * Sets the NodeConstraint of the source grandparent.
-     * @param sourceGrandparentConstraint The NodeConstraint on the source grandparent.
-     */
-    public void setSourceGrandparentConstraint(NodeConstraint sourceGrandparentConstraint) {
-        this.source_grandparent_constraint = sourceGrandparentConstraint;
     }
 
     /**
@@ -79,7 +73,9 @@ public class NodeTransform extends AbstractDescribedObject {
 
     /**
      * Sets the NodeConstraint of the source child.
-     * @param childConstraint The NodeConstraint of the source child.
+     * 
+     * @param childConstraint
+     *            The NodeConstraint of the source child.
      */
     public void setSourceChildConstraint(NodeConstraint childConstraint) {
         this.source_child_constraint = childConstraint;
@@ -94,108 +90,100 @@ public class NodeTransform extends AbstractDescribedObject {
 
     /**
      * Sets the NodeType of the result of transform .
-     * @param resultNodeType The NodeType of the result of the transform.
+     * 
+     * @param resultNodeType
+     *            The NodeType of the result of the transform.
      */
     public void setResultNodeType(NodeType resultNodeType) {
         this.result_node_type = resultNodeType;
     }
 
     /**
-     * If parent inserted, applies to inserted parent. If source moved to
-     * grandparent, applies to grandparent.
-     * 
-     * @return Constraints that parent will be transformed to meet. May be null
-     *         to indicate no change.
+     * @return Whether or not source node children of source node are moved to
+     *         parent.
      */
-    public NodeType getResultParentNodeType() {
-        return result_parent_node_type;
+    public boolean moveChildrenToParent() {
+        return move_children_to_parent;
     }
 
     /**
-     * Sets the NodeType on the parent of the result.
-     * 
-     * @param resultParentType The NodeType for the parent of the result of the transform.
+     * @param status
+     *            Boolean flag on whether or not children of source node should
+     *            be moved to parent.
      */
-    public void setResultParentNodeType(NodeType resultParentType) {
-        this.result_parent_node_type = resultParentType;
+    public void setMoveChildrenToParent(boolean status) {
+        this.move_children_to_parent = status;
     }
 
     /**
-     * @return Whether or not result node has new parent inserted.
+     * @return Whether or not result nodes with no children are removed.
      */
-    public boolean insertParent() {
-        return insert_parent;
+    public boolean removeEmptyResult() {
+        return remove_empty_result;
     }
 
     /**
-     * Sets whether a parent node will be inserted as a result of the transform.
-     * @param insertParent Boolean flag on whether or not a parent node should be inserted.
+     * @param status
+     *            A boolean flag that states whether or not result nodes with no
+     *            children are removed.
      */
-    public void setInsertParent(boolean insertParent) {
-        this.insert_parent = insertParent;
+    public void setRemoveEmptyResult(boolean status) {
+        this.remove_empty_result = status;
     }
 
     /**
-     * Source node may be optionally moved to its grandparent. This may only
-     * occur if the source node has a grandparent.
-     * 
-     * @return Whether or not source node is moved.
+     * @param other
+     * @return Whether or not this object may be equal to the other
      */
-    public boolean moveResultToGrandParent() {
-        return move_result_grandparent;
+    public boolean canEqual(Object other) {
+        return (other instanceof NodeTransform);
     }
 
     /**
-     * Sets whether as a result of the transform the node should be moved to it's grandparent.
-     * @param moveResultToGrandParent Boolean flag on whether or not a node should be moved to it's grandparent as a result of the transform.
+     * @return The type of parent node to insert or null for no insertion.
      */
-    public void setMoveResultToGrandParent(boolean moveResultToGrandParent) {
-        this.move_result_grandparent = moveResultToGrandParent;
+    public NodeType getInsertParentNodeType() {
+        return insert_parent_node_type;
     }
 
     /**
-     * If the source node is moved and the original parent of the source node
-     * has no children, remove it.
-     * 
-     * @return Whether or not empty parent is removed.
+     * @param type
+     *            The type of parent node to insert or null for no insertion.
      */
-    public boolean removeEmptyParent() {
-        return remove_empty_parent;
+    public void setInsertParentNodeType(NodeType type) {
+        this.insert_parent_node_type = type;
     }
 
     /**
-     * Sets if the parent becomes empty as a result of the transform it should be removed.
-     * @param removeEmptyParent A boolean flag that states whether empty parents should be removed as a result of the transform.
+     * @return Type to transform children to or null for no transform.
      */
-    public void setRemoveEmptyParent(boolean removeEmptyParent) {
-        this.remove_empty_parent = removeEmptyParent;
+    public NodeType getResultChildNodeType() {
+        return result_child_node_type;
+    }
+
+    /**
+     * @param result_child_node_type
+     *            Type to transform children to or null for no transform.
+     */
+    public void setResultChildNodeType(NodeType result_child_node_type) {
+        this.result_child_node_type = result_child_node_type;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (insert_parent ? 1231 : 1237);
-        result = prime * result + (move_result_grandparent ? 1231 : 1237);
-        result = prime * result + (remove_empty_parent ? 1231 : 1237);
+        result = prime * result + ((insert_parent_node_type == null) ? 0 : insert_parent_node_type.hashCode());
+        result = prime * result + (move_children_to_parent ? 1231 : 1237);
+        result = prime * result + (remove_empty_result ? 1231 : 1237);
+        result = prime * result + ((result_child_node_type == null) ? 0 : result_child_node_type.hashCode());
         result = prime * result + ((result_node_type == null) ? 0 : result_node_type.hashCode());
-        result = prime * result + ((result_parent_node_type == null) ? 0 : result_parent_node_type.hashCode());
         result = prime * result + ((source_child_constraint == null) ? 0 : source_child_constraint.hashCode());
-        result = prime * result
-                + ((source_grandparent_constraint == null) ? 0 : source_grandparent_constraint.hashCode());
         result = prime * result + ((source_parent_constraint == null) ? 0 : source_parent_constraint.hashCode());
         result = prime * result + ((source_type == null) ? 0 : source_type.hashCode());
         return result;
     }
 
-    /**
-     * @param other 
-     * @return Whether or not this object may be equal to the other
-     */
-    public boolean canEqual(Object other) {
-        return (other instanceof NodeTransform);
-    }
-    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -205,35 +193,33 @@ public class NodeTransform extends AbstractDescribedObject {
         if (!(obj instanceof NodeTransform))
             return false;
         NodeTransform other = (NodeTransform) obj;
-        
+
         if (!other.canEqual(this))
             return false;
-        
-        if (insert_parent != other.insert_parent)
+
+        if (insert_parent_node_type == null) {
+            if (other.insert_parent_node_type != null)
+                return false;
+        } else if (!insert_parent_node_type.equals(other.insert_parent_node_type))
             return false;
-        if (move_result_grandparent != other.move_result_grandparent)
+        if (move_children_to_parent != other.move_children_to_parent)
             return false;
-        if (remove_empty_parent != other.remove_empty_parent)
+        if (remove_empty_result != other.remove_empty_result)
+            return false;
+        if (result_child_node_type == null) {
+            if (other.result_child_node_type != null)
+                return false;
+        } else if (!result_child_node_type.equals(other.result_child_node_type))
             return false;
         if (result_node_type == null) {
             if (other.result_node_type != null)
                 return false;
         } else if (!result_node_type.equals(other.result_node_type))
             return false;
-        if (result_parent_node_type == null) {
-            if (other.result_parent_node_type != null)
-                return false;
-        } else if (!result_parent_node_type.equals(other.result_parent_node_type))
-            return false;
         if (source_child_constraint == null) {
             if (other.source_child_constraint != null)
                 return false;
         } else if (!source_child_constraint.equals(other.source_child_constraint))
-            return false;
-        if (source_grandparent_constraint == null) {
-            if (other.source_grandparent_constraint != null)
-                return false;
-        } else if (!source_grandparent_constraint.equals(other.source_grandparent_constraint))
             return false;
         if (source_parent_constraint == null) {
             if (other.source_parent_constraint != null)
@@ -250,10 +236,10 @@ public class NodeTransform extends AbstractDescribedObject {
 
     @Override
     public String toString() {
-        return "NodeTransform [source_type=" + (source_type == null ? "" : source_type.getIdentifier()) + ", source_parent_constraint=" + source_parent_constraint
-                + ", source_grandparent_constraint=" + source_grandparent_constraint + ", source_child_constraint="
-                + source_child_constraint + ", result_node_type=" + (result_node_type == null ? "" : result_node_type.getIdentifier()) + ", result_parent_constraint="
-                + result_parent_node_type + ", insert_parent=" + insert_parent + ", move_result_grandparent="
-                + move_result_grandparent + ", remove_empty_parent=" + remove_empty_parent + "]";
+        return "NodeTransform [source_type=" + source_type.getIdentifier() + ", source_parent_constraint="
+                + source_parent_constraint + ", source_child_constraint=" + source_child_constraint
+                + ", result_node_type=" + result_node_type.getIdentifier() + ", result_child_node_type=" + result_child_node_type.getIdentifier()
+                + ", insert_parent_node_type=" + insert_parent_node_type.getIdentifier() + ", move_children_to_parent="
+                + move_children_to_parent + ", remove_empty_result=" + remove_empty_result + "]";
     }
 }

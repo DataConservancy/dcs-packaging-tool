@@ -413,6 +413,8 @@ public class DomainProfileServiceImplTest {
         
         root.walk(store::updateObject);
         
+        System.err.println(store);
+        
         service.transformNode(trough, profile.getTroughToCowTransform());
         
         assertEquals(profile.getCowNodeType().getIdentifier(), trough.getNodeType().getIdentifier());        
@@ -422,6 +424,8 @@ public class DomainProfileServiceImplTest {
         Node parent = trough.getParent();
         
         assertEquals(profile.getBarnNodeType().getIdentifier(), parent.getNodeType().getIdentifier());        
+        
+        System.err.println(store);
         
         assertTrue(root.getChildren().contains(parent));
         assertEquals(root, parent.getParent());
@@ -439,9 +443,9 @@ public class DomainProfileServiceImplTest {
         
         root.walk(store::updateObject);
 
-        // Should move media to barn and remove cow
+        // Should move media from cow to barn and remove cow
         
-        service.transformNode(media, profile.getMoveMediaFromCowToBarnTransform());
+        service.transformNode(cow, profile.getMoveMediaFromCowToBarnTransform());
         
         assertEquals(profile.getMediaNodeType().getIdentifier(), media.getNodeType().getIdentifier());
         assertEquals(barn.getIdentifier(), media.getParent().getIdentifier()); 

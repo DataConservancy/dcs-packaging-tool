@@ -36,6 +36,27 @@ public interface DomainProfileObjectStore {
     void updateObject(Node node);
 
     /**
+     * @param object
+     *            Remove all statements defining the object and about the
+     *            object.
+     */
+    void removeObject(URI object);
+
+    /**
+     * Move one node to another, optionally changing the type of the node, and
+     * updating their associated domain objects. The resulting tree must be
+     * valid.
+     * 
+     * @param node
+     *            The node to move.
+     * @param new_node_type
+     *            If non-null, the new type to set on the node.
+     * @param new_parent
+     *            The new parent of the node.
+     */
+    void moveObject(Node node, NodeType new_node_type, Node new_parent);
+
+    /**
      * Add a property to a domain object. Only one simple property with a given
      * value may be on an object. Others are ignored. Multiple complex
      * properties with the same value may be added.

@@ -157,9 +157,9 @@ public class DcsBOProfile
     private final PropertyType homepage = new PropertyType();
 
     /*
-     * Maybe it makes sense to have a central location for prefix maps,
-     * project-wide
-     */
+         * Maybe it makes sense to have a central location for prefix maps,
+         * project-wide
+         */
     @SuppressWarnings("serial")
     private static final PrefixMap PREFIX_MAP = PrefixMapFactory
             .create(new HashMap<String, String>() {
@@ -574,8 +574,6 @@ public class DcsBOProfile
         collection_to_project.setLabel("Collection to Project");
         collection_to_project
                 .setDescription("Transform a Collection to a Project");
-        collection_to_project.setInsertParent(false);
-        collection_to_project.setRemoveEmptyParent(false);
         collection_to_project.setSourceNodeType(collection);
         collection_to_project
                 .setSourceParentConstraint(noNodeConstraint());
@@ -587,8 +585,6 @@ public class DcsBOProfile
         collectionToProjectNoChildren.setLabel("Collection to Project");
         collectionToProjectNoChildren
                 .setDescription("Transform a Collection to a Project");
-        collectionToProjectNoChildren.setInsertParent(false);
-        collectionToProjectNoChildren.setRemoveEmptyParent(false);
         collectionToProjectNoChildren.setSourceNodeType(collection);
         collectionToProjectNoChildren
                 .setSourceParentConstraint(noNodeConstraint());
@@ -599,8 +595,6 @@ public class DcsBOProfile
         project_to_collection.setLabel("Project to Collection");
         project_to_collection
                 .setDescription("Transforms a project into a collection");
-        project_to_collection.setInsertParent(false);
-        project_to_collection.setRemoveEmptyParent(false);
         project_to_collection.setSourceNodeType(project);
         project_to_collection.setResultNodeType(collection);
 
@@ -611,8 +605,6 @@ public class DcsBOProfile
         collection_to_dataItem.setLabel("Collection to DataItem");
         collection_to_dataItem
                 .setDescription("Transforms a Collection into a DataItem");
-        collection_to_dataItem.setInsertParent(false);
-        collection_to_dataItem.setRemoveEmptyParent(false);
         collection_to_dataItem.setSourceNodeType(collection);
         collection_to_dataItem
                 .setSourceParentConstraint(allowRelationshipTo(collection,
@@ -625,8 +617,6 @@ public class DcsBOProfile
         collectionToDataItemNoChildren.setLabel("Collection to DataItem");
         collectionToDataItemNoChildren
                 .setDescription("Transforms a Collection into a DataItem");
-        collectionToDataItemNoChildren.setInsertParent(false);
-        collectionToDataItemNoChildren.setRemoveEmptyParent(false);
         collectionToDataItemNoChildren.setSourceNodeType(collection);
         collectionToDataItemNoChildren
                 .setSourceParentConstraint(allowRelationshipTo(collection,
@@ -765,6 +755,110 @@ public class DcsBOProfile
     public NodeTransform getFileToMetadataTransform() {
         return file_to_metadata;
     }
+
+    public PropertyType getHasAlottedStorage() {
+        return hasAlottedStorage;
+    }
+
+    public PropertyType getHasAlternateId() {
+        return hasAlternateId;
+    }
+
+    public PropertyType getHasAwardNumber() {
+        return hasAwardNumber;
+    }
+
+    public PropertyType getHasBusinessID() {
+        return hasBusinessID;
+    }
+
+    public PropertyType getHasCitableLocator() {
+        return hasCitableLocator;
+    }
+
+    public PropertyType getHasContact() {
+        return hasContact;
+    }
+
+    public PropertyType getHasContentModel() {
+        return hasContentModel;
+    }
+
+    public PropertyType getHasCreateDate() {
+        return hasCreateDate;
+    }
+
+    public PropertyType getHasCreator() {
+        return hasCreator;
+    }
+
+    public PropertyType getHasDepositDate() {
+        return hasDepositDate;
+    }
+
+    public PropertyType getHasDescription() {
+        return hasDescription;
+    }
+
+    public PropertyType getHasDiscipline() {
+        return hasDiscipline;
+    }
+
+    public PropertyType getHasEndDate() {
+        return hasEndDate;
+    }
+
+    public PropertyType getHasFormat() {
+        return hasFormat;
+    }
+
+    public PropertyType getHasFundingEntity() {
+        return hasFundingEntity;
+    }
+
+    public PropertyType getHasModifiedDate() {
+        return hasModifiedDate;
+    }
+
+    public PropertyType getHasPrincipalInvestigator() {
+        return hasPrincipalInvestigator;
+    }
+
+    public PropertyType getHasPublicationDate() {
+        return hasPublicationDate;
+    }
+
+    public PropertyType getHasPublisher() {
+        return hasPublisher;
+    }
+
+    public PropertyType getHasSize() {
+        return hasSize;
+    }
+
+    public PropertyType getHasStartDate() {
+        return hasStartDate;
+    }
+
+    public PropertyType getHasTitle() {
+        return hasTitle;
+    }
+
+    public PropertyType getHasUsedStorage() {
+        return hasUsedStorage;
+    }
+
+    public PropertyType getHomepage() {
+        return homepage;
+    }
+
+    public PropertyType getMbox() {
+        return mbox;
+    }
+
+    public PropertyType getPhone() { return phone; }
+
+    public PropertyType getName() { return  name; }
 
     /**
      * Serialize the profile to a file.

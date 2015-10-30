@@ -34,10 +34,12 @@ import org.joda.time.format.ISODateTimeFormat;
 public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     private final Model model;
     private final URIGenerator urigen;
-    
+
     /**
-     * @param model Model used to store domain objects.
-     * @param urigen Used to generate URI for the domain object of a Node.
+     * @param model
+     *            Model used to store domain objects.
+     * @param urigen
+     *            Used to generate URI for the domain object of a Node.
      */
     public DomainProfileObjectStoreImpl(Model model, URIGenerator urigen) {
         this.model = model;
@@ -67,6 +69,43 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
         if (node.getSubNodeTypes() != null) {
             node.getSubNodeTypes().forEach(type -> create_properties(node));
+        }
+    }
+
+    @Override
+    public void removeObject(URI object) {
+        Resource res = as_resource(object);
+
+        // Remove statements defining object
+
+        res.listProperties().toList().forEach(s -> remove_property(res, s.getPredicate(), s.getObject()));
+
+        // Remove all statements about this object
+        model.removeAll(null, null, res);
+    }
+
+    @Override
+    public void moveObject(Node node, NodeType new_node_type, Node new_parent) {
+        Node old_parent = node.getParent();
+
+        if (old_parent != null) {
+            clear_relations(node.getDomainObject(), old_parent.getDomainObject());
+            old_parent.removeChild(node);
+        }
+
+        if (new_node_type != null) {
+            node.setNodeType(new_node_type);
+        }
+
+        if (new_parent != null) {
+            new_parent.addChild(node);
+            updateObject(new_parent);
+        }
+
+        updateObject(node);
+
+        if (node.hasChildren()) {
+            node.getChildren().forEach(this::updateObject);
         }
     }
 
