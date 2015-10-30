@@ -157,9 +157,9 @@ public class DcsBOProfile
     private final PropertyType homepage = new PropertyType();
 
     /*
-     * Maybe it makes sense to have a central location for prefix maps,
-     * project-wide
-     */
+         * Maybe it makes sense to have a central location for prefix maps,
+         * project-wide
+         */
     @SuppressWarnings("serial")
     private static final PrefixMap PREFIX_MAP = PrefixMapFactory
             .create(new HashMap<String, String>() {
@@ -764,6 +764,106 @@ public class DcsBOProfile
 
     public NodeTransform getFileToMetadataTransform() {
         return file_to_metadata;
+    }
+
+    public PropertyType getHasAlottedStorage() {
+        return hasAlottedStorage;
+    }
+
+    public PropertyType getHasAlternateId() {
+        return hasAlternateId;
+    }
+
+    public PropertyType getHasAwardNumber() {
+        return hasAwardNumber;
+    }
+
+    public PropertyType getHasBusinessID() {
+        return hasBusinessID;
+    }
+
+    public PropertyType getHasCitableLocator() {
+        return hasCitableLocator;
+    }
+
+    public PropertyType getHasContact() {
+        return hasContact;
+    }
+
+    public PropertyType getHasContentModel() {
+        return hasContentModel;
+    }
+
+    public PropertyType getHasCreateDate() {
+        return hasCreateDate;
+    }
+
+    public PropertyType getHasCreator() {
+        return hasCreator;
+    }
+
+    public PropertyType getHasDepositDate() {
+        return hasDepositDate;
+    }
+
+    public PropertyType getHasDescription() {
+        return hasDescription;
+    }
+
+    public PropertyType getHasDiscipline() {
+        return hasDiscipline;
+    }
+
+    public PropertyType getHasEndDate() {
+        return hasEndDate;
+    }
+
+    public PropertyType getHasFormat() {
+        return hasFormat;
+    }
+
+    public PropertyType getHasFundingEntity() {
+        return hasFundingEntity;
+    }
+
+    public PropertyType getHasModifiedDate() {
+        return hasModifiedDate;
+    }
+
+    public PropertyType getHasPrincipalInvestigator() {
+        return hasPrincipalInvestigator;
+    }
+
+    public PropertyType getHasPublicationDate() {
+        return hasPublicationDate;
+    }
+
+    public PropertyType getHasPublisher() {
+        return hasPublisher;
+    }
+
+    public PropertyType getHasSize() {
+        return hasSize;
+    }
+
+    public PropertyType getHasStartDate() {
+        return hasStartDate;
+    }
+
+    public PropertyType getHasTitle() {
+        return hasTitle;
+    }
+
+    public PropertyType getHasUsedStorage() {
+        return hasUsedStorage;
+    }
+
+    public PropertyType getHomepage() {
+        return homepage;
+    }
+
+    public PropertyType getMbox() {
+        return mbox;
     }
 
     /**
