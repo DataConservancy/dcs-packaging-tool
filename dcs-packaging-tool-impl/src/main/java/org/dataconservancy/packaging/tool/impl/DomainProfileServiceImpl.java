@@ -238,15 +238,16 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         NodeConstraint child_constraint = tr.getSourceChildConstraint();
 
-        if (node.isLeaf()) {
-            if (child_constraint != null && !child_constraint.matchesNone()) {
-                return false;
-            }
-        } else {
-            for (Node child : node.getChildren()) {
-                if (!meets_type_constraint(child, child_constraint)
-                        || !meets_parent_relation_constraint(child, node, child_constraint)) {
+        if (child_constraint != null) {
+            if (node.isLeaf()) {
+                if (!child_constraint.matchesNone()) {
                     return false;
+                }
+            } else {
+                for (Node child : node.getChildren()) {
+                    if (!meets_type_constraint(child, child_constraint) || !meets_parent_relation_constraint(child, node, child_constraint)) {
+                        return false;
+                    }
                 }
             }
         }
