@@ -16,6 +16,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -143,7 +145,6 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getProjectNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        // Missing species, title, and weight
         assertFalse(service.validateProperties(node, profile.getProjectNodeType()));
 
         Property title = new Property(profile.getHasTitle());
@@ -174,7 +175,7 @@ public class DcBoProfileServiceTest {
     }
 
     /**
-     * Test validating properties on a Project
+     * Test validating properties on a Collection
      */
     @Test
     public void testValidateCollectionProperties() {
@@ -182,7 +183,6 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getCollectionNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        // Missing species, title, and weight
         assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
 
         Property title = new Property(profile.getHasTitle());
@@ -209,7 +209,6 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getDataItemNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        // Missing species, title, and weight
         assertFalse(service.validateProperties(node, profile.getDataItemNodeType()));
 
         Property title = new Property(profile.getHasTitle());
@@ -240,7 +239,6 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getFileNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        // Missing species, title, and weight
         assertFalse(service.validateProperties(node, profile.getFileNodeType()));
 
         Property title = new Property(profile.getHasTitle());
@@ -279,7 +277,6 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getMetadataNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        // Missing species, title, and weight
         assertFalse(service.validateProperties(node, profile.getMetadataNodeType()));
 
         Property title = new Property(profile.getHasTitle());
@@ -307,6 +304,53 @@ public class DcBoProfileServiceTest {
         service.addProperty(node, size);
 
         assertTrue(service.validateProperties(node, profile.getMetadataNodeType()));
+    }
+
+    /**
+     * Test that the creator property is correctly validated.
+     */
+    @Test
+    public void testComplexPropertyValidates() {
+        Node node = new Node(URI.create("test:node"));
+        node.setNodeType(profile.getCollectionNodeType());
+        node.setDomainObject(URI.create("domain:object"));
+
+        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
+
+        Property title = new Property(profile.getHasTitle());
+        title.setStringValue("title");
+        service.addProperty(node, title);
+
+        Property description = new Property(profile.getHasDescription());
+        description.setStringValue("description");
+        service.addProperty(node, description);
+
+        Property createDate = new Property(profile.getHasCreateDate());
+        createDate.setDateTimeValue(new DateTime());
+        service.addProperty(node, createDate);
+
+        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()));
+
+        Property creator = new Property(profile.getHasCreator());
+
+        Property phone = new Property(profile.getPhone());
+        phone.setStringValue("8886515908");
+
+        creator.setComplexValue(Arrays.asList(phone));
+        service.addProperty(node, creator);
+
+        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
+
+        Property name = new Property(profile.getName());
+        name.setStringValue("name");
+
+        creator.setComplexValue(Arrays.asList(name, phone));
+
+        // Must remove existing incorrect person property
+        service.removeProperty(node, profile.getHasCreator());
+        service.addProperty(node, creator);
+
+        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()));
     }
 
     // Update objects and then validate the tree

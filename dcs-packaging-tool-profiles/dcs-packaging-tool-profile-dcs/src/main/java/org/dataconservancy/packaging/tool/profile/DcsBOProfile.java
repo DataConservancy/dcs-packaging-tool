@@ -856,6 +856,10 @@ public class DcsBOProfile
         return mbox;
     }
 
+    public PropertyType getPhone() { return phone; }
+
+    public PropertyType getName() { return  name; }
+
     /**
      * Serialize the profile to a file.
      * 
