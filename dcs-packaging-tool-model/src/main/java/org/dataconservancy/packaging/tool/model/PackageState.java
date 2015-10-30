@@ -56,11 +56,6 @@ public class PackageState {
     private LinkedHashMap<String, List<String>> packageMetadataList;
 
     /**
-     * Package serialization/generation information
-     */
-    private File outputDirectory;
-
-    /**
      * Metadata about the tools used to create this package
      */
     private ApplicationVersion creationToolVersion;
@@ -86,23 +81,11 @@ public class PackageState {
     }
 
     /**
-     * Returns location at which the final package file/directory will be placed
-     */
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    /**
      * Returns the set of metadata fields used to describe this package.
      */
     public Set<String> getMetadataFields() {
         return packageMetadataList.keySet();
     }
-
 
     /**
      * Returns list of values for package metadata named {@code fieldName}
