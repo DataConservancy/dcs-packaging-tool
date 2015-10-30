@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.gui.model;
 
+import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -72,7 +73,7 @@ public class RelationshipGroupJSONBuilderTest {
     }
 
     @Test
-    public void testSerialization() throws FileNotFoundException {
+    public void testSerialization() throws FileNotFoundException, JSONException {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         RelationshipGroupJSONBuilder.serialize(testGroups, outStream);

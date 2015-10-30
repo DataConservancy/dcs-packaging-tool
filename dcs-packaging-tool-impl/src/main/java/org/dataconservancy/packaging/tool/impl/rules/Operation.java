@@ -21,9 +21,9 @@ import org.dataconservancy.packaging.tool.impl.rules.operations.OperationExcepti
 /**
  * Operations operate in the context of a filesystem entity.
  *
- * @param R
+ * @param <R>
  *        Return type when applying the operation to a given filesystem entity
- * @param C
+ * @param <C>
  *        Additional operations that constrain the results returned by this
  *        operation.
  */

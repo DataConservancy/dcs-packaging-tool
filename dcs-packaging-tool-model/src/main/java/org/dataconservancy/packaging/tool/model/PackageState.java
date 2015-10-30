@@ -67,8 +67,7 @@ public class PackageState {
     }
 
     /**
-     * Name of the package, will be used as the name of the package file or folder
-     * @return
+     * @return Name of the package, will be used as the name of the package file or folder
      */
     public String getPackageName() {
         return packageName;

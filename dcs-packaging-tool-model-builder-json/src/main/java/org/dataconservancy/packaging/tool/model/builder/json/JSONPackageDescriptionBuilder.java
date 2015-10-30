@@ -20,14 +20,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.jsonldjava.core.JSONLD;
-import com.github.jsonldjava.core.JSONLDProcessingError;
-import com.github.jsonldjava.core.JSONLDTripleCallback;
-import com.github.jsonldjava.core.Options;
-import com.github.jsonldjava.impl.JenaRDFParser;
-import com.github.jsonldjava.impl.JenaTripleCallback;
-import com.github.jsonldjava.utils.JSONUtils;
-import com.hp.hpl.jena.rdf.model.Model;
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.JsonLdProcessor;
+import com.github.jsonldjava.core.JsonLdTripleCallback;
+import com.github.jsonldjava.core.JsonLdOptions;
+import com.github.jsonldjava.core.RDFDataset;
+import com.github.jsonldjava.utils.JsonUtils;
+import org.apache.jena.rdf.model.Model;
 
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
@@ -48,25 +47,22 @@ public class JSONPackageDescriptionBuilder implements  PackageDescriptionBuilder
 
         try {
             Model descriptionModel = PackageDescriptionRDFTransform.transformToRDF(description);
-            final JenaRDFParser parser = new JenaRDFParser();
-            Object json = JSONLD.fromRDF(descriptionModel, parser);
+            JsonLdOptions opts = new JsonLdOptions();
+            opts.setUseRdfType(true);
+            Object json = JsonLdProcessor.fromRDF(descriptionModel, opts);
             
             Map<String, Object> context = new HashMap<String, Object>();
             context.put("dc", "http://dataconservancy.org/ns/types/");
-            
-            Options opts = new Options();
-            opts.graph = true;
-            opts.useRdfType = true;
 
             // Must compact to turn into a graph and use context
-            json = JSONLD.compact(json, context, opts);
+            json = JsonLdProcessor.compact(json, context, opts);
 
             // Pretty print output to ease debugging
             
             OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8"); 
-            JSONUtils.writePrettyPrint(writer, json);
+            JsonUtils.writePrettyPrint(writer, json);
             writer.flush();
-        } catch (JSONLDProcessingError e) {
+        } catch (JsonLdError e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_DESC_JSON_PROCESSING_ERROR, e);
         } catch (UnsupportedEncodingException e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_DESC_UNSUPPORTED_ENCODING_EXCEPTION, e);
@@ -81,11 +77,19 @@ public class JSONPackageDescriptionBuilder implements  PackageDescriptionBuilder
     public PackageDescription deserialize(InputStream stream) throws PackageToolException {
         PackageDescription description;
         try {
-            Object json = JSONUtils.fromInputStream(stream);
-            final JSONLDTripleCallback callback = new JenaTripleCallback();
-            Model model = (Model) JSONLD.toRDF(json, callback);
+            Object json = JsonUtils.fromInputStream(stream);
+            final JsonLdTripleCallback callback = new JsonLdTripleCallback() {
+                @Override
+                public Object call(RDFDataset rdfDataset) {
+                    // Default method body
+                    return null;
+                }
+            };
+
+            JsonLdOptions opts = new JsonLdOptions();
+            Model model = (Model) JsonLdProcessor.toRDF(json, callback, opts);
             description = PackageDescriptionRDFTransform.transformToPackageDescription(model);
-        } catch (JSONLDProcessingError e) {
+        } catch (JsonLdError e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_DESC_JSON_PROCESSING_ERROR, e);
         } catch (IOException e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_DESC_IO_EXCEPTION, e);

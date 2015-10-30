@@ -21,6 +21,7 @@ import org.dataconservancy.dcs.model.DetectedFormat;
 
 import java.io.File;
 import java.nio.file.FileSystems;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -283,8 +284,14 @@ public class FilePathUtil {
      * @return boolean true if the path is OK, false otherwise
      */
     public static boolean hasValidFilePath(File file){
-        Path path = file.toPath();
-        for(int i=0; i<path.getNameCount(); i++){
+        Path path;
+        try {
+            path = file.toPath();
+        } catch (InvalidPathException e) {
+            return false;
+        }
+
+        for(int i = 0; i < path.getNameCount(); i++){
             if (StringUtils.containsAny(path.getName(i).toString(), getCharacterBlackList())){
                 return false;
             }

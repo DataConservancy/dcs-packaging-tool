@@ -91,7 +91,6 @@ public abstract class BaseValidationChecker {
     }
 
     /**
-     * {@inheritDoc}
      * <p/>
      * Implementation details:<br/>
      * Checks the types of the ORE-related aggregations in the AttributeSetManager.  It manages a {@code List} of
