@@ -15,7 +15,6 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -53,11 +52,6 @@ public class PackageState {
     private LinkedHashMap<String, List<String>> packageMetadataList;
 
     /**
-     * Package serialization/generation information
-     */
-    private File outputDirectory;
-
-    /**
      * Metadata about the tools used to create this package
      */
     private ApplicationVersion creationToolVersion;
@@ -83,23 +77,11 @@ public class PackageState {
     }
 
     /**
-     * Returns location at which the final package file/directory will be placed
-     */
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    /**
      * Returns the set of metadata fields used to describe this package.
      */
     public Set<String> getMetadataFields() {
         return packageMetadataList.keySet();
     }
-
 
     /**
      * Returns list of values for package metadata named {@code fieldName}
@@ -148,8 +130,6 @@ public class PackageState {
 
         if (creationToolVersion != null ? !creationToolVersion.equals(that.creationToolVersion) : that.creationToolVersion != null)
             return false;
-        if (outputDirectory != null ? !outputDirectory.equals(that.outputDirectory) : that.outputDirectory != null)
-            return false;
         if (packageMetadataList != null ? !packageMetadataList.equals(that.packageMetadataList) : that.packageMetadataList != null)
             return false;
         if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null) return false;
@@ -161,7 +141,6 @@ public class PackageState {
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;
         result = 31 * result + (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
-        result = 31 * result + (outputDirectory != null ? outputDirectory.hashCode() : 0);
         result = 31 * result + (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;
     }
