@@ -329,6 +329,10 @@
     -fx-background-color: #E0E0E0;
 }
 
+.PackageDescriptionView .column-header .label{
+	-fx-alignment: center-left;
+}
+
 .PackageDescriptionView .InheritanceControls {
     -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 2;
@@ -491,4 +495,8 @@
 	-fx-font-weight: bold;
 	-fx-font-size: 15px;
 	-fx-padding: 10 0 0 0;
+}
+
+.Squiggly {
+	fx-background: url("../images/x.png") bottom repeat-x;
 }

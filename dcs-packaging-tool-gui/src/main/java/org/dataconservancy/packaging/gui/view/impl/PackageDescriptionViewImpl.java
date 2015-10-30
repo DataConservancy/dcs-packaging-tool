@@ -22,6 +22,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -47,7 +48,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -134,6 +138,9 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     private static final String synthesizedArtifactMarker = " *";
 
     private String availableRelationshipsPath;
+    private PackageToolPopup refreshPopup;
+    private Button refreshPopupPositiveButton;
+    private Button refreshPopupNegativeButton;
 
     public PackageDescriptionViewImpl(final Labels labels, final Errors errors, final Messages messages, final OntologyLabels ontologyLabels,
                                       final InternalProperties internalProperties, final String availableRelationshipsPath) {
@@ -232,21 +239,23 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         });
 
         //set up the columns for the artifact, its type and the options control
-        TreeTableColumn<PackageArtifact, Label> artifactColumn = new TreeTableColumn<>("Artifact");
+        TreeTableColumn<PackageArtifact, VBox> artifactColumn = new TreeTableColumn<>("Artifact");
         TreeTableColumn<PackageArtifact, Label> typeColumn = new TreeTableColumn<>("Type");
         TreeTableColumn<PackageArtifact, Label> optionsColumn = new TreeTableColumn<>("");
 
         //make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
         typeColumn.setPrefWidth(100); //make wide enough so that any displayed text will not truncate
         optionsColumn.setPrefWidth(42); //make wide enough to comfortably fit image and vertical scroll bar
+        optionsColumn.setStyle(ALIGN_CENTER_RIGHT);
         //add 2 here to get rid of horizontal scroll bar
         artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
 
-        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, Label>, ObservableValue<Label>>() {
-            public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<PackageArtifact, Label> p) {
+        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, VBox>, ObservableValue<VBox>>() {
+            public ObservableValue<VBox> call(TreeTableColumn.CellDataFeatures<PackageArtifact, VBox> p) {
                 // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
                 // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
                 PackageArtifact packageArtifact = p.getValue().getValue();
+                VBox vbox = new VBox(0);
                 Label viewLabel = new Label();
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
                 viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
@@ -265,13 +274,33 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 }
                 viewLabel.setText(labelText);
 
-
                 Tooltip t = new Tooltip(viewLabel.getText());
                 t.setPrefWidth(300);
                 t.setWrapText(true);
                 viewLabel.setTooltip(t);
 
-                return new ReadOnlyObjectWrapper<>(viewLabel);
+                vbox.getChildren().add(viewLabel);
+
+                // FIXME: This is quite a hack to make a squiggly line, couldn't figure out any other way in JavaFX
+                String squigglyText = "";
+                for (int i = 0; i < labelText.length(); i++) {
+                    squigglyText += "~";
+                }
+                Label squiggly = new Label(squigglyText);
+                squiggly.setFont(Font.font(9));
+                squiggly.setTextFill(Color.web("#C00000"));
+
+                // TODO: The tooltip text should come from the service?
+                Tooltip squigglyTooltip = new Tooltip("This node could not be dereferenced");
+                squigglyTooltip.setPrefWidth(300);
+                squigglyTooltip.setWrapText(true);
+                squigglyTooltip.setFont(Font.font(12));
+                squiggly.setTooltip(squigglyTooltip);
+
+                // TODO: the addition of this line should be determined by PackageService
+                // vbox.getChildren().add(squiggly);
+
+                return new ReadOnlyObjectWrapper<>(vbox);
             }
         });
 
@@ -360,11 +389,19 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
         //Controls for the validation error popup.
         warningPopupPositiveButton = new Button(labels.get(LabelKey.OK_BUTTON));
+        warningPopupPositiveButton.getStyleClass().add(CLICKABLE);
         warningPopupNegativeButton = new Button(labels.get(LabelKey.CANCEL_BUTTON));
+        warningPopupNegativeButton.getStyleClass().add(CLICKABLE);
         hideFutureWarningPopupCheckBox = new CheckBox(labels.get(LabelKey.DONT_SHOW_WARNING_AGAIN_CHECKBOX));
 
         //Instantiating metadata inheritance button map
         metadataInheritanceButtonMap = new HashMap<>();
+
+        // controls for the refresh popup
+        refreshPopupPositiveButton = new Button(labels.get(LabelKey.ACCEPT_BUTTON));
+        refreshPopupPositiveButton.getStyleClass().add(CLICKABLE);
+        refreshPopupNegativeButton = new Button(labels.get(LabelKey.REJECT_BUTTON));
+        refreshPopupNegativeButton.getStyleClass().add(CLICKABLE);
 
        // windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
@@ -420,13 +457,60 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         final PackageArtifact packageArtifact = treeItem.getValue();
 
         //Create a menu item that will show the package artifacts popup.
-        MenuItem item = new MenuItem(labels.get(LabelKey.PROPERTIES_LABEL));
-        itemList.add(item);
-        item.setOnAction(actionEvent -> {
+        MenuItem propertiesItem = new MenuItem(labels.get(LabelKey.PROPERTIES_LABEL));
+        itemList.add(propertiesItem);
+        propertiesItem.setOnAction(actionEvent -> {
             VBox detailsBox = new VBox();
             detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
             showArtifactDetails(packageArtifact, label);
             artifactTree.getSelectionModel().select(treeItem);
+        });
+
+        // TODO: Addition of these items to the list should be determined by the service
+        //Create a menu item that will allow the user to pick a file.
+        MenuItem addFileItem = new MenuItem(labels.get(LabelKey.ADD_FILE_ITEM_LABEL));
+        itemList.add(addFileItem);
+        addFileItem.setOnAction(event -> {
+            File file = presenter.getController().showOpenFileDialog(new FileChooser());
+            // TODO: do something with this file.
+        });
+
+        //Create a menu item that will allow the user to pick a folder.
+        MenuItem addDirItem = new MenuItem(labels.get(LabelKey.ADD_FOLDER_ITEM_LABEL));
+        itemList.add(addDirItem);
+        addDirItem.setOnAction(event -> {
+            File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+            // TODO: do something with this dir.
+        });
+
+        //Create a menu item that will allow the user to refresh the tree.
+        // TODO: the showing of this item should be determined by a service
+        MenuItem refreshItem = new MenuItem(labels.get(LabelKey.REFRESH_ITEM_LABEL));
+        itemList.add(refreshItem);
+        refreshItem.setOnAction(event -> {
+            // TODO: Do the refresh and pass in a RefreshResults object of some sort
+            // For now, the refresh is faked out exactly like the mock up.
+            showRefreshResultsPopup();
+        });
+
+        //Create a menu item that will allow the user to pick a file.
+        MenuItem remapFileItem = new MenuItem(labels.get(LabelKey.REMAP_FILE_ITEM_LABEL));
+        itemList.add(remapFileItem);
+        // TODO: the showing of this item should be determined by a service
+        remapFileItem.setOnAction(event -> {
+            File file = presenter.getController().showOpenFileDialog(new FileChooser());
+            // TODO: Do the remap of this file.
+
+        });
+
+        //Create a menu item that will allow the user to pick a folder.
+        MenuItem remapDirItem = new MenuItem(labels.get(LabelKey.REMAP_FOLDER_ITEM_LABEL));
+        itemList.add(remapDirItem);
+        // TODO: the showing of this item should be determined by a service
+        remapDirItem.setOnAction(event -> {
+            File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+            // TODO: Do the remap of this dir.
+
         });
 
         //Create a menu item for each available artifact type.
@@ -439,18 +523,18 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 final List<String> invalidProperties = presenter.findInvalidProperties(packageArtifact, type);
 
                 String prefix = type.equals(packageArtifact.getType()) ? labels.get(LabelKey.KEEP_TYPE_LABEL) + " " :  labels.get(LabelKey.CHANGE_TYPE_LABEL) + " ";
-                item = new MenuItem(prefix + ontologyLabels.get(type));
+                refreshItem = new MenuItem(prefix + ontologyLabels.get(type));
 
-                itemList.add(item);
+                itemList.add(refreshItem);
 
                 if (!invalidProperties.isEmpty() && !type.equals(packageArtifact.getType())) {
                     ImageView invalidImage = new ImageView("/images/orange_exclamation.png");
                     invalidImage.setFitWidth(8);
                     invalidImage.setFitHeight(24);
-                    item.setGraphic(invalidImage);
+                    refreshItem.setGraphic(invalidImage);
                 }
 
-                item.setOnAction(actionEvent -> {
+                refreshItem.setOnAction(actionEvent -> {
                     boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
                     if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageArtifact.getType())) {
@@ -478,9 +562,9 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
         if (presenter.canCollapseParentArtifact(packageArtifact)) {
 
-            item = new MenuItem("Collapse up one level");
+            refreshItem = new MenuItem("Collapse up one level");
 
-            item.setOnAction(actionEvent -> {
+            refreshItem.setOnAction(actionEvent -> {
                 showWarningPopup(errors.get(ErrorKey.ARTIFACT_LOSS_WARNING),
                         errors.get(ErrorKey.ARTIFACT_LOSS_WARNING_MESSAGE), true, false);
 
@@ -494,7 +578,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                     item1.setExpanded(true);
                 });
             });
-            itemList.add(item);
+            itemList.add(refreshItem);
             separator =  new SeparatorMenuItem();
             separator.setStyle("-fx-color: #FFFFFF");
             itemList.add(separator);
@@ -702,9 +786,65 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         return warningPopupPositiveButton;
     }
 
+    private void showRefreshResultsPopup() {
+        if (refreshPopup == null) {
+            refreshPopup = new PackageToolPopup();
+        }
+
+        refreshPopup.setTitleText(labels.get(LabelKey.DETECTED_CHANGES_LABEL));
+
+        VBox content = new VBox(48);
+        content.setPrefWidth(300);
+
+        VBox changesVBox = new VBox(4);
+        Label changesLabel = new Label("1 new file found");
+        changesLabel.setWrapText(true);
+
+        Label changesLabel2 = new Label("/dir/file");
+        changesLabel2.setFont(Font.font(12));
+        changesLabel2.setPadding(new Insets(0, 0, 0, 10));
+        changesLabel2.setWrapText(true);
+
+        changesVBox.getChildren().add(changesLabel);
+        changesVBox.getChildren().add(changesLabel2);
+
+        content.getChildren().add(changesVBox);
+
+        HBox controls = new HBox(16);
+        controls.setAlignment(Pos.BOTTOM_RIGHT);
+        controls.getChildren().add(refreshPopupNegativeButton);
+        controls.getChildren().add(refreshPopupPositiveButton);
+        content.getChildren().add(controls);
+
+        refreshPopup.setContent(content);
+
+        //Quickly display the popup so we can measure the content
+        double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
+        double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
+        refreshPopup.setOwner(getScene().getWindow());
+        refreshPopup.show(x, y);
+        refreshPopup.hide();
+
+        //Get the content width and height to property center the popup.
+        x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - content.getWidth()/2.0;
+        y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - content.getHeight()/2.0;
+        refreshPopup.setOwner(getScene().getWindow());
+        refreshPopup.show(x, y);
+    }
+
     @Override
     public Button getWarningPopupNegativeButton() {
         return warningPopupNegativeButton;
+    }
+
+    @Override
+    public Button getRefreshPopupPositiveButton() {
+        return refreshPopupPositiveButton;
+    }
+
+    @Override
+    public Button getRefreshPopupNegativeButton() {
+        return refreshPopupNegativeButton;
     }
 
     @Override
@@ -788,4 +928,10 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
         windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
+
+    @Override
+    public PackageToolPopup getRefreshPopup() {
+        return refreshPopup;
+    }
+
 }

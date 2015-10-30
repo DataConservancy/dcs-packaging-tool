@@ -22,13 +22,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
-import javafx.stage.WindowEvent;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
-import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.util.RDFURIValidator;
@@ -79,7 +78,7 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
     private Set<String> expandedArtifacts;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
     public PackageDescriptionPresenterImpl(PackageDescriptionView view) {
         super(view);
         this.view = view;
@@ -239,6 +238,16 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
 
         //Gets the button that's used to dismiss validation error popup.
         view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
+
+        view.getRefreshPopupPositiveButton().setOnAction(event -> {
+            // TODO: Do something useful
+            view.getRefreshPopup().hide();
+        });
+
+        view.getRefreshPopupNegativeButton().setOnAction(event -> {
+            // TODO: Do something useful
+            view.getRefreshPopup().hide();
+        });
     }
 
     @Override

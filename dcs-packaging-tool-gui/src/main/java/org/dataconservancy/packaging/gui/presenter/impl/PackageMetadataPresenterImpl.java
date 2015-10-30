@@ -64,6 +64,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     public Node display() {
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
+        view.getErrorLabel().setVisible(false);
         bind();
         setView(view);
         super.bindBaseElements();

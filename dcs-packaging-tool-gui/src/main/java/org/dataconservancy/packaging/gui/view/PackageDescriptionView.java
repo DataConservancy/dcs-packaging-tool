@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
@@ -37,6 +38,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import javafx.scene.control.Button;
+
+import javax.swing.Popup;
 
 /**
  * A view that shows the pacakge description tree, and displays a popup to show package artifact properties.
@@ -165,4 +168,22 @@ public interface PackageDescriptionView extends View<PackageDescriptionPresenter
     public Button getReenableWarningsButton();
 
     public void setupWindowBuilder(String disciplinePath);
+
+    /**
+     * Gets the refresh popup
+     * @return refresh popup
+     */
+    PackageToolPopup getRefreshPopup();
+
+    /**
+     * Gets the button that is used for a positive action for the refresh popup.
+     * @return  the button that is used for a positive action for the refres popup
+     */
+    public Button getRefreshPopupPositiveButton();
+
+    /**
+     * Gets the button that is used for a negative action for the refresh popup.
+     * @return the button that is used for a negative action for the refresh popup.
+     */
+    public Button getRefreshPopupNegativeButton();
 }
