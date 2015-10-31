@@ -43,10 +43,6 @@ public class BagItParameterNames extends GeneralParameterNames{
     public static final String INTERNAL_SENDER_IDENTIFIER = "Internal-Sender-Identifier";
     public static final String INTERNAL_SENDER_DESCRIPTION = "Internal-Sender-Description";
     public static final String PKG_BAG_DIR = "PKG-BAG-DIR";
-    // FIXME: Please move these to GeneralParams if they're not appropriate for BagIt.
-    public static final String KEYWORD = "Keyword";
-    public static final String RIGHTS_STRING = "Rights-String";
-    public static final String RIGHTS_URI = "Rights-Uri";
 
     /**
      * Addtional element names

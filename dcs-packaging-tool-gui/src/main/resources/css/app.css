@@ -497,6 +497,7 @@
 	-fx-padding: 10 0 0 0;
 }
 
-.Squiggly {
-	fx-background: url("../images/x.png") bottom repeat-x;
+.ExclamationImage {
+	-fx-image: url("../images/orange_exclamation.png");
 }
+

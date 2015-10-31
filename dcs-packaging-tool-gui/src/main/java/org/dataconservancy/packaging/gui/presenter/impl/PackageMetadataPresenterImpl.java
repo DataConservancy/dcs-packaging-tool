@@ -27,6 +27,7 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.joda.time.DateTime;
@@ -159,6 +160,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         // Clear the package metadata list and reset the values based on the current state of form
         getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
 
+        // FIXME: This ID should come from somewhere? Setting something now so the page moves on.
+        getController().getPackageState().addPackageMetadata("BagIt-Profile-Identifier", "SomeFakeId");
+
         for (Node removableLabel : view.getDomainProfileRemovableLabelVBox().getChildren()) {
             if (removableLabel instanceof RemovableLabel) {
                 getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((RemovableLabel) removableLabel).getLabel().getText());
@@ -169,7 +173,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         for (Node node : view.getAllFields()) {
             if (node instanceof TextField) {
-                getController().getPackageState().addPackageMetadata(node.getId(), ((TextField) node).getText());
+                if (((TextField) node).getText() != null && !((TextField) node).getText().isEmpty()) {
+                    getController().getPackageState().addPackageMetadata(node.getId(), ((TextField) node).getText());
+                }
             } else if (node instanceof VBox) {
                 for (Node removableLabel : ((VBox) node).getChildren()) {
                     getController().getPackageState().addPackageMetadata(node.getId(), ((RemovableLabel) removableLabel).getLabel().getText());
@@ -189,13 +195,17 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
      * @return true or false based on validation
      */
     private boolean validateRequiredFields() {
+
         for (PackageMetadata reqField : packageMetadataService.getRequiredPackageMetadata()) {
             if (getController().getPackageState().getPackageMetadataValues(reqField.getName()) == null) {
                 return false;
             }
+            else if (view.hasFailedValidation(reqField.getName())) {
+                return false;
+            }
         }
 
-        if (getController().getPackageState().getPackageName() == null || getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE) == null) {
+        if (getController().getPackageState().getPackageName() == null || (getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE) == null)) {
             return false;
         }
 

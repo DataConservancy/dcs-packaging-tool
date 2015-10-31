@@ -387,7 +387,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         updateParams(BagItParameterNames.CONTACT_NAME, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_NAME));
         updateParams(BagItParameterNames.CONTACT_PHONE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_PHONE));
         updateParams(BagItParameterNames.CONTACT_EMAIL, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_EMAIL));
-        updateParams(BagItParameterNames.KEYWORD, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.KEYWORD));
         updateParams(BagItParameterNames.EXTERNAL_IDENTIFIER, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.EXTERNAL_IDENTIFIER));
         updateParams(BagItParameterNames.EXTERNAL_DESCRIPTION, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.EXTERNAL_DESCRIPTION));
         updateParams(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER));
@@ -395,8 +394,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         updateParams(BagItParameterNames.SOURCE_ORG, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.SOURCE_ORG));
         updateParams(BagItParameterNames.ORG_ADDRESS, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.ORG_ADDRESS));
         updateParams(BagItParameterNames.BAG_GROUP_ID, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAG_GROUP_ID));
-        updateParams(BagItParameterNames.RIGHTS_STRING, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.RIGHTS_STRING));
-        updateParams(BagItParameterNames.RIGHTS_URI, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.RIGHTS_URI));
         updateParams(BagItParameterNames.BAGGING_DATE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAGGING_DATE));
         updateParams(BagItParameterNames.BAG_SIZE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAG_SIZE));
         updateParams(BagItParameterNames.PAYLOAD_OXUM, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.PAYLOAD_OXUM));

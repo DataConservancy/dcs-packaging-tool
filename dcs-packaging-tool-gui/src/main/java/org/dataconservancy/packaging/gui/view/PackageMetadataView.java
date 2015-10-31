@@ -151,4 +151,11 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * @return file chooser
      */
     FileChooser getPackageMetadataFileChooser();
+
+    /**
+     * Given a field name, it tells the presenter whether it's failed GUI validation or not.
+     * @param fieldName
+     * @return true or false
+     */
+    boolean hasFailedValidation(String fieldName);
 }

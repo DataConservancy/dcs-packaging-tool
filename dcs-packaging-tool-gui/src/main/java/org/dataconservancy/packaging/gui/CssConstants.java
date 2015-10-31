@@ -60,5 +60,5 @@ public interface CssConstants {
     public static final String TOOLTIP_IMAGE = "TooltipImage";
     public static final String FORM_FIELDS_DIVISION_CLASS = "FormFieldsDivision";
     public static final String ALIGN_CENTER_RIGHT = "-fx-alignment: CENTER-RIGHT"; // table columns don't take css classes
-    public static final String SQUIGGLY = "Squiggly";
+    public static final String EXCLAMATION_IMAGE = "ExclamationImage";
 }

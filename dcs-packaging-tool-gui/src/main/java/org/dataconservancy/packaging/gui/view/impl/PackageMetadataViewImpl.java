@@ -53,7 +53,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of the view that displays the controls for package metadata.
@@ -81,12 +83,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
     private FileChooser packageMetadataFileChooser;
+    private Set<String> failedValidation;
 
     public PackageMetadataViewImpl(Labels labels) {
         super(labels);
         this.labels = labels;
 
         allFields = new ArrayList<>();
+        failedValidation = new HashSet<>();
 
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
@@ -237,10 +241,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void setupRequiredFields(List<PackageMetadata> requiredPackageMetadataList) {
         if (requiredPackageMetadataList != null && !requiredPackageMetadataList.isEmpty()) {
 
-            for (PackageMetadata packageMetadata : requiredPackageMetadataList) {
+            requiredPackageMetadataList.stream().filter(PackageMetadata::isVisible).forEach(packageMetadata -> {
                 VBox fieldContainer = createFieldsView(packageMetadata);
                 requiredVBox.getChildren().add(fieldContainer);
-            }
+            });
 
             formAlreadyDrawn = true;
         }
@@ -253,10 +257,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             VBox recommendedLabelVBox = createSectionLabel(labels.get(LabelKey.RECOMMENDED_FIELDS_LABEL));
             bottomContent.getChildren().add(recommendedLabelVBox);
 
-            for (PackageMetadata packageMetadata : recommendedPackageMetadataList) {
+            recommendedPackageMetadataList.stream().filter(PackageMetadata::isVisible).forEach(packageMetadata -> {
                 VBox fieldContainer = createFieldsView(packageMetadata);
                 bottomContent.getChildren().add(fieldContainer);
-            }
+            });
 
             formAlreadyDrawn = true;
         }
@@ -269,10 +273,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             VBox optionalLabelVBox = createSectionLabel(labels.get(LabelKey.OPTIONAL_FIELDS_LABEL));
             bottomContent.getChildren().add(optionalLabelVBox);
 
-            for (PackageMetadata packageMetadata : optionalPackageMetadataList) {
+            optionalPackageMetadataList.stream().filter(PackageMetadata::isVisible).forEach(packageMetadata -> {
                 VBox fieldContainer = createFieldsView(packageMetadata);
                 bottomContent.getChildren().add(fieldContainer);
-            }
+            });
 
             formAlreadyDrawn = true;
         }
@@ -439,11 +443,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         Label inputVerificationLabel = new Label();
         inputVerificationLabel.setPadding(new Insets(3, 0, 0, 3));
         if (validationType.equals(PackageMetadata.ValidationType.URL)) {
-            textField.textProperty().addListener(getNewChangeListenerForUrl(inputVerificationLabel));
+            textField.textProperty().addListener(getNewChangeListenerForUrl(textField.getId(), inputVerificationLabel));
         } else if (validationType.equals(PackageMetadata.ValidationType.PHONE)) {
-            textField.textProperty().addListener(getNewChangeListenerForPhoneNumber(inputVerificationLabel));
+            textField.textProperty().addListener(getNewChangeListenerForPhoneNumber(textField.getId(), inputVerificationLabel));
         } else if (validationType.equals(PackageMetadata.ValidationType.EMAIL)) {
-            textField.textProperty().addListener(getNewChangeListenerForEmail(inputVerificationLabel));
+            textField.textProperty().addListener(getNewChangeListenerForEmail(textField.getId(), inputVerificationLabel));
         }
         horizontalBox.getChildren().add(textField);
         horizontalBox.getChildren().add(inputVerificationLabel);
@@ -472,15 +476,17 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
      * @param errorMessageLabel
      * @return ChangeListener
      */
-    private ChangeListener<String> getNewChangeListenerForPhoneNumber(final Label errorMessageLabel) {
+    private ChangeListener<String> getNewChangeListenerForPhoneNumber(final String packageMetadataName, final Label errorMessageLabel) {
         //Add a listener for text entry in the phone number box
         return (observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 setLabelImage(errorMessageLabel, null);
             } else if (PhoneNumberValidator.isValid(newValue)) {
                 setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+                failedValidation.remove(packageMetadataName);
             } else {
                 setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
+                failedValidation.add(packageMetadataName);
             }
         };
     }
@@ -491,14 +497,16 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
      * @param errorMessageLabel
      * @return ChangeListener
      */
-    private ChangeListener<String> getNewChangeListenerForEmail(final Label errorMessageLabel) {
+    private ChangeListener<String> getNewChangeListenerForEmail(final String packageMetadataName, final Label errorMessageLabel) {
         return (observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 setLabelImage(errorMessageLabel, null);
             } else if (EmailValidator.isValidEmail(newValue)) {
                 setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+                failedValidation.remove(packageMetadataName);
             } else {
                 setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
+                failedValidation.add(packageMetadataName);
             }
         };
     }
@@ -509,16 +517,23 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
      * @param errorMessageLabel
      * @return ChangeListener
      */
-    private ChangeListener<String> getNewChangeListenerForUrl(final Label errorMessageLabel) {
+    private ChangeListener<String> getNewChangeListenerForUrl(final String packageMetadataName, final Label errorMessageLabel) {
         return (observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty()) {
                 setLabelImage(errorMessageLabel, null);
             } else if (UriUtility.isHttpUrl(newValue)) {
                 setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+                failedValidation.remove(packageMetadataName);
             } else {
                 setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
+                failedValidation.add(packageMetadataName);
             }
         };
+    }
+
+    @Override
+    public boolean hasFailedValidation(String fieldName) {
+        return failedValidation.contains(fieldName);
     }
 
 }

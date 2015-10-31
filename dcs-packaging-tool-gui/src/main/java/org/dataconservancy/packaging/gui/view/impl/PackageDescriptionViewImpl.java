@@ -239,23 +239,44 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         });
 
         //set up the columns for the artifact, its type and the options control
-        TreeTableColumn<PackageArtifact, VBox> artifactColumn = new TreeTableColumn<>("Artifact");
+        TreeTableColumn<PackageArtifact, HBox> artifactColumn = new TreeTableColumn<>("Artifact");
+        artifactColumn.setResizable(false);
         TreeTableColumn<PackageArtifact, Label> typeColumn = new TreeTableColumn<>("Type");
+        typeColumn.setResizable(false);
         TreeTableColumn<PackageArtifact, Label> optionsColumn = new TreeTableColumn<>("");
+        optionsColumn.setResizable(false);
 
         //make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
         typeColumn.setPrefWidth(100); //make wide enough so that any displayed text will not truncate
         optionsColumn.setPrefWidth(42); //make wide enough to comfortably fit image and vertical scroll bar
-        optionsColumn.setStyle(ALIGN_CENTER_RIGHT);
         //add 2 here to get rid of horizontal scroll bar
         artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
 
-        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, VBox>, ObservableValue<VBox>>() {
-            public ObservableValue<VBox> call(TreeTableColumn.CellDataFeatures<PackageArtifact, VBox> p) {
+        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, HBox>, ObservableValue<HBox>>() {
+            public ObservableValue<HBox> call(TreeTableColumn.CellDataFeatures<PackageArtifact, HBox> p) {
                 // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
                 // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
                 PackageArtifact packageArtifact = p.getValue().getValue();
-                VBox vbox = new VBox(0);
+                HBox hbox = new HBox(3);
+
+                ImageView exclamImage = new ImageView();
+                exclamImage.getStyleClass().add(EXCLAMATION_IMAGE);
+                exclamImage.setFitHeight(12);
+                exclamImage.setFitWidth(5);
+
+                Label exclamLabel = new Label();
+                exclamLabel.setGraphic(exclamImage);
+
+                // TODO: The tooltip text should come from the service?
+                Tooltip exclamTooltip = new Tooltip("This node could not be dereferenced");
+                exclamTooltip.setPrefWidth(300);
+                exclamTooltip.setWrapText(true);
+                exclamTooltip.setFont(Font.font(12));
+                Tooltip.install(exclamLabel, exclamTooltip);
+
+                // TODO: the addition of this line should be determined by PackageService
+                hbox.getChildren().add(exclamLabel);
+
                 Label viewLabel = new Label();
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
                 viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
@@ -279,28 +300,11 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 t.setWrapText(true);
                 viewLabel.setTooltip(t);
 
-                vbox.getChildren().add(viewLabel);
+                hbox.getChildren().add(viewLabel);
 
-                // FIXME: This is quite a hack to make a squiggly line, couldn't figure out any other way in JavaFX
-                String squigglyText = "";
-                for (int i = 0; i < labelText.length(); i++) {
-                    squigglyText += "~";
-                }
-                Label squiggly = new Label(squigglyText);
-                squiggly.setFont(Font.font(9));
-                squiggly.setTextFill(Color.web("#C00000"));
 
-                // TODO: The tooltip text should come from the service?
-                Tooltip squigglyTooltip = new Tooltip("This node could not be dereferenced");
-                squigglyTooltip.setPrefWidth(300);
-                squigglyTooltip.setWrapText(true);
-                squigglyTooltip.setFont(Font.font(12));
-                squiggly.setTooltip(squigglyTooltip);
 
-                // TODO: the addition of this line should be determined by PackageService
-                // vbox.getChildren().add(squiggly);
-
-                return new ReadOnlyObjectWrapper<>(vbox);
+                return new ReadOnlyObjectWrapper<>(hbox);
             }
         });
 
@@ -468,7 +472,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
         // TODO: Addition of these items to the list should be determined by the service
         //Create a menu item that will allow the user to pick a file.
-        MenuItem addFileItem = new MenuItem(labels.get(LabelKey.ADD_FILE_ITEM_LABEL));
+        MenuItem addFileItem = new MenuItem(labels.get(LabelKey.ADD_ITEM_LABEL));
         itemList.add(addFileItem);
         addFileItem.setOnAction(event -> {
             File file = presenter.getController().showOpenFileDialog(new FileChooser());
@@ -476,7 +480,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         });
 
         //Create a menu item that will allow the user to pick a folder.
-        MenuItem addDirItem = new MenuItem(labels.get(LabelKey.ADD_FOLDER_ITEM_LABEL));
+        MenuItem addDirItem = new MenuItem(labels.get(LabelKey.ADD_ITEM_LABEL));
         itemList.add(addDirItem);
         addDirItem.setOnAction(event -> {
             File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
@@ -494,7 +498,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         });
 
         //Create a menu item that will allow the user to pick a file.
-        MenuItem remapFileItem = new MenuItem(labels.get(LabelKey.REMAP_FILE_ITEM_LABEL));
+        MenuItem remapFileItem = new MenuItem(labels.get(LabelKey.REMAP_ITEM_LABEL));
         itemList.add(remapFileItem);
         // TODO: the showing of this item should be determined by a service
         remapFileItem.setOnAction(event -> {
@@ -504,7 +508,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         });
 
         //Create a menu item that will allow the user to pick a folder.
-        MenuItem remapDirItem = new MenuItem(labels.get(LabelKey.REMAP_FOLDER_ITEM_LABEL));
+        MenuItem remapDirItem = new MenuItem(labels.get(LabelKey.REMAP_ITEM_LABEL));
         itemList.add(remapDirItem);
         // TODO: the showing of this item should be determined by a service
         remapDirItem.setOnAction(event -> {
