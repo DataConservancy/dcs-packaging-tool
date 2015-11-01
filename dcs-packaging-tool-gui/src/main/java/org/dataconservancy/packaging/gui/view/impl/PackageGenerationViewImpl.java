@@ -445,6 +445,26 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     }
 
     @Override
+    public ToggleGroup getSerializationToggleGroup() {
+        return serializationToggleGroup;
+    }
+
+    @Override
+    public RadioButton getJSONRadioButton() {
+        return jsonRadioButton;
+    }
+
+    @Override
+    public RadioButton getXMLRadioButton() {
+        return xmlRadioButton;
+    }
+
+    @Override
+    public RadioButton getTurtleRadioButton() {
+        return turtleRadioButton;
+    }
+
+    @Override
     public PackageToolPopup getProgressPopup() {
         if (progressDialogPopup == null) {
             progressDialogPopup = new ProgressDialogPopup(labels);

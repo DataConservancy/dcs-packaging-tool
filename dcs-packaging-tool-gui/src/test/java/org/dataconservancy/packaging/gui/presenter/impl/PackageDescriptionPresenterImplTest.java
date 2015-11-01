@@ -23,9 +23,11 @@ import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Factory;
+import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
+import org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
 import org.dataconservancy.packaging.tool.model.*;
@@ -282,18 +284,21 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
                 }
             }
 
+            @Override
+            public void showGeneratePackage() {
+                goToNextPage = true;
+            }
         };
 
         controller.setFactory(factory);
         controller.setPackageState(new PackageState());
-
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
         view = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
         view.setPackageOntologyService(packageOntologyService);
         
         HeaderView headerView = new HeaderViewImpl(labels);
-        //factory.setHeaderView(headerView);
+        factory.setHeaderView(headerView);
         view.setHeaderView(headerView);
         view.setHelp(help);
         
@@ -308,6 +313,15 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
         description = new PackageDescription();
         description.setPackageOntologyIdentifier("test");
         description.setPackageArtifacts(setupPackageArtifacts());
+
+        // Setup controller to handle going to the next page.
+        controller.setCreateNewPackage(true);
+        controller.getCreateNewPackagePagesStack().clear();
+        controller.getCreateNewPackagePagesStack().push(Page.GENERATE_PACKAGE);
+        PackageGenerationViewImpl packageGenerationView = new PackageGenerationViewImpl(labels);
+        packageGenerationView.setHeaderView(headerView);
+        factory.setPackageGenerationPresenter(new PackageGenerationPresenterImpl(packageGenerationView));
+
 
 
     }
@@ -329,11 +343,10 @@ public class PackageDescriptionPresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testEventHandlers() {
-
         assertFalse(goToNextPage);
         view.getContinueButton().fire();
         assertTrue(goToNextPage);
-    }   
+    }
     
     /**
      * Tests successful tree generation

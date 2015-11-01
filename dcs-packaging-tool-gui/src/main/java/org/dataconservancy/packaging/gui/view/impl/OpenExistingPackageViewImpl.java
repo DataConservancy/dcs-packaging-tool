@@ -137,7 +137,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     }
 
     @Override
-    public TextField getChooseInProgressFileTextField() {
+    public TextField getChooseInProgressPackageFileTextField() {
         return chooseInProgressFileTextField;
     }
 
@@ -147,7 +147,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     }
 
     @Override
-    public TextField getPackageDirectoryTextField() {
+    public TextField getChoosePackageDirectoryTextField() {
         return choosePackageDirectoryTextField;
     }
 

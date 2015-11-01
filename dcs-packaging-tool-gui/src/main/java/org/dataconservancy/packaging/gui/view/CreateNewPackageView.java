@@ -45,27 +45,13 @@ public interface CreateNewPackageView extends View<CreateNewPackagePresenter> {
      * editable.
      * @return The TextField to use for entering the in base directory.
      */
-    public TextField getSelectedBaseDirectoryTextField();
+    public TextField getChooseContentDirectoryTextField();
 
     /**
      * Label for displaying an error message to the user, typically when a required field has not been selected.
      * @return Label for displaying an error message to the user
      */
     public Label getErrorMessage();
-    
-    /**
-     * A button for selecting an existing package description to load.
-     * @return The button for selecting a package description file.
-     */
-    public Button getChoosePackageDescriptionButton();
-    
-    /**
-     * A text field that displays the currently selected package description. Note a text field 
-     * is used here to allow the user to scroll the text ot see the entire path. The text field however
-     * is not editable.
-     * @return The text field for displaying hte selected package description.
-     */
-    public TextField getSelectedPackageDescriptionTextField();
     
     /**
      * This brings up input fields for defining any properties (such as project ID) to use during package description creation.

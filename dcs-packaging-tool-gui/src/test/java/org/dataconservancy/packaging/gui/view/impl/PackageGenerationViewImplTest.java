@@ -39,13 +39,16 @@ public class PackageGenerationViewImplTest extends BaseGuiTest {
     @Test
     public void testComponentsNotNull() {
         assertNotNull(view.getContinueButton());
-        assertNotNull(view.getSelectOutputDirectoryButton());
-        assertNotNull(view.getOutputDirectoryChooser());
-        assertNotNull(view.getArchiveToggleGroup());
         assertNotNull(view.getStatusLabel());
         assertNotNull(view.getNoThanksLink());
-        assertNotNull(view.getCreateNewPackageButton());
+
+        assertNotNull(view.getArchiveToggleGroup());
         assertNotNull(view.getCompressionToggleGroup());
+        assertNotNull(view.getSerializationToggleGroup());
+
+        assertNotNull(view.getCreateNewPackageButton());
+        assertNotNull(view.getOutputDirectoryChooser());
+        assertNotNull(view.getSelectOutputDirectoryButton());
         assertNotNull(view.getCurrentOutputDirectoryTextField());
     }
 }

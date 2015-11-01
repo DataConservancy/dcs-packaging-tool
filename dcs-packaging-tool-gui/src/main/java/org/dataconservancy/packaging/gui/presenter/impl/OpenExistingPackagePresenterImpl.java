@@ -3,10 +3,8 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.scene.Node;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
-import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +76,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
 
                         view.getErrorMessage().setVisible(false);
                         view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
-                        view.getSelectedBaseDirectoryTextField().setText("");
+                        view.getChooseContentDirectoryTextField().setText("");
                         fileChooser.setInitialDirectory(descriptionFile.getParentFile());
                     }
                 } catch (FileNotFoundException | PackageToolException e) {
@@ -94,7 +92,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
     @Override
     public void clear() {
         // Default method body
-        view.getPackageDirectoryTextField().setText("");
+        view.getChoosePackageDirectoryTextField().setText("");
         view.getErrorMessage().setText("");
 
         contentDir = null;

@@ -35,12 +35,20 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import org.dataconservancy.packaging.gui.BaseGuiTest;
+import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
+import org.dataconservancy.packaging.gui.Errors;
+import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.OntologyLabels;
+import org.dataconservancy.packaging.gui.Page;
+import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
 import org.dataconservancy.packaging.gui.view.HeaderView;
+import org.dataconservancy.packaging.gui.view.PackageDescriptionView;
 import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
+import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
@@ -81,7 +89,9 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
-    
+
+    private PackageDescriptionPresenterImpl packageDescriptionPresenter;
+
     @Before
     public void setup() throws InterruptedException {
         if (!initialized) {
@@ -91,6 +101,14 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             showFileDialog = false;
             chosenFile = null;
             chosenDirectory = null;
+
+            HeaderView header = new HeaderViewImpl(labels);
+
+            // Setup next page
+            PackageDescriptionView packageDescriptionView = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
+            packageDescriptionView.setHeaderView(header);
+            packageDescriptionPresenter = new PackageDescriptionPresenterImpl(packageDescriptionView);
+            factory.setPackageDescriptionPresenter(packageDescriptionPresenter);
 
             Controller controller = new Controller() {
 
@@ -116,14 +134,18 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                     return chosenFile;
                 }
 
-
+                @Override
+                public PackageDescriptionPresenter showPackageDescriptionViewer() {
+                    showNextPage = true;
+                    return packageDescriptionPresenter;
+                }
             };
             controller.setFactory(factory);
             factory.setController(controller);
 
             view = new CreateNewPackageViewImpl(labels);
             view.setHelp(help);
-            HeaderView header = new HeaderViewImpl(labels);
+
             view.setHeaderView(header);
             presenter = new CreateNewPackagePresenterImpl(view);
 
@@ -136,6 +158,13 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             when(builder.deserialize(any(InputStream.class))).thenReturn(description);
 
             presenter.setPackageDescriptionBuilder(builder);
+
+            // Setup controller to handle going to the next page.
+            controller.setCreateNewPackage(true);
+            controller.getCreateNewPackagePagesStack().clear();
+            controller.getCreateNewPackagePagesStack().push(Page.DEFINE_RELATIONSHIPS);
+            packageDescriptionView.setHeaderView(header);
+
             initialized = true;
         }
     }
@@ -173,7 +202,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
         assertFalse(showNextPage);
         view.getContinueButton().fire();
         assertFalse(showNextPage);
-        
+
         assertTrue(view.getErrorMessage().getText().length() > 0);
     }
     

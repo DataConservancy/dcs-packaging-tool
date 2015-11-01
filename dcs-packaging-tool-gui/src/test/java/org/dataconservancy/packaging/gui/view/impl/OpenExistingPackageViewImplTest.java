@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,38 @@
  */
 package org.dataconservancy.packaging.gui.view.impl;
 
-import static org.junit.Assert.assertNotNull;
-
 import org.dataconservancy.packaging.gui.BaseGuiTest;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
 
 /**
- * Tests that create new package view impl initializes all fields correctly. 
+ * Tests that open existing package view impl initializes all fields correctly.
  */
-public class CreateNewPackageViewImplTest extends BaseGuiTest {
-    private CreateNewPackageViewImpl view;
+public class OpenExistingPackageViewImplTest extends BaseGuiTest {
+
+    private OpenExistingPackageViewImpl view;
 
     @Before
     public void setup() {
-        view = new CreateNewPackageViewImpl(labels);
+        view = new OpenExistingPackageViewImpl(labels);
     }
-    
+
     /**
      * Make sure controls can be retrieved.
      */
     @Test
     public void testComponentsNotNull() {
-        assertNotNull(view.getChooseContentDirectoryButton());
-        assertNotNull(view.getChooseContentDirectoryTextField());
+        assertNotNull(view.getChooseInProgressPackageFileTextField());
+        assertNotNull(view.getChooseInProgressPackageFileButton());
+        assertNotNull(view.getChoosePackageFileTextField());
+        assertNotNull(view.getChoosePackageFileButton());
+        assertNotNull(view.getChoosePackageDirectoryTextField());
+        assertNotNull(view.getChoosePackageDirectoryButton());
         assertNotNull(view.getContinueButton());
         assertNotNull(view.getErrorMessage());
     }
+
+
 }

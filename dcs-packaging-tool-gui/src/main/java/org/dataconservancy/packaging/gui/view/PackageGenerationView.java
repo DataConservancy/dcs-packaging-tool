@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.view;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.RadioButton;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 
 import javafx.scene.control.CheckBox;
@@ -132,6 +133,30 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      * @return The checkbox for selecting sha1 generation.
      */
     CheckBox getSHA1CheckBox();
+
+    /**
+     * Gets the serialization format toggle group.
+     * @return  the serialization format toggle group.
+     */
+    ToggleGroup getSerializationToggleGroup();
+
+    /**
+     * Gets the JSON format checkbox.
+     * @return The checkbox for selecting JSON format.
+     */
+    RadioButton getJSONRadioButton();
+
+    /**
+     * Gets the XML format checkbox.
+     * @return The checkbox for selecting XML format.
+     */
+    RadioButton getXMLRadioButton();
+
+    /**
+     * Gets the sha1 checksum checkbox.
+     * @return The checkbox for selecting Turtle format.
+     */
+    RadioButton getTurtleRadioButton();
     
     /**
      * Gets the progress dialog popup that's used when the package is being generated.

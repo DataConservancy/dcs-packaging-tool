@@ -49,10 +49,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     private Button chooseBaseDirectoryButton;
     private TextField currentBaseDirectory;
     
-    private Button choosePackageDescriptionButton;
-    private TextField currentPackageDescription;
-
-
     private ProgressDialogPopup progressIndicatorPopUp;
     private Label errorMessage;
     private VBox content;
@@ -109,36 +105,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
        
         packageSelectionFields.getChildren().add(baseDirectorySelectionFields);   
 
-        /*
-        Label orLabel = new Label(labels.get(LabelKey.OR_LABEL));
-        packageSelectionFields.getChildren().add(orLabel);
-        
-        //Create controls for selecting an existing package description.
-        VBox packageDescriptionSelectionFields = new VBox(4);
-        packageDescriptionSelectionFields.setAlignment(Pos.TOP_LEFT);
-        
-        Label choosePackageDescriptionLabel = new Label(labels.get(LabelKey.OPEN_PACKAGE_DESCRIPTION_LABEL_KEY));
-        packageDescriptionSelectionFields.getChildren().add(choosePackageDescriptionLabel);
-        
-        HBox packageDescriptionSelector = new HBox(6);
-        packageDescriptionSelector.getStyleClass().add(DIRECTORY_BOX);
-        packageDescriptionSelector.setPrefWidth(ControlFactory.textPrefWidth);
-        
-        choosePackageDescriptionButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
-        choosePackageDescriptionButton.setMinWidth(80);
-        packageDescriptionSelector.getChildren().add(choosePackageDescriptionButton);
-        
-        currentPackageDescription = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, "");
-        currentPackageDescription.setMinWidth(100);
-        currentPackageDescription.getStyleClass().add(INVISBILE_TEXT_FIELD);
-        currentPackageDescription.setEditable(false);
-        packageDescriptionSelector.getChildren().add(currentPackageDescription);
-        packageDescriptionSelectionFields.getChildren().add(packageDescriptionSelector);
-       
-        packageSelectionFields.getChildren().add(packageDescriptionSelectionFields);
-        */
-        
-        content.getChildren().add(packageSelectionFields);        
+        content.getChildren().add(packageSelectionFields);
     }
 
     @Override
@@ -152,18 +119,8 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     }
 
     @Override
-    public TextField getSelectedBaseDirectoryTextField() {
+    public TextField getChooseContentDirectoryTextField() {
         return currentBaseDirectory;
-    }
-
-    @Override
-    public Button getChoosePackageDescriptionButton() {
-        return choosePackageDescriptionButton;
-    }
-
-    @Override
-    public TextField getSelectedPackageDescriptionTextField() {
-        return currentPackageDescription;
     }
 
     @Override

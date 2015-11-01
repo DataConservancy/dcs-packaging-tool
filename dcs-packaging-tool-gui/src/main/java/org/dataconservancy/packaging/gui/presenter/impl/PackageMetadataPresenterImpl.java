@@ -16,6 +16,7 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -123,6 +124,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         view.getContinueButton().setOnAction(event -> {
             updatePackageState();
+
             if (validateRequiredFields()) {
                 view.getErrorLabel().setVisible(false);
                 getController().goToNextPage();
@@ -141,12 +143,13 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         view.getCancelLink().setOnAction(event -> view.showWarningPopup());
 
-        view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
-        view.getWarningPopup().setConfirmEventHandler(event -> {
-            view.getWarningPopup().hide();
-            getController().goToPreviousPage();
-        });
-
+        if (Platform.isFxApplicationThread()) {
+            view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
+            view.getWarningPopup().setConfirmEventHandler(event -> {
+                view.getWarningPopup().hide();
+                getController().goToPreviousPage();
+            });
+        }
 
     }
 

@@ -38,7 +38,7 @@ public interface OpenExistingPackageView extends View<OpenExistingPackagePresent
      * editable.
      * @return The TextField to use for entering the in content directory.
      */
-    TextField getChooseInProgressFileTextField();
+    TextField getChooseInProgressPackageFileTextField();
 
     /**
      * The button for choosing a content directory that is the location of the package contents.
@@ -52,7 +52,7 @@ public interface OpenExistingPackageView extends View<OpenExistingPackagePresent
      * editable.
      * @return The TextField to use for entering the in content directory.
      */
-    TextField getPackageDirectoryTextField();
+    TextField getChoosePackageDirectoryTextField();
 
     /**
      * The button for choosing a package file.

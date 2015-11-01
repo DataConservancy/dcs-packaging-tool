@@ -66,6 +66,7 @@ public class Controller {
     private PackageToolPopup crossPageProgressIndicatorPopUp;
     private Page currentPage;
     private Stack<Page> previousPages;
+
     private Stack<Page> createNewPackagePagesStack;
     private Stack<Page> openExistingPackagePagesStack;
     private boolean createNewPackage;
@@ -81,6 +82,7 @@ public class Controller {
         createNewPackagePagesStack = new Stack<>();
         openExistingPackagePagesStack = new Stack<>();
         toolVersion = new ApplicationVersion();
+        initiatePagesStacks();
     }
 
     public Factory getFactory() {
@@ -106,7 +108,6 @@ public class Controller {
     public void showHome(boolean clear) {
         container.setTop((VBox) factory.getHeaderView());
         currentPage = Page.HOMEPAGE;
-        initiatePagesStacks();
         packageDescription = null;
         packageDescriptionFile = null;
         contentRoot = null;
@@ -296,7 +297,7 @@ public class Controller {
         showPage();
     }
 
-    //Returns the application to the previous page, or redisplays the current page if it's the first page. 
+    //Returns the application to the previous page
     public void goToPreviousPage() {
         if (previousPages != null && !previousPages.isEmpty()) {
             if (createNewPackage) {
@@ -425,5 +426,22 @@ public class Controller {
 
     public void setCreateNewPackage(boolean createNewPackage) {
         this.createNewPackage = createNewPackage;
+    }
+
+    /**
+     * Gets the current page, mainly used for tests.
+     * @return currentPage
+     */
+    public Page getCurrentPage() {
+        return this.currentPage;
+    }
+
+    public void setCurrentPage(Page currentPage) {
+        this.currentPage = currentPage;
+    }
+
+
+    public Stack<Page> getCreateNewPackagePagesStack() {
+        return createNewPackagePagesStack;
     }
 }

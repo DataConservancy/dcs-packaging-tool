@@ -35,6 +35,7 @@ import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.ontologies.DcsBoPackageOntology;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -502,5 +503,35 @@ public class PackageDescriptionViewImplTest extends BaseGuiTest {
 
         //Cousins?? should still be ignored
         assertTrue(collection3.isIgnored());
+    }
+
+    @Ignore
+    @Test
+    public void testAddFile() {
+        // TODO: test that adding files works
+    }
+
+    @Ignore
+    @Test
+    public void testAddFolder() {
+        // TODO: test that adding files works
+    }
+
+    @Ignore
+    @Test
+    public void testRefresh() {
+        // TODO: test that refresh works
+    }
+
+    @Ignore
+    @Test
+    public void testRemapFile() {
+        // TODO: test that remap file works
+    }
+
+    @Ignore
+    @Test
+    public void testRemapFolder() {
+        // TODO: test that remap folder works
     }
 }

@@ -16,6 +16,7 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -96,7 +97,9 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         contentScrollPane.setFitToWidth(true);
         content = new VBox();
 
-        warningPopup = new WarningPopup(labels);
+        if (Platform.isFxApplicationThread()) {
+            warningPopup = new WarningPopup(labels);
+        }
 
         packageMetadataFileChooser = new FileChooser();
 
@@ -391,9 +394,9 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             VBox parentContainer = new VBox();
             parentContainer.getStyleClass().add(VBOX_BORDER);
             parentContainer.setId(packageMetadata.getName());
+            allFields.add(parentContainer);
 
             TextField textField = (TextField) ControlFactory.createControl(labels.get(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
-            allFields.add(textField);
 
             if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.URL)) {
                 // TODO: this may have to be done via a button

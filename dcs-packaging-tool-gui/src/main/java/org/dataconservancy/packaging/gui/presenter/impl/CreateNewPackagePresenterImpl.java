@@ -17,8 +17,6 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import java.util.Map;
@@ -27,7 +25,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
-import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
@@ -40,7 +37,6 @@ import org.dataconservancy.packaging.tool.model.DcsPackageDescriptionSpec;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionRulesBuilder;
-import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.builder.xstream.JaxbPackageDescriptionRulesBuilder;
 import org.dataconservancy.packaging.tool.model.description.RulesSpec;
 import org.slf4j.Logger;
@@ -180,7 +176,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     if (dir != null) {
                         root_artifact_dir = dir;
                         content_dir = root_artifact_dir.getParentFile();
-                        view.getSelectedBaseDirectoryTextField().setText(root_artifact_dir.getPath());
+                        view.getChooseContentDirectoryTextField().setText(root_artifact_dir.getPath());
                         //view.getSelectedPackageDescriptionTextField().setText("");
                         //If the error message happens to be visible erase it.
                         view.getErrorMessage().setVisible(false);
@@ -192,7 +188,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
     @Override
     public void clear() {
-        view.getSelectedBaseDirectoryTextField().setText("");
+        view.getChooseContentDirectoryTextField().setText("");
         view.getErrorMessage().setText("");
 
         content_dir = null;

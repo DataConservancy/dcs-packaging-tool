@@ -83,10 +83,10 @@ import java.util.Set;
 import java.util.prefs.Preferences;
 
 /**
- * Implementation of the view that displays the package description tree, and the controls for applying inherited metadata. 
+ * Implementation of the view that displays the package description tree, and the controls for applying inherited metadata.
  */
 public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionPresenter> implements PackageDescriptionView {
-    
+
     private Labels labels;
     private Messages messages;
     private TreeTableView<PackageArtifact> artifactTree;
@@ -105,10 +105,10 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     private Button reenableWarningsButton;
 
     private Label errorMessageLabel;
-    
+
     //Metadata Inheritance Controls
     private Map<String, CheckBox> metadataInheritanceButtonMap;
-    
+
     //File chooser for where to save package description. 
     private FileChooser packageDescriptionFileChooser;
 
@@ -117,7 +117,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
     //Whether to show ignored Artifacts
     private CheckBox showIgnored;
- 
+
     //Controls that are displayed in the package artifact popup.
     private Hyperlink cancelPopupLink;
     private Button applyPopupButton;
@@ -125,7 +125,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     //Storage for mapping popup fields to properties on the artifacts. 
     private Map<String, PackageDescriptionViewImpl.ArtifactPropertyContainer> artifactPropertyFields;
     private Set<ArtifactRelationshipContainer> artifactRelationshipFields;
-    
+
     private Errors errors;
     private OntologyLabels ontologyLabels;
     private InternalProperties internalProperties;
@@ -145,7 +145,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
     public PackageDescriptionViewImpl(final Labels labels, final Errors errors, final Messages messages, final OntologyLabels ontologyLabels,
                                       final InternalProperties internalProperties, final String availableRelationshipsPath) {
         super(labels);
-        this.labels = labels;        
+        this.labels = labels;
         this.errors = errors;
         this.messages = messages;
         this.ontologyLabels = ontologyLabels;
@@ -412,7 +412,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
     @Override
     public TreeItem<PackageArtifact> getRoot() {
-        return artifactTree.getRoot(); 
+        return artifactTree.getRoot();
     }
 
     @Override
@@ -590,7 +590,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         }
 
         itemList.add(createIgnoreMenuItem(treeItem));
-                
+
        return itemList;
     }
 
@@ -620,18 +620,18 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
     private void setIgnoredAncestors(TreeItem<PackageArtifact> node, boolean status) {
         do {
-            node.getValue().setIgnored(status);        
-        } while ((node = node.getParent()) != null); 
+            node.getValue().setIgnored(status);
+        } while ((node = node.getParent()) != null);
     }
 
     private void setIgnoredDescendants(TreeItem<PackageArtifact> node, boolean status) {
-        node.getValue().setIgnored(status);        
+        node.getValue().setIgnored(status);
 
         for (TreeItem<PackageArtifact> kid: node.getChildren()) {
             setIgnoredDescendants(kid, status);
         }
     }
-    
+
     //Creates a string that lists all the invalid properties in single line list.
     private String formatInvalidProperties(List<String> invalidProperties) {
         String invalidPropertyString = "";
@@ -767,7 +767,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         }
         controls.getChildren().add(warningPopupPositiveButton);
         content.getChildren().add(controls);
-        
+
         warningPopup.setContent(content);
 
         //Quickly display the popup so we can measure the content
@@ -784,8 +784,8 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         warningPopup.show(x, y);
 
     }
-    
-    @Override 
+
+    @Override
     public Button getWarningPopupPositiveButton() {
         return warningPopupPositiveButton;
     }
@@ -924,7 +924,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
         helpText.setMaxWidth(300);
         helpText.setWrapText(true);
         helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);         
+        setHelpPopupContent(helpText);
     }
 
     @Override
