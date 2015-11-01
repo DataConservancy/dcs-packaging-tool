@@ -81,12 +81,8 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
     @Autowired
     private Configuration configuration;
 
-    private boolean initialized = false;
-
     @Before
     public void setup() throws InterruptedException, IOException {
-        if (!initialized) {
-
             showNextPage = false;
 
             Controller controller = new Controller() {
@@ -113,8 +109,6 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             service = new PackageMetadataService(configuration);
             presenter.setPackageMetadataService(service);
 
-            initialized = true;
-
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);
             controller.getCreateNewPackagePagesStack().clear();
@@ -123,7 +117,6 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             createNewPackageView.setHeaderView(header);
             factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
 
-        }
     }
 
 

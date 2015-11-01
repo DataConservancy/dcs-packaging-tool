@@ -68,6 +68,7 @@ public class Controller {
     private Stack<Page> previousPages;
 
     private Stack<Page> createNewPackagePagesStack;
+
     private Stack<Page> openExistingPackagePagesStack;
     private boolean createNewPackage;
 
@@ -286,8 +287,7 @@ public class Controller {
         previousPages.push(currentPage);
         if (createNewPackage) {
             currentPage = createNewPackagePagesStack.pop();
-        }
-        else {
+        } else {
             currentPage = openExistingPackagePagesStack.pop();
         }
         showPage();
@@ -298,8 +298,7 @@ public class Controller {
         if (previousPages != null && !previousPages.isEmpty()) {
             if (createNewPackage) {
                 createNewPackagePagesStack.push(currentPage);
-            }
-            else {
+            } else {
                 openExistingPackagePagesStack.push(currentPage);
             }
             currentPage = previousPages.pop();
@@ -427,5 +426,9 @@ public class Controller {
     // Only used for tests so each test's continue button can be tested.
     public Stack<Page> getCreateNewPackagePagesStack() {
         return createNewPackagePagesStack;
+    }
+
+    public Stack<Page> getOpenExistingPackagePagesStack() {
+        return openExistingPackagePagesStack;
     }
 }
