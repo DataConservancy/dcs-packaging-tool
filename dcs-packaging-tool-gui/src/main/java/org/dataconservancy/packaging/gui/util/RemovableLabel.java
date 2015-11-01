@@ -1,10 +1,6 @@
 package org.dataconservancy.packaging.gui.util;
 
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -12,10 +8,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.CssConstants;
 
-import java.util.List;
-
 /**
- * Created by pmeyer on 10/17/15.
+ * Custom widget that has a label with a trash icon within a parent vbox that is passed in so that these values can
+ * be added to or removed from that vbox.
  */
 public class RemovableLabel extends HBox implements CssConstants {
 

@@ -18,12 +18,10 @@ package org.dataconservancy.packaging.gui;
 
 /**
  * A simple enumeration that is used to control flow in the application. There is an entry for each page in the application.
- * Each page contains it's order in the application as well as a title.
+ *
  */
 public enum Page {
 
-    //Positions must be in numerical order of there appearance in the workflow but don't need to be sequential
-    //Space is left between pages to allow for the future addition of more screens
     HOMEPAGE(Labels.LabelKey.HOMEPAGE_PAGE),
     PACKAGE_METADATA(Labels.LabelKey.CREATE_PACKAGE_PAGE),
     CREATE_NEW_PACKAGE(Labels.LabelKey.CREATE_PACKAGE_PAGE),

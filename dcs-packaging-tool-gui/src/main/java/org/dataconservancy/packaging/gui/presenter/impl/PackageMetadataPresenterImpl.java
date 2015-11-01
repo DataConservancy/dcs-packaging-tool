@@ -48,7 +48,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     private PackageMetadataView view;
     private PackageMetadataService packageMetadataService;
-    private boolean existingPackage = false;
     private File packageMetadataFile;
 
     public PackageMetadataPresenterImpl(PackageMetadataView view) {
@@ -78,7 +77,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     public void setExistingValues() {
         if (getController().getPackageState().hasPackageMetadataValues()) {
             view.clearAllFields();
-            existingPackage = true;
 
             view.getPackageNameField().setText(getController().getPackageState().getPackageName());
 

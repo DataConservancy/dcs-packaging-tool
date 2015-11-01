@@ -19,7 +19,9 @@ package org.dataconservancy.packaging.gui.util;
 import java.util.regex.Pattern;
 
 /**
- * This is a simple EmailValidator based on commonly used regex.
+ * This is a simple EmailValidator based on commonly used regex. Obviously this is just a syntactic validation. The
+ * email address could look like an email address but not really be real.
+ *
  */
 public class EmailValidator {
 

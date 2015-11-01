@@ -25,7 +25,7 @@ import org.dataconservancy.packaging.gui.Page;
 public interface HeaderView {
     /**
      * Highlights the correct segment of the location bar in the header.
-     * @param nextPosition The next page to be highlighted, will automatically remove old highlights
+     * @param page The next page to be highlighted, will automatically remove old highlights
      */
     public void highlightNextPage(Page page);
     

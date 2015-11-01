@@ -122,6 +122,9 @@ public class Controller {
         show(factory.getHomepagePresenter());
     }
 
+    /**
+     * Initiates the page stacks so the application flows appropriately
+     */
     private void initiatePagesStacks() {
         createNewPackagePagesStack.clear();
         createNewPackagePagesStack.add(Page.GENERATE_PACKAGE);
@@ -171,13 +174,6 @@ public class Controller {
      */
     public void showCreatePackageDescription() {
         show(factory.getCreateNewPackagePresenter());
-    }
-
-    /**
-     * Switch to the screen for selecting a content directory.
-     */
-    public void showSelectContentDirectory() {
-        show(factory.getOpenExistingPackagePresenter());
     }
 
     /**
@@ -428,19 +424,7 @@ public class Controller {
         this.createNewPackage = createNewPackage;
     }
 
-    /**
-     * Gets the current page, mainly used for tests.
-     * @return currentPage
-     */
-    public Page getCurrentPage() {
-        return this.currentPage;
-    }
-
-    public void setCurrentPage(Page currentPage) {
-        this.currentPage = currentPage;
-    }
-
-
+    // Only used for tests so each test's continue button can be tested.
     public Stack<Page> getCreateNewPackagePagesStack() {
         return createNewPackagePagesStack;
     }

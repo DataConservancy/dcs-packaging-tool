@@ -81,7 +81,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     /**
      * the VBox that contains removable lables.
      *
-     * @return the vbox containing removablelabels.
+     * @return the vbox containing removablelabels for domain profiles.
      */
     VBox getDomainProfileRemovableLabelVBox();
 
@@ -104,8 +104,8 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
 
     /**
-     * Shows any status messages.
-     * @param status
+     * Gets the label that is used to show any error message at the top.
+     * @return the errorLabel
      */
     Label getErrorLabel();
 
