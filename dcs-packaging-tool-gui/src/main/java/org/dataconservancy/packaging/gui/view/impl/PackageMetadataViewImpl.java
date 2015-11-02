@@ -80,7 +80,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private VBox bottomContent;
 
     private Labels labels;
-    private List<Node> allFields;
+    private List<Node> allDynamicFields;
     private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
     private FileChooser packageMetadataFileChooser;
@@ -90,7 +90,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         super(labels);
         this.labels = labels;
 
-        allFields = new ArrayList<>();
+        allDynamicFields = new ArrayList<>();
         failedValidation = new HashSet<>();
 
         contentScrollPane = new ScrollPane();
@@ -297,7 +297,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         domainProfilesComboBox.getItems().clear();
         domainProfilesComboBox.setDisable(false);
         addDomainProfileButton.setDisable(false);
-        for (Node node : allFields) {
+        for (Node node : allDynamicFields) {
             if (node instanceof TextField) {
                 ((TextField) node).clear();
             }
@@ -311,8 +311,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public List<Node> getAllFields() {
-        return this.allFields;
+    public List<Node> getAllDynamicFields() {
+        return this.allDynamicFields;
     }
 
     @Override
@@ -394,7 +394,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             VBox parentContainer = new VBox();
             parentContainer.getStyleClass().add(VBOX_BORDER);
             parentContainer.setId(packageMetadata.getName());
-            allFields.add(parentContainer);
+            allDynamicFields.add(parentContainer);
 
             TextField textField = (TextField) ControlFactory.createControl(labels.get(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
 
@@ -411,14 +411,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.DATE)) {
                 DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, null, packageMetadata.getHelpText());
-                allFields.add(datePicker);
+                allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
                 TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
                 textField.setEditable(packageMetadata.isEditable());
                 textField.setDisable(!packageMetadata.isEditable());
                 textField.setId(packageMetadata.getName());
-                allFields.add(textField);
+                allDynamicFields.add(textField);
 
                 if (packageMetadata.getValidationType().equals(PackageMetadata.ValidationType.PHONE)) {
                     HBox horizontalBox = createHBoxForType(textField, PackageMetadata.ValidationType.PHONE);

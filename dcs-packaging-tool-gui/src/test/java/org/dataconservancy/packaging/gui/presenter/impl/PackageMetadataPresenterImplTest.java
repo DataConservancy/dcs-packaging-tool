@@ -16,45 +16,23 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.control.TextField;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Errors;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
-import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl;
-import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.PackageState;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -63,7 +41,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test for the package metadata presenter implementation. Tests that validation for required fields works
@@ -138,7 +115,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
         view.getPackageNameField().setText(null);
         view.addDomainProfileLabel("Some Domain");
         for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
+            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
                 ((TextField) node).setText("Some Text");
             });
         }
@@ -159,7 +136,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
         view.getPackageNameField().setText("Some name");
         for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
+            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
                 ((TextField) node).setText("Some Text");
             });
         }
@@ -198,7 +175,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
         view.getPackageNameField().setText("Some Name");
         view.addDomainProfileLabel("Some Domain");
         for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
+            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
                 ((TextField) node).setText("Some Text");
             });
         }

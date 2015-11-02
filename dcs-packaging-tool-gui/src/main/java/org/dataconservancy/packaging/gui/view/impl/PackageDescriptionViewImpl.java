@@ -527,18 +527,18 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                 final List<String> invalidProperties = presenter.findInvalidProperties(packageArtifact, type);
 
                 String prefix = type.equals(packageArtifact.getType()) ? labels.get(LabelKey.KEEP_TYPE_LABEL) + " " :  labels.get(LabelKey.CHANGE_TYPE_LABEL) + " ";
-                refreshItem = new MenuItem(prefix + ontologyLabels.get(type));
+                MenuItem item = new MenuItem(prefix + ontologyLabels.get(type));
 
-                itemList.add(refreshItem);
+                itemList.add(item);
 
                 if (!invalidProperties.isEmpty() && !type.equals(packageArtifact.getType())) {
                     ImageView invalidImage = new ImageView("/images/orange_exclamation.png");
                     invalidImage.setFitWidth(8);
                     invalidImage.setFitHeight(24);
-                    refreshItem.setGraphic(invalidImage);
+                    item.setGraphic(invalidImage);
                 }
 
-                refreshItem.setOnAction(actionEvent -> {
+                item.setOnAction(actionEvent -> {
                     boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
                     if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageArtifact.getType())) {
@@ -566,9 +566,9 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
 
         if (presenter.canCollapseParentArtifact(packageArtifact)) {
 
-            refreshItem = new MenuItem("Collapse up one level");
+            MenuItem item = new MenuItem("Collapse up one level");
 
-            refreshItem.setOnAction(actionEvent -> {
+            item.setOnAction(actionEvent -> {
                 showWarningPopup(errors.get(ErrorKey.ARTIFACT_LOSS_WARNING),
                         errors.get(ErrorKey.ARTIFACT_LOSS_WARNING_MESSAGE), true, false);
 
@@ -582,7 +582,7 @@ public class PackageDescriptionViewImpl extends BaseViewImpl<PackageDescriptionP
                     item1.setExpanded(true);
                 });
             });
-            itemList.add(refreshItem);
+            itemList.add(item);
             separator =  new SeparatorMenuItem();
             separator.setStyle("-fx-color: #FFFFFF");
             itemList.add(separator);

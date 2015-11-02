@@ -46,7 +46,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     public OpenExistingPackageViewImpl(Labels labels) {
         super(labels);
 
-        getContinueButton().setText(labels.get(Labels.LabelKey.NEXT_BUTTON));
+        getContinueButton().setText(labels.get(Labels.LabelKey.CONTINUE_BUTTON));
         getCancelLink().setText(labels.get(Labels.LabelKey.BACK_LINK));
 
         VBox content = new VBox();

@@ -61,7 +61,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         super(labels); 
         this.labels = labels;
         
-        getContinueButton().setText(labels.get(LabelKey.NEXT_BUTTON));
+        getContinueButton().setText(labels.get(LabelKey.CONTINUE_BUTTON));
         getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
 
         content = new VBox();

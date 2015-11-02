@@ -119,7 +119,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * Gets all the fields in the form to set their values in the PackageState
      * @return list of nodes in the form
      */
-    List<Node> getAllFields();
+    List<Node> getAllDynamicFields();
 
     /**
      * shows the warning popup if user is going back to the beginning.

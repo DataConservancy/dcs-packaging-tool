@@ -45,7 +45,6 @@ public class Labels {
         CREATE_PACKAGE_PAGE("createPackage.page"),
         DEFINE_RELATIONSHIPS_PAGE("defineRelationships.page"),
         GENERATE_PACKAGE_PAGE("generatePackage.page"),
-        NEXT_BUTTON("next.button"),
         CONTINUE_BUTTON("continue.button"),
         HELP_LABEL("help.label"),
         ABOUT_LABEL("about.label"),

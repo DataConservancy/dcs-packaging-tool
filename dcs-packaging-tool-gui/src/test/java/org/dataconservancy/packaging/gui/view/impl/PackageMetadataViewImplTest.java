@@ -62,8 +62,8 @@ public class PackageMetadataViewImplTest extends BaseGuiTest {
         assertNotNull(view.getDomainProfilesComboBox());
         assertNotNull(view.getErrorLabel());
         assertNotNull(view.getPackageMetadataFileChooser());
-        assertNotNull(view.getAllFields());
-        assertTrue(view.getAllFields().size() > 0);
+        assertNotNull(view.getAllDynamicFields());
+        assertTrue(view.getAllDynamicFields().size() > 0);
 
     }
 

@@ -28,7 +28,6 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
-import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.joda.time.DateTime;
@@ -86,7 +85,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.getDomainProfilesComboBox().setDisable(true);
             view.getAddDomainProfileButton().setDisable(true);
 
-            for (Node node : view.getAllFields()) {
+            for (Node node : view.getAllDynamicFields()) {
                 if (getController().getPackageState().getPackageMetadataValues(node.getId()) != null) {
                     if (node instanceof TextField) {
                         ((TextField) node).setText(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
@@ -156,6 +155,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
      */
     private void updatePackageState() {
 
+        // Let's first fetch the static fields' values and update the PackageState with them.
         getController().getPackageState().setPackageName(view.getPackageNameField().getText());
 
         // Clear the package metadata list and reset the values based on the current state of form
@@ -172,7 +172,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         }
 
-        for (Node node : view.getAllFields()) {
+        // Now let's go through the dynamic fields and update the package state.
+        for (Node node : view.getAllDynamicFields()) {
             if (node instanceof TextField) {
                 if (((TextField) node).getText() != null && !((TextField) node).getText().isEmpty()) {
                     getController().getPackageState().addPackageMetadata(node.getId(), ((TextField) node).getText());
