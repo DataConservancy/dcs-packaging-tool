@@ -36,9 +36,9 @@ public class DomainProfileServiceImplTest {
     @Before
     public void setup() {
         model = ModelFactory.createDefaultModel();
-        
+
         URIGenerator urigen = new SimpleURIGenerator();
-        
+
         store = new DomainProfileObjectStoreImpl(model, urigen);
         service = new DomainProfileServiceImpl(store, urigen);
         ipmfact = new FarmIpmFactory();
@@ -62,7 +62,7 @@ public class DomainProfileServiceImplTest {
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getFarmNodeType().getIdentifier(), root.getNodeType().getIdentifier());
 
-        check_valid_tree(root);
+        assertTrue(service.validateTree(root));
     }
 
     /**
@@ -100,7 +100,7 @@ public class DomainProfileServiceImplTest {
         assertNotNull(child.getNodeType());
         assertNotNull(child.getDomainObject());
 
-        check_valid_tree(root);
+        assertTrue(service.validateTree(root));
     }
 
     /**
@@ -121,7 +121,7 @@ public class DomainProfileServiceImplTest {
             assertNotNull(n.getNodeType());
         });
 
-        check_valid_tree(root);
+        assertTrue(service.validateTree(root));
     }
 
     /**
@@ -142,7 +142,7 @@ public class DomainProfileServiceImplTest {
             assertNotNull(n.getNodeType());
         });
 
-        check_valid_tree(root);
+        assertTrue(service.validateTree(root));
     }
 
     /**
@@ -178,7 +178,7 @@ public class DomainProfileServiceImplTest {
             }
         });
 
-        check_valid_tree(root);
+        assertTrue(service.validateTree(root));
     }
 
     /**
@@ -258,11 +258,17 @@ public class DomainProfileServiceImplTest {
 
     @Test
     public void testValidateValidTree() {
-        check_valid_tree(ipmfact.createSingleDirectoryTree());
-        check_valid_tree(ipmfact.createTwoDirectoryTree());
-        check_valid_tree(ipmfact.createSimpleTree());
-        check_valid_tree(ipmfact.createSimpleTree2());
-        check_valid_tree(ipmfact.createCompleteTree(3, 3));
+        update_objects_and_check_valid_tree(ipmfact.createSingleDirectoryTree());
+        update_objects_and_check_valid_tree(ipmfact.createTwoDirectoryTree());
+        update_objects_and_check_valid_tree(ipmfact.createSimpleTree());
+        update_objects_and_check_valid_tree(ipmfact.createSimpleTree2());
+        update_objects_and_check_valid_tree(ipmfact.createCompleteTree(3, 3));
+    }
+
+    private void update_objects_and_check_valid_tree(Node node) {
+        node.walk(store::updateObject);
+
+        assertTrue(service.validateTree(node));
     }
 
     @Test
@@ -275,7 +281,9 @@ public class DomainProfileServiceImplTest {
     public void testValidateTreeWithoutType() {
         Node root = ipmfact.createSimpleTree();
 
-        check_valid_tree(root);
+        root.walk(store::updateObject);
+
+        assertTrue(service.validateTree(root));
 
         root.setNodeType(null);
 
@@ -287,18 +295,10 @@ public class DomainProfileServiceImplTest {
     public void testValidateTreeWithoutDomainObject() {
         Node root = ipmfact.createSimpleTree();
 
-        check_valid_tree(root);
-
+        root.walk(store::updateObject);
         root.setDomainObject(null);
 
         assertFalse(service.validateTree(root));
-    }
-
-    // Update objects and then validate the tree
-    private void check_valid_tree(Node node) {
-        node.walk(store::updateObject);
-
-        assertTrue(service.validateTree(node));
     }
 
     private void update_object_and_get_transforms(Node node) {
@@ -369,23 +369,23 @@ public class DomainProfileServiceImplTest {
         Node barn_file = barn.getChildren().get(0);
 
         root.walk(store::updateObject);
-        
+
         List<NodeTransform> trs = service.getNodeTransforms(barn);
         assertEquals(1, trs.size());
         assertEquals(profile.getBarnMediaChildToFarmTransform(), trs.get(0));
-        
+
         // Transform barn -> farm
-        
+
         service.transformNode(barn, profile.getBarnMediaChildToFarmTransform());
 
-        assertEquals(profile.getFarmNodeType().getIdentifier(), barn.getNodeType().getIdentifier()); 
+        assertEquals(profile.getFarmNodeType().getIdentifier(), barn.getNodeType().getIdentifier());
         assertEquals(root.getIdentifier(), barn.getParent().getIdentifier());
         assertEquals(1, barn.getChildren().size());
         assertEquals(barn_file.getIdentifier(), barn.getChildren().get(0).getIdentifier());
 
         assertTrue(service.validateTree(root));
     }
-    
+
     @Test
     public void testCowToStockpileNodeTransform() {
         Node root = ipmfact.createSimpleTree();
@@ -393,66 +393,62 @@ public class DomainProfileServiceImplTest {
         Node cow = barn.getChildren().get(0);
 
         // Remove cow child so cow can be transformed.
-        cow.setChildren(null);        
+        cow.setChildren(null);
         root.walk(store::updateObject);
-        
+
         // Transform cow -> stockpile
-        
+
         service.transformNode(cow, profile.getCowToStockpileTransform());
 
-        assertEquals(profile.getStockpileNodeType().getIdentifier(), cow.getNodeType().getIdentifier());        
+        assertEquals(profile.getStockpileNodeType().getIdentifier(), cow.getNodeType().getIdentifier());
         assertEquals(barn.getIdentifier(), cow.getParent().getIdentifier());
 
         assertTrue(service.validateTree(root));
     }
-    
+
     @Test
     public void testTroughToCowNodeTransform() {
         Node root = ipmfact.createTwoDirectoryTree2();
         Node trough = root.getChildren().get(0);
-        
+
         root.walk(store::updateObject);
-        
-        System.err.println(store);
+        assertTrue(service.validateTree(root));
         
         service.transformNode(trough, profile.getTroughToCowTransform());
-        
-        assertEquals(profile.getCowNodeType().getIdentifier(), trough.getNodeType().getIdentifier());        
-        
+
+        assertEquals(profile.getCowNodeType().getIdentifier(), trough.getNodeType().getIdentifier());
+
         // Check that barn parent is inserted.
-        
+
         Node parent = trough.getParent();
-        
-        assertEquals(profile.getBarnNodeType().getIdentifier(), parent.getNodeType().getIdentifier());        
-        
-        System.err.println(store);
-        
+
+        assertEquals(profile.getBarnNodeType().getIdentifier(), parent.getNodeType().getIdentifier());
         assertTrue(root.getChildren().contains(parent));
         assertEquals(root, parent.getParent());
         assertTrue(parent.getChildren().contains(trough));
-        
-        assertTrue(service.validateTree(root)); 
+
+        assertTrue(service.validateTree(root));
     }
-    
+
     @Test
     public void testMoveMediaFromCowToFarmTransform() {
         Node root = ipmfact.createSimpleTree();
         Node barn = root.getChildren().get(0);
         Node cow = barn.getChildren().get(0);
         Node media = cow.getChildren().get(0);
-        
+
         root.walk(store::updateObject);
 
         // Should move media from cow to barn and remove cow
-        
+
         service.transformNode(cow, profile.getMoveMediaFromCowToBarnTransform());
-        
+
         assertEquals(profile.getMediaNodeType().getIdentifier(), media.getNodeType().getIdentifier());
-        assertEquals(barn.getIdentifier(), media.getParent().getIdentifier()); 
+        assertEquals(barn.getIdentifier(), media.getParent().getIdentifier());
         assertTrue(barn.getChildren().contains(media));
         assertFalse(barn.getChildren().contains(cow));
-    
-        assertTrue(service.validateTree(root));         
+
+        assertTrue(service.validateTree(root));
     }
-    
+
 }
