@@ -1,4 +1,4 @@
-package org.dataconservancy.packaging.tool.api;
+package org.dataconservancy.packaging.tool.impl;
 
 import java.net.URI;
 import java.util.List;

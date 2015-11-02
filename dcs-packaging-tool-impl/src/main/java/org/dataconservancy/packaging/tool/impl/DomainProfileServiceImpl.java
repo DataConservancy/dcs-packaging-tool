@@ -3,7 +3,6 @@ package org.dataconservancy.packaging.tool.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.model.dprofile.CardinalityConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
