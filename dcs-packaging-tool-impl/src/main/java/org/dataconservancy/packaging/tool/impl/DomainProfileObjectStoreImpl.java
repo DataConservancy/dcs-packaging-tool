@@ -195,41 +195,41 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     private List<Property> as_property_values(PropertyType type, SuppliedProperty sup, FileInfo info) {
         List<Property> result = new ArrayList<>();
         Property value;
-
-        switch (sup) {
-        case FILE_CREATED_DATE:
-            value = new Property(type);
-            value.setDateTimeValue(new DateTime(info.getCreationTime().toMillis()));
-            result.add(value);
-            break;
-        case FILE_FORMAT_URI:
-            if (info.getFormats() != null) {
-                for (String fmt : info.getFormats()) {
+        if (info != null) {
+            switch (sup) {
+                case FILE_CREATED_DATE:
                     value = new Property(type);
-                    value.setStringValue(fmt);
+                    value.setDateTimeValue(new DateTime(info.getCreationTime().toMillis()));
                     result.add(value);
-                }
+                    break;
+                case FILE_FORMAT_URI:
+                    if (info.getFormats() != null) {
+                        for (String fmt : info.getFormats()) {
+                            value = new Property(type);
+                            value.setStringValue(fmt);
+                            result.add(value);
+                        }
+                    }
+                    break;
+                case FILE_MODIFIED_DATE:
+                    value = new Property(type);
+                    value.setDateTimeValue(new DateTime(info.getLastModifiedTime().toMillis()));
+                    result.add(value);
+                    break;
+                case FILE_NAME:
+                    value = new Property(type);
+                    value.setStringValue(info.getName());
+                    result.add(value);
+                    break;
+                case FILE_SIZE:
+                    value = new Property(type);
+                    value.setLongValue(info.getSize());
+                    result.add(value);
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown supplied property.");
             }
-            break;
-        case FILE_MODIFIED_DATE:
-            value = new Property(type);
-            value.setDateTimeValue(new DateTime(info.getLastModifiedTime().toMillis()));
-            result.add(value);
-            break;
-        case FILE_NAME:
-            value = new Property(type);
-            value.setStringValue(info.getName());
-            result.add(value);
-            break;
-        case FILE_SIZE:
-            value = new Property(type);
-            value.setLongValue(info.getSize());
-            result.add(value);
-            break;
-        default:
-            throw new IllegalStateException("Unknown supplied property.");
         }
-
         return result;
     }
 
