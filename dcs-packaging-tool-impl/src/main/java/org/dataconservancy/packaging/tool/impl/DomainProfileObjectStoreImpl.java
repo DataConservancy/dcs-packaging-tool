@@ -93,22 +93,22 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
             old_parent.removeChild(node);
         }
 
+        if (new_parent != null) {
+            new_parent.addChild(node);
+        }
+
         if (new_node_type != null) {
             node.setNodeType(new_node_type);
         }
 
-        if (new_parent != null) {
-            new_parent.addChild(node);
-            updateObject(new_parent);
-        }
-
         updateObject(node);
 
+        // Must update children relations in case parent has new type
         if (node.hasChildren()) {
             node.getChildren().forEach(this::updateObject);
         }
     }
-
+    
     private void clear_types(URI subject) {
         as_resource(subject).removeAll(RDF.type);
     }
