@@ -278,8 +278,6 @@ public class FarmDomainProfile extends DomainProfile {
         // Cannot transform cow with a Media child
         cowToStockpileTransform.setSourceChildConstraints(Arrays.asList(no_child_constraint));
         cowToStockpileTransform.setResultNodeType(stockpile_node_type);
-        //cowToStockpileTransform.setres
-        
 
         // Transform barn to farm
         
@@ -322,7 +320,7 @@ public class FarmDomainProfile extends DomainProfile {
         setDescription("Vocabulary for describing a farm");
         setNodeTypes(Arrays.asList(trough_node_type, media_node_type, cow_node_type, barn_node_type, feed_node_type, stockpile_node_type, farm_node_type));
         setPropertyTypes(Arrays.asList(species_property_type, weight_property_type, title_property_type, breed));
-        setNodeTransforms(Arrays.asList(cowToStockpileTransform, barnNoChildToFarmTransform, barnMediaChildToFarmTransform));
+        setNodeTransforms(Arrays.asList(cowToStockpileTransform, barnNoChildToFarmTransform, barnMediaChildToFarmTransform, moveMediaFromCowToBarnTransform, troughToCowTransform));
     }
 
     public NodeType getFarmNodeType() {

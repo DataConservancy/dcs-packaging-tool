@@ -327,15 +327,18 @@ public class DomainProfileServiceImplTest {
 
         root.walk(store::updateObject);
 
-        // No transform because cow has media child
-        assertEquals(0, service.getNodeTransforms(cow).size());
-
-        // Remove child, now has transform available
+        // One transform because cow has media child
+        List<NodeTransform> result = service.getNodeTransforms(cow);
+        
+        assertEquals(1, result.size());
+        assertEquals(profile.getMoveMediaFromCowToBarnTransform(), result.get(0));
+        
+        // Remove child, now has different transform available
         cow.setChildren(null);
         model.removeAll();
         root.walk(store::updateObject);
 
-        List<NodeTransform> result = service.getNodeTransforms(cow);
+        result = service.getNodeTransforms(cow);
         assertEquals(1, result.size());
         assertEquals(profile.getCowToStockpileTransform(), result.get(0));
 
