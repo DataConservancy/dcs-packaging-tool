@@ -145,7 +145,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         if (tr.getInsertParentNodeType() != null) {
             Node new_parent = new Node(urigen.generateNodeURI());
-
+            
             objstore.moveObject(new_parent, tr.getInsertParentNodeType(), node.getParent());
             objstore.moveObject(node, tr.getResultNodeType(), new_parent);
         }
@@ -360,6 +360,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (type == null) {
             return false;
         }
+        
+        if (node.getDomainObject() == null) {
+            return false;
+        }
 
         if (!meets_file_requirements(node, type)) {
             return false;
@@ -370,7 +374,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (constraints == null || constraints.isEmpty()) {
             return true;
         }
-
+        
         // Parent must meet one constraint
 
         Node parent = node.getParent();

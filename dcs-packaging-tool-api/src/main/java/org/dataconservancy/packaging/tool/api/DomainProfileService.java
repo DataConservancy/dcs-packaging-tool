@@ -86,8 +86,8 @@ public interface DomainProfileService {
     List<NodeTransform> getNodeTransforms(Node node);
 
     /**
-     * Check if a tree satisfies all its node and optionally property
-     * constraints.
+     * Check if a tree satisfies all its node constraints. Such a tree must also
+     * have domain objects with the correct relations.
      * 
      * @param root
      *            The root node of the tree to validate.
