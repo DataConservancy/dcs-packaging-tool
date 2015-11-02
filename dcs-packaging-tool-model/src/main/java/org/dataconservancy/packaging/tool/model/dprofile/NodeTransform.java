@@ -1,5 +1,10 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import java.util.HashSet;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+
 /**
  * Represents a transform of a node Each transform has a source, a result,
  * possibly an action, and a description. The result of the transform must
@@ -7,24 +12,29 @@ package org.dataconservancy.packaging.tool.model.dprofile;
  * 
  * A node having meeting all the specified constraints on the source node may be
  * transformed to the result node. The source node must have the specified type.
- * If a constraint is specified for the source parent, it must be met. If a
- * constraint is specified on the source node children, it must be met by all
- * children.
+ * If a constraint is specified for the source parent, it must be met. If
+ * constraints are specified on the source node children, every child must meet
+ * at least one of them.
  * 
  * The node and its children may have their types changed. Changing the type of
  * a node will change the relations between the node and its parent and children
  * to allowed structural relations of the new node type.
  * 
- * In addition actions can be performed on the structure of the tree. A parent
- * node may be inserted. Child nodes may be moved to their parent. If the
- * resulting node is a leaf, it may be removed.
+ * Actions can be performed on the structure of the tree. A parent node may be
+ * inserted. Child nodes may be moved to their parent. If the resulting node is
+ * a leaf, it may be removed.
+ * 
+ * Finally any children of the result node which match a child transform, are
+ * themselves transformed. Child transforms are checked after the node type and
+ * structure changes are made. The tree may not be valid at that time, but must
+ * be valid after the child transforms are performed.
  */
 public class NodeTransform extends AbstractDescribedObject {
     private NodeType source_type;
     private NodeConstraint source_parent_constraint;
-    private NodeConstraint source_child_constraint;
+    private List<NodeConstraint> source_child_constraints;
+    private List<NodeTransform> result_child_transforms;
     private NodeType result_node_type;
-    private NodeType result_child_node_type;
     private NodeType insert_parent_node_type;
     private boolean move_children_to_parent;
     private boolean remove_empty_result;
@@ -65,20 +75,24 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
-     * @return Constraint that must be obeyed by every child.
+     * If child constraints are null or empty, they are ignored.
+     * 
+     * @return Every child must meet at least one constraint.
      */
-    public NodeConstraint getSourceChildConstraint() {
-        return source_child_constraint;
+    public List<NodeConstraint> getSourceChildConstraints() {
+        return source_child_constraints;
     }
 
     /**
-     * Sets the NodeConstraint of the source child.
+     * Set constraints on children of the source node. If child constraints are
+     * null or empty, they are ignored. Otherwise every child must meet at least
+     * one constraint.
      * 
-     * @param childConstraint
-     *            The NodeConstraint of the source child.
+     * @param childConstraints
+     *            The NodeConstraints of the source child.
      */
-    public void setSourceChildConstraint(NodeConstraint childConstraint) {
-        this.source_child_constraint = childConstraint;
+    public void setSourceChildConstraints(List<NodeConstraint> childConstraints) {
+        this.source_child_constraints = childConstraints;
     }
 
     /**
@@ -154,21 +168,6 @@ public class NodeTransform extends AbstractDescribedObject {
         this.insert_parent_node_type = type;
     }
 
-    /**
-     * @return Type to transform children to or null for no transform.
-     */
-    public NodeType getResultChildNodeType() {
-        return result_child_node_type;
-    }
-
-    /**
-     * @param result_child_node_type
-     *            Type to transform children to or null for no transform.
-     */
-    public void setResultChildNodeType(NodeType result_child_node_type) {
-        this.result_child_node_type = result_child_node_type;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -176,11 +175,12 @@ public class NodeTransform extends AbstractDescribedObject {
         result = prime * result + ((insert_parent_node_type == null) ? 0 : insert_parent_node_type.hashCode());
         result = prime * result + (move_children_to_parent ? 1231 : 1237);
         result = prime * result + (remove_empty_result ? 1231 : 1237);
-        result = prime * result + ((result_child_node_type == null) ? 0 : result_child_node_type.hashCode());
         result = prime * result + ((result_node_type == null) ? 0 : result_node_type.hashCode());
-        result = prime * result + ((source_child_constraint == null) ? 0 : source_child_constraint.hashCode());
+        result = prime * result
+                + ((source_child_constraints == null) ? 0 : new HashSet<>(source_child_constraints).hashCode());
         result = prime * result + ((source_parent_constraint == null) ? 0 : source_parent_constraint.hashCode());
         result = prime * result + ((source_type == null) ? 0 : source_type.hashCode());
+        result = prime * result + ((result_child_transforms == null) ? 0 : result_child_transforms.hashCode());
         return result;
     }
 
@@ -206,20 +206,21 @@ public class NodeTransform extends AbstractDescribedObject {
             return false;
         if (remove_empty_result != other.remove_empty_result)
             return false;
-        if (result_child_node_type == null) {
-            if (other.result_child_node_type != null)
-                return false;
-        } else if (!result_child_node_type.equals(other.result_child_node_type))
-            return false;
         if (result_node_type == null) {
             if (other.result_node_type != null)
                 return false;
         } else if (!result_node_type.equals(other.result_node_type))
             return false;
-        if (source_child_constraint == null) {
-            if (other.source_child_constraint != null)
+        if (result_child_transforms == null) {
+            if (other.result_child_transforms != null)
                 return false;
-        } else if (!source_child_constraint.equals(other.source_child_constraint))
+        } else if (!result_child_transforms.equals(other.result_child_transforms))
+            return false;        
+        if (source_child_constraints == null) {
+            if (other.source_child_constraints != null)
+                return false;
+        } else if (other.source_child_constraints == null
+                || !CollectionUtils.isEqualCollection(source_child_constraints, other.source_child_constraints))
             return false;
         if (source_parent_constraint == null) {
             if (other.source_parent_constraint != null)
@@ -237,9 +238,28 @@ public class NodeTransform extends AbstractDescribedObject {
     @Override
     public String toString() {
         return "NodeTransform [source_type=" + source_type.getIdentifier() + ", source_parent_constraint="
-                + source_parent_constraint + ", source_child_constraint=" + source_child_constraint
-                + ", result_node_type=" + result_node_type.getIdentifier() + ", result_child_node_type=" + result_child_node_type.getIdentifier()
-                + ", insert_parent_node_type=" + insert_parent_node_type.getIdentifier() + ", move_children_to_parent="
-                + move_children_to_parent + ", remove_empty_result=" + remove_empty_result + "]";
+                + source_parent_constraint + ", source_child_constraints="
+                + (source_child_constraints == null ? "null" : source_child_constraints) + ", result_node_type="
+                + result_node_type.getIdentifier() + ", insert_parent_node_type="
+                + insert_parent_node_type.getIdentifier() + ", move_children_to_parent=" + move_children_to_parent
+                + ", remove_empty_result=" + remove_empty_result + "]";
+    }
+
+    /**
+     * @return Transforms that are applied to children of the result node.
+     */
+    public List<NodeTransform> getResultChildTransforms() {
+        return result_child_transforms;
+    }
+
+    /**
+     * Transforms which match a child of the result node are applied to that
+     * child.
+     * 
+     * @param result_child_transforms
+     *            Set transforms on result node children.
+     */
+    public void setResultChildTransforms(List<NodeTransform> result_child_transforms) {
+        this.result_child_transforms = result_child_transforms;
     }
 }

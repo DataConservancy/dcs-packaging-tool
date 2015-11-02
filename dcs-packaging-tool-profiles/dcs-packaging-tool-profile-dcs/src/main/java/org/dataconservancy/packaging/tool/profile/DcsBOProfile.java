@@ -594,7 +594,7 @@ public class DcsBOProfile
         collectionToProjectNoChildren
                 .setSourceParentConstraint(noNodeConstraint());
         collectionToProjectNoChildren
-                .setSourceChildConstraint(noNodeConstraint());
+                .setSourceChildConstraints(Arrays.asList(noNodeConstraint()));
         collectionToProjectNoChildren.setResultNodeType(project);
 
         /* Projects can always be transformed to collections */
@@ -616,8 +616,8 @@ public class DcsBOProfile
                 .setSourceParentConstraint(allowRelationshipTo(collection,
                                                                memberRel));
         collection_to_dataItem
-                .setSourceChildConstraint(allowRelationshipTo(metadata,
-                                                              metadataRel));
+                .setSourceChildConstraints(Arrays.asList(allowRelationshipTo(metadata,
+                                                              metadataRel)));
         collection_to_dataItem.setResultNodeType(dataItem);
 
         collectionToDataItemNoChildren.setLabel("Collection to DataItem");
@@ -628,7 +628,7 @@ public class DcsBOProfile
                 .setSourceParentConstraint(allowRelationshipTo(collection,
                                                                memberRel));
         collectionToDataItemNoChildren
-                .setSourceChildConstraint(noNodeConstraint());
+                .setSourceChildConstraints(Arrays.asList(noNodeConstraint()));
         collectionToDataItemNoChildren.setResultNodeType(dataItem);
 
         /* DataItem can always be changed to Collection */

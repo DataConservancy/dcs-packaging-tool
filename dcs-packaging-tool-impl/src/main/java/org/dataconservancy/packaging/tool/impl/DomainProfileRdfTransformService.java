@@ -493,16 +493,14 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             transformResource.addProperty(HAS_SOURCE_PARENT_CONSTRAINT, transformToRdf(model, transform.getSourceParentConstraint(), domainProfileResource, null));
         }
 
-        if (transform.getSourceChildConstraint() != null) {
-            transformResource.addProperty(HAS_SOURCE_CHILD_CONSTRAINT, transformToRdf(model, transform.getSourceChildConstraint(), domainProfileResource, null));
+        if (transform.getSourceChildConstraints() != null) {
+            for (NodeConstraint nc: transform.getSourceChildConstraints()) {
+                transformResource.addProperty(HAS_SOURCE_CHILD_CONSTRAINT, transformToRdf(model, nc, domainProfileResource, null));
+            }
         }
 
         if (transform.getResultNodeType() != null) {
             transformResource.addProperty(HAS_RESULT_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
-        }
-
-        if (transform.getResultChildNodeType() != null) {
-            transformResource.addProperty(HAS_RESULT_CHILD_NODE_TYPE, transformToRdf(model, transform.getResultNodeType(), domainProfileResource));
         }
         
         if (transform.getInsertParentNodeType() != null) {
@@ -763,19 +761,23 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (resource.hasProperty(HAS_SOURCE_CHILD_CONSTRAINT)) {
-            nodeTransform.setSourceChildConstraint(transformToNodeConstraint(resource.getPropertyResourceValue(HAS_SOURCE_CHILD_CONSTRAINT), profile, model));
+            List<NodeConstraint> child_constraints = new ArrayList<>();
+            
+            for (Statement stat : resource.listProperties(HAS_SOURCE_CHILD_CONSTRAINT).toList()) {
+                if (stat.getObject().isResource()) {
+                    child_constraints.add(transformToNodeConstraint(stat.getObject().asResource(), profile, model));
+                }
+            }
+            
+            nodeTransform.setSourceChildConstraints(child_constraints);
         }
 
         if (resource.hasProperty(HAS_RESULT_NODE_TYPE)) {
             nodeTransform.setResultNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_NODE_TYPE), profile, model));
         }
 
-        if (resource.hasProperty(HAS_RESULT_CHILD_NODE_TYPE)) {
-            nodeTransform.setResultChildNodeType(transformToNodeType(resource.getPropertyResourceValue(HAS_RESULT_CHILD_NODE_TYPE), profile, model));
-        }
-
         if (resource.hasProperty(INSERT_PARENT_NODE_TYPE)) {
-            nodeTransform.setResultChildNodeType(transformToNodeType(resource.getPropertyResourceValue(INSERT_PARENT_NODE_TYPE), profile, model));
+            nodeTransform.setInsertParentNodeType(transformToNodeType(resource.getPropertyResourceValue(INSERT_PARENT_NODE_TYPE), profile, model));
         }
 
         if (resource.hasProperty(MOVE_CHILDREN_TO_PARENT)) {

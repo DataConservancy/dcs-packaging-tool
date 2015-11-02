@@ -1,7 +1,6 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileObjectStore;
@@ -162,7 +161,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
             if (node.hasChildren()) {
                 new ArrayList<>(node.getChildren())
-                        .forEach(child -> objstore.moveObject(child, tr.getResultChildNodeType(), parent));
+                        .forEach(child -> objstore.moveObject(child, null, parent));
             }
         }
 
@@ -206,17 +205,38 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         Node parent = node.getParent();
-        NodeConstraint child_constraint = tr.getSourceChildConstraint();
+        List<NodeConstraint> child_constraints = tr.getSourceChildConstraints();
 
-        if (child_constraint != null) {
+        if (child_constraints != null && !tr.getSourceChildConstraints().isEmpty()) {
             if (node.isLeaf()) {
-                if (!child_constraint.matchesNone()) {
+                // Leaf node must have a matches none child constraint
+                
+                boolean matches_none = false;
+                
+                for (NodeConstraint nc: child_constraints) {
+                    if (nc.matchesNone()) {
+                        matches_none = true;
+                    }
+                }
+                
+                if (!matches_none) {
                     return false;
                 }
             } else {
+                // Each child must meet at least one child constraint
+                
                 for (Node child : node.getChildren()) {
-                    if (!meets_type_constraint(child, child_constraint)
-                            || !meets_parent_relation_constraint(child, node, child_constraint)) {
+                    boolean meets_constraint = false;
+                    
+                    for (NodeConstraint nc: child_constraints) {
+                        if (meets_type_constraint(child, nc)
+                                && meets_parent_relation_constraint(child, node, nc)) {
+                            meets_constraint = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!meets_constraint) {
                         return false;
                     }
                 }
