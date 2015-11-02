@@ -76,9 +76,10 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-ontologies</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>

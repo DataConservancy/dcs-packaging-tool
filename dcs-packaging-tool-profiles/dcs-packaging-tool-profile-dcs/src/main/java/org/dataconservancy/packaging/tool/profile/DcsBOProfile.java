@@ -43,6 +43,11 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.dprofile.StructuralRelation;
 import org.dataconservancy.packaging.tool.model.dprofile.SuppliedProperty;
+import org.dataconservancy.packaging.tool.ontologies.Ontologies;
+
+import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_DCS_PKGTOOL_PROFILE_BOM;
+import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_DCS_ONTOLOGY_BOM;
+import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_FOAF;
 
 /** Default Data Conservancy business object profile */
 public class DcsBOProfile
@@ -50,13 +55,6 @@ public class DcsBOProfile
 
     private static final String BO_PROFILE_ID =
             "http//dataconservancy.org/ptg-profiles/dcs-bo-1.0";
-
-    private static final String BO_PROFILE_BASE = BO_PROFILE_ID + '#';
-
-    private static final String BO_ONTOLOGY_BASE =
-            "http://www.dataconservancy.org/business-object-model#";
-
-    private static final String FOAF_BASE = "http://xmlns.com/foaf/0.1/";
 
     /* Business objects */
 
@@ -75,7 +73,8 @@ public class DcsBOProfile
     /* Transforms */
     private final NodeTransform collection_to_project = new NodeTransform();
 
-    private final NodeTransform collectionToProjectNoChildren = new NodeTransform();
+    private final NodeTransform collectionToProjectNoChildren =
+            new NodeTransform();
 
     private final NodeTransform project_to_collection = new NodeTransform();
 
@@ -83,7 +82,8 @@ public class DcsBOProfile
 
     private final NodeTransform collection_to_dataItem = new NodeTransform();
 
-    private final NodeTransform collectionToDataItemNoChildren = new NodeTransform();
+    private final NodeTransform collectionToDataItemNoChildren =
+            new NodeTransform();
 
     private final NodeTransform metadata_to_file = new NodeTransform();
 
@@ -92,12 +92,14 @@ public class DcsBOProfile
     /* Properties */
 
     private final StructuralRelation metadataRel =
-            new StructuralRelation(URI.create(BO_ONTOLOGY_BASE + "metadataFor"),
-                                   URI.create(BO_ONTOLOGY_BASE + "hasMetadata"));
+            new StructuralRelation(URI.create(NS_DCS_ONTOLOGY_BOM
+                    + "metadataFor"), URI.create(NS_DCS_ONTOLOGY_BOM
+                    + "hasMetadata"));
 
     private final StructuralRelation memberRel =
-            new StructuralRelation(URI.create(BO_ONTOLOGY_BASE + "isMemberOf"),
-                                   URI.create(BO_ONTOLOGY_BASE + "hasMember"));
+            new StructuralRelation(URI.create(NS_DCS_ONTOLOGY_BOM
+                    + "isMemberOf"), URI.create(NS_DCS_ONTOLOGY_BOM
+                    + "hasMember"));
 
     private final PropertyType hasBusinessID = new PropertyType();
 
@@ -156,22 +158,8 @@ public class DcsBOProfile
 
     private final PropertyType homepage = new PropertyType();
 
-    /*
-         * Maybe it makes sense to have a central location for prefix maps,
-         * project-wide
-         */
-    @SuppressWarnings("serial")
     private static final PrefixMap PREFIX_MAP = PrefixMapFactory
-            .create(new HashMap<String, String>() {
-
-                {
-                    put("prof", "http://www.dataconservancy.org/ptg-prof/");
-                    put("datacons", "http://dataconservancy.org/ns/types/");
-                    put("boprof", BO_PROFILE_BASE);
-                    put("bom", BO_ONTOLOGY_BASE);
-                    put("foaf", FOAF_BASE);
-                }
-            });
+            .create(Ontologies.PREFIX_MAP);
 
     public DcsBOProfile() {
 
@@ -196,7 +184,11 @@ public class DcsBOProfile
 
         setIdentifier(URI.create(BO_PROFILE_ID));
 
-        setNodeTypes(Arrays.asList(project, collection, dataItem, file, metadata));
+        setNodeTypes(Arrays.asList(project,
+                                   collection,
+                                   dataItem,
+                                   file,
+                                   metadata));
 
         setNodeTransforms(Arrays.asList(project_to_collection,
                                         collection_to_project,
@@ -227,43 +219,48 @@ public class DcsBOProfile
     }
 
     private void defineNodeTypes() {
-        project.setIdentifier(URI.create(BO_PROFILE_BASE + "Project"));
+        project.setIdentifier(URI
+                .create(NS_DCS_PKGTOOL_PROFILE_BOM + "Project"));
         project.setLabel("Project");
         project.setDescription("Project business object");
-        project.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE
+        project.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "Project")));
         project.setDomainProfile(this);
 
-        collection.setIdentifier(URI.create(BO_PROFILE_BASE + "Collection"));
+        collection.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM
+                + "Collection"));
         collection.setLabel("Collection");
         collection.setDescription("Collection business object");
-        collection.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE
+        collection.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "Collection")));
         collection.setDomainProfile(this);
 
-        dataItem.setIdentifier(URI.create(BO_PROFILE_BASE + "DataItem"));
+        dataItem.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM
+                + "DataItem"));
         dataItem.setLabel("DataItem");
         dataItem.setDescription("DataItem business object");
-        dataItem.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE
+        dataItem.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "DataItem")));
         dataItem.setDomainProfile(this);
 
-        file.setIdentifier(URI.create(BO_PROFILE_BASE + "File"));
+        file.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "File"));
         file.setLabel("DataFile");
         file.setDescription("File business object");
-        file.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE + "File")));
+        file.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
+                + "File")));
         file.setDomainProfile(this);
 
-        metadata.setIdentifier(URI.create(BO_PROFILE_BASE + "File"));
+        metadata.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "File"));
         metadata.setLabel("Metadata File");
         metadata.setDescription("File business object representing metadata");
-        metadata.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE + "Metadata")));
+        metadata.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
+                + "Metadata")));
         metadata.setDomainProfile(this);
 
-        person.setIdentifier(URI.create(BO_PROFILE_BASE + "Person"));
+        person.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "Person"));
         person.setLabel("Person");
         person.setDescription("Person business object");
-        person.setDomainTypes(Arrays.asList(URI.create(BO_ONTOLOGY_BASE
+        person.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "Person")));
         person.setDomainProfile(this);
 
@@ -273,26 +270,27 @@ public class DcsBOProfile
         hasBusinessID.setLabel("Business ID");
         hasBusinessID
                 .setDescription("A data property specifying a business identifier for the BusinessObject");
-        hasBusinessID.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasBusinessID.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasBusinessID"));
         hasBusinessID.setPropertyValueType(PropertyValueType.LONG);
 
         hasAlternateId.setLabel("Alternate ID");
         hasAlternateId
                 .setDescription("A data property specifying an alternate identifier for the BusinessObject");
-        hasAlternateId.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasAlternateId.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasAlternateId"));
         hasAlternateId.setPropertyValueType(PropertyValueType.STRING);
 
         hasTitle.setLabel("Title");
         hasTitle.setDescription("A data property specifying a title for a Project, Collection, DataItem or File");
-        hasTitle.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE + "hasTitle"));
+        hasTitle.setDomainPredicate(URI
+                .create(NS_DCS_ONTOLOGY_BOM + "hasTitle"));
         hasTitle.setPropertyValueType(PropertyValueType.STRING);
 
         hasDescription.setLabel("Description");
         hasDescription
                 .setDescription("A data property specifying a description for a Project, Collection, DataItem or File");
-        hasDescription.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasDescription.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasDescription"));
         hasDescription.setPropertyValueType(PropertyValueType.STRING);
         hasDescription.setPropertyValueHint(PropertyValueHint.TEXT);
@@ -300,55 +298,55 @@ public class DcsBOProfile
         hasCitableLocator.setLabel("Citable Locator");
         hasCitableLocator
                 .setDescription("A data property specifying a citable locator for the Collection or DataItem.");
-        hasCitableLocator.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasCitableLocator.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasCitableLocator"));
         hasCitableLocator.setPropertyValueType(PropertyValueType.STRING);
 
         hasCreateDate.setLabel("Create Date");
         hasCreateDate
                 .setDescription("A data property specifying the create date for a Collection, DataItem or File");
-        hasCreateDate.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasCreateDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasCreateDate"));
         hasCreateDate.setPropertyValueType(PropertyValueType.DATE_TIME);
 
         hasModifiedDate.setLabel("Modified Date");
         hasModifiedDate
                 .setDescription("A data property specifying the modified date for a Collection, DataItem or File");
-        hasModifiedDate.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasModifiedDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasModifiedDate"));
         hasModifiedDate.setPropertyValueType(PropertyValueType.DATE_TIME);;
 
         hasDepositDate.setLabel("Deposit Date");
         hasDepositDate
                 .setDescription("A data property specifying the deposit date for a Collection, DataItem or File");
-        hasDepositDate.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasDepositDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasDepositDate"));
         hasDepositDate.setPropertyValueType(PropertyValueType.DATE_TIME);
 
         hasPublicationDate.setLabel("Publication Date");
         hasPublicationDate
                 .setDescription("A data property specifying the publication date for a Collection, DataItem or File");
-        hasPublicationDate.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasPublicationDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasPublicationDate"));
         hasPublicationDate.setPropertyValueType(PropertyValueType.DATE_TIME);
 
         hasDiscipline.setLabel("Discipline");
         hasDiscipline
                 .setDescription("A data property specifying a discipline for a Collection");
-        hasDiscipline.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasDiscipline.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasDiscipline"));
         hasDiscipline.setPropertyValueType(PropertyValueType.STRING);
 
         hasContentModel.setLabel("Content Model");
         hasContentModel
                 .setDescription("A data property specifying the content model for a DataItem.");
-        hasContentModel.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasContentModel.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasContentModel"));
         hasContentModel.setPropertyValueType(PropertyValueType.STRING);
 
         hasSize.setLabel("File size");
         hasSize.setDescription("A data property specifying the size of a File");
-        hasSize.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE + "hasSize"));
+        hasSize.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM + "hasSize"));
         hasSize.setPropertyValueType(PropertyValueType.LONG);
         hasSize.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
         hasSize.setReadOnly(true);
@@ -365,13 +363,14 @@ public class DcsBOProfile
         hasFormat.setLabel("Fixity");
         hasFormat
                 .setDescription("A data property specifying the format of a File");
-        hasFormat.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE + "hasFormat"));
+        hasFormat.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
+                + "hasFormat"));
         hasFormat.setPropertyValueType(PropertyValueType.STRING);
 
         hasContact.setLabel("Contact Info");
         hasContact
                 .setDescription("A data property specifying a contact for the Collection or DataItem");
-        hasContact.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasContact.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasContact"));
         hasContact.setPropertyValueType(PropertyValueType.COMPLEX);
         hasContact.setPropertyValueHint(PropertyValueHint.CONTACT_INFO);
@@ -379,7 +378,7 @@ public class DcsBOProfile
         hasCreator.setLabel("Contact Info");
         hasCreator
                 .setDescription("A data property specifying a creator for the Collection or DataItem");
-        hasCreator.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasCreator.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasCreator"));
         hasCreator.setPropertyValueType(PropertyValueType.COMPLEX);
         hasCreator.setPropertyValueHint(PropertyValueHint.CONTACT_INFO);
@@ -387,13 +386,13 @@ public class DcsBOProfile
         hasPublisher.setLabel("Publisher");
         hasPublisher
                 .setDescription("A data property specifying a publisher for a Project");
-        hasPublisher.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasPublisher.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasPublisher"));
 
         hasAlottedStorage.setLabel("Alotted Storage");
         hasAlottedStorage
                 .setDescription("A data property specifying alotted storage of a Project");
-        hasAlottedStorage.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasAlottedStorage.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasAlottedStorage"));
         hasAlottedStorage.setPropertyValueType(PropertyValueType.LONG);
         hasAlottedStorage.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
@@ -401,7 +400,7 @@ public class DcsBOProfile
         hasUsedStorage.setLabel("Used Storage");
         hasUsedStorage
                 .setDescription("A data property specifying Used storage of a Project");
-        hasUsedStorage.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasUsedStorage.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasUsedStorage"));
         hasUsedStorage.setPropertyValueType(PropertyValueType.LONG);
         hasUsedStorage.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
@@ -409,60 +408,60 @@ public class DcsBOProfile
         hasStartDate.setLabel("Start Date");
         hasStartDate
                 .setDescription("A data property specifying the Start date for a Project");
-        hasStartDate.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasStartDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasStartDate"));
         hasStartDate.setPropertyValueType(PropertyValueType.DATE_TIME);
 
         hasEndDate.setLabel("End Date");
         hasEndDate
                 .setDescription("A data property specifying the End date for a Project");
-        hasEndDate.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasEndDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasEndDate"));
         hasEndDate.setPropertyValueType(PropertyValueType.DATE_TIME);
 
         hasFundingEntity.setLabel("Funding Entity");
         hasFundingEntity
                 .setDescription("A data property specifying a FundingEntity for a Project");
-        hasFundingEntity.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasFundingEntity.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasFundingEntity"));
         hasFundingEntity.setPropertyValueType(PropertyValueType.STRING);
 
         hasAwardNumber.setLabel("Award number");
         hasAwardNumber
                 .setDescription("A data property specifying a Award Number for a Project");
-        hasAwardNumber.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
+        hasAwardNumber.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasAwardNumber"));
         hasAwardNumber.setPropertyValueType(PropertyValueType.STRING);
 
         hasPrincipalInvestigator.setLabel("Principal Investigator");
         hasPrincipalInvestigator
                 .setDescription("A data property specifying Principal Investigators for a Project");
-        hasPrincipalInvestigator.setDomainPredicate(URI.create(BO_ONTOLOGY_BASE
-                + "hasPrincipalInvestigator"));
+        hasPrincipalInvestigator.setDomainPredicate(URI
+                .create(NS_DCS_ONTOLOGY_BOM + "hasPrincipalInvestigator"));
         hasPrincipalInvestigator.setPropertyValueType(PropertyValueType.STRING);
 
         hasPublisher.setPropertyValueType(PropertyValueType.STRING);
         name.setLabel("Name");
         name.setDescription("Person name");
-        name.setDomainPredicate(URI.create(FOAF_BASE + "name"));
+        name.setDomainPredicate(URI.create(NS_FOAF + "name"));
         name.setPropertyValueType(PropertyValueType.STRING);
         name.setPropertyValueHint(PropertyValueHint.PERSON_NAME);
 
         phone.setLabel("Phone");
         phone.setDescription("Phone number");
-        phone.setDomainPredicate(URI.create(FOAF_BASE + "phone"));
+        phone.setDomainPredicate(URI.create(NS_FOAF + "phone"));
         phone.setPropertyValueType(PropertyValueType.STRING);
         phone.setPropertyValueHint(PropertyValueHint.PHONE_NUMBER);
 
         mbox.setLabel("Email");
         mbox.setDescription("E-mail address");
-        mbox.setDomainPredicate(URI.create(FOAF_BASE + "mbox"));
+        mbox.setDomainPredicate(URI.create(NS_FOAF + "mbox"));
         mbox.setPropertyValueType(PropertyValueType.STRING);
         mbox.setPropertyValueHint(PropertyValueHint.EMAIL);
 
         homepage.setLabel("Web Page");
         homepage.setDescription("Web Page");
-        homepage.setDomainPredicate(URI.create(FOAF_BASE + "homepage"));
+        homepage.setDomainPredicate(URI.create(NS_FOAF + "homepage"));
         // TODO:  resource properties
         homepage.setPropertyValueHint(PropertyValueHint.URL);
 
@@ -515,33 +514,37 @@ public class DcsBOProfile
                                                   exactlyOne(hasFormat),
                                                   exactlyOne(hasSize)));
 
-        metadata.setPropertyConstraints(Arrays.asList(exactlyOne(hasTitle),
-                                                   exactlyOne(hasDescription),
-                                                   exactlyOne(hasCreateDate),
-                                                   exactlyOne(hasModifiedDate),
-                                                   exactlyOne(hasFormat),
-                                                   exactlyOne(hasSize)));
+        metadata.setPropertyConstraints(Arrays
+                .asList(exactlyOne(hasTitle),
+                        exactlyOne(hasDescription),
+                        exactlyOne(hasCreateDate),
+                        exactlyOne(hasModifiedDate),
+                        exactlyOne(hasFormat),
+                        exactlyOne(hasSize)));
 
         /* Now we do "complex properties */
 
         /* XXX No properties defined in ontology */
-        
-        hasContact.setComplexDomainTypes(Arrays.asList(URI.create(FOAF_BASE + "person")));
-        hasContact.setComplexPropertyConstraints(Arrays.asList(exactlyOne(name),
-                                                     zeroOrMore(phone),
-                                                     zeroOrMore(mbox)));
+
+        hasContact.setComplexDomainTypes(Arrays.asList(URI.create(NS_FOAF
+                + "person")));
+        hasContact.setComplexPropertyConstraints(Arrays
+                .asList(exactlyOne(name), zeroOrMore(phone), zeroOrMore(mbox)));
 
         /* XXX No properties defined in the ontology */
-        hasCreator.setComplexDomainTypes(Arrays.asList(URI.create(FOAF_BASE + "person")));
-        hasCreator.setComplexPropertyConstraints(Arrays.asList(exactlyOne(name),
-                                                     zeroOrMore(phone),
-                                                     zeroOrMore(homepage),
-                                                     zeroOrMore(mbox)));
+        hasCreator.setComplexDomainTypes(Arrays.asList(URI.create(NS_FOAF
+                + "person")));
+        hasCreator.setComplexPropertyConstraints(Arrays
+                .asList(exactlyOne(name),
+                        zeroOrMore(phone),
+                        zeroOrMore(homepage),
+                        zeroOrMore(mbox)));
     }
 
     private void setRelationshipConstraints() {
 
-        project.setParentConstraints(Collections.singletonList(noNodeConstraint()));
+        project.setParentConstraints(Collections
+                .singletonList(noNodeConstraint()));
 
         collection.setParentConstraints(Arrays
                 .asList(noNodeConstraint(),
@@ -552,9 +555,11 @@ public class DcsBOProfile
                 .asList(noNodeConstraint(),
                         allowRelationshipTo(collection, memberRel)));
 
-        file.setParentConstraints(Collections.singletonList(allowRelationshipTo(dataItem, memberRel)));
+        file.setParentConstraints(Collections
+                .singletonList(allowRelationshipTo(dataItem, memberRel)));
 
-        metadata.setParentConstraints(Collections.singletonList(allowAll(metadataRel)));
+        metadata.setParentConstraints(Collections
+                .singletonList(allowAll(metadataRel)));
     }
 
     private void setFileAssociations() {
@@ -575,12 +580,12 @@ public class DcsBOProfile
         collection_to_project
                 .setDescription("Transform a Collection to a Project");
         collection_to_project.setSourceNodeType(collection);
-        collection_to_project
-                .setSourceParentConstraint(noNodeConstraint());
+        collection_to_project.setSourceParentConstraint(noNodeConstraint());
         collection_to_project.setResultNodeType(project);
 
         /*
-         * Collection can be transformed to projects if they have no parent and have no children
+         * Collection can be transformed to projects if they have no parent and
+         * have no children
          */
         collectionToProjectNoChildren.setLabel("Collection to Project");
         collectionToProjectNoChildren
@@ -588,7 +593,8 @@ public class DcsBOProfile
         collectionToProjectNoChildren.setSourceNodeType(collection);
         collectionToProjectNoChildren
                 .setSourceParentConstraint(noNodeConstraint());
-        collectionToProjectNoChildren.setSourceChildConstraint(noNodeConstraint());
+        collectionToProjectNoChildren
+                .setSourceChildConstraint(noNodeConstraint());
         collectionToProjectNoChildren.setResultNodeType(project);
 
         /* Projects can always be transformed to collections */
@@ -608,10 +614,10 @@ public class DcsBOProfile
         collection_to_dataItem.setSourceNodeType(collection);
         collection_to_dataItem
                 .setSourceParentConstraint(allowRelationshipTo(collection,
-                                                                  memberRel));
+                                                               memberRel));
         collection_to_dataItem
                 .setSourceChildConstraint(allowRelationshipTo(metadata,
-                                                                 metadataRel));
+                                                              metadataRel));
         collection_to_dataItem.setResultNodeType(dataItem);
 
         collectionToDataItemNoChildren.setLabel("Collection to DataItem");
@@ -620,7 +626,7 @@ public class DcsBOProfile
         collectionToDataItemNoChildren.setSourceNodeType(collection);
         collectionToDataItemNoChildren
                 .setSourceParentConstraint(allowRelationshipTo(collection,
-                                                                  memberRel));
+                                                               memberRel));
         collectionToDataItemNoChildren
                 .setSourceChildConstraint(noNodeConstraint());
         collectionToDataItemNoChildren.setResultNodeType(dataItem);
@@ -722,7 +728,9 @@ public class DcsBOProfile
         return file;
     }
 
-    public NodeType getMetadataNodeType() { return metadata; }
+    public NodeType getMetadataNodeType() {
+        return metadata;
+    }
 
     public NodeTransform getCollectionToProjectTransform() {
         return collection_to_project;
@@ -856,9 +864,13 @@ public class DcsBOProfile
         return mbox;
     }
 
-    public PropertyType getPhone() { return phone; }
+    public PropertyType getPhone() {
+        return phone;
+    }
 
-    public PropertyType getName() { return  name; }
+    public PropertyType getName() {
+        return name;
+    }
 
     /**
      * Serialize the profile to a file.

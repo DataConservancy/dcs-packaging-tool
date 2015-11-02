@@ -1,0 +1,341 @@
+@prefix bom: <http://www.dataconservancy.org/business-object-model#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://www.dataconservancy.org/business-object-model> a owl:Ontology ;
+    dcterms:modified "2015-08-18"^^xsd:date ;
+    dcterms:publisher <http://www.dataconservancy.org/> ;
+    dcterms:title "Data Conservancy Business Object Model Ontology"@en ;
+    rdfs:comment "Ontology for the Data Conservancy Business Object Model"@en ;
+    owl:versionInfo "2015/08/14" .
+
+bom:hasAlternateId a owl:DatatypeProperty ;
+    rdfs:label "has alternate id"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "A data property specifying an alternate identifier for the BusinessObject."@en ;
+    rdfs:domain bom:BusinessObject .
+
+bom:hasAwardNumber a owl:DatatypeProperty ;
+    rdfs:label "has award number"@en ;
+    rdfs:comment "A data property specifying the award number of a grant provided by a funding agency."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:string .
+
+bom:hasCitableLocator a owl:DatatypeProperty ;
+    rdfs:label "has citable locator"@en ;
+    rdfs:comment "A data property specifying a citable locator for the Collection or DataItem."@en ;
+    rdfs:domain bom:DataAggregator ;
+    rdfs:range xsd:anyURI .
+
+bom:hasContact a owl:DatatypeProperty ;
+    rdfs:label "has contact"@en ;
+    rdfs:comment "A data property specifying a contact for the Collection or DataItem."@en ;
+    rdfs:domain bom:DataAggregator ;
+    rdfs:range <http://xmlns.com/foaf.0.1/Person> .
+
+bom:hasContentModel a owl:DatatypeProperty ;
+    rdfs:label "has content model"@en ;
+    rdfs:comment "A data property specifying the content model for a DataItem."@en ;
+    rdfs:domain bom:DataItem ;
+    rdfs:range xsd:string .
+
+bom:hasCreator a owl:DatatypeProperty ;
+    rdfs:label "has creator"@en ;
+    rdfs:comment "A data property specifying a creator for the Collection or DataItem."@en ;
+    rdfs:domain bom:DataAggregator ;
+    rdfs:range <http://xmlns.com/foaf.0.1/Person> .
+
+bom:hasDiscipline a owl:DatatypeProperty ;
+    rdfs:label "has discipline"@en ;
+    rdfs:comment "A data property specifying a discipline for a Collection."@en ;
+    rdfs:domain bom:Collection ;
+    rdfs:range xsd:string .
+
+bom:hasFormat a owl:DatatypeProperty ;
+    rdfs:label "has format"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "A data property specifying a format for a DataItem."@en ;
+    rdfs:domain bom:File .
+
+bom:hasPrincipalInvestigator a owl:DatatypeProperty ;
+    rdfs:label "has principal investigator"@en ;
+    rdfs:comment "A data property specifying a principal investigator for a Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:string .
+
+bom:hasVersion a owl:DatatypeProperty ;
+    rdfs:label "has version"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "A data property specifying a version for the BusinessObject."@en ;
+    rdfs:domain bom:BusinessObject .
+
+<http://www.dataconservancy.org/File> a owl:Class .
+
+bom:hasAllottedStorage a owl:DatatypeProperty ;
+    rdfs:label "has allotted storage"@en ;
+    rdfs:comment "A data property specifying the amount of allotted storage for the Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:long .
+
+bom:hasBusinessId a owl:DatatypeProperty,
+        owl:FunctionalProperty ;
+    rdfs:label "has business id"@en ;
+    rdfs:range xsd:string ;
+    rdfs:comment "A data property specifying a business identifier for the BusinessObject."@en ;
+    rdfs:domain bom:BusinessObject .
+
+bom:hasCreateDate a owl:DatatypeProperty ;
+    rdfs:label "has create date"@en ;
+    rdfs:comment "A data property specifying the create date for a Collection, DataItem or File."@en ;
+    rdfs:domain bom:MemberEntity ;
+    rdfs:range xsd:dateTime .
+
+bom:hasDepositDate a owl:DatatypeProperty ;
+    rdfs:label "has deposit date"@en ;
+    rdfs:comment "A data property specifying the deposit date for a Collection, DataItem or File."@en ;
+    rdfs:domain bom:MemberEntity ;
+    rdfs:range xsd:dateTime .
+
+bom:hasDepositor a owl:ObjectProperty ;
+    rdfs:label "has depositor"@en ;
+    rdfs:comment "A data type specifying a depositor for a Collection, DataItem or File."@en ;
+    rdfs:domain bom:MemberEntity ;
+    rdfs:range bom:Person .
+
+bom:hasDescription a owl:DatatypeProperty ;
+    rdfs:label "has description"@en ;
+    rdfs:comment "A data property specifying a description for a Project, Collection, DataItem or File."@en ;
+    rdfs:domain bom:ContentEntity ;
+    rdfs:range xsd:string .
+
+bom:hasEndDate a owl:DatatypeProperty ;
+    rdfs:label "has end date"@en ;
+    rdfs:comment "A data property specifying the end date for the Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:dateTime .
+
+bom:hasFixity a owl:DatatypeProperty ;
+    rdfs:label "has fixity"@en ;
+    rdfs:comment "A data property specifying the fixity of a File"@en ;
+    rdfs:domain bom:File ;
+    rdfs:range xsd:string .
+
+bom:hasFundingEntity a owl:DatatypeProperty ;
+    rdfs:label "has funding entity"@en ;
+    rdfs:comment "A data property specifying a funding entity for a Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:string .
+
+bom:hasModifiedDate a owl:DatatypeProperty ;
+    rdfs:label "has modified date"@en ;
+    rdfs:comment "A data property specifying the modification date for a Collection, DataItem or File."@en ;
+    rdfs:domain bom:MemberEntity ;
+    rdfs:range xsd:dateTime .
+
+bom:hasPublicationDate a owl:DatatypeProperty ;
+    rdfs:label "has publication date"@en ;
+    rdfs:comment "A data property specifying the publication date for a Collection."@en ;
+    rdfs:domain bom:Collection ;
+    rdfs:range xsd:dateTime .
+
+bom:hasPublisher a owl:DatatypeProperty ;
+    rdfs:label "has publisher"@en ;
+    rdfs:comment "A data property specifying a publisher for a Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:string .
+
+bom:hasSize a owl:DatatypeProperty ;
+    rdfs:label "has size"@en ;
+    rdfs:range xsd:long ;
+    rdfs:comment "A data property specifying the size of a File"@en ;
+    rdfs:domain bom:File .
+
+bom:hasStartDate a owl:DatatypeProperty ;
+    rdfs:label "has start date"@en ;
+    rdfs:comment "A data property specifying the start date for the Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:dateTime .
+
+bom:hasTitle a owl:DatatypeProperty ;
+    rdfs:label "has title"@en ;
+    rdfs:comment "A data property specifying a title for a Project, Collection, DataItem or File."@en ;
+    rdfs:domain bom:ContentEntity ;
+    rdfs:range xsd:string .
+
+bom:hasUsedStorage a owl:DatatypeProperty ;
+    rdfs:label "has used storage"@en ;
+    rdfs:comment "A data property specifying the amount of storage used by the Project."@en ;
+    rdfs:domain bom:Project ;
+    rdfs:range xsd:long .
+
+bom:isMetadataFor a owl:FunctionalProperty,
+        owl:ObjectProperty ;
+    rdfs:label "is metadata for"@en ;
+    rdfs:comment "Links from a metadata File to a Businsess Object."@en ;
+    rdfs:domain bom:File ;
+    rdfs:range bom:BusinessObject ;
+    owl:inverseOf bom:hasMetadata ;
+    owl:propertyDisjointWith bom:isMemberOf .
+
+bom:DataEntity a owl:Class ;
+    owl:intersectionOf ( [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasCreateDate ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasDepositDate ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasModifiedDate ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasDepositor ] ) ;
+    owl:unionOf ( bom:DataItem bom:File ) .
+
+bom:hasMetadata a owl:ObjectProperty ;
+    rdfs:label "has metadata"@en ;
+    rdfs:comment "Links from a BusinessObject to a metadata File"@en ;
+    rdfs:domain bom:BusinessObject ;
+    rdfs:range bom:File ;
+    owl:propertyDisjointWith bom:hasMember .
+
+bom:CollectionAggregator a owl:Class ;
+    owl:unionOf ( bom:Project bom:Collection ) .
+
+bom:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A Person is a person."@en ;
+    rdfs:subClassOf bom:BusinessObject ;
+    owl:disjointWith bom:Collection,
+        bom:DataItem,
+        bom:File,
+        bom:Project .
+
+bom:isMemberOf a owl:FunctionalProperty,
+        owl:ObjectProperty ;
+    rdfs:label "is member of"@en ;
+    rdfs:comment "Links from a constituent member to an aggregating object."@en ;
+    rdfs:domain bom:MemberEntity ;
+    rdfs:range bom:ContentEntity ;
+    owl:inverseOf bom:hasMember ;
+    owl:propertyDisjointWith bom:isMetadataFor .
+
+bom:DataAggregator a owl:Class ;
+    owl:unionOf ( bom:Collection bom:DataItem ) .
+
+bom:hasMember a owl:ObjectProperty ;
+    rdfs:label "has member"@en ;
+    rdfs:comment "Links an aggregating object to a constituent member."@en ;
+    rdfs:domain bom:ContentEntity ;
+    rdfs:range bom:MemberEntity ;
+    owl:propertyDisjointWith bom:hasMetadata .
+
+bom:ContentEntity a owl:Class ;
+    owl:intersectionOf ( [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasDescription ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasTitle ] ) ;
+    owl:unionOf ( bom:Project bom:Collection bom:DataItem bom:File ) .
+
+bom:MemberEntity a owl:Class ;
+    owl:unionOf ( bom:Collection bom:DataItem <http://www.dataconservancy.org/File> ) .
+
+bom:BusinessObject a owl:Class ;
+    rdfs:label "BusinessObject"@en ;
+    rdfs:comment """
+      A BusinessObject is a common superclass for objects which must have a business ID
+    """@en ;
+    rdfs:subClassOf [ a owl:Restriction ;
+            owl:cardinality "1"^^xsd:nonNegativeInteger ;
+            owl:onProperty bom:hasBusinessId ] .
+
+bom:DataItem a owl:Class ;
+    rdfs:label "DataItem"@en ;
+    rdfs:comment """
+      A DataItem is an aggregation of Files. 
+    """@en ;
+    rdfs:subClassOf bom:BusinessObject,
+        bom:ContentEntity,
+        bom:DataAggregator,
+        bom:DataEntity,
+        bom:MemberEntity ;
+    owl:disjointWith bom:Collection,
+        bom:File,
+        bom:Person,
+        bom:Project ;
+    owl:intersectionOf ( [ a owl:Restriction ;
+                owl:allValuesFrom bom:File ;
+                owl:onProperty bom:hasMember ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:Collection ;
+                owl:onProperty bom:isMemberOf ] ) .
+
+bom:Collection a owl:Class ;
+    rdfs:label "Collection"@en ;
+    rdfs:comment """
+      A Collection is a group of Collections and DataItems.
+    """@en ;
+    rdfs:subClassOf bom:BusinessObject,
+        bom:CollectionAggregator,
+        bom:ContentEntity,
+        bom:DataAggregator,
+        bom:MemberEntity ;
+    owl:disjointWith bom:DataItem,
+        bom:File,
+        bom:Person,
+        bom:Project ;
+    owl:intersectionOf ( [ a owl:Restriction ;
+                owl:allValuesFrom bom:DataAggregator ;
+                owl:onProperty bom:hasMember ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:CollectionAggregator ;
+                owl:onProperty bom:isMemberOf ] [ a owl:Restriction ;
+                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasPublicationDate ] ) .
+
+bom:File a owl:Class ;
+    rdfs:label "File"@en ;
+    rdfs:comment "A File is a sequence of binary data. "@en ;
+    rdfs:subClassOf bom:BusinessObject,
+        bom:ContentEntity,
+        bom:DataEntity,
+        bom:MemberEntity ;
+    owl:disjointWith bom:Collection,
+        bom:DataItem,
+        bom:Person,
+        bom:Project ;
+    owl:intersectionOf ( [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasMember ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:DataItem ;
+                owl:onProperty bom:isMemberOf ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasSize ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasFixity ] ) .
+
+bom:Project a owl:Class ;
+    rdfs:label "Project"@en ;
+    rdfs:comment " A Project aggregates Collections "@en ;
+    rdfs:subClassOf bom:BusinessObject,
+        bom:CollectionAggregator,
+        bom:ContentEntity ;
+    owl:disjointWith bom:Collection,
+        bom:DataItem,
+        bom:File,
+        bom:Person ;
+    owl:intersectionOf ( [ a owl:Restriction ;
+                owl:allValuesFrom bom:Collection ;
+                owl:onProperty bom:hasMember ] [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:isMemberOf ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasPublisher ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasAllottedStorage ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasUsedStorage ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasStartDate ] [ a owl:Restriction ;
+                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasEndDate ] [ a owl:Restriction ;
+                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasFundingEntity ] ) .
