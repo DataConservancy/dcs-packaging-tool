@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 public class DomainProfileStoreJenaImplTest {
 
     private List<DomainProfile> primaryProfiles;
