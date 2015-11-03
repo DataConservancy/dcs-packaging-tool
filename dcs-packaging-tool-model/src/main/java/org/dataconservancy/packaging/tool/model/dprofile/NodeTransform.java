@@ -26,8 +26,9 @@ import org.apache.commons.collections.CollectionUtils;
  * 
  * Finally any children of the result node which match a child transform, are
  * themselves transformed. Child transforms are checked after the node type and
- * structure changes are made. The tree may not be valid at that time, but must
- * be valid after the child transforms are performed.
+ * structure changes are made. A child may only undergo one transform. The tree
+ * may not be valid at that time, but must be valid after the child transforms
+ * are performed.
  */
 public class NodeTransform extends AbstractDescribedObject {
     private NodeType source_type;
@@ -180,7 +181,7 @@ public class NodeTransform extends AbstractDescribedObject {
                 + ((source_child_constraints == null) ? 0 : new HashSet<>(source_child_constraints).hashCode());
         result = prime * result + ((source_parent_constraint == null) ? 0 : source_parent_constraint.hashCode());
         result = prime * result + ((source_type == null) ? 0 : source_type.hashCode());
-        result = prime * result + ((result_child_transforms == null) ? 0 : result_child_transforms.hashCode());
+        result = prime * result + ((result_child_transforms == null) ? 0 : new HashSet<>(result_child_transforms).hashCode());
         return result;
     }
 
@@ -214,8 +215,9 @@ public class NodeTransform extends AbstractDescribedObject {
         if (result_child_transforms == null) {
             if (other.result_child_transforms != null)
                 return false;
-        } else if (!result_child_transforms.equals(other.result_child_transforms))
-            return false;        
+        } else if (other.result_child_transforms == null
+                || !CollectionUtils.isEqualCollection(result_child_transforms, other.result_child_transforms))
+            return false;
         if (source_child_constraints == null) {
             if (other.source_child_constraints != null)
                 return false;
