@@ -19,8 +19,8 @@ public class DomainProfileRdfTransformServiceTest {
         service = new DomainProfileRdfTransformService();
         profile = new FarmDomainProfile();
     }
+
     @Test
-    @Ignore
     public void roundTrip() throws RDFTransformException {
         DomainProfile returnedProfile = service.transformToProfile(service.transformToRdf(profile));
 

@@ -507,6 +507,12 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             transformResource.addProperty(INSERT_PARENT_NODE_TYPE, transformToRdf(model, transform.getInsertParentNodeType(), domainProfileResource));
         }
 
+        if (transform.getResultChildTransforms() != null) {
+            for (NodeTransform nodeTransform : transform.getResultChildTransforms()) {
+                transformResource.addProperty(HAS_NODE_TRANSFORM, transformToRdf(model, nodeTransform, domainProfileResource));
+            }
+        }
+
         transformResource.addLiteral(MOVE_CHILDREN_TO_PARENT, transform.moveChildrenToParent());
         transformResource.addLiteral(REMOVE_EMPTY_RESULT, transform.removeEmptyResult());
 
@@ -770,6 +776,18 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             }
             
             nodeTransform.setSourceChildConstraints(child_constraints);
+        }
+
+        if (resource.hasProperty(HAS_NODE_TRANSFORM)) {
+            List<NodeTransform> childTransforms = new ArrayList<>();
+
+            for (Statement stat : resource.listProperties(HAS_NODE_TRANSFORM).toList()) {
+                if (stat.getObject().isResource()) {
+                    childTransforms.add(transformToNodeTransform(stat.getObject().asResource(), profile, model));
+                }
+            }
+
+            nodeTransform.setResultChildTransforms(childTransforms);
         }
 
         if (resource.hasProperty(HAS_RESULT_NODE_TYPE)) {
