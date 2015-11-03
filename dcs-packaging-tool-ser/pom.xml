@@ -60,12 +60,24 @@
       <artifactId>spring-oxm</artifactId>
       <scope>compile</scope>
     </dependency> 
+
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>compile</scope>
+    </dependency> 
     
     <!-- Test ===================================================== -->
     
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ogce</groupId>
+      <artifactId>xpp3</artifactId>
       <scope>test</scope>
     </dependency>
 

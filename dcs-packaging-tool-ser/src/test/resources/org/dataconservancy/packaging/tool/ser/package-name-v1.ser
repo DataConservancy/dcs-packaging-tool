@@ -1,0 +1,3 @@
+<serialization version="1" converterClass="org.dataconservancy.packaging.tool.ser.PackageNameConverter" streamId="PACKAGE_NAME">
+  <packageName>a package name</packageName>
+</serialization>
