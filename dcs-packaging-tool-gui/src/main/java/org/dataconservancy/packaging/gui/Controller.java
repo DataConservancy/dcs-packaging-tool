@@ -27,7 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
-import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
+import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
@@ -204,8 +204,8 @@ public class Controller {
         show(factory.getPackageGenerationPresenter());
     }
 
-    public PackageDescriptionPresenter showPackageDescriptionViewer() {
-        PackageDescriptionPresenter presenter = factory.getPackageDescriptionPresenter();
+    public EditPackageContentsPresenter showPackageDescriptionViewer() {
+        EditPackageContentsPresenter presenter = factory.getPackageDescriptionPresenter();
         show(presenter);
         return presenter;
     }

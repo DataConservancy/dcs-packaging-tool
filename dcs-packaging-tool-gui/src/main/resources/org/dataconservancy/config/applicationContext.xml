@@ -164,7 +164,7 @@
     <property name="help" ref="help"/>    
   </bean>
 
-  <bean id="packageDescriptionView" class="org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl">
+  <bean id="packageDescriptionView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
     <constructor-arg ref="labels" />
     <constructor-arg ref="errors" />
     <constructor-arg ref="messages"/>
@@ -203,7 +203,7 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
-  <bean id="packageDescriptionPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageDescriptionPresenterImpl">
+  <bean id="packageDescriptionPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.EditPackageContentsPresenterImpl">
     <constructor-arg ref="packageDescriptionView" />
     <property name="controller" ref="controller" />
     <property name="labels" ref="labels" />

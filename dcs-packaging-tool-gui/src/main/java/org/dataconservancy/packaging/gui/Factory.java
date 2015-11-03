@@ -56,8 +56,8 @@ public class Factory {
     private TestPackageGenerator testPkgGenerator;
     private PackageGenerationPresenter pkgGenerationPresenter;
     private PackageGenerationView pkgGenerationView;
-    private PackageDescriptionPresenter pkgDescriptionPresenter;
-    private PackageDescriptionView pkgDescriptionView;
+    private EditPackageContentsPresenter pkgDescriptionPresenter;
+    private EditPackageContentsView pkgDescriptionView;
     private HeaderView headerView;
     private OpenExistingPackagePresenterImpl openExistingPackagePresenter;
     private OpenExistingPackageView openExistingPackageView;
@@ -119,11 +119,11 @@ public class Factory {
     public PackageGenerationPresenter getPackageGenerationPresenter() { return pkgGenerationPresenter; }
     public void setPackageGenerationPresenter(PackageGenerationPresenter presenter) { this.pkgGenerationPresenter = presenter; }
 
-    public PackageDescriptionView getPackageDescriptionView() { return pkgDescriptionView; }
-    public void setPackageDescriptionView(PackageDescriptionView view) { this.pkgDescriptionView = view; }
+    public EditPackageContentsView getPackageDescriptionView() { return pkgDescriptionView; }
+    public void setPackageDescriptionView(EditPackageContentsView view) { this.pkgDescriptionView = view; }
 
-    public PackageDescriptionPresenter getPackageDescriptionPresenter() { return pkgDescriptionPresenter; }
-    public void setPackageDescriptionPresenter(PackageDescriptionPresenter presenter) { this.pkgDescriptionPresenter = presenter; }
+    public EditPackageContentsPresenter getPackageDescriptionPresenter() { return pkgDescriptionPresenter; }
+    public void setPackageDescriptionPresenter(EditPackageContentsPresenter presenter) { this.pkgDescriptionPresenter = presenter; }
 
     public PackageDescriptionValidator getPackageDescriptionValidator() { return packageDescriptionValidator; }
     public void setPackageDescriptionValidator(PackageDescriptionValidator validator ) { this.packageDescriptionValidator = validator; }

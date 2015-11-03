@@ -35,20 +35,16 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import org.dataconservancy.packaging.gui.BaseGuiTest;
-import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Errors;
-import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Messages;
-import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.Page;
-import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
+import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
 import org.dataconservancy.packaging.gui.view.HeaderView;
-import org.dataconservancy.packaging.gui.view.PackageDescriptionView;
+import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
+import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
@@ -90,7 +86,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
-    private PackageDescriptionPresenterImpl packageDescriptionPresenter;
+    private EditPackageContentsPresenterImpl packageDescriptionPresenter;
 
     @Before
     public void setup() throws InterruptedException {
@@ -105,9 +101,9 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             HeaderView header = new HeaderViewImpl(labels);
 
             // Setup next page
-            PackageDescriptionView packageDescriptionView = new PackageDescriptionViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
-            packageDescriptionView.setHeaderView(header);
-            packageDescriptionPresenter = new PackageDescriptionPresenterImpl(packageDescriptionView);
+            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
+            editPackageContentsView.setHeaderView(header);
+            packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
             factory.setPackageDescriptionPresenter(packageDescriptionPresenter);
 
             Controller controller = new Controller() {
@@ -135,7 +131,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 }
 
                 @Override
-                public PackageDescriptionPresenter showPackageDescriptionViewer() {
+                public EditPackageContentsPresenter showPackageDescriptionViewer() {
                     showNextPage = true;
                     return packageDescriptionPresenter;
                 }
@@ -163,7 +159,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             controller.setCreateNewPackage(true);
             controller.getCreateNewPackagePagesStack().clear();
             controller.getCreateNewPackagePagesStack().push(Page.DEFINE_RELATIONSHIPS);
-            packageDescriptionView.setHeaderView(header);
+            editPackageContentsView.setHeaderView(header);
 
             initialized = true;
         }

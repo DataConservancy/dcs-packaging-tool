@@ -18,7 +18,6 @@ package org.dataconservancy.packaging.gui.view.impl;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -31,11 +30,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
@@ -45,11 +41,10 @@ import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.model.RelationshipGroup;
 import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
-import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
+import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
 import org.dataconservancy.packaging.gui.util.DisciplinePropertyBox;
 import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
-import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.RelationshipSelectionBox;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
@@ -77,8 +72,8 @@ public class PackageArtifactWindowBuilder implements CssConstants {
     private OntologyLabels ontologyLabels;
     private Messages messages;
 
-    private Map<String, PackageDescriptionViewImpl.ArtifactPropertyContainer> artifactPropertyFields;
-    private Set<PackageDescriptionViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields;
+    private Map<String, EditPackageContentsViewImpl.ArtifactPropertyContainer> artifactPropertyFields;
+    private Set<EditPackageContentsViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields;
 
     //Controls that are displayed in the package artifact popup.
     private Hyperlink cancelPopupLink;
@@ -90,7 +85,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
     private Map<String, CheckBox> metadataInheritanceButtonMap;
 
-    PackageDescriptionPresenter presenter;
+    EditPackageContentsPresenter presenter;
 
     List<RelationshipGroup> availableRelationshipGroups;
     Map<String, List<String>> availableDisciplines;
@@ -118,10 +113,10 @@ public class PackageArtifactWindowBuilder implements CssConstants {
     }
 
     public Pane buildArtifactPropertiesLayout(PackageArtifact artifact,
-                                              Map<String, PackageDescriptionViewImpl.ArtifactPropertyContainer> artifactPropertyFields,
-                                              Set<PackageDescriptionViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields,
+                                              Map<String, EditPackageContentsViewImpl.ArtifactPropertyContainer> artifactPropertyFields,
+                                              Set<EditPackageContentsViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields,
                                               Map<String, CheckBox> metadataInheritanceButtonMap,
-                                              PackageDescriptionPresenter packageDescriptionPresenter,
+                                              EditPackageContentsPresenter editPackageContentsPresenter,
                                               PackageOntologyService packageOntologyService) {
 
         this.artifactPropertyFields = artifactPropertyFields;
@@ -135,7 +130,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         artifactDetailsLayout.getStyleClass().add(PACKAGE_TOOL_POPUP_CLASS);
 
         this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
-        this.presenter = packageDescriptionPresenter;
+        this.presenter = editPackageContentsPresenter;
         this.packageOntologyService = packageOntologyService;
 
         createArtifactDetailsPopup(artifact);
@@ -256,7 +251,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         for (final String property : sortedProperties) {
             //If the property isn't a creator property we include it in this tab
             if (!creatorProperties.contains(property)) {
-                final PackageDescriptionViewImpl.ArtifactPropertyContainer container = new PackageDescriptionViewImpl.ArtifactPropertyContainer();
+                final EditPackageContentsViewImpl.ArtifactPropertyContainer container = new EditPackageContentsViewImpl.ArtifactPropertyContainer();
 
                 //If the property is complex use the group property creation.
                 if (packageOntologyService.isPropertyComplex(properties.get(property))) {
@@ -344,7 +339,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
         //Loop through all the creator properties as defined in the ontology.
         for (final String property : sortedProperties) {
-            final PackageDescriptionViewImpl.ArtifactPropertyContainer container = new PackageDescriptionViewImpl.ArtifactPropertyContainer();
+            final EditPackageContentsViewImpl.ArtifactPropertyContainer container = new EditPackageContentsViewImpl.ArtifactPropertyContainer();
 
             //If the property is complex use the group property creation, otherwise use the simple property set up.
             if (packageOntologyService.isPropertyComplex(properties.get(property))) {
@@ -416,7 +411,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
      * @param container
      * @return  the VBox
      */
-    private VBox createGroupPropertySection(PackageArtifact artifact, String propertyName, String propertyType, boolean empty, PackageDescriptionViewImpl.ArtifactPropertyContainer container) {
+    private VBox createGroupPropertySection(PackageArtifact artifact, String propertyName, String propertyType, boolean empty, EditPackageContentsViewImpl.ArtifactPropertyContainer container) {
         VBox complexPropertyBox = new VBox(8);
         Separator separator = new Separator();
         complexPropertyBox.getChildren().add(separator);
@@ -633,14 +628,14 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewRelationshipButton);
 
         if (artifact.getRelationships().isEmpty()) {
-            PackageDescriptionViewImpl.ArtifactRelationshipContainer container = new PackageDescriptionViewImpl.ArtifactRelationshipContainer();
+            EditPackageContentsViewImpl.ArtifactRelationshipContainer container = new EditPackageContentsViewImpl.ArtifactRelationshipContainer();
             artifactRelationshipFields.add(container);
             relationshipsBox.getChildren().add(new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener));
             addNewRelationshipButton.setDisable(true);
         } else {
             //Otherwise loop through the relationships and create a box for each one.
             for (PackageRelationship relationship : artifact.getRelationships()) {
-                PackageDescriptionViewImpl.ArtifactRelationshipContainer container = new PackageDescriptionViewImpl.ArtifactRelationshipContainer();
+                EditPackageContentsViewImpl.ArtifactRelationshipContainer container = new EditPackageContentsViewImpl.ArtifactRelationshipContainer();
                 artifactRelationshipFields.add(container);
                 relationshipsBox.getChildren().add(new RelationshipSelectionBox(artifact, relationship, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener));
                 if (relationship.getTargets() == null || relationship.getTargets().isEmpty()) {
@@ -652,7 +647,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         relationshipsBox.getChildren().add(addNewRelationshipButton);
 
         addNewRelationshipButton.setOnAction(arg0 -> {
-            PackageDescriptionViewImpl.ArtifactRelationshipContainer container = new PackageDescriptionViewImpl.ArtifactRelationshipContainer();
+            EditPackageContentsViewImpl.ArtifactRelationshipContainer container = new EditPackageContentsViewImpl.ArtifactRelationshipContainer();
             artifactRelationshipFields.add(container);
             VBox newRelationshipBox = new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener);
             int buttonIndex = relationshipsBox.getChildren().indexOf(addNewRelationshipButton);
@@ -671,9 +666,9 @@ public class PackageArtifactWindowBuilder implements CssConstants {
      */
     private class GroupPropertyChangeListener implements ChangeListener<String> {
         private Button propertyAddButton;
-        private PackageDescriptionViewImpl.ArtifactPropertyContainer container;
+        private EditPackageContentsViewImpl.ArtifactPropertyContainer container;
 
-        public GroupPropertyChangeListener(Button propertyAddButton, PackageDescriptionViewImpl.ArtifactPropertyContainer container) {
+        public GroupPropertyChangeListener(Button propertyAddButton, EditPackageContentsViewImpl.ArtifactPropertyContainer container) {
             this.propertyAddButton = propertyAddButton;
             this.container = container;
         }
