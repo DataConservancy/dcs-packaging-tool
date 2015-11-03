@@ -156,11 +156,14 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             }
 
             // Move children to parent, avoiding concurrent modification of
-            // children list
-
+            // children list also performs any child transformations on the moved children
             if (node.hasChildren()) {
-                new ArrayList<>(node.getChildren())
-                        .forEach(child -> objstore.moveObject(child, null, parent));
+                for (Node child : new ArrayList<>(node.getChildren())) {
+                    objstore.moveObject(child, null, parent);
+                    if (tr.getResultChildTransforms() != null) {
+                        transformChildren(child, tr.getResultChildTransforms());
+                    }
+                }
             }
         }
 
@@ -177,14 +180,18 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         
         if (tr.getResultChildTransforms() != null && node.hasChildren()) {
             // For each child, do only first transform which matches
-            
             for (Node child: node.getChildren()) {
-                for (NodeTransform child_tr : tr.getResultChildTransforms()) {
-                    if (can_transform(child, child_tr)) {
-                        transformNode(child, child_tr);
-                        break;
-                    }
-                }
+                transformChildren(child, tr.getResultChildTransforms());
+            }
+        }
+    }
+
+    //Runs the child transforms on the passed in child node. Applies the first applicable transform in the list.
+    private void transformChildren(Node child, List<NodeTransform> childTransforms) {
+        for (NodeTransform child_tr : childTransforms) {
+            if (can_transform(child, child_tr)) {
+                transformNode(child, child_tr);
+                break;
             }
         }
     }
