@@ -103,6 +103,10 @@
       <constructor-arg ref="internalPropertiesResource"/>
   </bean>
 
+  <bean id="headerView" class="org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl">
+    <constructor-arg ref="labels"/>
+  </bean>
+
   <!-- SERVICES AND BUILDERS -->
   <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
   <bean id="packageDescriptionBuilder" class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
@@ -129,6 +133,7 @@
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
     <property name="labels" ref="labels" />
     <property name="configuration" ref="configuration" />
+    <property name="headerView" ref="headerView"/>
   </bean>
 
 </beans>

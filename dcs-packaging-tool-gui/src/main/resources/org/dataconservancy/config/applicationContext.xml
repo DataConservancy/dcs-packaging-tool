@@ -113,7 +113,9 @@
   <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
   <bean id="packageDescriptionBuilder" class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
   <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
-
+  <bean id="packageMetadataService" class="org.dataconservancy.packaging.gui.services.PackageMetadataService">
+    <constructor-arg ref="configuration"/>
+  </bean>
 
   <!--
   <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
@@ -135,7 +137,21 @@
     <property name="localCountryCode" value="${localCountryCode}"/>
   </bean>
 
+  <bean id="emailValidator" class="org.dataconservancy.packaging.gui.util.EmailValidator" />
+
   <!-- VIEWS -->
+  <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
+    <constructor-arg ref="labels" />
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>
+  </bean>
+
+  <bean id="packageMetadataView" class="org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl">
+    <constructor-arg ref="labels" />
+    <property name="headerView" ref="headerView"/>
+    <property name="help" ref="help"/>
+  </bean>
+
   <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
     <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
@@ -165,13 +181,19 @@
   	<constructor-arg ref="labels"/>
   </bean>
 
-  <bean id="contentDirectoryView" class="org.dataconservancy.packaging.gui.view.impl.SelectContentDirectoryViewImpl">
+  <bean id="openExistingPackageView" class="org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl">
     <constructor-arg ref="labels"/>
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
   </bean>
 
   <!-- PRESENTERS -->
+  <bean id="homepagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.HomepagePresenterImpl">
+    <constructor-arg ref="homepageView" />
+    <property name="controller" ref="controller" />
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
   <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
     <constructor-arg ref="createNewPackageView" />
     <property name="controller" ref="controller" />
@@ -203,8 +225,17 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
-  <bean id="contentDirectoryPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter">
-    <constructor-arg ref="contentDirectoryView"/>
+  <bean id="packageMetadataPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageMetadataPresenterImpl">
+    <constructor-arg ref="packageMetadataView"/>
+    <property name="controller" ref="controller"/>
+    <property name="packageMetadataService" ref="packageMetadataService"/>
+    <property name="messages" ref="messages"/>
+    <property name="errors" ref="errors"/>
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
+  <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
+    <constructor-arg ref="openExistingPackageView"/>
     <property name="controller" ref="controller" />
     <property name="messages" ref="messages" />
     <property name="errors" ref="errors"/>
@@ -217,15 +248,19 @@
     <property name="labels" ref="labels" />
     <property name="configuration" ref="configuration" />
 
+    <property name="homepageView" ref="homepageView" />
+    <property name="packageMetadataView" ref="packageMetadataView" />
     <property name="createNewPackageView" ref="createNewPackageView" />
     <property name="packageGenerationView" ref="packageGenerationView" />
     <property name="packageDescriptionView" ref="packageDescriptionView" />
-    <property name="contentDirectoryView" ref="contentDirectoryView" />
+    <property name="openExistingPackageView" ref="openExistingPackageView" />
 
+    <property name="homepagePresenter" ref="homepagePresenter" />
+    <property name="packageMetadataPresenter" ref="packageMetadataPresenter" />
     <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
     <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
-    <property name="contentDirectoryPresenter" ref="contentDirectoryPresenter" />
+    <property name="openExistingPackagePresenter" ref="openExistingPackagePresenter" />
 
     <property name="controller" ref="controller" />
     

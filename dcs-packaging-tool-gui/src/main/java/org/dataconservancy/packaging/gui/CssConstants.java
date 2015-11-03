@@ -52,4 +52,13 @@ public interface CssConstants {
     public static final String PACKAGE_DESCRIPTION_ROW_IGNORE = "PackageDescriptionView-IgnoreRow";
     public static final String UNEDITABLE_PROPERTY_VALUE = "UneditablePropertyValue";
     public static final String PROPERTY_TEXT_AREA = "PopertyTextArea";
+    public static final String HOMEPAGE_VIEW_CLASS = "HomepageView";
+    public static final String HOMEPAGE_VIEW_BUTTON_CLASS = "HomepageViewButton";
+    public static final String CLICKABLE = "Clickable";
+    public static final String VBOX_BORDER = "VBoxBorder";
+    public static final String TRASH_IMAGE = "TrashImage";
+    public static final String TOOLTIP_IMAGE = "TooltipImage";
+    public static final String FORM_FIELDS_DIVISION_CLASS = "FormFieldsDivision";
+    public static final String ALIGN_CENTER_RIGHT = "-fx-alignment: CENTER-RIGHT"; // table columns don't take css classes
+    public static final String EXCLAMATION_IMAGE = "ExclamationImage";
 }

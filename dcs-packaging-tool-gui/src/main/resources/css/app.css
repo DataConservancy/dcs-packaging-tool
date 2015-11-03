@@ -58,6 +58,7 @@
 	-fx-pref-height: 28px;
 	-fx-effect: dropshadow( one-pass-box , #005048,
                 1, 0.0, 1, 1);
+	-fx-cursor: hand;
 }
 
 .ViewFooter .button:hover {
@@ -85,7 +86,7 @@
 }
 
 .PackageToolPopup {
-    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 1, 3, 3, 1;
     -fx-border-radius: 3;
     -fx-font-family: OpenSans-Regular;
@@ -127,7 +128,7 @@
    	-fx-text-fill: #316a93;
    	-fx-border-width: 0;
    	-fx-font-weight: bold;
-   	-fx-underline: true;   	
+   	-fx-underline: true;
 }
 
 .PackageToolPopup .hyperlink:visited {
@@ -169,7 +170,7 @@
 	-fx-font-size: 12px;
 	-fx-text-fill: #8c8c8c;
 	-fx-font-weight: bold;
-   	-fx-border-width: 0;	
+   	-fx-border-width: 0;
 }
 
 .PackageToolPopup .ViewFooter .hyperlink:visited {
@@ -177,7 +178,7 @@
 	-fx-font-size: 12px;
 	-fx-text-fill: #8c8c8c;
 	-fx-font-weight: bold;
-   	-fx-border-width: 0;	
+   	-fx-border-width: 0;
 }
 
 .PackageToolPopup .ViewFooter .button {
@@ -227,17 +228,17 @@
 
 .PageOneUnselected {
 	-fx-graphic: url("../images/1-inactive.png");
-	-fx-text-fill: #8c8c8c;	
+	-fx-text-fill: #8c8c8c;
 }
 
 .PageTwoUnselected {
 	-fx-graphic: url("../images/2-inactive.png");
-	-fx-text-fill: #8c8c8c;	
+	-fx-text-fill: #8c8c8c;
 }
 
 .PageThreeUnselected {
 	-fx-graphic: url("../images/3-inactive.png");
-	-fx-text-fill: #8c8c8c;		
+	-fx-text-fill: #8c8c8c;
 }
 
 .PageOneSelected {
@@ -270,7 +271,7 @@
 }
 
 .DirectoryBox {
-    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 2;
     -fx-border-radius: 3 3 3 3;
     -fx-padding: 4px;
@@ -328,8 +329,12 @@
     -fx-background-color: #E0E0E0;
 }
 
+.PackageDescriptionView .column-header .label{
+	-fx-alignment: center-left;
+}
+
 .PackageDescriptionView .InheritanceControls {
-    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+    -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 2;
     -fx-border-radius: 3 3 3 3;
     -fx-padding: 4px;
@@ -366,7 +371,7 @@
 .PackageArtifactPopup {
     -fx-background-color: white;
     -fx-padding: 24;
-    -fx-border-color: black; 
+    -fx-border-color: black;
     -fx-border-width: 2;
 }
 
@@ -385,7 +390,7 @@
 }
 
 .CreateNewPackage .text-field {
-	-fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8; 
+	-fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 2;
     -fx-border-radius: 3 3 3 3;
     -fx-focus-color: transparent;
@@ -435,10 +440,64 @@
     -fx-opacity: 0;
 }
 
-}
-*/
 .UneditablePropertyValue {
      -fx-border-width: 0;
      -fx-padding: 0;
      -fx-background-color: transparent;
 }
+
+.HomepageView {
+
+}
+
+.HomepageView .button {
+	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+	-fx-border-radius: 6px;
+	-fx-border-width: 1;
+	-fx-border-color: #008330;
+	-fx-font-weight: bold;
+	-fx-font-size: 22px;
+	-fx-text-fill: #ffffff;
+	-fx-pref-height: 50px;
+	-fx-pref-width: 400px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+	1, 0.0, 1, 1);
+	-fx-cursor: hand;
+}
+
+.HomepageView .button:hover {
+	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+}
+
+.Clickable {
+	-fx-cursor: hand;
+}
+
+.VBoxBorder {
+	-fx-border-color: #888888;
+	-fx-background-color: white;
+	-fx-border-width: 1px;
+	-fx-border-radius: 2px;
+	-fx-padding: 10;
+	-fx-spacing: 8;
+	-fx-min-height: 50px;
+}
+
+.TrashImage {
+	-fx-image: url("../images/trash.png");
+}
+
+.TooltipImage {
+	-fx-image: url("../images/Button-info-icon-gray.png");
+}
+
+.FormFieldsDivision {
+	-fx-font-weight: bold;
+	-fx-font-size: 15px;
+	-fx-padding: 10 0 0 0;
+}
+
+.ExclamationImage {
+	-fx-image: url("../images/orange_exclamation.png");
+}
+

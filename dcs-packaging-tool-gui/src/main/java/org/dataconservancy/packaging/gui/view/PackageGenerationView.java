@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.view;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 
+import javafx.scene.control.RadioButton;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 
 import javafx.scene.control.CheckBox;
@@ -36,12 +37,6 @@ import org.dataconservancy.packaging.gui.util.PackageToolPopup;
  * options for creating another package or starting over.
  */
 public interface PackageGenerationView extends View<PackageGenerationPresenter> {
-
-    /**
-     * A text field that is used for entering the package name.
-     * @return The text field for entering the package name.
-     */
-    TextField getPackageNameField();
 
     /**
      * Gets the directory chooser for setting the output directory.
@@ -138,37 +133,31 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      * @return The checkbox for selecting sha1 generation.
      */
     CheckBox getSHA1CheckBox();
-    
-    /**
-     * Gets the contact information text field, that will be supplied in the bag.
-     * @return  the contact information text field
-     */
-    TextField getContactEmailTextField();
-    
-    /**
-     * Gets the contact name text field, that will be supplied in the bag.
-     * @return   the contact name text field
-     */
-    TextField getContactNameTextField();
-    
-    /**
-     * Gets the contact phone number text field, that will be supplied in the bag.
-     * @return The text field for entering in a contact phone number.
-     */
-    TextField getContactPhoneTextField();
-    
-    /**
-     * Gets the text field for setting the external identifier if there is one.
-     * @return The text field for entering in an external identifier.
-     */
-    TextField getExternalIdentifierTextField();
 
     /**
-     * Gets the text field for setting the external project Identifier if there is one.
-     * @return The string property for labeling the project identifier field.
+     * Gets the serialization format toggle group.
+     * @return  the serialization format toggle group.
      */
-    StringProperty getExternalProjectIdentifierProperty();
+    ToggleGroup getSerializationToggleGroup();
 
+    /**
+     * Gets the JSON format checkbox.
+     * @return The checkbox for selecting JSON format.
+     */
+    RadioButton getJSONRadioButton();
+
+    /**
+     * Gets the XML format checkbox.
+     * @return The checkbox for selecting XML format.
+     */
+    RadioButton getXMLRadioButton();
+
+    /**
+     * Gets the sha1 checksum checkbox.
+     * @return The checkbox for selecting Turtle format.
+     */
+    RadioButton getTurtleRadioButton();
+    
     /**
      * Gets the progress dialog popup that's used when the package is being generated.
      * @return The popup used to display package generation progress.

@@ -8,4 +8,6 @@ public enum ControlType {
         EDITABLE_COMBO_BOX,
         TEXT_AREA,
         TEXT_FIELD,
+        TEXT_FIELD_W_REMOVABLE_LABEL,
+        DATE_PICKER
 }

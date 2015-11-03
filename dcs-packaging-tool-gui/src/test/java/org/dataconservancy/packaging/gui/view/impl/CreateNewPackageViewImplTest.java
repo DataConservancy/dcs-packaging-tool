@@ -40,7 +40,7 @@ public class CreateNewPackageViewImplTest extends BaseGuiTest {
     @Test
     public void testComponentsNotNull() {
         assertNotNull(view.getChooseContentDirectoryButton());
-        assertNotNull(view.getSelectedBaseDirectoryTextField());
+        assertNotNull(view.getChooseContentDirectoryTextField());
         assertNotNull(view.getContinueButton());
         assertNotNull(view.getErrorMessage());
     }

@@ -22,7 +22,7 @@ import java.util.Map;
 import javafx.stage.Stage;
 
 import org.dataconservancy.packaging.gui.presenter.*;
-import org.dataconservancy.packaging.gui.presenter.impl.SelectContentDirectoryPresenter;
+import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
 import org.dataconservancy.packaging.gui.view.*;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
@@ -44,6 +44,8 @@ public class Factory {
     private Stage stage;
     private Controller controller;
 
+    private HomepageView homepageView;
+    private HomepagePresenter homepagePresenter;
     private CreateNewPackageView createNewPackageView;
     private CreateNewPackagePresenter createNewPackagePresenter;
     private PackageDescriptionValidator packageDescriptionValidator;
@@ -57,8 +59,10 @@ public class Factory {
     private PackageDescriptionPresenter pkgDescriptionPresenter;
     private PackageDescriptionView pkgDescriptionView;
     private HeaderView headerView;
-    private SelectContentDirectoryPresenter contentDirectoryPresenter;
-    private SelectContentDirectoryView contentDirectoryView;
+    private OpenExistingPackagePresenterImpl openExistingPackagePresenter;
+    private OpenExistingPackageView openExistingPackageView;
+    private PackageMetadataPresenter packageMetadataPresenter;
+    private PackageMetadataView packageMetadataView;
 
     private Labels labels;
     private Messages messages;
@@ -94,6 +98,14 @@ public class Factory {
 
     public Controller getController() { return controller; }
     public void setController(Controller controller) { this.controller = controller; }
+
+    public HomepageView getHomepageView() { return homepageView; }
+
+    public void setHomepageView(HomepageView homepageView) { this.homepageView = homepageView; }
+
+    public HomepagePresenter getHomepagePresenter() { return homepagePresenter; }
+
+    public void setHomepagePresenter(HomepagePresenter homepagePresenter) { this.homepagePresenter = homepagePresenter; }
 
     public CreateNewPackageView getCreateNewPackageView() { return createNewPackageView; }
     public void setCreateNewPackageView(CreateNewPackageView view) { this.createNewPackageView = view; }
@@ -134,9 +146,25 @@ public class Factory {
     public HeaderView getHeaderView() { return headerView; }
     public void setHeaderView(HeaderView headerView) { this.headerView = headerView; }
 
-    public SelectContentDirectoryPresenter getContentDirectoryPresenter() { return contentDirectoryPresenter; }
-    public void setContentDirectoryPresenter(SelectContentDirectoryPresenter presenter) {this.contentDirectoryPresenter = presenter; }
+    public OpenExistingPackagePresenterImpl getOpenExistingPackagePresenter() { return openExistingPackagePresenter; }
+    public void setOpenExistingPackagePresenter(OpenExistingPackagePresenterImpl presenter) {this.openExistingPackagePresenter = presenter; }
 
-    public SelectContentDirectoryView getContentDirectoryView() { return contentDirectoryView; }
-    public void setContentDirectoryView(SelectContentDirectoryView contentDirectoryView) { this.contentDirectoryView = contentDirectoryView; }
+    public OpenExistingPackageView getOpenExistingPackageView() { return openExistingPackageView; }
+    public void setOpenExistingPackageView(OpenExistingPackageView openExistingPackageView) { this.openExistingPackageView = openExistingPackageView; }
+
+    public PackageMetadataPresenter getPackageMetadataPresenter() {
+        return packageMetadataPresenter;
+    }
+
+    public void setPackageMetadataPresenter(PackageMetadataPresenter packageMetadataPresenter) {
+        this.packageMetadataPresenter = packageMetadataPresenter;
+    }
+
+    public PackageMetadataView getPackageMetadataView() {
+        return packageMetadataView;
+    }
+
+    public void setPackageMetadataView(PackageMetadataView packageMetadataView) {
+        this.packageMetadataView = packageMetadataView;
+    }
 }

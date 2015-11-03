@@ -17,8 +17,6 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import java.util.Map;
@@ -39,7 +37,6 @@ import org.dataconservancy.packaging.tool.model.DcsPackageDescriptionSpec;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionRulesBuilder;
-import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.builder.xstream.JaxbPackageDescriptionRulesBuilder;
 import org.dataconservancy.packaging.tool.model.description.RulesSpec;
 import org.slf4j.Logger;
@@ -127,7 +124,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     packageDescriptionService.setOnCancelled(event -> {
                         packageDescriptionService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
-                        controller.showHome(false);
                     });
 
                     packageDescriptionService.setOnFailed(workerStateEvent -> {
@@ -135,7 +131,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         view.getErrorMessage().setVisible(true);
                         packageDescriptionService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
-                        controller.showHome(false);
                     });
 
                     packageDescriptionService.setOnSucceeded(workerStateEvent -> {
@@ -165,7 +160,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 log.error(e.getMessage());
             }
         });
-        
+
         //Handles the user pressing the button to choose a base directory to create a package from.
         view.getChooseContentDirectoryButton()
                 .setOnAction(event -> {
@@ -179,51 +174,19 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     if (dir != null) {
                         root_artifact_dir = dir;
                         content_dir = root_artifact_dir.getParentFile();
-                        view.getSelectedBaseDirectoryTextField().setText(root_artifact_dir.getPath());
-                        view.getSelectedPackageDescriptionTextField().setText("");
+                        view.getChooseContentDirectoryTextField().setText(root_artifact_dir.getPath());
+                        //view.getSelectedPackageDescriptionTextField().setText("");
                         //If the error message happens to be visible erase it.
                         view.getErrorMessage().setVisible(false);
                         directoryChooser.setInitialDirectory(dir);
                     }
                 });
-        
-        //Handles the user pressing a button to choose an existing package description. 
-        view.getChoosePackageDescriptionButton().setOnAction(arg0 -> {
-            File descriptionFile = controller.showOpenFileDialog(fileChooser);
-
-            if (descriptionFile != null) {
-                try {
-                    FileInputStream fis = new FileInputStream(descriptionFile);
-                    PackageDescription description = packageDescriptionBuilder.deserialize(fis);
-                    //If the selected package description file is valid set it on the controller and remove the content directory if it was set.
-                    if (description != null) {
-                        //content_dir = null;
-                        controller.setPackageDescription(description);
-                        controller.setPackageDescriptionFile(descriptionFile);
-                        controller.setRootArtifactDir(null);
-                        controller.setContentRoot(null);
-                        content_dir = null;
-                        root_artifact_dir = null;
-
-                        view.getErrorMessage().setVisible(false);
-                        view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
-                        view.getSelectedBaseDirectoryTextField().setText("");
-                        fileChooser.setInitialDirectory(descriptionFile.getParentFile());
-                    }
-                } catch (FileNotFoundException | PackageToolException e) {
-                    view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
-                    view.getErrorMessage().setVisible(true);
-                    log.error(e.getMessage());
-                }
-            }
-        });
 
     }
 
     @Override
     public void clear() {
-        view.getSelectedBaseDirectoryTextField().setText("");
-        view.getSelectedPackageDescriptionTextField().setText("");
+        view.getChooseContentDirectoryTextField().setText("");
         view.getErrorMessage().setText("");
 
         content_dir = null;

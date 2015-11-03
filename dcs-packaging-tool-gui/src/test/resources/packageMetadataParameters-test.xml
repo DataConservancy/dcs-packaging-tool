@@ -17,36 +17,43 @@
         <name>Package-Metadata-Required</name>
         <requiredness>REQUIRED</requiredness>
         <helpText>This is the help text for Package-Metadata-1</helpText>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Package-Metadata-Recommended</name>
         <requiredness>RECOMMENDED</requiredness>
         <helpText>This is the help text for Package-Metadata-2</helpText>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Package-Metadata-Optional</name>
         <requiredness>OPTIONAL</requiredness>
         <helpText>This is the help text for Package-Metadata-2</helpText>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Email-Metadata</name>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>EMAIL</validationType>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Phone-Metadata</name>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>PHONE</validationType>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Repeatable-Metadata</name>
         <requiredness>MISSPELLED</requiredness>
         <validationType>MISSPELLED</validationType>
         <repeatable>true</repeatable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Editable-Metadata</name>
         <editable>true</editable>
+        <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Visible-Metadata</name>

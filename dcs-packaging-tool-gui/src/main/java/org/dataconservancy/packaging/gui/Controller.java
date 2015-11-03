@@ -66,19 +66,33 @@ public class Controller {
     private PackageToolPopup crossPageProgressIndicatorPopUp;
     private Page currentPage;
     private Stack<Page> previousPages;
-    
+
+    private Stack<Page> createNewPackagePagesStack;
+
+    private Stack<Page> openExistingPackagePagesStack;
+    private boolean createNewPackage;
+
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
     private final ConcurrentHashMap<Object, Semaphore> locks = new ConcurrentHashMap<>();
-    
+
+
     public Controller() {
         this.container = new BorderPane();
         container.getStyleClass().add(CssConstants.ROOT_CLASS);
         previousPages = new Stack<>();
+        createNewPackagePagesStack = new Stack<>();
+        openExistingPackagePagesStack = new Stack<>();
         toolVersion = new ApplicationVersion();
+        initiatePagesStacks();
     }
 
-    public Factory getFactory() { return factory; }
-    public void setFactory(Factory factory) { this.factory = factory; }
+    public Factory getFactory() {
+        return factory;
+    }
+
+    public void setFactory(Factory factory) {
+        this.factory = factory;
+    }
 
     public void startApp() {
         defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
@@ -86,35 +100,74 @@ public class Controller {
         availableProjects = factory.getConfiguration().getAvailableProjects();
         showHome(true);
     }
-    
+
     /**
      * Switch to home.
+     *
      * @param clear Set to true if the fields on the home page should be cleared, false if not.
      */
     public void showHome(boolean clear) {
-        container.setTop((VBox)factory.getHeaderView());
-        currentPage = Page.CREATE_NEW_PACKAGE;
+        container.setTop((VBox) factory.getHeaderView());
+        currentPage = Page.HOMEPAGE;
         packageDescription = null;
         packageDescriptionFile = null;
         contentRoot = null;
         rootArtifactDir = null;
         packageState = new PackageState(this.toolVersion);
 
-
         if (clear) {
             clearPresenters();
         }
-        showPage();
+
+        factory.getHeaderView().highlightNextPage(currentPage);
+        show(factory.getHomepagePresenter());
+    }
+
+    /**
+     * Initiates the page stacks so the application flows appropriately
+     */
+    private void initiatePagesStacks() {
+        createNewPackagePagesStack.clear();
+        createNewPackagePagesStack.add(Page.GENERATE_PACKAGE);
+        createNewPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        createNewPackagePagesStack.add(Page.CREATE_NEW_PACKAGE);
+        createNewPackagePagesStack.add(Page.PACKAGE_METADATA);
+
+        openExistingPackagePagesStack.clear();
+        openExistingPackagePagesStack.add(Page.GENERATE_PACKAGE);
+        openExistingPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        openExistingPackagePagesStack.add(Page.EXISTING_PACKAGE_METADATA);
+        openExistingPackagePagesStack.add(Page.OPEN_EXISTING_PACKAGE);
     }
 
     /**
      * Method to clear stale information from the presenters.
      */
     private void clearPresenters() {
+        factory.getHomepagePresenter().clear();
+        factory.getPackageMetadataPresenter().clear();
         factory.getCreateNewPackagePresenter().clear();
-        factory.getContentDirectoryPresenter().clear();
+        factory.getOpenExistingPackagePresenter().clear();
         factory.getPackageDescriptionPresenter().clear();
         factory.getPackageGenerationPresenter().clear();
+    }
+
+    /**
+     * Switch to homepage
+     */
+    private void showHomepage() {
+        previousPages.clear();
+        showHome(true);
+    }
+
+    /**
+     * Switch to package metadata
+     */
+    private void showPackageMetadata(boolean existing) {
+        show(factory.getPackageMetadataPresenter());
+        if (existing) {
+            factory.getPackageMetadataPresenter().setExistingValues();
+        }
     }
 
     /**
@@ -125,10 +178,10 @@ public class Controller {
     }
 
     /**
-     * Switch to the screen for selecting a content directory.
+     * Switch to the screen for selecting a package directory.
      */
-    public void showSelectContentDirectory() {
-        show(factory.getContentDirectoryPresenter());
+    public void showOpenExistingPackage() {
+        show(factory.getOpenExistingPackagePresenter());
     }
 
     /**
@@ -140,12 +193,13 @@ public class Controller {
 
     /**
      * Shows the presenter and optionally clears the information
+     *
      * @param presenter The presenter to show
      */
     private void show(Presenter presenter) {
         container.setCenter(presenter.display());
     }
-    
+
     public void showGeneratePackage() {
         show(factory.getPackageGenerationPresenter());
     }
@@ -155,9 +209,10 @@ public class Controller {
         show(presenter);
         return presenter;
     }
+
     /**
      * Pops up a dialog that waits for the user to choose a file.
-     * 
+     *
      * @param chooser the FileChooser
      * @return file chosen or null on cancel
      */
@@ -177,10 +232,11 @@ public class Controller {
             return null;
         }
     }
-    
-    /** Pops up a save file dialog.
-     * 
-     * @param chooser  the FileChooser
+
+    /**
+     * Pops up a save file dialog.
+     *
+     * @param chooser the FileChooser
      * @return File to save or null on cancel.
      */
     public File showSaveFileDialog(FileChooser chooser) {
@@ -201,6 +257,7 @@ public class Controller {
 
     /**
      * Pops up a dialog that waits for the user to choose a directory
+     *
      * @param chooser the DirectoryChooser
      * @return directory chosen or null on cancel
      */
@@ -219,127 +276,51 @@ public class Controller {
             return null;
         }
     }
-    
+
     private Semaphore getLock(Object exclusive) {
         locks.putIfAbsent(exclusive, new Semaphore(1));
         return locks.get(exclusive);
     }
-    
-    /** 
-     * A simple enumeration that is used to control flow in the application. There is an entry for each page in the application.
-     * Each page contains it's order in the application as well as a title. 
-     */
-    //TODO: This enum is getting a bit unwieldy as enum at this point, and may need to be converted to a separate class -BMB
-    public enum Page {
 
-        //Positions must be in numerical order of there appearance in the workflow but don't need to be sequential
-        //Space is left between pages to allow for the future addition of more screens
-        CREATE_NEW_PACKAGE(10, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-        SELECT_CONTENT_DIRECTORY(11, Labels.LabelKey.CREATE_PACKAGE_PAGE),
-        DEFINE_RELATIONSHIPS(20, Labels.LabelKey.DEFINE_RELATIONSHIPS_PAGE),
-        GENERATE_PACKAGE(30, Labels.LabelKey.GENERATE_PACKAGE_PAGE);
-        
-        private int position;
-        private Labels.LabelKey labelKey;
-        
-        Page(int position, Labels.LabelKey label) {
-            this.position = position;
-            this.labelKey = label;
-        }
-        
-        /**
-         * Returns the position of the page in the application.
-         * @return  the position of the page
-         */
-        public int getPosition() {
-            return position;
-        }
-
-        /**
-         * Static method to get the page that corresponds to a specific position.
-         * Note: This method is required because the pages are not zero indexed, or sequential so you can't simply access or loop through to find the correct page based on position.
-         * @param position The position to retrieve the page for.
-         * @return The page corresponding to the given position or null if none exist.
-         */
-        public static Page getPageByPosition(int position) {
-            switch (position) {
-                case 10:
-                    return CREATE_NEW_PACKAGE;
-                case 11:
-                    return SELECT_CONTENT_DIRECTORY;
-                case 20:
-                    return DEFINE_RELATIONSHIPS;
-                case 30:
-                    return GENERATE_PACKAGE;
-            }
-
-            return null;
-        }
-        /**
-         * Returns the label key to get the title of the page.
-         * @return  the label key to get the title of the page
-         */
-        public Labels.LabelKey getLabelKey() {
-            return labelKey;
-        }
-
-        /**
-         * Determines if the page is valid to be shown, this is for conditional pages such as the the SELECT_CONTENT_DIRECTORY page.
-         * For most pages this method will default to true since they're always valid to be shown.
-         * @param controller The controller instance that's checking for page validity
-         * @return True if the page should be shown, false if not
-         */
-        //TODO: I was hoping to make this a parameter of the enum but getting that to work proved to be beyond my java foo. So this method exists instead. -BMB
-        public boolean isValidPage(Controller controller) {
-            switch(this) {
-                case SELECT_CONTENT_DIRECTORY:
-                    if (controller.getPackageDescriptionFile() == null) {
-                        return false;
-                    }
-                    break;
-            }
-
-            return true;
-        }
-    }
-    
     //Advances the application to the next page. Or redisplays the current page if it's the last page.
     public void goToNextPage() {
-        Page nextPage = currentPage;
-        int currentPosition = currentPage.getPosition();
-        int nextPosition = Integer.MAX_VALUE;
-        for (Page pages : Page.values()) {
-            if (pages.position > currentPosition && pages.position < nextPosition && pages.isValidPage(this)) {
-                nextPosition = pages.position;
-            }
-        }
-        
-        if (nextPosition < Integer.MAX_VALUE) {
-            Page pageForPosition = Page.getPageByPosition(nextPosition);
-            if (pageForPosition != null) {
-                nextPage = pageForPosition;
-            }
-        }
-
         previousPages.push(currentPage);
-        currentPage = nextPage;
+        if (createNewPackage) {
+            currentPage = createNewPackagePagesStack.pop();
+        } else {
+            currentPage = openExistingPackagePagesStack.pop();
+        }
         showPage();
     }
-    
-    //Returns the application to the previous page, or redisplays the current page if it's the first page. 
+
+    //Returns the application to the previous page
     public void goToPreviousPage() {
         if (previousPages != null && !previousPages.isEmpty()) {
+            if (createNewPackage) {
+                createNewPackagePagesStack.push(currentPage);
+            } else {
+                openExistingPackagePagesStack.push(currentPage);
+            }
             currentPage = previousPages.pop();
             showPage();
         }
     }
-    
+
     /**
-     * Shows the current page, a tells the presenter if it should clear it's information. 
+     * Shows the current page, a tells the presenter if it should clear it's information.
      */
     private void showPage() {
-        factory.getHeaderView().highlightNextPage(currentPage.getPosition());
+        factory.getHeaderView().highlightNextPage(currentPage);
         switch (currentPage) {
+            case HOMEPAGE:
+                showHomepage();
+                break;
+            case PACKAGE_METADATA:
+                showPackageMetadata(false);
+                break;
+            case EXISTING_PACKAGE_METADATA:
+                showPackageMetadata(true);
+                break;
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
                 break;
@@ -349,8 +330,8 @@ public class Controller {
             case GENERATE_PACKAGE:
                 showGeneratePackage();
                 break;
-            case SELECT_CONTENT_DIRECTORY:
-                showSelectContentDirectory();
+            case OPEN_EXISTING_PACKAGE:
+                showOpenExistingPackage();
                 break;
             default:
                 //There is no next page do nothing
@@ -358,20 +339,19 @@ public class Controller {
         }
     }
 
-
     public void setPackageDescription(PackageDescription description) {
         this.packageDescription = description;
     }
-    
+
     public PackageDescription getPackageDescription() {
         return packageDescription;
     }
-    
-    public void setPackageDescriptionFile(File packageDescriptionFile){
+
+    public void setPackageDescriptionFile(File packageDescriptionFile) {
         this.packageDescriptionFile = packageDescriptionFile;
     }
 
-    public File getPackageDescriptionFile(){
+    public File getPackageDescriptionFile() {
         return packageDescriptionFile;
     }
 
@@ -383,17 +363,29 @@ public class Controller {
         this.contentRoot = contentRoot;
     }
 
-    public File getRootArtifactDir() { return rootArtifactDir; }
+    public File getRootArtifactDir() {
+        return rootArtifactDir;
+    }
 
-    public void setRootArtifactDir(File rootArtifactDir) { this.rootArtifactDir = rootArtifactDir; }
+    public void setRootArtifactDir(File rootArtifactDir) {
+        this.rootArtifactDir = rootArtifactDir;
+    }
 
-    public String getPackageFilenameIllegalCharacters() { return packageFilenameIllegalCharacters; }
+    public String getPackageFilenameIllegalCharacters() {
+        return packageFilenameIllegalCharacters;
+    }
 
-    public void setPackageFilenameIllegalCharacters(String illegalCharacters) { this.packageFilenameIllegalCharacters = illegalCharacters;}
+    public void setPackageFilenameIllegalCharacters(String illegalCharacters) {
+        this.packageFilenameIllegalCharacters = illegalCharacters;
+    }
 
-    public String getAvailableProjects() { return availableProjects; }
+    public String getAvailableProjects() {
+        return availableProjects;
+    }
 
-    public void setAvailableProjects(String availableProjects) { this.availableProjects = availableProjects; }
+    public void setAvailableProjects(String availableProjects) {
+        this.availableProjects = availableProjects;
+    }
 
     public PackageState getPackageState() {
         return packageState;
@@ -414,14 +406,29 @@ public class Controller {
     public void setToolBuildNumber(String buildNumber) {
         toolVersion.setBuildNumber(buildNumber);
     }
+
     public void setToolBuildRevision(String buildRevision) {
         toolVersion.setBuildRevision(buildRevision);
     }
+
     public void setToolBuildTimestamp(String buildTimestamp) {
         toolVersion.setBuildTimeStamp(buildTimestamp);
     }
 
-    public String getDefaultPackageGenerationParametersFilePath () {
+    public String getDefaultPackageGenerationParametersFilePath() {
         return defaultPackageGenerationParametersFilePath;
+    }
+
+    public void setCreateNewPackage(boolean createNewPackage) {
+        this.createNewPackage = createNewPackage;
+    }
+
+    // Only used for tests so each test's continue button can be tested.
+    public Stack<Page> getCreateNewPackagePagesStack() {
+        return createNewPackagePagesStack;
+    }
+
+    public Stack<Page> getOpenExistingPackagePagesStack() {
+        return openExistingPackagePagesStack;
     }
 }

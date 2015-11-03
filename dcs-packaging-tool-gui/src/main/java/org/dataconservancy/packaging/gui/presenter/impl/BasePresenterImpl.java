@@ -39,15 +39,14 @@ public abstract class BasePresenterImpl implements Presenter {
 
     public BasePresenterImpl(View<?> view) {
         this.view = view;
-        bindBaseElements();
     }
     
     protected void bindBaseElements() {
         view.getHeaderViewAboutLink().setOnAction(arg0 -> view.showAboutPopup());
         
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
-        
-        view.getCancelLink().setOnAction(arg0 -> getController().goToPreviousPage());
+
+        bindCancelLink();
     }
 
     @Override
@@ -82,5 +81,9 @@ public abstract class BasePresenterImpl implements Presenter {
     
     public void setView(View<?> view) {
         this.view = view;
+    }
+
+    public void bindCancelLink() {
+        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
     }
 }
