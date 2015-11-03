@@ -90,6 +90,10 @@ public class DcsBOProfile
 
     private final NodeTransform rootCollectionToDataItem = new NodeTransform();
 
+    private final NodeTransform rootDataItemToProject = new NodeTransform();
+
+    private final NodeTransform projectToDataItem = new NodeTransform();
+
     /* Properties */
 
     private final StructuralRelation metadataRel =
@@ -199,7 +203,9 @@ public class DcsBOProfile
                                         file_to_metadata,
                                         collectionMetadataFileToDataFile,
                                         dataFileToCollectionMetadataFile,
-                                        rootCollectionToDataItem));
+                                        rootCollectionToDataItem,
+                                        rootDataItemToProject,
+                                        projectToDataItem));
 
         setPropertyTypes(Arrays.asList(hasBusinessID,
                                        hasAlternateId,
@@ -646,6 +652,22 @@ public class DcsBOProfile
                                                               metadataRel), noNodeConstraint()));
         rootCollectionToDataItem.setResultNodeType(dataItem);
 
+        /*
+         * Root data items can be converted to projects
+         */
+        rootDataItemToProject.setLabel("DataItem to Project");
+        rootDataItemToProject.setDescription("Transforms a DataItem into a Project");
+        rootDataItemToProject.setSourceNodeType(dataItem);
+        rootDataItemToProject.setResultNodeType(project);
+        rootDataItemToProject.setSourceParentConstraint(noNodeConstraint());
+        rootDataItemToProject.setResultChildTransforms(Collections.singletonList(file_to_metadata));
+
+        projectToDataItem.setLabel("Project to DataItem");
+        projectToDataItem.setDescription("Transforms a project into a Data Item");
+        projectToDataItem.setSourceNodeType(project);
+        projectToDataItem.setResultNodeType(dataItem);
+        projectToDataItem.setSourceChildConstraints(Arrays.asList(allowRelationshipTo(metadata, metadataRel), noNodeConstraint()));
+
         /* DataItem can always be changed to Collection */
         dataItem_to_collection.setLabel("DataItem to Collection");
         dataItem_to_collection
@@ -659,6 +681,7 @@ public class DcsBOProfile
         metadata_to_file.setDescription("MetadataFile to DataFile");
         metadata_to_file.setSourceNodeType(metadata);
         metadata_to_file.setResultNodeType(file);
+        metadata_to_file.setSourceParentConstraint(allowRelationshipTo(dataItem, metadataRel));
 
         /* DataFile can be changed to MetadataFile */
         file_to_metadata.setLabel("DataFile to MetadataFile");
@@ -681,6 +704,7 @@ public class DcsBOProfile
         //So the data item remains unchanged unless empty then it's deleted.
         dataFileToCollectionMetadataFile.setSourceNodeType(dataItem);
         dataFileToCollectionMetadataFile.setResultNodeType(dataItem);
+        dataFileToCollectionMetadataFile.setSourceChildConstraints(Arrays.asList(allowRelationshipTo(file, memberRel), allowRelationshipTo(metadata, metadataRel)));
         dataFileToCollectionMetadataFile.setMoveChildrenToParent(true);
         dataFileToCollectionMetadataFile.setRemoveEmptyResult(true);
         dataFileToCollectionMetadataFile.setResultChildTransforms(Collections.singletonList(file_to_metadata));
@@ -802,6 +826,14 @@ public class DcsBOProfile
 
     public NodeTransform getRootCollectionToDataItemTransform() {
         return rootCollectionToDataItem;
+    }
+
+    public NodeTransform getRootDataItemToProjectTransform() {
+        return rootDataItemToProject;
+    }
+
+    public NodeTransform getProjectToDataItemTransform() {
+        return projectToDataItem;
     }
 
     public PropertyType getHasAlottedStorage() {
