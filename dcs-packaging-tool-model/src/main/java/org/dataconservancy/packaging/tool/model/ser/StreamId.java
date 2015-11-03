@@ -19,13 +19,29 @@
 package org.dataconservancy.packaging.tool.model.ser;
 
 /**
- * Identifiers for streams serialized in a package or package state
+ * Identifiers for streams serialized in a package or package state.
  */
 public enum StreamId {
 
     /**
      * Identifier for the stream containing the name of the package
      */
-    PACKAGE_NAME
+    PACKAGE_NAME,
+
+    /**
+     * Identifier for the stream containing the internal package model
+     */
+    PACKAGE_TREE,
+
+    /**
+     * Identifier for the stream containing package metadata fields and values
+     */
+    PACKAGE_METADATA,
+
+    /**
+     * Identifier for the stream containing developer version information (version number, build number, etc.) for the
+     * Package Tool GUI
+     */
+    APPLICATION_VERSION
 
 }
