@@ -149,22 +149,20 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
         NodeConstraint nc = find_parent_constraint(node.getNodeType(), parent_node.getNodeType());
 
-        if (nc == null) {
-            throw new IllegalStateException("Cannot find parent constraint for " + node.getIdentifier());
-        }
+        if (nc != null) {
+            Resource object = as_resource(node.getDomainObject());
+            Resource parent = as_resource(parent_node.getDomainObject());
 
-        Resource object = as_resource(node.getDomainObject());
-        Resource parent = as_resource(parent_node.getDomainObject());
+            StructuralRelation rel = nc.getStructuralRelation();
 
-        StructuralRelation rel = nc.getStructuralRelation();
+            if (rel != null) {
+                if (rel.getHasParentPredicate() != null) {
+                    object.addProperty(as_property(rel.getHasParentPredicate()), parent);
+                }
 
-        if (rel != null) {
-            if (rel.getHasParentPredicate() != null) {
-                object.addProperty(as_property(rel.getHasParentPredicate()), parent);
-            }
-
-            if (rel.getHasChildPredicate() != null) {
-                parent.addProperty(as_property(rel.getHasChildPredicate()), object);
+                if (rel.getHasChildPredicate() != null) {
+                    parent.addProperty(as_property(rel.getHasChildPredicate()), object);
+                }
             }
         }
     }
