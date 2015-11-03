@@ -13,7 +13,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -25,7 +24,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class DcBoProfileServiceTest {
@@ -48,6 +46,9 @@ public class DcBoProfileServiceTest {
         treeFactory = new IpmTreeFactory();
     }
 
+    /**
+     * Tests that a single directory with no children is assigned type project.
+     */
     @Test
     public void testSingleDirectoryAssignment() {
         Node root = treeFactory.createSingleDirectoryTree(null);
@@ -59,6 +60,9 @@ public class DcBoProfileServiceTest {
         assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
     }
 
+    /**
+     * Documents behavior that we don't support a single file tree currently, so assigning types will fail.
+     */
     @Test
     public void testSingleFileAssignment() {
         Node root = treeFactory.createSingleFileTree(null);
@@ -67,6 +71,9 @@ public class DcBoProfileServiceTest {
         assertFalse(success);
     }
 
+    /**
+     * Test that two directories are given the preferred types of project and collection.
+     */
     @Test
     public void testTwoDirectoryAssignment() {
         Node root = treeFactory.createTwoDirectoryTree(null, null);
@@ -81,6 +88,9 @@ public class DcBoProfileServiceTest {
         checkValidTree(root);
     }
 
+    /**
+     * Tests that a single directory with a single file is assigned preferred type of collection and metadata file.
+     */
     @Test
     public void testSingleDirectoryFileAssigment() {
         Node root = treeFactory.createSingleDirectoryFileTree(null, null);
@@ -93,6 +103,9 @@ public class DcBoProfileServiceTest {
         assertEquals(profile.getMetadataNodeType().getIdentifier(), root.getChildren().get(0).getNodeType().getIdentifier());
     }
 
+    /**
+     * Tests that a small tree of nodes can successfully have types assigned.
+     */
     @Test
     public void testSmallTreeAssignment() {
         Node root = treeFactory.createTree(4, 2, true);
@@ -105,6 +118,9 @@ public class DcBoProfileServiceTest {
         checkValidTree(root);
     }
 
+    /**
+     * Tests that a sub collection with no children can be converted to a data item.
+     */
     @Test
     public void testSubCollectionToDataItemNoChildrenTransform() {
         Node root = boIpmFactory.createSubCollectionTree();
@@ -119,6 +135,9 @@ public class DcBoProfileServiceTest {
         assertTrue(service.validateTree(root));
     }
 
+    /**
+     * Tests that a sub collection with metadata file children can be transformed to a data item.
+     */
     @Test
     public void testSubCollectionToDataItemWithChildrenTransform() {
         treeFactory.setNodeTypeSetter((node, depth) -> {
@@ -157,6 +176,9 @@ public class DcBoProfileServiceTest {
         treeFactory.setNodeTypeSetter(null);
     }
 
+    /**
+     * Tests that a data item with a data file child is correctly converted to a collection and metadata file.
+     */
     @Test
     public void testDataItemToSubCollectionTransformWithFile() {
         Node root = boIpmFactory.createSmallLinearTree();
@@ -172,6 +194,9 @@ public class DcBoProfileServiceTest {
         assertTrue(service.validateTree(root));
     }
 
+    /**
+     * Tests that a collection metadata file can be transformed to a data item and data file under the collection.
+     */
     @Test
     public void testCollectionMetadataFileToDataItemAndDataFile() {
         Node root = treeFactory.createSingleDirectoryFileTree(profile.getCollectionNodeType(), profile.getMetadataNodeType());
@@ -190,8 +215,10 @@ public class DcBoProfileServiceTest {
         assertEquals(metadata.getIdentifier(), dataItem.getChildren().get(0).getIdentifier());
     }
 
+    /**
+     * Tests that a DataFile can be transformed to a collection metadata file.
+     */
     @Test
-    @Ignore
     public void testDataFileToCollectionMetadataFile() {
         treeFactory.setNodeTypeSetter((node, depth) -> {
             switch (depth) {
@@ -221,13 +248,16 @@ public class DcBoProfileServiceTest {
         Node metadataFile = root.getChildren().get(0);
 
         assertEquals(profile.getMetadataNodeType().getIdentifier(), metadataFile.getNodeType().getIdentifier());
-        assertNull(dataItem.getChildren());
+        assertEquals(0, dataItem.getChildren().size());
 
         assertEquals(dataFileId, metadataFile.getIdentifier());
 
         treeFactory.setNodeTypeSetter(null);
     }
 
+    /**
+     * Tests that a collection can be transformed to project if it has no parent.
+     */
     @Test
     public void testCollectionToProjectTransform() {
         treeFactory.setNodeTypeSetter((node, depth) -> {
@@ -263,6 +293,9 @@ public class DcBoProfileServiceTest {
         treeFactory.setNodeTypeSetter(null);
     }
 
+    /**
+     * Tests that a project can be transformed to a collection
+     */
     @Test
     public void testProjectToCollectionTransform() {
         Node root = treeFactory.createTwoDirectoryTree(profile.getProjectNodeType(), profile.getCollectionNodeType());
@@ -276,6 +309,9 @@ public class DcBoProfileServiceTest {
         assertEquals(profile.getCollectionNodeType().getIdentifier(), collection.getNodeType().getIdentifier());
     }
 
+    /**
+     * Tests that a metadata file can be converted to a data file if it's under a data item.
+     */
     @Test
     public void testMetadataToFileTransform() {
         Node root = treeFactory.createSingleDirectoryFileTree(profile.getDataItemNodeType(), profile.getMetadataNodeType());
@@ -291,6 +327,9 @@ public class DcBoProfileServiceTest {
         assertEquals(profile.getFileNodeType().getIdentifier(), dataFile.getNodeType().getIdentifier());
     }
 
+    /**
+     * Tests that a data file can be converted to a metadata file.
+     */
     @Test
     public void testFileToMetadataTransform() {
         Node root = treeFactory.createSingleDirectoryFileTree(profile.getDataItemNodeType(), profile.getFileNodeType());
@@ -306,6 +345,9 @@ public class DcBoProfileServiceTest {
         assertEquals(profile.getMetadataNodeType().getIdentifier(), metadataFile.getNodeType().getIdentifier());
     }
 
+    /**
+     * Tests that a collection with no parent can be transformed to a data item
+     */
     @Test
     public void testRootCollectionToDataItemTransform() {
         Node root = treeFactory.createSingleDirectoryFileTree(profile.getCollectionNodeType(), profile.getMetadataNodeType());
@@ -314,6 +356,42 @@ public class DcBoProfileServiceTest {
         service.transformNode(root, profile.getRootCollectionToDataItemTransform());
 
         assertEquals(profile.getDataItemNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+
+        assertTrue(service.validateTree(root));
+    }
+
+    /**
+     * Tests transforming a root data item to a project works correctly.
+     */
+    @Test
+    public void testRootDataItemToProjectTransform() {
+        Node root = treeFactory.createSingleDirectoryFileTree(profile.getDataItemNodeType(), profile.getFileNodeType());
+        root.walk(store::updateObject);
+
+        service.transformNode(root, profile.getRootDataItemToProjectTransform());
+
+        assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+
+        Node child = root.getChildren().get(0);
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), child.getNodeType().getIdentifier());
+
+        assertTrue(service.validateTree(root));
+    }
+
+    /**
+     * Tests transforming project to a data item if it only contains files
+     */
+    @Test
+    public void testProjectToDataItemTransform() {
+        Node root = treeFactory.createSingleDirectoryFileTree(profile.getProjectNodeType(), profile.getMetadataNodeType());
+        root.walk(store::updateObject);
+
+        service.transformNode(root, profile.getProjectToDataItemTransform());
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+
+        Node child = root.getChildren().get(0);
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), child.getNodeType().getIdentifier());
 
         assertTrue(service.validateTree(root));
     }
@@ -356,6 +434,9 @@ public class DcBoProfileServiceTest {
         assertTrue(service.validateProperties(node, profile.getProjectNodeType()));
     }
 
+    /**
+     * Tests that the profile service return the correct list of node transforms for given nodes.
+     */
     @Test
     public void testAvailableTransforms() {
         //Should be able to transform to a data item or a project.
@@ -372,7 +453,59 @@ public class DcBoProfileServiceTest {
         Node projectRoot = boIpmFactory.createSingleProjectTree();
         projectRoot.setDomainObject(URI.create(UUID.randomUUID().toString()));
         transformList = service.getNodeTransforms(projectRoot);
+        assertNotNull(transformList);
+        assertEquals(2, transformList.size());
+        assertTrue(transformList.contains(profile.getProjectToCollectionTransform()));
+        assertTrue(transformList.contains(profile.getProjectToDataItemTransform()));
 
+        //Should be able to transform a root data item to a collection or project
+        Node dataItemRoot = boIpmFactory.createSingleDataItemTree();
+        dataItemRoot.setDomainObject(URI.create(UUID.randomUUID().toString()));
+        transformList = service.getNodeTransforms(dataItemRoot);
+        assertNotNull(transformList);
+        assertEquals(2, transformList.size());
+        assertTrue(transformList.contains(profile.getRootDataItemToProjectTransform()));
+        assertTrue(transformList.contains(profile.getDataItemToCollectionTransform()));
+
+        Node linearRoot = boIpmFactory.createSmallLinearTree();
+        linearRoot.walk(store::updateObject);
+
+        //Should only be able to transform project to collection since it has a child collection
+        transformList = service.getNodeTransforms(linearRoot);
+        assertNotNull(transformList);
+        assertEquals(1, transformList.size());
+        assertTrue(transformList.contains(profile.getProjectToCollectionTransform()));
+
+        Node collectionNode = linearRoot.getChildren().get(0);
+
+        //Should have no transforms
+        transformList = service.getNodeTransforms(collectionNode);
+        assertNotNull(transformList);
+        assertEquals(0, transformList.size());
+
+        //Should be able to transform to a collection this node will also report the data file to collection metadata transform.
+        Node dataItemNode = collectionNode.getChildren().get(0);
+        transformList = service.getNodeTransforms(dataItemNode);
+        assertNotNull(transformList);
+        assertEquals(2, transformList.size());
+        assertTrue(transformList.contains(profile.getDataItemToCollectionTransform()));
+        assertTrue(transformList.contains(profile.getDataFileToCollectionMetadataFileTransform()));
+
+        //Should be able to transform the data file into a metadata file.
+        Node dataFileNode = dataItemNode.getChildren().get(0);
+        transformList = service.getNodeTransforms(dataFileNode);
+        assertNotNull(transformList);
+        assertEquals(1, transformList.size());
+        assertTrue(transformList.contains(profile.getFileToMetadataTransform()));
+
+        //Should be able to convert a collection metadata file into a data item plus data file
+        Node collection = treeFactory.createSingleDirectoryFileTree(profile.getCollectionNodeType(), profile.getMetadataNodeType());
+        collection.walk(store::updateObject);
+
+        transformList = service.getNodeTransforms(collection.getChildren().get(0));
+        assertNotNull(transformList);
+        assertEquals(1, transformList.size());
+        assertTrue(transformList.contains(profile.getCollectionMetadataFileToDataFileTransform()));
     }
 
     /**
