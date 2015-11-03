@@ -163,6 +163,48 @@ public class FarmIpmFactory {
 
         return root;
     }
+    
+    /**
+     * Return a tree with types assigned.
+     * 
+     * <pre>
+     *  /farm                     (Farm)
+     *  /farm/subfarm             (Farm)
+     *  /farm/subfarm/moo.mp3     (Media)
+     *  /farm/subfarm/trough      (Trough)
+     *  /farm/subfarm/trough/feed (Feed)
+     * </pre>
+     * 
+     * @return root of tree.
+     */
+    public Node createSimpleTree3() {
+        Node farm = new Node(URI.create("test:farm"));
+        farm.setNodeType(profile.getFarmNodeType());
+        farm.setFileInfo(create_directory_info("/farm", "farm"));
+
+        Node subfarm = new Node(URI.create("test:subfarm"));
+        subfarm.setNodeType(profile.getFarmNodeType());
+        subfarm.setFileInfo(create_directory_info("/farm/subfarm", "subfarm"));
+
+        Node moo = new Node(URI.create("test:moo"));
+        moo.setNodeType(profile.getMediaNodeType());
+        moo.setFileInfo(create_file_info("/farm/subfarm/moo.mp3", "moo.mp3"));
+
+        Node trough = new Node(URI.create("test:trough"));
+        trough.setNodeType(profile.getTroughNodeType());
+        trough.setFileInfo(create_directory_info("/farm/subfarm/trough", "trough"));
+        
+        Node feed = new Node(URI.create("test:feed"));
+        feed.setNodeType(profile.getFeedNodeType());
+        feed.setFileInfo(create_directory_info("/farm/subfarm/trough/feed", "feed"));
+
+        farm.addChild(subfarm);
+        subfarm.addChild(moo);
+        subfarm.addChild(trough);
+        trough.addChild(feed);
+
+        return farm;
+    }
 
     /**
      * Return a tree of the given size with the given depth and branching.

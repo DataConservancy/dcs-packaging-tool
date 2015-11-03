@@ -3,13 +3,15 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 <http://www.dataconservancy.org/business-object-model> a owl:Ontology ;
-    dcterms:modified "2015-08-18"^^xsd:date ;
+    dcterms:modified "2015-11-03"^^xsd:date ;
     dcterms:publisher <http://www.dataconservancy.org/> ;
     dcterms:title "Data Conservancy Business Object Model Ontology"@en ;
     rdfs:comment "Ontology for the Data Conservancy Business Object Model"@en ;
-    owl:versionInfo "2015/08/14" .
+    owl:imports foaf: ;
+    owl:versionInfo "2015/11/03" .
 
 bom:hasAlternateId a owl:DatatypeProperty ;
     rdfs:label "has alternate id"@en ;
@@ -33,7 +35,7 @@ bom:hasContact a owl:DatatypeProperty ;
     rdfs:label "has contact"@en ;
     rdfs:comment "A data property specifying a contact for the Collection or DataItem."@en ;
     rdfs:domain bom:DataAggregator ;
-    rdfs:range <http://xmlns.com/foaf.0.1/Person> .
+    rdfs:range bom:NamedPerson .
 
 bom:hasContentModel a owl:DatatypeProperty ;
     rdfs:label "has content model"@en ;
@@ -45,7 +47,7 @@ bom:hasCreator a owl:DatatypeProperty ;
     rdfs:label "has creator"@en ;
     rdfs:comment "A data property specifying a creator for the Collection or DataItem."@en ;
     rdfs:domain bom:DataAggregator ;
-    rdfs:range <http://xmlns.com/foaf.0.1/Person> .
+    rdfs:range bom:NamedPerson .
 
 bom:hasDiscipline a owl:DatatypeProperty ;
     rdfs:label "has discipline"@en ;
@@ -70,8 +72,6 @@ bom:hasVersion a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:comment "A data property specifying a version for the BusinessObject."@en ;
     rdfs:domain bom:BusinessObject .
-
-<http://www.dataconservancy.org/File> a owl:Class .
 
 bom:hasAllottedStorage a owl:DatatypeProperty ;
     rdfs:label "has allotted storage"@en ;
@@ -176,39 +176,13 @@ bom:isMetadataFor a owl:FunctionalProperty,
     rdfs:comment "Links from a metadata File to a Businsess Object."@en ;
     rdfs:domain bom:File ;
     rdfs:range bom:BusinessObject ;
-    owl:inverseOf bom:hasMetadata ;
-    owl:propertyDisjointWith bom:isMemberOf .
-
-bom:DataEntity a owl:Class ;
-    owl:intersectionOf ( [ a owl:Restriction ;
-                owl:cardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasCreateDate ] [ a owl:Restriction ;
-                owl:cardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasDepositDate ] [ a owl:Restriction ;
-                owl:cardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasModifiedDate ] [ a owl:Restriction ;
-                owl:cardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasDepositor ] ) ;
-    owl:unionOf ( bom:DataItem bom:File ) .
+    owl:inverseOf bom:hasMetadata .
 
 bom:hasMetadata a owl:ObjectProperty ;
     rdfs:label "has metadata"@en ;
     rdfs:comment "Links from a BusinessObject to a metadata File"@en ;
     rdfs:domain bom:BusinessObject ;
-    rdfs:range bom:File ;
-    owl:propertyDisjointWith bom:hasMember .
-
-bom:CollectionAggregator a owl:Class ;
-    owl:unionOf ( bom:Project bom:Collection ) .
-
-bom:Person a owl:Class ;
-    rdfs:label "Person"@en ;
-    rdfs:comment "A Person is a person."@en ;
-    rdfs:subClassOf bom:BusinessObject ;
-    owl:disjointWith bom:Collection,
-        bom:DataItem,
-        bom:File,
-        bom:Project .
+    rdfs:range bom:File .
 
 bom:isMemberOf a owl:FunctionalProperty,
         owl:ObjectProperty ;
@@ -216,29 +190,50 @@ bom:isMemberOf a owl:FunctionalProperty,
     rdfs:comment "Links from a constituent member to an aggregating object."@en ;
     rdfs:domain bom:MemberEntity ;
     rdfs:range bom:ContentEntity ;
-    owl:inverseOf bom:hasMember ;
-    owl:propertyDisjointWith bom:isMetadataFor .
-
-bom:DataAggregator a owl:Class ;
-    owl:unionOf ( bom:Collection bom:DataItem ) .
+    owl:inverseOf bom:hasMember .
 
 bom:hasMember a owl:ObjectProperty ;
     rdfs:label "has member"@en ;
     rdfs:comment "Links an aggregating object to a constituent member."@en ;
     rdfs:domain bom:ContentEntity ;
-    rdfs:range bom:MemberEntity ;
-    owl:propertyDisjointWith bom:hasMetadata .
+    rdfs:range bom:MemberEntity .
+
+bom:DataAggregator a owl:Class .
+
+bom:DataEntity a owl:Class ;
+    rdfs:subClassOf [ a owl:Class; 
+        owl:intersectionOf ( [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasCreateDate ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasDepositDate ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasModifiedDate ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasDepositor ])] .
 
 bom:ContentEntity a owl:Class ;
-    owl:intersectionOf ( [ a owl:Restriction ;
+    rdfs:subClassOf [a owl:Class; 
+        owl:intersectionOf ( [ a owl:Restriction ;
                 owl:cardinality "1"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasDescription ] [ a owl:Restriction ;
                 owl:cardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasTitle ] ) ;
-    owl:unionOf ( bom:Project bom:Collection bom:DataItem bom:File ) .
+                owl:onProperty bom:hasTitle ] ) ].
 
-bom:MemberEntity a owl:Class ;
-    owl:unionOf ( bom:Collection bom:DataItem <http://www.dataconservancy.org/File> ) .
+bom:MetadataFile a owl:Class ;
+    rdfs:subClassOf [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:isMemberOf ] .
+
+bom:MemberEntity a owl:Class .
+
+bom:CollectionAggregator a owl:Class .
+
+bom:NamedPerson a owl:Class ;
+    rdfs:subClassOf foaf:Person ;
+    rdfs:subClassOf [a owl:Restriction ;
+        owl:onProperty foaf:name ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger ] .
 
 bom:BusinessObject a owl:Class ;
     rdfs:label "BusinessObject"@en ;
@@ -249,6 +244,14 @@ bom:BusinessObject a owl:Class ;
             owl:cardinality "1"^^xsd:nonNegativeInteger ;
             owl:onProperty bom:hasBusinessId ] .
 
+bom:Person a owl:Class ;
+    rdfs:label "Person"@en ;
+    rdfs:comment "A Person is a person."@en ;
+    rdfs:subClassOf bom:BusinessObject, bom:NamedPerson, [ a owl:Class;
+        owl:intersectionOf ( [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasFixity ])] .
+
 bom:DataItem a owl:Class ;
     rdfs:label "DataItem"@en ;
     rdfs:comment """
@@ -258,16 +261,18 @@ bom:DataItem a owl:Class ;
         bom:ContentEntity,
         bom:DataAggregator,
         bom:DataEntity,
-        bom:MemberEntity ;
-    owl:disjointWith bom:Collection,
-        bom:File,
-        bom:Person,
-        bom:Project ;
-    owl:intersectionOf ( [ a owl:Restriction ;
+        bom:MemberEntity, [ a owl:Class;  
+            owl:intersectionOf ( [ a owl:Restriction ;
                 owl:allValuesFrom bom:File ;
                 owl:onProperty bom:hasMember ] [ a owl:Restriction ;
                 owl:allValuesFrom bom:Collection ;
-                owl:onProperty bom:isMemberOf ] ) .
+                owl:onProperty bom:isMemberOf ] [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasFixity ]  [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty foaf:name ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:MetadataFile ;
+                owl:onProperty bom:hasMetadata])] .
 
 bom:Collection a owl:Class ;
     rdfs:label "Collection"@en ;
@@ -278,18 +283,21 @@ bom:Collection a owl:Class ;
         bom:CollectionAggregator,
         bom:ContentEntity,
         bom:DataAggregator,
-        bom:MemberEntity ;
-    owl:disjointWith bom:DataItem,
-        bom:File,
-        bom:Person,
-        bom:Project ;
-    owl:intersectionOf ( [ a owl:Restriction ;
+        bom:MemberEntity , [a owl:Class ;
+            owl:intersectionOf ( [ a owl:Restriction ;
                 owl:allValuesFrom bom:DataAggregator ;
                 owl:onProperty bom:hasMember ] [ a owl:Restriction ;
+                owl:cardinality "1"^^xsd:nonNegativeInteger ;
                 owl:allValuesFrom bom:CollectionAggregator ;
                 owl:onProperty bom:isMemberOf ] [ a owl:Restriction ;
                 owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasPublicationDate ] ) .
+                owl:onProperty bom:hasPublicationDate ] [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasFixity ]  [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty foaf:name ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:MetadataFile ;
+                owl:onProperty bom:hasMetadata]) ] .
 
 bom:File a owl:Class ;
     rdfs:label "File"@en ;
@@ -297,12 +305,8 @@ bom:File a owl:Class ;
     rdfs:subClassOf bom:BusinessObject,
         bom:ContentEntity,
         bom:DataEntity,
-        bom:MemberEntity ;
-    owl:disjointWith bom:Collection,
-        bom:DataItem,
-        bom:Person,
-        bom:Project ;
-    owl:intersectionOf ( [ a owl:Restriction ;
+        bom:MemberEntity , [ a owl:Class ;
+            owl:intersectionOf ( [ a owl:Restriction ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasMember ] [ a owl:Restriction ;
                 owl:allValuesFrom bom:DataItem ;
@@ -310,19 +314,19 @@ bom:File a owl:Class ;
                 owl:cardinality "1"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasSize ] [ a owl:Restriction ;
                 owl:cardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasFixity ] ) .
+                owl:onProperty bom:hasFixity ] [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty foaf:name ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:MetadataFile ;
+                owl:onProperty bom:hasMetadata])] .
 
 bom:Project a owl:Class ;
     rdfs:label "Project"@en ;
     rdfs:comment " A Project aggregates Collections "@en ;
     rdfs:subClassOf bom:BusinessObject,
         bom:CollectionAggregator,
-        bom:ContentEntity ;
-    owl:disjointWith bom:Collection,
-        bom:DataItem,
-        bom:File,
-        bom:Person ;
-    owl:intersectionOf ( [ a owl:Restriction ;
+        bom:ContentEntity , [ a owl:Class;
+            owl:intersectionOf ( [ a owl:Restriction ;
                 owl:allValuesFrom bom:Collection ;
                 owl:onProperty bom:hasMember ] [ a owl:Restriction ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
@@ -338,4 +342,10 @@ bom:Project a owl:Class ;
                 owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasEndDate ] [ a owl:Restriction ;
                 owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onProperty bom:hasFundingEntity ] ) .
+                owl:onProperty bom:hasFundingEntity ] [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty bom:hasFixity ] [ a owl:Restriction ;
+                owl:cardinality "0"^^xsd:nonNegativeInteger ;
+                owl:onProperty foaf:name ] [ a owl:Restriction ;
+                owl:allValuesFrom bom:MetadataFile ;
+                owl:onProperty bom:hasMetadata])] .

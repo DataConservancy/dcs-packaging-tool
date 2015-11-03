@@ -454,4 +454,36 @@ public class DomainProfileServiceImplTest {
         assertTrue(service.validateTree(root));
     }
 
+    /**
+     * Test a recursive node transform.
+     */
+    @Test
+    public void testFarmWithTroughToBarnWithStockpileTransform() {
+        Node farm = ipmfact.createSimpleTree3();
+        Node subfarm = farm.getChildren().get(0);
+        
+        Node trough = subfarm.getChildren().stream().filter(n -> n.getNodeType() == profile.getTroughNodeType()).findFirst()
+                .get();
+        Node moo = subfarm.getChildren().stream().filter(n -> n.getNodeType() == profile.getMediaNodeType()).findFirst()
+                .get();
+        Node feed = trough.getChildren().get(0);
+
+        farm.walk(store::updateObject);
+
+        List<NodeTransform> trs = service.getNodeTransforms(subfarm);
+        assertEquals(1, trs.size());
+        assertEquals(profile.getFarmWithTroughToBarnWithStockpileTransform(), trs.get(0));
+
+        // Transform subfarm to barn and trough to stockpile
+
+        service.transformNode(subfarm, profile.getFarmWithTroughToBarnWithStockpileTransform());
+
+        assertEquals(profile.getBarnNodeType().getIdentifier(), subfarm.getNodeType().getIdentifier());
+        assertEquals(profile.getStockpileNodeType().getIdentifier(), trough.getNodeType().getIdentifier());
+
+        assertEquals(subfarm.getIdentifier(), moo.getParent().getIdentifier());
+        assertEquals(trough.getIdentifier(), feed.getParent().getIdentifier());
+        
+        assertTrue(service.validateTree(farm));
+    }
 }

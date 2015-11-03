@@ -174,6 +174,19 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             node.setNodeType(tr.getResultNodeType());
             objstore.updateObject(node);
         }
+        
+        if (tr.getResultChildTransforms() != null && node.hasChildren()) {
+            // For each child, do only first transform which matches
+            
+            for (Node child: node.getChildren()) {
+                for (NodeTransform child_tr : tr.getResultChildTransforms()) {
+                    if (can_transform(child, child_tr)) {
+                        transformNode(child, child_tr);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Override

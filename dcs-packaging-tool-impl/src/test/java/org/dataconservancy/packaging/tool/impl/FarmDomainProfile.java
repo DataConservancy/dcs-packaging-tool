@@ -55,6 +55,7 @@ public class FarmDomainProfile extends DomainProfile {
     private NodeTransform barnMediaChildToFarmTransform;
     private NodeTransform troughToCowTransform;
     private NodeTransform moveMediaFromCowToBarnTransform;
+    private NodeTransform farmWithTroughToBarnWithStockpileTransform;
     
     public FarmDomainProfile() {
         farm_node_type = new NodeType();
@@ -191,9 +192,9 @@ public class FarmDomainProfile extends DomainProfile {
         stockpile_parent_constraint.setNodeType(stockpile_node_type);
         stockpile_parent_constraint.setStructuralRelation(has_part_rel);
         
-        NodeConstraint trough_parent_constraint = new NodeConstraint();
-        trough_parent_constraint.setNodeType(trough_node_type);
-        trough_parent_constraint.setStructuralRelation(has_part_rel);
+        NodeConstraint trough_constraint = new NodeConstraint();
+        trough_constraint.setNodeType(trough_node_type);
+        trough_constraint.setStructuralRelation(has_part_rel);
 
         feed_node_type.setIdentifier(URI.create("fdp:feed"));
         feed_node_type.setLabel("Feed");
@@ -201,7 +202,7 @@ public class FarmDomainProfile extends DomainProfile {
         feed_node_type.setDomainTypes(Collections.singletonList(URI.create("farm:feed")));
         feed_node_type.setPropertyConstraints(Collections.singletonList(weight_constraint));
         feed_node_type.setDefaultPropertyValues(Collections.emptyList());
-        feed_node_type.setParentConstraints(Arrays.asList(trough_parent_constraint, stockpile_parent_constraint));
+        feed_node_type.setParentConstraints(Arrays.asList(trough_constraint, stockpile_parent_constraint));
         feed_node_type.setDomainProfile(this);
 
         NodeConstraint barn_parent_constraint = new NodeConstraint();
@@ -315,12 +316,26 @@ public class FarmDomainProfile extends DomainProfile {
         moveMediaFromCowToBarnTransform.setRemoveEmptyResult(true);
         moveMediaFromCowToBarnTransform.setSourceChildConstraints(Arrays.asList(media_constraint));
         
+        
+        NodeTransform troughToStockpileTransform = new NodeTransform();
+        troughToStockpileTransform.setSourceNodeType(trough_node_type);
+        troughToStockpileTransform.setResultNodeType(stockpile_node_type);
+        
+        farmWithTroughToBarnWithStockpileTransform = new NodeTransform();
+        farmWithTroughToBarnWithStockpileTransform.setLabel("Farm/Trough -> Barn/Stockpile");
+        farmWithTroughToBarnWithStockpileTransform.setDescription("Transform a farm with a trough to a stockpile in a barn.");
+        farmWithTroughToBarnWithStockpileTransform.setSourceParentConstraint(farm_parent_constraint);
+        farmWithTroughToBarnWithStockpileTransform.setSourceNodeType(farm_node_type);
+        farmWithTroughToBarnWithStockpileTransform.setSourceChildConstraints(Arrays.asList(trough_constraint, media_constraint));
+        farmWithTroughToBarnWithStockpileTransform.setResultNodeType(barn_node_type);
+        farmWithTroughToBarnWithStockpileTransform.setResultChildTransforms(Arrays.asList(troughToStockpileTransform));
+        
         setIdentifier(URI.create("http://example.com/farm"));
         setLabel("Farm");
         setDescription("Vocabulary for describing a farm");
         setNodeTypes(Arrays.asList(trough_node_type, media_node_type, cow_node_type, barn_node_type, feed_node_type, stockpile_node_type, farm_node_type));
         setPropertyTypes(Arrays.asList(species_property_type, weight_property_type, title_property_type, breed));
-        setNodeTransforms(Arrays.asList(cowToStockpileTransform, barnNoChildToFarmTransform, barnMediaChildToFarmTransform, moveMediaFromCowToBarnTransform, troughToCowTransform));
+        setNodeTransforms(Arrays.asList(cowToStockpileTransform, barnNoChildToFarmTransform, barnMediaChildToFarmTransform, moveMediaFromCowToBarnTransform, troughToCowTransform, farmWithTroughToBarnWithStockpileTransform));
     }
 
     public NodeType getFarmNodeType() {
@@ -407,5 +422,9 @@ public class FarmDomainProfile extends DomainProfile {
     
     public NodeTransform getMoveMediaFromCowToBarnTransform() {
         return moveMediaFromCowToBarnTransform;
+    }
+    
+    public NodeTransform getFarmWithTroughToBarnWithStockpileTransform() {
+        return farmWithTroughToBarnWithStockpileTransform;
     }
 }
