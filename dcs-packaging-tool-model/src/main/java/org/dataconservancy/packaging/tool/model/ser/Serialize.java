@@ -39,7 +39,7 @@ public @interface Serialize {
      *
      * @return
      */
-    String streamId();
+    StreamId streamId();
 
     /**
      * Serialization scope is used to mark what fields will get serialized when.
