@@ -32,6 +32,7 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
 
 import org.dataconservancy.packaging.tool.impl.DomainProfileRdfTransformService;
+import org.dataconservancy.packaging.tool.model.dprofile.CardinalityConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
@@ -73,21 +74,19 @@ public class DcsBOProfile
     /* Transforms */
     private final NodeTransform collection_to_project = new NodeTransform();
 
-    private final NodeTransform collectionToProjectNoChildren =
-            new NodeTransform();
-
     private final NodeTransform project_to_collection = new NodeTransform();
 
     private final NodeTransform dataItem_to_collection = new NodeTransform();
 
     private final NodeTransform collection_to_dataItem = new NodeTransform();
 
-    private final NodeTransform collectionToDataItemNoChildren =
-            new NodeTransform();
-
     private final NodeTransform metadata_to_file = new NodeTransform();
 
     private final NodeTransform file_to_metadata = new NodeTransform();
+
+    private final NodeTransform collectionMetadataFileToDataFile = new NodeTransform();
+
+    private final NodeTransform dataFileToCollectionMetadataFile = new NodeTransform();
 
     /* Properties */
 
@@ -173,7 +172,7 @@ public class DcsBOProfile
 
         setPropertyConstraints();
 
-        setRelationshipConstraints();;
+        setRelationshipConstraints();
 
         setFileAssociations();
 
@@ -195,7 +194,9 @@ public class DcsBOProfile
                                         collection_to_dataItem,
                                         dataItem_to_collection,
                                         metadata_to_file,
-                                        file_to_metadata));
+                                        file_to_metadata,
+                                        collectionMetadataFileToDataFile,
+                                        dataFileToCollectionMetadataFile));
 
         setPropertyTypes(Arrays.asList(hasBusinessID,
                                        hasAlternateId,
@@ -227,6 +228,12 @@ public class DcsBOProfile
                 + "Project")));
         project.setDomainProfile(this);
 
+        //This sets the preference of project assignment to no files, this is to mirror the existing package tool behavior
+        //Note this is just a preference the type can still be changed by the user.
+        CardinalityConstraint projectFilePreference = new CardinalityConstraint();
+        projectFilePreference.setMax(0);
+        project.setChildFileConstraint(projectFilePreference);
+
         collection.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM
                 + "Collection"));
         collection.setLabel("Collection");
@@ -234,6 +241,12 @@ public class DcsBOProfile
         collection.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "Collection")));
         collection.setDomainProfile(this);
+        //This sets the preference of collection assignment to a single file, this is to mirror the existing package tool behavior
+        //Note this is just a preference the type can still be changed by the user.
+        CardinalityConstraint collectionFilePreference = new CardinalityConstraint();
+        collectionFilePreference.setMin(1);
+        collectionFilePreference.setMax(1);
+        collection.setChildFileConstraint(collectionFilePreference);
 
         dataItem.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM
                 + "DataItem"));
@@ -242,6 +255,11 @@ public class DcsBOProfile
         dataItem.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "DataItem")));
         dataItem.setDomainProfile(this);
+        //This sets the preference of data item assignment to nodes with more than 1 file, this is to mirror the existing package tool behavior
+        //Note this is just a preference the type can still be changed by the user.
+        CardinalityConstraint dataItemPreferences = new CardinalityConstraint();
+        dataItemPreferences.setMin(2);
+        dataItem.setChildFileConstraint(dataItemPreferences);
 
         file.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "File"));
         file.setLabel("DataFile");
@@ -314,7 +332,7 @@ public class DcsBOProfile
                 .setDescription("A data property specifying the modified date for a Collection, DataItem or File");
         hasModifiedDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasModifiedDate"));
-        hasModifiedDate.setPropertyValueType(PropertyValueType.DATE_TIME);;
+        hasModifiedDate.setPropertyValueType(PropertyValueType.DATE_TIME);
 
         hasDepositDate.setLabel("Deposit Date");
         hasDepositDate
@@ -580,22 +598,11 @@ public class DcsBOProfile
         collection_to_project
                 .setDescription("Transform a Collection to a Project");
         collection_to_project.setSourceNodeType(collection);
-        collection_to_project.setSourceParentConstraint(noNodeConstraint());
-        collection_to_project.setResultNodeType(project);
-
-        /*
-         * Collection can be transformed to projects if they have no parent and
-         * have no children
-         */
-        collectionToProjectNoChildren.setLabel("Collection to Project");
-        collectionToProjectNoChildren
-                .setDescription("Transform a Collection to a Project");
-        collectionToProjectNoChildren.setSourceNodeType(collection);
-        collectionToProjectNoChildren
+        collection_to_project
                 .setSourceParentConstraint(noNodeConstraint());
-        collectionToProjectNoChildren
-                .setSourceChildConstraints(Arrays.asList(noNodeConstraint()));
-        collectionToProjectNoChildren.setResultNodeType(project);
+        collection_to_project.setSourceChildConstraints(Arrays.asList(allowRelationshipTo(collection, memberRel), noNodeConstraint()));
+        collection_to_project.setResultNodeType(project);
+        collection_to_project.setResultChildTransforms(Collections.singletonList(dataItem_to_collection));
 
         /* Projects can always be transformed to collections */
         project_to_collection.setLabel("Project to Collection");
@@ -617,25 +624,15 @@ public class DcsBOProfile
                                                                memberRel));
         collection_to_dataItem
                 .setSourceChildConstraints(Arrays.asList(allowRelationshipTo(metadata,
-                                                              metadataRel)));
+                                                              metadataRel), noNodeConstraint()));
         collection_to_dataItem.setResultNodeType(dataItem);
-
-        collectionToDataItemNoChildren.setLabel("Collection to DataItem");
-        collectionToDataItemNoChildren
-                .setDescription("Transforms a Collection into a DataItem");
-        collectionToDataItemNoChildren.setSourceNodeType(collection);
-        collectionToDataItemNoChildren
-                .setSourceParentConstraint(allowRelationshipTo(collection,
-                                                               memberRel));
-        collectionToDataItemNoChildren
-                .setSourceChildConstraints(Arrays.asList(noNodeConstraint()));
-        collectionToDataItemNoChildren.setResultNodeType(dataItem);
 
         /* DataItem can always be changed to Collection */
         dataItem_to_collection.setLabel("DataItem to Collection");
         dataItem_to_collection
                 .setDescription("Transforms a DataItem into a Collection");
         dataItem_to_collection.setResultNodeType(collection);
+        dataItem_to_collection.setResultChildTransforms(Collections.singletonList(file_to_metadata));
 
         /* MetadataFile can be changed to a DataFile */
         metadata_to_file.setLabel("MetadataFile to DataFile");
@@ -648,6 +645,25 @@ public class DcsBOProfile
         file_to_metadata.setDescription("DataFile to MetadataFile");
         file_to_metadata.setSourceNodeType(file);
         file_to_metadata.setResultNodeType(metadata);
+
+        /* Collection metadata file becomes a data file with a data item inserted as the parent */
+        collectionMetadataFileToDataFile.setLabel("MetadataFile to DataFile");
+        collectionMetadataFileToDataFile.setDescription("MetadataFile to DataFile, inserting a data item.");
+        collectionMetadataFileToDataFile.setSourceNodeType(metadata);
+        collectionMetadataFileToDataFile.setSourceParentConstraint(allowRelationshipTo(collection, metadataRel));
+        collectionMetadataFileToDataFile.setInsertParentNodeType(dataItem);
+        collectionMetadataFileToDataFile.setResultNodeType(file);
+
+        /* DataFile becomes a metadata file about the collection */
+        dataFileToCollectionMetadataFile.setLabel("DataFile to Collection Metadata");
+        dataFileToCollectionMetadataFile.setDescription("DataFile to Collection Metadata");
+        //This transform operates on the data item and moves it's children to parent.
+        //So the data item remains unchanged unless empty then it's deleted.
+        dataFileToCollectionMetadataFile.setSourceNodeType(dataItem);
+        dataFileToCollectionMetadataFile.setResultNodeType(dataItem);
+        dataFileToCollectionMetadataFile.setMoveChildrenToParent(true);
+        dataFileToCollectionMetadataFile.setRemoveEmptyResult(true);
+        dataFileToCollectionMetadataFile.setResultChildTransforms(Collections.singletonList(file_to_metadata));
     }
 
     private void setSuppliedValues() {
@@ -736,10 +752,6 @@ public class DcsBOProfile
         return collection_to_project;
     }
 
-    public NodeTransform getCollectionToProjectNoChildrenTransform() {
-        return collectionToProjectNoChildren;
-    }
-
     public NodeTransform getProjectToCollectionTransform() {
         return project_to_collection;
     }
@@ -752,16 +764,20 @@ public class DcsBOProfile
         return collection_to_dataItem;
     }
 
-    public NodeTransform getCollectionToDataItemNoChildrenTransform() {
-        return collectionToDataItemNoChildren;
-    }
-
     public NodeTransform getMetadataToFileTransform() {
         return metadata_to_file;
     }
 
     public NodeTransform getFileToMetadataTransform() {
         return file_to_metadata;
+    }
+
+    public NodeTransform getCollectionMetadataFileToDataFileTransform() {
+        return collectionMetadataFileToDataFile;
+    }
+
+    public NodeTransform getDataFileToCollectionMetadataFileTransform() {
+        return dataFileToCollectionMetadataFile;
     }
 
     public PropertyType getHasAlottedStorage() {
