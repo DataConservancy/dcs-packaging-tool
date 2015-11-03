@@ -31,14 +31,15 @@ import static org.dataconservancy.packaging.tool.ser.XstreamUtil.hasAttribute;
  * Abstract XStream {@link Converter converter} for Package Tool GUI serialization.  Any XStream converters are expected
  * to inherit from this class.
  * <p>
- * This converter is responsible for encapsulating all XStream serializations with serialization metadata.  The metadata
- * include:
+ * This converter is responsible for encapsulating all XStream serializations with serialization metadata, and providing
+ * access to the metadata to sub classes via the marshalling contexts {@link MarshallingContext} and
+ * {@link UnmarshallingContext}.  The metadata include:
  * <dl>
- * <dt>version (since version 1)</dt>
+ * <dt>version - context key {@link #version}, context value {@code Integer} <em>(since version 1)</em></dt>
  * <dd>an integer indicating the version of the serialization format</dd>
- * <dt>converterClass (since version 1)</dt>
+ * <dt>converterClass - context key {@link #A_CONVERTER_CLASS}, context value {@code String} <em>(since version 1)</em></dt>
  * <dd>fully qualified name of the Java class that produced the serialization</dd>
- * <dt>stream identifier (since version 1)</dt>
+ * <dt>stream identifier context key {@link #A_STREAMID}, context value {@code StreamId} <em>(since version 1)</em></dt>
  * <dd>symbolic name identifying the serialized stream</dd>
  * </dl>
  * Additional metadata can be added in the future.  Metadata documentation should include the field name and the
@@ -199,7 +200,8 @@ public abstract class AbstractPackageToolConverter implements Converter {
     }
 
     /**
-     * Responsible for wrapping serializations with metadata.
+     * Responsible for wrapping serializations with metadata, and including the metadata in the
+     * {@code MarshallingContext}.
      *
      * @param source
      * @param writer
@@ -210,10 +212,21 @@ public abstract class AbstractPackageToolConverter implements Converter {
             return;
         }
 
+        if (context.get(A_VERSION) != null) {
+            // we've already added metadata nodes to the writer; the caller is probably
+            // chaining calls to another converter using MarshallingContext.convertAnother(...).
+            // We don't want to add duplicate nodes, so we just return.
+            return;
+        }
+
         writer.startNode(E_SERIALIZATION);
         writer.addAttribute(A_VERSION, String.valueOf(version));
         writer.addAttribute(A_CONVERTER_CLASS, this.getClass().getName());
         writer.addAttribute(A_STREAMID, streamId);
+
+        context.put(A_VERSION, version);
+        context.put(A_CONVERTER_CLASS, this.getClass().getName());
+        context.put(A_STREAMID, streamId);
     }
 
     /**
@@ -228,12 +241,20 @@ public abstract class AbstractPackageToolConverter implements Converter {
     }
 
     /**
-     * Responsible for metadata deserialization.
+     * Responsible for metadata deserialization, and including the metadata in the
+     * {@code UnmarshallingContext}.
      *
      * @param reader
      * @param context
      */
     void beforeUnmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        if (context.get(A_VERSION) != null) {
+            // we've already unmarshalled metadata nodes from the reader; the caller is probably
+            // chaining calls to another converter using UnmarshallingContext.convertAnother(...).
+            // We won't be able to deserialize metadata nodes so we just return.
+            return;
+        }
+
         if (!E_SERIALIZATION.equals(reader.getNodeName())) {
             throw new ConversionException(
                     String.format(ERR_MISSING_EXPECTED_ELEMENT, E_SERIALIZATION, reader.getNodeName()));
@@ -253,6 +274,10 @@ public abstract class AbstractPackageToolConverter implements Converter {
         if (!hasAttribute(A_STREAMID, reader)) {
             throw new ConversionException(String.format(ERR_MISSING_EXPECTED_ATTRIBUTE, A_STREAMID));
         }
+
+        context.put(A_VERSION, version);
+        context.put(A_CONVERTER_CLASS, this.getClass().getName());
+        context.put(A_STREAMID, streamId);
 
         reader.moveDown();
     }
