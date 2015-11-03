@@ -8,6 +8,7 @@ import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
 import org.dataconservancy.packaging.tool.impl.SimpleURIGenerator;
 import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.impl.support.IpmTreeFactory;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.joda.time.DateTime;
@@ -18,10 +19,13 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class DcBoProfileServiceTest {
@@ -29,12 +33,11 @@ public class DcBoProfileServiceTest {
     private DomainProfileObjectStoreImpl store;
     private DcBoIpmFactory boIpmFactory;
     private DcsBOProfile profile;
-    private Model model;
     private IpmTreeFactory treeFactory;
 
     @Before
     public void setup() {
-        model = ModelFactory.createDefaultModel();
+        Model model = ModelFactory.createDefaultModel();
 
         URIGenerator urigen = new SimpleURIGenerator();
 
@@ -54,8 +57,6 @@ public class DcBoProfileServiceTest {
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
         assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
-
-        checkValidTree(root);
     }
 
     @Test
@@ -88,10 +89,8 @@ public class DcBoProfileServiceTest {
         assertTrue(success);
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
-        assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
-        assertEquals(profile.getFileNodeType().getIdentifier(), root.getChildren().get(0).getNodeType().getIdentifier());
-
-        checkValidTree(root);
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), root.getChildren().get(0).getNodeType().getIdentifier());
     }
 
     @Test
@@ -112,7 +111,7 @@ public class DcBoProfileServiceTest {
         root.walk(store::updateObject);
 
         Node subCollection = root.getChildren().get(0);
-        service.transformNode(subCollection, profile.getCollectionToDataItemNoChildrenTransform());
+        service.transformNode(subCollection, profile.getCollectionToDataItemTransform());
 
         assertEquals(profile.getDataItemNodeType().getIdentifier(), subCollection.getNodeType().getIdentifier());
         assertEquals(root.getIdentifier(), subCollection.getParent().getIdentifier());
@@ -121,7 +120,44 @@ public class DcBoProfileServiceTest {
     }
 
     @Test
-    @Ignore("Unignore once transforms are updated")
+    public void testSubCollectionToDataItemWithChildrenTransform() {
+        treeFactory.setNodeTypeSetter((node, depth) -> {
+            switch (depth) {
+                case 0:
+                    node.setNodeType(profile.getCollectionNodeType());
+                    break;
+                case 1:
+                    node.setNodeType(profile.getCollectionNodeType());
+                    break;
+                case 2:
+                    node.setNodeType(profile.getMetadataNodeType());
+                    break;
+            }
+
+        });
+        Node root = treeFactory.createTree(3, 1, false);
+
+        root.walk(store::updateObject);
+
+        Node subCollection = root.getChildren().get(0);
+        URI metadataFileId = subCollection.getChildren().get(0).getIdentifier();
+        service.transformNode(subCollection, profile.getCollectionToDataItemTransform());
+
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertEquals(1, root.getChildren().size());
+
+        Node dataItem = root.getChildren().get(0);
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), dataItem.getNodeType().getIdentifier());
+        assertEquals(1, dataItem.getChildren().size());
+
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), dataItem.getChildren().get(0).getNodeType().getIdentifier());
+        assertEquals(metadataFileId, dataItem.getChildren().get(0).getIdentifier());
+
+        treeFactory.setNodeTypeSetter(null);
+    }
+
+    @Test
     public void testDataItemToSubCollectionTransformWithFile() {
         Node root = boIpmFactory.createSmallLinearTree();
         root.walk(store::updateObject);
@@ -132,7 +168,153 @@ public class DcBoProfileServiceTest {
         assertEquals(profile.getCollectionNodeType().getIdentifier(), dataItem.getNodeType().getIdentifier());
         assertEquals(root.getChildren().get(0).getIdentifier(), dataItem.getParent().getIdentifier());
 
-        assertEquals(profile.getMetadataNodeType(), dataItem.getChildren().get(0).getNodeType().getIdentifier());
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), dataItem.getChildren().get(0).getNodeType().getIdentifier());
+        assertTrue(service.validateTree(root));
+    }
+
+    @Test
+    public void testCollectionMetadataFileToDataItemAndDataFile() {
+        Node root = treeFactory.createSingleDirectoryFileTree(profile.getCollectionNodeType(), profile.getMetadataNodeType());
+        root.walk(store::updateObject);
+
+        Node metadata = root.getChildren().get(0);
+        service.transformNode(metadata, profile.getCollectionMetadataFileToDataFileTransform());
+
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        Node dataItem = root.getChildren().get(0);
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), dataItem.getNodeType().getIdentifier());
+        assertNotNull(dataItem.getChildren());
+
+        assertEquals(profile.getFileNodeType().getIdentifier(), dataItem.getChildren().get(0).getNodeType().getIdentifier());
+        assertEquals(metadata.getIdentifier(), dataItem.getChildren().get(0).getIdentifier());
+    }
+
+    @Test
+    @Ignore
+    public void testDataFileToCollectionMetadataFile() {
+        treeFactory.setNodeTypeSetter((node, depth) -> {
+            switch (depth) {
+                case 0:
+                    node.setNodeType(profile.getCollectionNodeType());
+                    break;
+                case 1:
+                    node.setNodeType(profile.getDataItemNodeType());
+                    break;
+                case 2:
+                    node.setNodeType(profile.getFileNodeType());
+                    break;
+            }
+
+        });
+        Node root = treeFactory.createTree(3, 1, false);
+
+        root.walk(store::updateObject);
+
+        Node dataItem = root.getChildren().get(0);
+        URI dataFileId = dataItem.getChildren().get(0).getIdentifier();
+        service.transformNode(dataItem, profile.getDataFileToCollectionMetadataFileTransform());
+
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertEquals(1, root.getChildren().size());
+
+        Node metadataFile = root.getChildren().get(0);
+
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), metadataFile.getNodeType().getIdentifier());
+        assertNull(dataItem.getChildren());
+
+        assertEquals(dataFileId, metadataFile.getIdentifier());
+
+        treeFactory.setNodeTypeSetter(null);
+    }
+
+    @Test
+    public void testCollectionToProjectTransform() {
+        treeFactory.setNodeTypeSetter((node, depth) -> {
+            switch (depth) {
+                case 0:
+                    node.setNodeType(profile.getCollectionNodeType());
+                    break;
+                case 1:
+                    node.setNodeType(profile.getDataItemNodeType());
+                    break;
+                case 2:
+                    node.setNodeType(profile.getFileNodeType());
+                    break;
+            }
+
+        });
+        Node root = treeFactory.createTree(3, 1, false);
+        root.walk(store::updateObject);
+
+        service.transformNode(root, profile.getCollectionToProjectTransform());
+
+        assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertEquals(1, root.getChildren().size());
+
+        Node collection = root.getChildren().get(0);
+
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), collection.getNodeType().getIdentifier());
+        assertEquals(1, collection.getChildren().size());
+
+        Node metadataFile = collection.getChildren().get(0);
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), metadataFile.getNodeType().getIdentifier());
+
+        treeFactory.setNodeTypeSetter(null);
+    }
+
+    @Test
+    public void testProjectToCollectionTransform() {
+        Node root = treeFactory.createTwoDirectoryTree(profile.getProjectNodeType(), profile.getCollectionNodeType());
+        root.walk(store::updateObject);
+
+        service.transformNode(root, profile.getProjectToCollectionTransform());
+
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        Node collection = root.getChildren().get(0);
+
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), collection.getNodeType().getIdentifier());
+    }
+
+    @Test
+    public void testMetadataToFileTransform() {
+        Node root = treeFactory.createSingleDirectoryFileTree(profile.getDataItemNodeType(), profile.getMetadataNodeType());
+        root.walk(store::updateObject);
+
+        Node metadataFile = root.getChildren().get(0);
+
+        service.transformNode(metadataFile, profile.getMetadataToFileTransform());
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        Node dataFile = root.getChildren().get(0);
+
+        assertEquals(profile.getFileNodeType().getIdentifier(), dataFile.getNodeType().getIdentifier());
+    }
+
+    @Test
+    public void testFileToMetadataTransform() {
+        Node root = treeFactory.createSingleDirectoryFileTree(profile.getDataItemNodeType(), profile.getFileNodeType());
+        root.walk(store::updateObject);
+
+        Node file = root.getChildren().get(0);
+
+        service.transformNode(file, profile.getFileToMetadataTransform());
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        Node metadataFile = root.getChildren().get(0);
+
+        assertEquals(profile.getMetadataNodeType().getIdentifier(), metadataFile.getNodeType().getIdentifier());
+    }
+
+    @Test
+    public void testRootCollectionToDataItemTransform() {
+        Node root = treeFactory.createSingleDirectoryFileTree(profile.getCollectionNodeType(), profile.getMetadataNodeType());
+        root.walk(store::updateObject);
+
+        service.transformNode(root, profile.getRootCollectionToDataItemTransform());
+
+        assertEquals(profile.getDataItemNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+
         assertTrue(service.validateTree(root));
     }
 
@@ -172,6 +354,25 @@ public class DcBoProfileServiceTest {
         service.addProperty(node, hasPublisher);
 
         assertTrue(service.validateProperties(node, profile.getProjectNodeType()));
+    }
+
+    @Test
+    public void testAvailableTransforms() {
+        //Should be able to transform to a data item or a project.
+        Node collectionRoot = boIpmFactory.createSingleCollectionTree();
+        collectionRoot.setDomainObject(URI.create("domain:object"));
+        List<NodeTransform> transformList = service.getNodeTransforms(collectionRoot);
+
+        assertNotNull(transformList);
+        assertEquals(2, transformList.size());
+        assertTrue(transformList.contains(profile.getRootCollectionToDataItemTransform()));
+        assertTrue(transformList.contains(profile.getCollectionToProjectTransform()));
+
+        //Should be able to transform to a collection or a data item.
+        Node projectRoot = boIpmFactory.createSingleProjectTree();
+        projectRoot.setDomainObject(URI.create(UUID.randomUUID().toString()));
+        transformList = service.getNodeTransforms(projectRoot);
+
     }
 
     /**
@@ -336,7 +537,7 @@ public class DcBoProfileServiceTest {
         Property phone = new Property(profile.getPhone());
         phone.setStringValue("8886515908");
 
-        creator.setComplexValue(Arrays.asList(phone));
+        creator.setComplexValue(Collections.singletonList(phone));
         service.addProperty(node, creator);
 
         assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
