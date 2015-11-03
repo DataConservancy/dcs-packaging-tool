@@ -277,7 +277,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             */
         });
 
-        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
     }
 
     /*

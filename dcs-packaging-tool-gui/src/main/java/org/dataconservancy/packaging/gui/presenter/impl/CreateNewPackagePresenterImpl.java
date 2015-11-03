@@ -161,8 +161,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             }
         });
 
-        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
-        
         //Handles the user pressing the button to choose a base directory to create a package from.
         view.getChooseContentDirectoryButton()
                 .setOnAction(event -> {

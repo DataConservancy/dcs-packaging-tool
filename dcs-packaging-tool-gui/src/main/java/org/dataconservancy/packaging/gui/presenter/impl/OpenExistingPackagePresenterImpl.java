@@ -47,8 +47,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
             getController().goToNextPage();
         });
 
-        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
-
         //Handles the user pressing the button to choose the content directory of the package
         view.getChoosePackageDirectoryButton().setOnAction(event -> {
            // TODO: Handle choosing a directory and validating the dir.

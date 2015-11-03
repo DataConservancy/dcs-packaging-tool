@@ -138,6 +138,10 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             // TODO: Store the package metadata in some sort of file here.
         });
 
+    }
+
+    @Override
+    public void bindCancelLink() {
         view.getCancelLink().setOnAction(event -> view.showWarningPopup());
 
         if (Platform.isFxApplicationThread()) {
@@ -147,7 +151,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 getController().goToPreviousPage();
             });
         }
-
     }
 
     /**

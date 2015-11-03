@@ -215,8 +215,6 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
             }
         });
 
-        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
-        
         //Cancels the property popup, which closes the popup with out saving any changes.
         view.getCancelPopupHyperlink().setOnAction(arg0 -> {
             if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
