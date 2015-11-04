@@ -15,8 +15,8 @@ public interface PackageStateSerializer {
      * Serialize objects in the state to the output stream.  Because the state normally contains multiple
      * objects, multiple streams will be written to the output stream.  How this occurs is implementation dependant.
      *
-     * @param state
-     * @param out
+     * @param state the package state containing the streams to be serialized
+     * @param out the output stream to serialize to
      */
     public void serialize(PackageState state, OutputStream out);
 
@@ -25,9 +25,9 @@ public interface PackageStateSerializer {
      * the state should only contain one object with the specified {@code StreamId}, a single stream will be written
      * to the output stream.
      *
-     * @param state
-     * @param streamId
-     * @param out
+     * @param state the package state containing the stream identified by {@code streamId}
+     * @param streamId the stream within the package state to serialize
+     * @param out the output stream to serialize to
      */
     public void serialize(PackageState state, StreamId streamId, OutputStream out);
 
@@ -35,8 +35,8 @@ public interface PackageStateSerializer {
      * Deserialize the stream or streams found in the input stream, and place the object form of each deserialized
      * stream on the supplied state.
      *
-     * @param state
-     * @param in
+     * @param state the package state to be populated from the input stream, {@code in}
+     * @param in the input stream containing the streams to be deserialized onto {@code state}
      */
     public void deserialize(PackageState state, InputStream in);
 
@@ -44,9 +44,9 @@ public interface PackageStateSerializer {
      * Deserialize the specified stream from the input stream, and place the object form of the deserialized stream on
      * the supplied state.
      *
-     * @param state
-     * @param in
-     * @param streamId
+     * @param state the package state to be populated from the input stream, {@code in}
+     * @param in the input stream containing the identified stream to be deserialized onto {@code state}
+     * @param streamId identifies an individual stream from the the input stream, {@code in}
      */
     public void deserialize(PackageState state, InputStream in, StreamId streamId);
 
