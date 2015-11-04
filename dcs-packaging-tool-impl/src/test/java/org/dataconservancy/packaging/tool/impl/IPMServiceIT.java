@@ -35,7 +35,7 @@ public class IPMServiceIT {
 
     @Before
     public void setup() {
-        underTest = new IPMServiceImpl();
+        underTest = new IPMServiceImpl(new SimpleURIGenerator());
     }
     /**
      * Tests creating a tree from the file system, modifies the file system, creates a new tree,

@@ -36,7 +36,7 @@ public class IPMServiceTest {
     private final URIGenerator uriGenerator = new SimpleURIGenerator();
     @Before
     public void setup() {
-        underTest = new IPMServiceImpl();
+        underTest = new IPMServiceImpl(new SimpleURIGenerator());
     }
 
     /**

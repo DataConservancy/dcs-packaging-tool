@@ -18,7 +18,11 @@ import java.util.Set;
 
 public class IPMServiceImpl implements IPMService {
     private Set<Path> visitedFiles = new HashSet<>();
-    private final URIGenerator uriGenerator = new SimpleURIGenerator();
+    private final URIGenerator uriGenerator;
+
+    public IPMServiceImpl(URIGenerator uriGenerator) {
+        this.uriGenerator = uriGenerator;
+    }
 
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -42,6 +43,11 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
      */
     public DomainProfileObjectStoreImpl(Model model, URIGenerator urigen) {
         this.model = model;
+        this.urigen = urigen;
+    }
+
+    public DomainProfileObjectStoreImpl(URIGenerator urigen) {
+        model = ModelFactory.createDefaultModel();
         this.urigen = urigen;
     }
 
