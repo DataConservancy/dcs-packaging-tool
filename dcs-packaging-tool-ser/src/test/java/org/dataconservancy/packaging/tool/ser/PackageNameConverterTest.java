@@ -18,8 +18,6 @@
 
 package org.dataconservancy.packaging.tool.ser;
 
-import com.thoughtworks.xstream.converters.MarshallingContext;
-import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppReader;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
@@ -27,31 +25,49 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  *
  */
-public class PackageNameConverterTest {
+public class PackageNameConverterTest extends AbstractRoundTripConverterTest {
 
     private static final String PACKAGE_NAME = "a package name";
+
+    private ClassPathResource serialization = new ClassPathResource(
+            "org/dataconservancy/packaging/tool/ser/package-name-v1.ser");
 
     private PackageNameConverter underTest = new PackageNameConverter();
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         underTest.setStreamId(StreamId.PACKAGE_NAME.name());
+    }
+
+    @Override
+    public InputStream getSerializationInputStream() throws IOException {
+        return serialization.getInputStream();
+    }
+
+    @Override
+    public Object getSerializationObject() {
+        return PACKAGE_NAME;
+    }
+
+    @Override
+    public AbstractPackageToolConverter getUnderTest() {
+        return underTest;
     }
 
     @Test
@@ -63,7 +79,7 @@ public class PackageNameConverterTest {
     @Test
     public void testMarshal() throws Exception {
         StringWriter writer = new StringWriter();
-        underTest.marshal(PACKAGE_NAME, new PrettyPrintWriter(writer), mock(MarshallingContext.class));
+        underTest.marshal(PACKAGE_NAME, new PrettyPrintWriter(writer), getMarshalingContext());
 
         assertTrue(writer.getBuffer().length() > 0);
         String result = writer.getBuffer().toString();
@@ -74,11 +90,10 @@ public class PackageNameConverterTest {
 
     @Test
     public void testUnmarshal() throws Exception {
-        XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
-        Reader reader = new InputStreamReader(
-                new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-name-v1.ser").getInputStream());
+        XmlPullParser parser = getPullParser();
+        Reader reader = new InputStreamReader(getSerializationInputStream());
 
-        Object o = underTest.unmarshal(new XppReader(reader, parser), mock(UnmarshallingContext.class));
+        Object o = underTest.unmarshal(new XppReader(reader, parser), getUnmarshallingContext());
 
         assertNotNull(o);
         assertTrue(o instanceof String);
@@ -88,53 +103,4 @@ public class PackageNameConverterTest {
         assertEquals(PACKAGE_NAME, result);
     }
 
-    @Test
-    public void testRoundTripUnmarshalFirst() throws Exception {
-        XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
-        Reader reader = new InputStreamReader(
-                new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-name-v1.ser").getInputStream());
-        StringWriter writer = new StringWriter();
-
-
-        // Unmarshal first
-        final String firstResult = (String)
-                underTest.unmarshal(new XppReader(reader, parser), mock(UnmarshallingContext.class));
-        assertNotNull(firstResult);
-
-        // Marshal
-        underTest.marshal(firstResult, new PrettyPrintWriter(writer), mock(MarshallingContext.class));
-        assertTrue(writer.getBuffer().length() > 0);
-
-        // Unmarshal
-        final String secondResult = (String)
-                underTest.unmarshal(
-                        new XppReader(new StringReader(writer.getBuffer().toString()), parser),
-                        mock(UnmarshallingContext.class));
-        assertNotNull(secondResult);
-
-        assertEquals(firstResult, secondResult);
-    }
-
-    @Test
-    public void testRoundTripMarshalFirst() throws Exception {
-        XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
-        StringWriter firstWriter = new StringWriter();
-        StringWriter secondWriter = new StringWriter();
-
-        // Marshal first
-        underTest.marshal(PACKAGE_NAME, new PrettyPrintWriter(firstWriter), mock(MarshallingContext.class));
-        assertTrue(firstWriter.getBuffer().length() > 0);
-
-        // Unmarshal
-        String unmarshalResult = (String) underTest.unmarshal(
-                new XppReader(new StringReader(firstWriter.getBuffer().toString()), parser),
-                mock(UnmarshallingContext.class));
-        assertNotNull(unmarshalResult);
-
-        // Marshal
-        underTest.marshal(unmarshalResult, new PrettyPrintWriter(secondWriter), mock(MarshallingContext.class));
-        assertTrue(secondWriter.getBuffer().length() > 0);
-
-        assertEquals(firstWriter.getBuffer().toString(), secondWriter.getBuffer().toString());
-    }
 }
