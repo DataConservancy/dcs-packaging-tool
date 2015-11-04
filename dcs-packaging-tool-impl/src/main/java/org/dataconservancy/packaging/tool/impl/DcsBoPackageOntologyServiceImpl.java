@@ -1252,7 +1252,7 @@ public class DcsBoPackageOntologyServiceImpl implements PackageOntologyService {
 
     @Override
     public PropertyValidationResult validateProperty(PackageArtifact artifact, String parentPropertyName, String propertyName, String propertyValue) {
-        PropertyValidationResult result = new PropertyValidationResult(true, PropertyValidationResult.VALIDATION_HINT.NONE);
+        PropertyValidationResult result = new PropertyValidationResult(true, ValidationType.NONE);
 
         String propertyType = ontology.getPropertyType(artifact.getType(), parentPropertyName, propertyName);
         if (propertyType != null) {

@@ -24,13 +24,13 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.PackageDescriptionPresenter;
-import org.dataconservancy.packaging.gui.util.RDFURIValidator;
+import org.dataconservancy.packaging.gui.util.UrlValidator;
+import org.dataconservancy.packaging.gui.util.Validator;
+import org.dataconservancy.packaging.gui.util.ValidatorFactory;
 import org.dataconservancy.packaging.gui.view.PackageDescriptionView;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactPropertyContainer;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl.ArtifactRelationshipContainer;
@@ -45,6 +45,7 @@ import org.dataconservancy.packaging.tool.model.PackageNode;
 import org.dataconservancy.packaging.tool.model.PackageOntologyException;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.PackageTree;
+import org.dataconservancy.packaging.tool.model.ValidationType;
 import org.dataconservancy.packaging.validation.PackageValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,21 +301,22 @@ public class PackageDescriptionPresenterImpl extends BasePresenterImpl implement
                 if (relationshipContainer.getRelationship().getValue() != null) {
                     Relationship relationship = relationshipContainer.getRelationship().getValue();
                     if (relationship.getRelationshipUri() != null && !relationship.getRelationshipUri().isEmpty()) {
-
+                        ValidatorFactory validatorFactory = new ValidatorFactory();
+                        Validator urlValidator = validatorFactory.getValidator(ValidationType.URL);
                         String relationshipUri = relationship.getRelationshipUri();
                         //Only save a hierarchical relationship if it was already on the object and thus created by the system.
                         if (packageOntologyService.isRelationshipHierarchical(view.getPopupArtifact(), relationshipUri)) {
                             if (view.getPopupArtifact().getRelationshipByName(relationshipUri) != null) {
                                 relationships.add(new PackageRelationship(relationshipUri, relationshipContainer.requiresURI.get(), view.getPopupArtifact().getRelationshipByName(relationshipUri).getTargets()));
                             }
-                        } else if (RDFURIValidator.isValid(relationshipUri)) {
+                        } else if (urlValidator.isValid(relationshipUri)) {
                             //If it's not hierarchical we just add it
                             Set<String> targets = new HashSet<>();
                             for (StringProperty field : relationshipContainer.getRelationshipTargets()) {
                                 //If target is not empty or null and is a valid RDF URI
                                 if (field.getValue() != null && !field.getValue().isEmpty()) {
                                     if (relationshipContainer.requiresURI().getValue()) {
-                                        if (RDFURIValidator.isValid(field.getValue())) {
+                                        if (urlValidator.isValid(field.getValue())) {
                                             targets.add(field.getValue());
                                         }
                                     } else {

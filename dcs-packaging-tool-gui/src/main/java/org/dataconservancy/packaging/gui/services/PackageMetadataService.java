@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.services;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.PackageMetadataList;
+import org.dataconservancy.packaging.tool.model.ValidationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,7 @@ public class PackageMetadataService {
                         //will get set to NONE
                         log.warn("Missing or invalid validationType for PackageMetadata " +
                         pm.getName() + ", setting validationType to NONE");
-                        pm.setValidationType(PackageMetadata.ValidationType.NONE);
+                        pm.setValidationType(ValidationType.NONE);
                     }
 
                     if (pm.getRequiredness()!= null && pm.getRequiredness().equals(PackageMetadata.Requiredness.REQUIRED)) {

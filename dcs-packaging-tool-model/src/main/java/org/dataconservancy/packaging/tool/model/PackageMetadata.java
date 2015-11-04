@@ -27,16 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class PackageMetadata {
 
     @XmlEnum
-    public enum ValidationType {
-        NONE,
-        PHONE,
-        EMAIL,
-        URL,
-        DATE,
-        FILENAME,
-    };
-
-    @XmlEnum
     public enum Requiredness {
         REQUIRED,
         RECOMMENDED,
@@ -67,7 +57,7 @@ public class PackageMetadata {
     }
 
     /**
-     * Returns the type of validation ({@link org.dataconservancy.packaging.tool.model.PackageMetadata.ValidationType})
+     * Returns the type of validation ({@link org.dataconservancy.packaging.tool.model.ValidationType})
      * that should be performed on the field's value. These types include: {@code NONE}, {@code EMAIL}, {@code PHONE},
      * {@code DATE}, {@code URL}, {@code FILENAME}.
      */

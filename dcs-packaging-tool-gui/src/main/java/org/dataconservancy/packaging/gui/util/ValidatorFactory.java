@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.dataconservancy.packaging.gui.util;
 
-import org.dataconservancy.dcs.util.UriUtility;
+import org.dataconservancy.packaging.tool.model.ValidationType;
 
 /**
- * Class which provide convenient method to validate a string for an RDF URI
+ * An enum of the different kinds of validation types for properties
  */
-public class RDFURIValidator {
-
-
-    public static boolean isValid(String uriString) {
-        return UriUtility.isHttpUrl(uriString);
+public class ValidatorFactory {
+    public static Validator getValidator(ValidationType type){
+        switch(type){
+            case EMAIL:
+                return new EmailValidator();
+            case PHONE:
+                return new PhoneNumberValidator();
+            case URL:
+                return new UrlValidator();
+            default:
+                return null;
+        }
     }
-
 }

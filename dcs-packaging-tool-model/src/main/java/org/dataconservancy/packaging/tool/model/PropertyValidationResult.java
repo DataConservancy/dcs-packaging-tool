@@ -17,28 +17,21 @@ package org.dataconservancy.packaging.tool.model;
 
 /**
  * Class that holds the validation result from validating a property of an ontology.
- * Class contains a boolean representing the validation result, and an enum that tells the system what hint to diplay to the user.
- * Classes receiving this class should implement strings to display for the {@link org.dataconservancy.packaging.tool.model.PropertyValidationResult.VALIDATION_HINT} enum.
+ * Class contains a boolean representing the validation result, and an enum that tells the system what hint to display to the user.
+ * Classes receiving this class should implement strings to display for the {@link org.dataconservancy.packaging.tool.model.ValidationType} enum.
  */
 public class PropertyValidationResult {
 
-    public static enum VALIDATION_HINT {
-        URL,
-        PHONE,
-        EMAIL,
-        NONE
-    }
-
-    private VALIDATION_HINT hint;
+    private ValidationType validationType;
     private boolean valid;
 
-    public PropertyValidationResult(boolean valid, VALIDATION_HINT hint) {
+    public PropertyValidationResult(boolean valid, ValidationType type) {
         this.valid = valid;
-        this.hint = hint;
+        this.validationType = type;
     }
 
-    public VALIDATION_HINT getHint() {
-        return hint;
+    public ValidationType getValidationType() {
+        return validationType;
     }
 
     public boolean isValid() {

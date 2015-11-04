@@ -15,51 +15,32 @@
  */
 package org.dataconservancy.packaging.gui.util;
 
-
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Messages;
-import org.dataconservancy.packaging.tool.api.PackageOntologyService;
-import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PropertyValidationResult;
+import org.dataconservancy.packaging.tool.model.ValidationType;
 
-import static org.dataconservancy.packaging.tool.model.PropertyValidationResult.VALIDATION_HINT.*;
+import static org.dataconservancy.packaging.tool.model.ValidationType.*;
 
 /**
  * Simple String property listener that validates the string field on change, and displays the correct information in the provided labels.
  */
 public class PropertyValidationListener implements ChangeListener<String>, CssConstants {
 
-    private PackageArtifact propertyArtifact;
-    private String parentPropertyName;
-    private String propertyName;
-    private VBox parent;
-    private Label validationImageLabel;
-    private PackageOntologyService ontologyService;
     private Messages messages;
-    private BooleanProperty validProperty;
-    private HBox propertyBox;
+    //validationLabel contains the validation error message
     private Label validationLabel;
+    private PropertyBox propertyBox;
+    private ValidationType validationType;
 
-    public PropertyValidationListener(PackageArtifact artifact, String complexPropertyName, String propertyName, VBox parent, HBox propertyBox,
-                                      Label validationImageLabel, PackageOntologyService ontologyService, Messages messages, BooleanProperty validProperty) {
-        this.propertyArtifact = artifact;
-        this.parentPropertyName = complexPropertyName;
-        this.propertyName = propertyName;
-        this.validationImageLabel = validationImageLabel;
-        this.ontologyService = ontologyService;
-        this.messages = messages;
-        this.validProperty = validProperty;
+    public PropertyValidationListener(PropertyBox propertyBox, ValidationType validationType) {
         this.propertyBox = propertyBox;
-        this.parent = parent;
-
+        this.validationType = validationType;
         validationLabel = new Label();
         validationLabel.setMaxWidth(350);
         validationLabel.setWrapText(true);
@@ -69,50 +50,49 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
 
     @Override
     public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-        if (newValue != null && !newValue.isEmpty()) {
-            PropertyValidationResult result = ontologyService.validateProperty(propertyArtifact, parentPropertyName, propertyName, newValue);
+       Label validationImageLabel = propertyBox.getValidationImageLabel();
 
-            validProperty.setValue(result.isValid());
+        if (newValue != null && !newValue.isEmpty()) {
+            Validator validator = ValidatorFactory.getValidator(validationType);
+            PropertyValidationResult result = new PropertyValidationResult(validator.isValid(newValue), validationType);
 
             if (result.isValid()) {
-                switch (result.getHint()) {
+                switch (result.getValidationType()) {
                     case PHONE:
                     case URL:
+                    case EMAIL:
                         ImageView image = new ImageView();
                         image.getStyleClass().add(GOOD_INPUT_IMAGE);
                         validationImageLabel.setGraphic(image);
                         validationImageLabel.setVisible(true);
-
-                        parent.getChildren().remove(validationLabel);
+                        propertyBox.getChildren().remove(validationLabel);
                         break;
                 }
             } else {
-                if (!parent.getChildren().contains(validationLabel)) {
-                    parent.getChildren().add(parent.getChildren().indexOf(propertyBox), validationLabel);
-                }
                 validationImageLabel.setVisible(true);
-                if (result.getHint() != NONE) {
+                if (result.getValidationType() != NONE) {
                     ImageView image = new ImageView();
                     image.getStyleClass().add(BAD_INPUT_IMAGE);
                     validationImageLabel.setGraphic(image);
                 }
 
-                switch (result.getHint()) {
+                switch (result.getValidationType()) {
                     case PHONE:
                         validationLabel.setText(messages.formatPhoneValidationFailure(newValue));
                         break;
                     case URL:
                         validationLabel.setText(messages.formatUrlValidationFailure(newValue));
                         break;
+                    case EMAIL:
+                        validationLabel.setText(messages.formatEmailValidationFailure(newValue));
                     default:
                         validationLabel.setText("");
                 }
             }
         } else {
             //This listener doesn't validate if a property is required or not so an empty value is considered valid
-            validProperty.setValue(true);
             validationImageLabel.setVisible(false);
-            parent.getChildren().remove(validationLabel);
+            propertyBox.getChildren().remove(validationLabel);
         }
     }
 }

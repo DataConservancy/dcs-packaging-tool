@@ -42,6 +42,7 @@ import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.model.RelationshipGroup;
 import org.dataconservancy.packaging.gui.view.impl.PackageDescriptionViewImpl;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
+import org.dataconservancy.packaging.tool.impl.support.UrlPropertyValidator;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 
@@ -228,7 +229,8 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         //Listens for changes to the relationship value and adjusts other fields accordingly.
         relationshipComboBox.valueProperty().addListener((observableValue, relationship, newRelationship) -> {
             if (newRelationship != null) {
-                if (RDFURIValidator.isValid(newRelationship.getRelationshipUri()) || ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
+               // if (UrlValidator.isValid(newRelationship.getRelationshipUri()) || ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
+                  if (ontologyService.getKnownRelationshipNames().contains(newRelationship.getLabel())
                         || ontologyService.getKnownRelationshipNames().contains(newRelationship.getRelationshipUri())) {
                     requiresURILabel.setVisible(false);
                     editable.setValue(!ontologyService.isRelationshipHierarchical(artifact, newRelationship.getLabel()));
@@ -535,8 +537,8 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         return (observable, oldValue, newValue) -> {
             if (newValue == null || newValue.isEmpty() || !requiresUri.getValue()) {
                 setLabelImage(errorMessageLabel, null);
-            } else if (RDFURIValidator.isValid(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
+          //  } else if (UrlValidator.isValid(newValue)) {
+          //      setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
             } else {
                 setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
             }

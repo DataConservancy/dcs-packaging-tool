@@ -20,6 +20,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import org.dataconservancy.packaging.tool.api.support.OntologyPropertyValidator;
 import org.dataconservancy.packaging.tool.model.PropertyValidationResult;
+import org.dataconservancy.packaging.tool.model.ValidationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,6 @@ public class PhoneNumberPropertyValidator implements OntologyPropertyValidator {
             valid = phoneUtil.isValidNumber(phoneNumber);
         }
 
-        return new PropertyValidationResult(valid, PropertyValidationResult.VALIDATION_HINT.PHONE);
+        return new PropertyValidationResult(valid, ValidationType.PHONE);
     }
 }

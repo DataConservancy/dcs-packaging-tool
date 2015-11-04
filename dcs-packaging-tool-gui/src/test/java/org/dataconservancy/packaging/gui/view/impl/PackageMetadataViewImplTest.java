@@ -19,6 +19,7 @@ import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +32,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests that package metadata view impl initializes all fields correctly based on the given service.
  */
+//ignore until refactoring is done
+    @Ignore
 public class PackageMetadataViewImplTest extends BaseGuiTest {
 
     private PackageMetadataViewImpl view;

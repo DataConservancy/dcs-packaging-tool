@@ -32,7 +32,8 @@ public class Messages {
         WARNING_INVALID_PROPERTY("invalidproperty.warning"),
         WARNING_PACKAGE_DESCRIPTION_MODIFICATION("packagedescriptionmodification.warning"),
         URL_VALIDATION_FAILURE("urlvalidation.failure"),
-        PHONE_VALIDATION_FAILURE("phonevalidation.failure");
+        PHONE_VALIDATION_FAILURE("phonevalidation.failure"),
+        EMAIL_VALIDATION_FAILURE("emailvalidation.failure");
 
         String property;
 
@@ -41,7 +42,7 @@ public class Messages {
         }
     }
 
-    private ResourceBundle bundle;
+    private static ResourceBundle bundle;
 
     public Messages(ResourceBundle bundle) {
         this.bundle = bundle;
@@ -53,7 +54,7 @@ public class Messages {
         }
     }
 
-    private String format(Key key, Object... args) {
+    private static String format(Key key, Object... args) {
         if (!bundle.containsKey(key.property)) {
             throw new IllegalArgumentException("No such resource: " + key);
         }
@@ -61,43 +62,47 @@ public class Messages {
         return String.format(bundle.getLocale(), bundle.getString(key.property), args);
     }
 
-    public String formatPackageDescriptionBuilderSuccess(String file) {
+    public static String formatPackageDescriptionBuilderSuccess(String file) {
         return format(Key.PACKAGE_DESCRIPTION_BUILDER_SUCCESS, file);
     }
 
-    public String formatPackageDescriptionBuilderFailure(String file) {
+    public static String formatPackageDescriptionBuilderFailure(String file) {
         return format(Key.PACKAGE_DESCRIPTION_BUILDER_FAILURE, file);
     }
 
-    public String formatPackageDescriptionBuilderError(String file) {
+    public static String formatPackageDescriptionBuilderError(String file) {
         return format(Key.PACKAGE_DESCRIPTION_BUILDER_ERROR, file);
     }
     
-    public String formatPackageGenerationSuccess(String file) {
+    public static String formatPackageGenerationSuccess(String file) {
         return format(Key.PACKAGE_GENERATION_SUCCESS, file);
     }
     
-    public String formatErrorCreatingNewPackage(String error) {
+    public static String formatErrorCreatingNewPackage(String error) {
         return format(Key.ERROR_CREATING_NEW_PACKAGE, error);
     }
 
-    public String formatFilenameLengthWarning(int length) {
+    public static String formatFilenameLengthWarning(int length) {
         return format(Key.WARNING_FILENAME_LENGTH, length);
     }
 
-    public String formatInvalidPropertyWarning(String type, String properties) {
+    public static String formatInvalidPropertyWarning(String type, String properties) {
         return format(Key.WARNING_INVALID_PROPERTY, type, properties);
     }
 
-    public String formatPackageDescriptionModificationWarning(String artifactRef, String oldType, String newType) {
+    public static String formatPackageDescriptionModificationWarning(String artifactRef, String oldType, String newType) {
         return format(Key.WARNING_PACKAGE_DESCRIPTION_MODIFICATION, artifactRef, oldType, newType);
     }
 
-    public String formatUrlValidationFailure(String url) {
+    public static String formatUrlValidationFailure(String url) {
         return format(Key.URL_VALIDATION_FAILURE, url);
     }
 
-    public String formatPhoneValidationFailure(String phoneNumber) {
+    public static String formatPhoneValidationFailure(String phoneNumber) {
         return format(Key.PHONE_VALIDATION_FAILURE, phoneNumber);
+    }
+
+    public static String formatEmailValidationFailure(String emailAddress) {
+        return format(Key.EMAIL_VALIDATION_FAILURE, emailAddress);
     }
 }
