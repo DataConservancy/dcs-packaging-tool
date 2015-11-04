@@ -34,6 +34,7 @@ import static org.dataconservancy.packaging.tool.ser.XstreamUtil.hasAttribute;
  * This converter is responsible for encapsulating all XStream serializations with serialization metadata, and providing
  * access to the metadata to sub classes via the marshalling contexts {@link MarshallingContext} and
  * {@link UnmarshallingContext}.  The metadata include:
+ * </p>
  * <dl>
  * <dt>version - context key {@link #version}, context value {@code Integer} <em>(since version 1)</em></dt>
  * <dd>an integer indicating the version of the serialization format</dd>
@@ -42,6 +43,7 @@ import static org.dataconservancy.packaging.tool.ser.XstreamUtil.hasAttribute;
  * <dt>stream identifier context key {@link #A_STREAMID}, context value {@code StreamId} <em>(since version 1)</em></dt>
  * <dd>symbolic name identifying the serialized stream</dd>
  * </dl>
+ * <p>
  * Additional metadata can be added in the future.  Metadata documentation should include the field name and the
  * version that the metadata was added.  Metadata are meant to enable forward compatability of the serializations
  * consumed and produced by this converter.  Future versions of the Package Tool GUI should be able to read
@@ -209,9 +211,9 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * Responsible for wrapping serializations with metadata, and including the metadata in the
      * {@code MarshallingContext}.
      *
-     * @param source
-     * @param writer
-     * @param context
+     * @param source the object to be marshalled
+     * @param writer a stream to write to
+     * @param context a context that allows nested objects to be processed by XStream.
      */
     void beforeMarshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         if (!canConvert(source.getClass())) {
@@ -239,9 +241,9 @@ public abstract class AbstractPackageToolConverter implements Converter {
     /**
      * Responsible for wrapping serializations with metadata.
      *
-     * @param source
-     * @param writer
-     * @param context
+     * @param source the object to be marshalled
+     * @param writer a stream to write to
+     * @param context a context that allows nested objects to be processed by XStream.
      */
     void afterMarshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         writer.endNode();  // end E_SERIALIZATION
@@ -251,8 +253,8 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * Responsible for metadata deserialization, and including the metadata in the
      * {@code UnmarshallingContext}.
      *
-     * @param reader
-     * @param context
+     * @param reader The stream to read the text from.
+     * @param context a context that allows nested objects to be processed by XStream.
      */
     void beforeUnmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         if (context.get(A_VERSION) != null) {
@@ -292,8 +294,8 @@ public abstract class AbstractPackageToolConverter implements Converter {
     /**
      * Responsible for metadata deserialization.
      *
-     * @param reader
-     * @param context
+     * @param reader the stream to read the text from.
+     * @param context a context that allows nested objects to be processed by XStream.
      */
     void afterUnmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         reader.moveUp(); // end E_SERIALIZATION
@@ -309,9 +311,9 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * Implemented by concrete subclasses.  Same contract as
      * {@link Converter#marshal(Object, HierarchicalStreamWriter, MarshallingContext)}.
      *
-     * @param source
-     * @param writer
-     * @param context
+     * @param source the object to be marshalled
+     * @param writer a stream to write to
+     * @param context a context that allows nested objects to be processed by XStream.
      */
     abstract void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context);
 
@@ -320,9 +322,9 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * Implemented by concrete subclasses.  Same contract as
      * {@link Converter#unmarshal(HierarchicalStreamReader, UnmarshallingContext)}.
      *
-     * @param reader
-     * @param context
-     * @return
+     * @param reader the stream to read the text from.
+     * @param context a context that allows nested objects to be processed by XStream.
+     * @return the resulting object
      */
     abstract Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context);
 

@@ -231,6 +231,11 @@
 
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>
+        <artifactId>dcs-packaging-tool-ser</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
         <artifactId>dcs-packaging-tool-profiles</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -246,6 +251,7 @@
         <artifactId>dcs-packaging-tool-ontologies</artifactId>
         <version>${project.version}</version>
       </dependency>
+      
       <!-- Support dependencies -->
       <dependency>
         <groupId>org.dataconservancy.shared</groupId>
