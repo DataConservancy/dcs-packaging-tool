@@ -83,6 +83,12 @@ public abstract class AbstractPackageToolConverter implements Converter {
             "null.  Set a stream identifier using 'setStreamId(String)' first.";
 
     /**
+     * Placeholder: instance of class that failed conversion, conversion class
+     */
+    static final String ERR_CANNOT_CONVERT = "Error (un)marshaling instance of class '%s': the converter '%s' does " +
+            "not support instances of this type.";
+
+    /**
      * Serialization element name
      */
     static final String E_SERIALIZATION = "serialization";
@@ -147,7 +153,7 @@ public abstract class AbstractPackageToolConverter implements Converter {
 
     /**
      * The symbolic name of the stream being (de)serialized.
-     *
+     * TODO: change signature to use StreamId enum?
      * @param streamId the name of the stream
      * @throws IllegalArgumentException if the stream identifier is null or the empty string
      */
@@ -209,7 +215,8 @@ public abstract class AbstractPackageToolConverter implements Converter {
      */
     void beforeMarshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         if (!canConvert(source.getClass())) {
-            return;
+            throw new ConversionException(String.format(
+                    ERR_CANNOT_CONVERT, source.getClass().getName(), this.getClass().getName()));
         }
 
         if (context.get(A_VERSION) != null) {
