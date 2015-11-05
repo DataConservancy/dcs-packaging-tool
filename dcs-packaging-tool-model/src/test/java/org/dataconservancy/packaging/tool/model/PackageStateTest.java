@@ -17,13 +17,18 @@ package org.dataconservancy.packaging.tool.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Test;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class PackageStateTest {
     @Test
-    public void PackageStateVerifier() {
+    public void PackageStateVerifier() throws URISyntaxException {
         EqualsVerifier
                 .forClass(PackageState.class).allFieldsShouldBeUsed()
+                .withPrefabValues(Node.class, new Node(new URI("uri:foo")), new Node(new URI("uri:bar")))
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();
     }

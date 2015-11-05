@@ -15,6 +15,9 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
+
 import java.io.File;
 import java.util.*;
 
@@ -29,12 +32,12 @@ public class PackageState {
     /**
      * Package's tree structure
      */
-    //private Node packageTree;
+    private Node packageTree;
 
     /**
      * List of domain profiles in-use in this package.
      */
-    //private List<DomainProfile> domainProfileList;
+    private List<DomainProfile> domainProfileList;
 
     /**
      * Container of all of the domain objects in this package.
@@ -133,6 +136,14 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
+    public Node getPackageTree() {
+        return packageTree;
+    }
+
+    public void setPackageTree(Node treeRoot) {
+        packageTree = treeRoot;
+    }
+
     /**
      * Determines whether this package state currently has any metadata or not, mainly used for opening existing packages.
      * @return true or false based on availability.
@@ -143,29 +154,57 @@ public class PackageState {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !(o instanceof PackageState)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PackageState)) {
+            return false;
+        }
 
         PackageState that = (PackageState) o;
 
-        if (creationToolVersion != null ? !creationToolVersion.equals(that.creationToolVersion) : that.creationToolVersion != null)
+        if (packageName != null ? !packageName.equals(that.packageName) :
+            that.packageName != null) {
             return false;
-        if (outputDirectory != null ? !outputDirectory.equals(that.outputDirectory) : that.outputDirectory != null)
+        }
+        if (packageTree != null ? !packageTree.equals(that.packageTree) :
+            that.packageTree != null) {
             return false;
-        if (packageMetadataList != null ? !packageMetadataList.equals(that.packageMetadataList) : that.packageMetadataList != null)
+        }
+        if (domainProfileList !=
+            null ? !domainProfileList.equals(that.domainProfileList) :
+            that.domainProfileList != null) {
             return false;
-        if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null) return false;
+        }
+        if (packageMetadataList !=
+            null ? !packageMetadataList.equals(that.packageMetadataList) :
+            that.packageMetadataList != null) {
+            return false;
+        }
+        if (outputDirectory !=
+            null ? !outputDirectory.equals(that.outputDirectory) :
+            that.outputDirectory != null) {
+            return false;
+        }
+        return !(creationToolVersion !=
+                     null ? !creationToolVersion.equals(that.creationToolVersion) :
+                     that.creationToolVersion != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;
-        result = 31 * result + (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
-        result = 31 * result + (outputDirectory != null ? outputDirectory.hashCode() : 0);
-        result = 31 * result + (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
+        result =
+            31 * result + (packageTree != null ? packageTree.hashCode() : 0);
+        result = 31 * result +
+            (domainProfileList != null ? domainProfileList.hashCode() : 0);
+        result = 31 * result +
+            (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
+        result = 31 * result +
+            (outputDirectory != null ? outputDirectory.hashCode() : 0);
+        result = 31 * result +
+            (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;
     }
-
 }
