@@ -320,7 +320,7 @@ public class DcsBOProfile
         hasDescription.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasDescription"));
         hasDescription.setPropertyValueType(PropertyValueType.STRING);
-        hasDescription.setPropertyValueHint(PropertyValueHint.TEXT);
+        hasDescription.setPropertyValueHint(PropertyValueHint.MULTI_LINE_TEXT);
 
         hasCitableLocator.setLabel("Citable Locator");
         hasCitableLocator
