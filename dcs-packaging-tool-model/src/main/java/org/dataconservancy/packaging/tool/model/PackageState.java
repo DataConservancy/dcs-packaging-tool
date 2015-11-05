@@ -15,6 +15,11 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.model.ser.SerializationScope;
+import org.dataconservancy.packaging.tool.model.ser.Serialize;
+import org.dataconservancy.packaging.tool.model.ser.StreamId;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -28,12 +33,14 @@ import java.util.Set;
  */
 public class PackageState {
 
+    @Serialize(streamId = StreamId.PACKAGE_NAME)
     private String packageName;
 
     /**
      * Package's tree structure
      */
-    //private Node packageTree;
+    @Serialize(streamId = StreamId.PACKAGE_TREE, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
+    private Node packageTree;
 
     /**
      * List of domain profiles in-use in this package.
@@ -43,17 +50,21 @@ public class PackageState {
     /**
      * Container of all of the domain objects in this package.
      */
-    //private DomainProfileObjectStore domainProfileObjectStore;
+    // TODO: Figure out approach to serializing domain objects
+//    @Serialize(streamId = "package-domain-objects", scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
+//    private DomainProfileObjectStore domainProfileObjectStore;
 
     /**
      * A map of metadata fields relevant to this package, keyed by the name of the metadata field to their associated
      * list of values. The map maintains entry by the order of insertion.
      */
+    @Serialize(streamId = StreamId.PACKAGE_METADATA)
     private LinkedHashMap<String, List<String>> packageMetadataList;
 
     /**
      * Metadata about the tools used to create this package
      */
+    @Serialize(streamId = StreamId.APPLICATION_VERSION)
     private ApplicationVersion creationToolVersion;
 
     public PackageState() {
