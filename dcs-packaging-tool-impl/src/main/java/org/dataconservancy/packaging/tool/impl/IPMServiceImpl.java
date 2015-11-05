@@ -49,7 +49,7 @@ public class IPMServiceImpl implements IPMService {
                                               ".  Find the link and remove it.");
                 }
             } else {
-                visitedFiles.add(path);
+                visitedFiles.add(path.toRealPath());
             }
         } catch (IOException e) {
             throw new IOException(
