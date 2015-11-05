@@ -181,6 +181,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
         VBox propertyContent = new VBox(8);
         propertiesPane.setContent(propertyContent);
+        propertiesTab.setContent(propertiesPane);
 
         PropertyCategoryBox generalPropertyBox = new PropertyCategoryBox(nodeType.getLabel());
         propertyContent.getChildren().add(generalPropertyBox);
@@ -228,43 +229,37 @@ public class PackageArtifactWindowBuilder implements CssConstants {
     public VBox createInheritanceGroup(final Node node) {
 
         final VBox inheritanceBox = new VBox(12);
-        inheritanceBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
-        boolean hasInheritableProperties = false;
+        if (node.getNodeType().getInheritableProperties() != null) {
+            inheritanceBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
+            boolean hasInheritableProperties = false;
 
-        //create label to explain what this tab is about.
-        Label inheritanceTabIntroLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_TAB_INTRO));
-        inheritanceTabIntroLabel.setPrefWidth(450);
-        inheritanceTabIntroLabel.setWrapText(true);
-        inheritanceBox.getChildren().add(inheritanceTabIntroLabel);
-
-        //create label to explain usage of buttons.
-        Label inheritanceButtonExplainedLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_BUTTON_EXPLAINED));
-        inheritanceButtonExplainedLabel.setPrefWidth(450);
-        inheritanceButtonExplainedLabel.setWrapText(true);
-        inheritanceBox.getChildren().add(inheritanceButtonExplainedLabel);
-
-        Separator groupSeparator = new Separator();
-        inheritanceBox.getChildren().add(groupSeparator);
-
-        //Loop through properties for the given artifact.
-        for (PropertyType inhertiableProperty : node.getNodeType().getInheritableProperties()) {
-            //If the property is inheritable, create a button which would allow the values to be apply to children
-            //appropriately
-
-            inheritanceBox.getChildren().add(createInheritanceBox(inhertiableProperty.getLabel()));
-
-            groupSeparator = new Separator();
-            inheritanceBox.getChildren().add(groupSeparator);
-            hasInheritableProperties = true;
-        }
-
-        if (!hasInheritableProperties) {
-            Label noInheritablePropertyLabel = new Label(TextFactory.getText(Labels.LabelKey.NO_INHERITABLE_PROPERTY));
+            //create label to explain what this tab is about.
+            Label inheritanceTabIntroLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_TAB_INTRO));
             inheritanceTabIntroLabel.setPrefWidth(450);
             inheritanceTabIntroLabel.setWrapText(true);
-            inheritanceBox.getChildren().add(noInheritablePropertyLabel);
-        }
+            inheritanceBox.getChildren().add(inheritanceTabIntroLabel);
 
+            //create label to explain usage of buttons.
+            Label inheritanceButtonExplainedLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_BUTTON_EXPLAINED));
+            inheritanceButtonExplainedLabel.setPrefWidth(450);
+            inheritanceButtonExplainedLabel.setWrapText(true);
+            inheritanceBox.getChildren().add(inheritanceButtonExplainedLabel);
+
+            Separator groupSeparator = new Separator();
+            inheritanceBox.getChildren().add(groupSeparator);
+
+            //Loop through properties for the given artifact.
+
+            for (PropertyType inhertiableProperty : node.getNodeType().getInheritableProperties()) {
+                //If the property is inheritable, create a button which would allow the values to be apply to children
+                //appropriately
+
+                inheritanceBox.getChildren().add(createInheritanceBox(inhertiableProperty.getLabel()));
+
+                groupSeparator = new Separator();
+                inheritanceBox.getChildren().add(groupSeparator);
+            }
+        }
         return inheritanceBox;
     }
 
