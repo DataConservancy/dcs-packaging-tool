@@ -155,6 +155,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-ontologies</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
