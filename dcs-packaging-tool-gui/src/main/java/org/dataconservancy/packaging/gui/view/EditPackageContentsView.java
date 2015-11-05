@@ -16,17 +16,16 @@
 
 package org.dataconservancy.packaging.gui.view;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javafx.scene.Node;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.ArtifactPropertyContainer;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.ArtifactRelationshipContainer;
-import org.dataconservancy.packaging.tool.model.PackageArtifact;
+import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
+import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.NodeRelationshipContainer;
 
 import javafx.scene.control.Label;
 
@@ -35,6 +34,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import javafx.scene.control.Button;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
  * A view that shows the pacakge description tree, and displays a popup to show package artifact properties.
@@ -46,74 +46,74 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * Gets the root element from the artifact tree.
      * @return  the root element
      */
-    public TreeItem<PackageArtifact> getRoot();
+    TreeItem<Node> getRoot();
     
     /**
      * Gets the artifact tree view that displays all the package artifacts. 
      * @return the artifact tree view
      */
-    public TreeTableView<PackageArtifact> getArtifactTreeView();
+    TreeTableView<Node> getArtifactTreeView();
 
     /**
      * Retrieves the stage that represents the window used for the editing package artifacts.
      * @return the stage that shows the artifact properties edit screen
      */
-    public Stage getArtifactDetailsWindow();
+    Stage getArtifactDetailsWindow();
     
     /**
      * Displays the artifact details window.
-     * @param artifact  the Artifact
+     * @param treeNode  the node
      * @param anchorNode The scene object the artifact details window should initially anchor too
      */
-    public void showArtifactDetails(PackageArtifact artifact, Node anchorNode);
+    void showArtifactDetails(Node treeNode, javafx.scene.Node anchorNode);
 
     /**
      * Gets the file chooser that's used for saving the pacakge description file. 
      * @return the file chooser
      */
-    public FileChooser getPackageDescriptionFileChooser();
+    FileChooser getPackageDescriptionFileChooser();
 
     /**
      * Gets the checkbox used to determine if the full path should be shown or not
      * @return  he checkbox
      */
-    public CheckBox getFullPathCheckBox();
+    CheckBox getFullPathCheckBox();
     
     /**
      * Gets the hyperlink for canceling the property popup. 
      * @return  the hyperlink for canceling the property popup
      */
-    public Hyperlink getCancelPopupHyperlink();
+    Hyperlink getCancelPopupHyperlink();
     
     /**
      * Gets the save property popup button, this button should apply any changes to the properties or relationships. 
      * @return  the save property popup button
      */
-    public Button getApplyPopupButton();
+    Button getApplyPopupButton();
 
     /**
      * Gets the container that holds the text fields representing the properties. 
      * @return the container that holds the text fields representing the properties
      */
-    public Map<String, ArtifactPropertyContainer> getArtifactPropertyFields();
+    List<ProfilePropertyBox> getProfilePropertyBoxes();
     
     /**
      * Gets the container that holds the text fields representing the relationships. 
      * @return  the container that holds the text fields representing the relationships
      */
-    public Set<ArtifactRelationshipContainer> getArtifactRelationshipFields();
+    Set<NodeRelationshipContainer> getArtifactRelationshipFields();
     
     /**
      * Gets the artifact that is being displayed in the popup. 
      * @return    the artifact that is being displayed in the popup
      */
-    public PackageArtifact getPopupArtifact();
+    Node getPopupNode();
     
     /**
      * Gets the warning popup that is diplayed to user in case of warnings or errors.
      * @return    the artifact that is being displayed in the popup
      */
-    public PackageToolPopup getWarningPopup();
+    PackageToolPopup getWarningPopup();
     
     /**
      * Displays the warning popup, this should be used when there is a warning or error that requires action from the user.
@@ -122,31 +122,32 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * @param allowNegative A boolean flag that shows whether the user should be allowed to cancel the popup.
      * @param allowFutureHide A boolean flag that shows whether the user should be allowed to hide the popup in the future.
      */
-    public void showWarningPopup(String title, String errorMessage, boolean allowNegative, boolean allowFutureHide);
+    void showWarningPopup(String title, String errorMessage,
+                          boolean allowNegative, boolean allowFutureHide);
     
     /**
      * Gets the button that is used for a positive action for the warning warning popup.
      * @return  the button that is used for a positive action for the warning warning popup
      */
-    public Button getWarningPopupPositiveButton();
+    Button getWarningPopupPositiveButton();
 
     /**
      * Gets the button that is used for a negative action for the warning popup.
      * @return the button that is used for a negative action for the warning popup.
      */
-    public Button getWarningPopupNegativeButton();
+    Button getWarningPopupNegativeButton();
 
     /**
      * Gets the hide future warning checkbox for the warning popup.
      * @return  the hide future warning checkbox
      */
-    public CheckBox getHideFutureWarningPopupCheckbox();
+    CheckBox getHideFutureWarningPopupCheckbox();
     
     /**
      * Gets the error message label that appears at the top of the screen.
      * @return The error message label
      */
-    public Label getErrorMessageLabel();
+    Label getErrorMessageLabel();
 
     CheckBox getShowIgnored();
 
@@ -154,15 +155,15 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * Gets metadata inheritance button
      * @return A map of the inherited property checkboxes.
      */
-    public Map<String, CheckBox> getInheritMetadataCheckBoxMap();
+    Map<String, CheckBox> getInheritMetadataCheckBoxMap();
 
     /**
      * Gets the button to renable warnings
      * @return The button to reenable warnings
      */
-    public Button getReenableWarningsButton();
+    Button getReenableWarningsButton();
 
-    public void setupWindowBuilder(String disciplinePath);
+    void setupWindowBuilder(String disciplinePath);
 
     /**
      * Gets the refresh popup
@@ -174,11 +175,11 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * Gets the button that is used for a positive action for the refresh popup.
      * @return  the button that is used for a positive action for the refres popup
      */
-    public Button getRefreshPopupPositiveButton();
+    Button getRefreshPopupPositiveButton();
 
     /**
      * Gets the button that is used for a negative action for the refresh popup.
      * @return the button that is used for a negative action for the refresh popup.
      */
-    public Button getRefreshPopupNegativeButton();
+    Button getRefreshPopupNegativeButton();
 }

@@ -25,7 +25,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -56,7 +55,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Errors;
-import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels;
@@ -66,9 +64,12 @@ import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
-import org.dataconservancy.packaging.tool.api.PackageOntologyService;
-import org.dataconservancy.packaging.tool.model.PackageArtifact;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,12 +89,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     private Labels labels;
     private Messages messages;
-    private TreeTableView<PackageArtifact> artifactTree;
+    private TreeTableView<Node> artifactTree;
 
     private Stage artifactDetailsWindow;
     private Scene artifactDetailsScene;
-    private PackageArtifact popupArtifact;
-    private PackageOntologyService packageOntologyService;
+    private Node popupNode;
+    private DomainProfileService profileService;
+    private IPMService ipmService;
 
     //Warning popup and controls
     public PackageToolPopup warningPopup;
@@ -122,8 +124,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Button applyPopupButton;
 
     //Storage for mapping popup fields to properties on the artifacts. 
-    private Map<String, EditPackageContentsViewImpl.ArtifactPropertyContainer> artifactPropertyFields;
-    private Set<ArtifactRelationshipContainer> artifactRelationshipFields;
+    private Set<NodeRelationshipContainer> artifactRelationshipFields;
 
     private Errors errors;
     private OntologyLabels ontologyLabels;
@@ -232,17 +233,17 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         artifactTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (artifactDetailsWindow != null && artifactDetailsWindow.isShowing()) {
-                presenter.saveCurrentArtifact();
+                presenter.saveCurrentNode();
                 showArtifactDetails(newValue.getValue(), null);
             }
         });
 
         //set up the columns for the artifact, its type and the options control
-        TreeTableColumn<PackageArtifact, HBox> artifactColumn = new TreeTableColumn<>("Artifact");
+        TreeTableColumn<Node, HBox> artifactColumn = new TreeTableColumn<>("Artifact");
         artifactColumn.setResizable(false);
-        TreeTableColumn<PackageArtifact, Label> typeColumn = new TreeTableColumn<>("Type");
+        TreeTableColumn<Node, Label> typeColumn = new TreeTableColumn<>("Type");
         typeColumn.setResizable(false);
-        TreeTableColumn<PackageArtifact, Label> optionsColumn = new TreeTableColumn<>("");
+        TreeTableColumn<Node, Label> optionsColumn = new TreeTableColumn<>("");
         optionsColumn.setResizable(false);
 
         //make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
@@ -251,11 +252,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         //add 2 here to get rid of horizontal scroll bar
         artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
 
-        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, HBox>, ObservableValue<HBox>>() {
-            public ObservableValue<HBox> call(TreeTableColumn.CellDataFeatures<PackageArtifact, HBox> p) {
+        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, HBox>, ObservableValue<HBox>>() {
+            public ObservableValue<HBox> call(TreeTableColumn.CellDataFeatures<Node, HBox> p) {
                 // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
                 // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                PackageArtifact packageArtifact = p.getValue().getValue();
+                Node packageNode = p.getValue().getValue();
+
                 HBox hbox = new HBox(3);
 
                 ImageView exclamImage = new ImageView();
@@ -280,18 +282,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
                 viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
 
-                String fragment = packageArtifact.getArtifactRef().getFragment();
                 String labelText;
 
                 if (getFullPathCheckBox().selectedProperty().getValue()) {
-                    labelText = packageArtifact.getArtifactRef().getRefPath();
+                    labelText = packageNode.getFileInfo().getLocation().toString();
                 } else {
-                    labelText = packageArtifact.getArtifactRef().getRefName();
+                    labelText = packageNode.getFileInfo().getName();
                 }
 
-                if (fragment != null) {
-                    labelText = labelText + synthesizedArtifactMarker;
-                }
                 viewLabel.setText(labelText);
 
                 Tooltip t = new Tooltip(viewLabel.getText());
@@ -310,20 +308,20 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         typeColumn.setCellValueFactory(p -> {
             // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
             // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-            String type = p.getValue().getValue().getType();
+            String type = p.getValue().getValue().getNodeType().toString();
             Label typeLabel = new Label(type);
             typeLabel.setPrefWidth(typeColumn.getWidth());
             return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
-        optionsColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<PackageArtifact, Label>, ObservableValue<Label>>() {
-            public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<PackageArtifact, Label> p) {
+        optionsColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, Label>, ObservableValue<Label>>() {
+            public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<Node, Label> p) {
                 // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
                 // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                PackageArtifact packageArtifact = p.getValue().getValue();
+                Node packageNode = p.getValue().getValue();
                 Label optionsLabel = new Label();
                 final ContextMenu contextMenu = new ContextMenu();
-                TreeItem<PackageArtifact> treeItem = p.getValue();
+                TreeItem<Node> treeItem = p.getValue();
                 ImageView image = new ImageView();
                 image.setFitHeight(20);
                 image.setFitWidth(20);
@@ -331,25 +329,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 optionsLabel.setGraphic(image);
                 //make sure the current artifact type is valid - this status may have changed if its
                 //parent's type has changed
-                if (packageArtifact.isIgnored()) {
+                if (packageNode.isIgnored()) {
                     contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
                 } else {
-                    Set<String> validTypeSet = presenter.getValidTypes(packageArtifact);
-                    List<String> validTypes = new ArrayList<>();
-                    validTypes.addAll(validTypeSet);
-                    if (validTypes.size() > 0 ) {
-                        if (!validTypes.contains(packageArtifact.getType())) {
-                            String oldType = packageArtifact.getType();
-                            presenter.changeType(packageArtifact, validTypes.get(0));
+                    List<NodeTransform> nodeTransforms = profileService.getNodeTransforms(packageNode);
 
-                            log.warn("Changing artifact " + packageArtifact.getArtifactRef() + " from " + oldType + " to " + packageArtifact.getType());
-                            //Notify the user that we are changing types
-                            showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_CHANGE_WARNING), messages.formatPackageDescriptionModificationWarning(packageArtifact.getArtifactRef().getRefString(), oldType, packageArtifact.getType()), false, false);
-                            getWarningPopupPositiveButton().setOnAction(actionEvent -> getWarningPopup().hide());
-                        }
-                            contextMenu.getItems().addAll(createMenuItemList(treeItem, validTypes, optionsLabel));
-                            optionsLabel.setContextMenu(contextMenu);
-                    }
+                    contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
+                    optionsLabel.setContextMenu(contextMenu);
                 }
 
                 //When the options label is clicked show the context menu.
@@ -366,14 +352,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         artifactTree.getColumns().addAll(artifactColumn, typeColumn, optionsColumn);
 
         //set up row factory to allow for a little alternate row styling for ignored package artifacts
-        artifactTree.setRowFactory(new Callback<TreeTableView<PackageArtifact>, TreeTableRow<PackageArtifact>>() {
+        artifactTree.setRowFactory(new Callback<TreeTableView<Node>, TreeTableRow<Node>>() {
             @Override
-             public TreeTableRow<PackageArtifact> call(TreeTableView<PackageArtifact> ttv) {
-                return new TreeTableRow<PackageArtifact>() {
+             public TreeTableRow<Node> call(TreeTableView<Node> ttv) {
+                return new TreeTableRow<Node>() {
                     @Override
-                    public void updateItem(PackageArtifact packageArtifact, boolean empty) {
-                        super.updateItem(packageArtifact, empty);
-                        if (packageArtifact != null && packageArtifact.isIgnored()) {
+                    public void updateItem(Node packageNode, boolean empty) {
+                        super.updateItem(packageNode, empty);
+                        if (packageNode != null && packageNode.isIgnored()) {
                             getStyleClass().add(PACKAGE_DESCRIPTION_ROW_IGNORE);
                         } else {
                             getStyleClass().removeAll(PACKAGE_DESCRIPTION_ROW_IGNORE);
@@ -410,12 +396,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     @Override
-    public TreeItem<PackageArtifact> getRoot() {
+    public TreeItem<Node> getRoot() {
         return artifactTree.getRoot();
     }
 
     @Override
-    public TreeTableView<PackageArtifact> getArtifactTreeView() {
+    public TreeTableView<Node> getArtifactTreeView() {
         return artifactTree;
     }
 
@@ -454,10 +440,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
      * @param label
      * @return
      */
-    private List<MenuItem> createMenuItemList(final TreeItem<PackageArtifact> treeItem, List<String> validTypes, final Label label){
+    private List<MenuItem> createMenuItemList(final TreeItem<Node> treeItem, List<NodeTransform> nodeTransforms, final Label label){
         List<MenuItem> itemList = new ArrayList<>();
 
-        final PackageArtifact packageArtifact = treeItem.getValue();
+        final Node packageNode = treeItem.getValue();
 
         //Create a menu item that will show the package artifacts popup.
         MenuItem propertiesItem = new MenuItem(labels.get(LabelKey.PROPERTIES_LABEL));
@@ -465,7 +451,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         propertiesItem.setOnAction(actionEvent -> {
             VBox detailsBox = new VBox();
             detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
-            showArtifactDetails(packageArtifact, label);
+            showArtifactDetails(packageNode, label);
             artifactTree.getSelectionModel().select(treeItem);
         });
 
@@ -517,30 +503,33 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //Create a menu item for each available artifact type.
-        if(validTypes.size() > 0) {
+        if (nodeTransforms != null && nodeTransforms.size() > 0) {
             SeparatorMenuItem separator =  new SeparatorMenuItem();
             separator.setStyle("-fx-color: #FFFFFF");
             itemList.add(separator);
 
-            for (final String type : validTypes) {
-                final List<String> invalidProperties = presenter.findInvalidProperties(packageArtifact, type);
+            for (final NodeTransform transform : nodeTransforms) {
+                //final List<String> invalidProperties = presenter.findInvalidProperties(packageNode, type);
 
-                String prefix = type.equals(packageArtifact.getType()) ? labels.get(LabelKey.KEEP_TYPE_LABEL) + " " :  labels.get(LabelKey.CHANGE_TYPE_LABEL) + " ";
-                MenuItem item = new MenuItem(prefix + ontologyLabels.get(type));
+                MenuItem item = new MenuItem(transform.getLabel());
 
                 itemList.add(item);
 
-                if (!invalidProperties.isEmpty() && !type.equals(packageArtifact.getType())) {
+                /*
+                 TODO: Do we still want to warn users about potential property loss, that seems unsustainable.
+                if (!invalidProperties.isEmpty() && !type.equals(packageNode.getType())) {
                     ImageView invalidImage = new ImageView("/images/orange_exclamation.png");
                     invalidImage.setFitWidth(8);
                     invalidImage.setFitHeight(24);
                     item.setGraphic(invalidImage);
                 }
-
+                */
                 item.setOnAction(actionEvent -> {
                     boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
-                    if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageArtifact.getType())) {
+                    /*TODO: Determine what we want to do about possible property loss
+                        if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageNode.getType())) {
+
                         showWarningPopup(errors.get(ErrorKey.PROPERTY_LOSS_WARNING), messages.formatInvalidPropertyWarning(type, formatInvalidProperties(invalidProperties)), true, true);
                         getWarningPopupNegativeButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
@@ -549,12 +538,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
                         getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            presenter.changeType(packageArtifact, type);
+                            presenter.changeType(packageNode, type);
                             preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
                         });
                     } else {
-                        presenter.changeType(packageArtifact, type);
-                    }
+                        presenter.changeType(packageNode, type);
+                    } */
+                    profileService.transformNode(packageNode, transform);
                 });
             }
         }
@@ -563,37 +553,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         separator.setStyle("-fx-color: #FFFFFF");
         itemList.add(separator);
 
-        if (presenter.canCollapseParentArtifact(packageArtifact)) {
-
-            MenuItem item = new MenuItem("Collapse up one level");
-
-            item.setOnAction(actionEvent -> {
-                showWarningPopup(errors.get(ErrorKey.ARTIFACT_LOSS_WARNING),
-                        errors.get(ErrorKey.ARTIFACT_LOSS_WARNING_MESSAGE), true, false);
-
-                getWarningPopupNegativeButton().setOnAction(actionEvent1 -> getWarningPopup().hide());
-
-                getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
-                    getWarningPopup().hide();
-                    presenter.collapseParentArtifact(packageArtifact);
-                    TreeItem item1 = presenter.findItem(packageArtifact);
-                    presenter.displayPackageTree();
-                    item1.setExpanded(true);
-                });
-            });
-            itemList.add(item);
-            separator =  new SeparatorMenuItem();
-            separator.setStyle("-fx-color: #FFFFFF");
-            itemList.add(separator);
-
-        }
-
         itemList.add(createIgnoreMenuItem(treeItem));
 
        return itemList;
     }
 
-    private MenuItem createIgnoreMenuItem(final TreeItem<PackageArtifact> treeItem) {
+    private MenuItem createIgnoreMenuItem(final TreeItem<Node> treeItem) {
         final CheckMenuItem ignoreCheck = new CheckMenuItem(labels.get(LabelKey.IGNORE_CHECKBOX));
         ignoreCheck.setSelected(treeItem.getValue().isIgnored());
 
@@ -603,7 +568,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     //Note this code is broken out into a protected method so that it can be executed by the test
-    protected void toggleItemIgnore(TreeItem<PackageArtifact> node, boolean status) {
+    protected void toggleItemIgnore(TreeItem<Node> node, boolean status) {
         if (status) {
             setIgnoredDescendants(node, true);
         } else {
@@ -617,16 +582,16 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         artifactTree.getSelectionModel().select(presenter.findItem(node.getValue()));
     }
 
-    private void setIgnoredAncestors(TreeItem<PackageArtifact> node, boolean status) {
+    private void setIgnoredAncestors(TreeItem<Node> node, boolean status) {
         do {
             node.getValue().setIgnored(status);
         } while ((node = node.getParent()) != null);
     }
 
-    private void setIgnoredDescendants(TreeItem<PackageArtifact> node, boolean status) {
+    private void setIgnoredDescendants(TreeItem<Node> node, boolean status) {
         node.getValue().setIgnored(status);
 
-        for (TreeItem<PackageArtifact> kid: node.getChildren()) {
+        for (TreeItem<Node> kid: node.getChildren()) {
             setIgnoredDescendants(kid, status);
         }
     }
@@ -643,16 +608,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     @Override
-    public void showArtifactDetails(PackageArtifact artifact, Node anchorNode) {
+    public void showArtifactDetails(Node packageNode, javafx.scene.Node anchorNode) {
 
         if (artifactDetailsWindow != null) {
-            popupArtifact = artifact;
-
-            //Initialize the containers that are used to hold the text fields.
-            artifactPropertyFields = new HashMap<>();
+            popupNode = packageNode;
             artifactRelationshipFields = new HashSet<>();
 
-            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(artifact, artifactPropertyFields, artifactRelationshipFields, metadataInheritanceButtonMap, presenter, packageOntologyService);
+            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(packageNode, metadataInheritanceButtonMap, profileService);
 
             if (artifactDetailsScene == null) {
                 artifactDetailsScene = new Scene(propertiesPane, 540, 500);
@@ -661,7 +623,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             }
 
             artifactDetailsWindow.setTitle(
-                artifact.getArtifactRef().getRefName() + " Properties");
+                packageNode.getFileInfo().getName() + " Properties");
             artifactDetailsWindow.setScene(artifactDetailsScene);
 
             if (!artifactDetailsWindow.isShowing()) {
@@ -691,8 +653,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return reenableWarningsButton;
     }
 
-    public void setPackageOntologyService(PackageOntologyService service) {
-        this.packageOntologyService = service;
+    public void setProfileService(DomainProfileService profileService) {
+        this.profileService = profileService;
+    }
+
+    public void setIpmService(IPMService ipmService) {
+        this.ipmService = ipmService;
     }
 
     /**
@@ -715,20 +681,19 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
      * {@inheritDoc}
      */
     @Override
-    public Map<String, ArtifactPropertyContainer> getArtifactPropertyFields() {
-        return artifactPropertyFields;
+    public List<ProfilePropertyBox> getProfilePropertyBoxes() {
+        return windowBuilder.getNodePropertyBoxes();
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public PackageArtifact getPopupArtifact() {
-        return popupArtifact;
+    public Node getPopupNode() {
+        return popupNode;
     }
 
-    public void setPopupArtifact (PackageArtifact artifact) {
-        popupArtifact = artifact;
+    public void setPopupNode(Node artifact) {
+        popupNode = artifact;
     }
     /**
      * {@inheritDoc}
@@ -856,32 +821,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     /**
-     * Simple Container to store property text fields. Simple one value properties are stored in the value field.
-     * Complex property values are stored in the subProperties map.
-     */
-    public static class ArtifactPropertyContainer {
-        Set<Map<String, Set<StringProperty>>> subProperties = new HashSet<>();
-        Set<StringProperty> values = new HashSet<>();
-        boolean isComplex = false;
-
-        public boolean isComplex() {
-            return isComplex;
-        }
-
-        public Set<StringProperty> getValues() {
-            return values;
-        }
-
-        public Set<Map<String, Set<StringProperty>>> getSubProperties() {
-            return subProperties;
-        }
-    }
-
-    /**
      * Simple container class for holding artifact relationships
      * text fields to link from the UI to artifact.
      */
-    public static class ArtifactRelationshipContainer {
+    public static class NodeRelationshipContainer {
         public ObservableValue<Relationship> relationship;
         public Set<StringProperty> relationshipTargets = new HashSet<>();
         public BooleanProperty requiresURI = new SimpleBooleanProperty(true);
@@ -898,7 +841,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     @Override
-    public Set<ArtifactRelationshipContainer> getArtifactRelationshipFields() {
+    public Set<NodeRelationshipContainer> getArtifactRelationshipFields() {
         return artifactRelationshipFields;
     }
 
@@ -929,7 +872,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public void setupWindowBuilder(String disciplineFilePath){
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
-        windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
+        windowBuilder = new PackageArtifactWindowBuilder(labels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
 
     @Override
