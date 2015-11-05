@@ -87,6 +87,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                         break;
                     case EMAIL:
                         validationLabel.setText(messages.formatEmailValidationFailure(newValue));
+                        break;
                     default:
                         propertyBox.getChildren().remove(validationLabel);
                 }
