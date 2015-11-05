@@ -22,6 +22,11 @@ import org.dataconservancy.packaging.tool.model.ValidationType;
  * A simple factory class which, when provided a validator type, provides an appropriate validator for property values
  */
 public class ValidatorFactory {
+    /**
+     * Returns a validator for the given ValidatorType
+     * @param type  the given ValidatorType
+     * @return  the Validator
+     */
     public static Validator getValidator(ValidationType type){
         switch(type){
             case EMAIL:

@@ -1,4 +1,4 @@
-@prefix bom: <http://www.dataconservancy.org/business-object-model#> .
+ @prefix bom: <http://www.dataconservancy.org/business-object-model#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -182,7 +182,7 @@ bom:hasMetadata a owl:ObjectProperty ;
     rdfs:label "has metadata"@en ;
     rdfs:comment "Links from a BusinessObject to a metadata File"@en ;
     rdfs:domain bom:BusinessObject ;
-    rdfs:range bom:File .
+    rdfs:range bom:MetadataFile .
 
 bom:isMemberOf a owl:FunctionalProperty,
         owl:ObjectProperty ;
@@ -270,9 +270,7 @@ bom:DataItem a owl:Class ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasFixity ]  [ a owl:Restriction ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
-                owl:onProperty foaf:name ] [ a owl:Restriction ;
-                owl:allValuesFrom bom:MetadataFile ;
-                owl:onProperty bom:hasMetadata])] .
+                owl:onProperty foaf:name ])] .
 
 bom:Collection a owl:Class ;
     rdfs:label "Collection"@en ;
@@ -295,9 +293,7 @@ bom:Collection a owl:Class ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasFixity ]  [ a owl:Restriction ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
-                owl:onProperty foaf:name ] [ a owl:Restriction ;
-                owl:allValuesFrom bom:MetadataFile ;
-                owl:onProperty bom:hasMetadata]) ] .
+                owl:onProperty foaf:name ]) ] .
 
 bom:File a owl:Class ;
     rdfs:label "File"@en ;
@@ -316,9 +312,7 @@ bom:File a owl:Class ;
                 owl:cardinality "1"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasFixity ] [ a owl:Restriction ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
-                owl:onProperty foaf:name ] [ a owl:Restriction ;
-                owl:allValuesFrom bom:MetadataFile ;
-                owl:onProperty bom:hasMetadata])] .
+                owl:onProperty foaf:name ])] .
 
 bom:Project a owl:Class ;
     rdfs:label "Project"@en ;
@@ -346,6 +340,4 @@ bom:Project a owl:Class ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
                 owl:onProperty bom:hasFixity ] [ a owl:Restriction ;
                 owl:cardinality "0"^^xsd:nonNegativeInteger ;
-                owl:onProperty foaf:name ] [ a owl:Restriction ;
-                owl:allValuesFrom bom:MetadataFile ;
-                owl:onProperty bom:hasMetadata])] .
+                owl:onProperty foaf:name ])] .

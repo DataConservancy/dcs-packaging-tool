@@ -367,6 +367,8 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
             return model.createTypedLiteral(prop.getLongValue());
         case STRING:
             return model.createTypedLiteral(prop.getStringValue());
+        case URI:
+            return model.createResource(prop.getUriValue().toString());
         default:
             throw new RuntimeException("Unhandled value type.");
         }

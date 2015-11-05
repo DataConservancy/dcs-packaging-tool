@@ -10,6 +10,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>dcs-packaging-tool-profile-dcs</module>
+    <module>dcs-packaging-tool-profile-pcdm</module>
   </modules>
 
 </project>
