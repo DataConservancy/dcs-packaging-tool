@@ -35,6 +35,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     private Messages messages;
     //validationLabel contains the validation error message
     private Label validationLabel;
+    //validationImageLabel provides the X or check image as a user guide
     private Label validationImageLabel;
     private PropertyBox propertyBox;
     private ValidationType validationType;
@@ -47,10 +48,10 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
 
     @Override
     public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-
+        //If the field contains an invalid entry, we will have two children the propertyBox
         if(propertyBox.getChildren().size() == 2){
             validationLabel = (Label) propertyBox.getChildren().get(0);
-        } else {
+        } else { //otherwise, we add the validation label, then see if the changed value is valid
             validationLabel = createValidationLabel();
             propertyBox.getChildren().add(0,validationLabel);
         }
@@ -87,12 +88,15 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case EMAIL:
                         validationLabel.setText(messages.formatEmailValidationFailure(newValue));
                     default:
-                        validationLabel.setText("");
+                        propertyBox.getChildren().remove(validationLabel);
                 }
             }
         } else {
             //This listener doesn't validate if a property is required or not so an empty value is considered valid
+            //If user has deleted all contents of a validating field, reset the property box to its initial state
             validationImageLabel.setVisible(false);
+            propertyBox.getChildren().remove(validationLabel);
+
         }
     }
 
