@@ -71,7 +71,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
     private StringProperty targetType;
 
     public RelationshipSelectionBox(final PackageArtifact artifact, PackageRelationship packageRelationship,
-                                    EditPackageContentsViewImpl.ArtifactRelationshipContainer container, List<RelationshipGroup> availableGroups,
+                                    EditPackageContentsViewImpl.NodeRelationshipContainer container, List<RelationshipGroup> availableGroups,
                                     Labels labels, PackageOntologyService ontologyService, EmptyFieldButtonDisableListener addNewRelationshipListener) {
         this.labels = labels;
         this.availableGroups = availableGroups;
@@ -109,7 +109,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
     }
 
     private void createRelationshipBox(final PackageArtifact artifact, RelationshipGroup startingGroup, Relationship startingRelationship, Set<String> relatedItems,
-                                       final EditPackageContentsViewImpl.ArtifactRelationshipContainer container, final EmptyFieldButtonDisableListener addNewRelationshipListener) {
+                                       final EditPackageContentsViewImpl.NodeRelationshipContainer container, final EmptyFieldButtonDisableListener addNewRelationshipListener) {
 
         setSpacing(8);
 
