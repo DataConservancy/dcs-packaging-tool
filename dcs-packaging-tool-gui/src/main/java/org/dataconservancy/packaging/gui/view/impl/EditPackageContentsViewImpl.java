@@ -300,7 +300,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         typeColumn.setCellValueFactory(p -> {
             // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
             // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-            String type = p.getValue().getValue().getNodeType().toString();
+            String type = p.getValue().getValue().getNodeType().getLabel();
             Label typeLabel = new Label(type);
             typeLabel.setPrefWidth(typeColumn.getWidth());
             return new ReadOnlyObjectWrapper<>(typeLabel);
