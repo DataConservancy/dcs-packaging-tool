@@ -32,14 +32,13 @@ import java.io.InputStream;
  * ${user.home}/.dataconservancy for the file; if that does not exist we get the default configuration file. The file in
  * the user's configuration directory must have the file name defined in the config_defaults.properties file for that parameter.
  *
- * Existence of command line values for configuration files is checked in the App class - this class is consulted if the
- * command line parameter is absent.
+ * Existence of command line values for configuration files is checked in the App class.
  */
 public class Configuration {
 
     private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
     private String ontologyFile;
-    private String packageFilenameIllegalCharacters;;
+    private String packageFilenameIllegalCharacters;
 
     //the default application configuration directory
     private String configurationDirectory;

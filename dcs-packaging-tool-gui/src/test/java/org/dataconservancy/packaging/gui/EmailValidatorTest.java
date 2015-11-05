@@ -18,6 +18,9 @@
 package org.dataconservancy.packaging.gui;
 
 import org.dataconservancy.packaging.gui.util.EmailValidator;
+import org.dataconservancy.packaging.gui.util.Validator;
+import org.dataconservancy.packaging.gui.util.ValidatorFactory;
+import org.dataconservancy.packaging.tool.model.ValidationType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -28,15 +31,19 @@ import static org.junit.Assert.assertTrue;
  */
 public class EmailValidatorTest {
 
+
+    ValidatorFactory vf = new ValidatorFactory();
+    Validator ev = ValidatorFactory.getValidator(ValidationType.EMAIL);
+
     @Test
     public void testValidEmails() {
-        assertTrue(EmailValidator.isValidEmail("blah@blah.com"));
+        assertTrue(ev.isValid("blah@blah.com"));
     }
 
     @Test
     public void testInvalidEmails() {
-        assertFalse(EmailValidator.isValidEmail("jack.com"));
-        assertFalse(EmailValidator.isValidEmail("@jack.com"));
+        assertFalse(ev.isValid("jack.com"));
+        assertFalse(ev.isValid("@jack.com"));
     }
 
 }

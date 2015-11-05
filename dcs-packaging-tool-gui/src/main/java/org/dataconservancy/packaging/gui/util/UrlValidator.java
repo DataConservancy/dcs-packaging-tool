@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.dataconservancy.packaging.gui.util;
 
-import java.util.regex.Pattern;
+import org.dataconservancy.dcs.util.UriUtility;
 
 /**
- * This is a simple EmailValidator based on commonly used regex. Obviously this is just a syntactic validation. The
- * email address could look like an email address but not really be real.
- *
+ * Class which provide convenient method to validate a string for an RDF URI
  */
-public class EmailValidator implements Validator{
-
-    private final static Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$");
+public class UrlValidator implements Validator{
 
     @Override
-    public boolean isValid(String email) {
-        return emailPattern.matcher(email).matches();
+    public boolean isValid(String uriString) {
+        return UriUtility.isHttpUrl(uriString);
     }
 
 }

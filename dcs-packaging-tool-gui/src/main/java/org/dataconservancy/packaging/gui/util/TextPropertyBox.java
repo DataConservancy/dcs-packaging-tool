@@ -241,7 +241,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
         fieldValidProperty.addListener(applyButtonValidationListener);
 
         //Add validation listener to the field to perform validation
-        propertyValue.addListener(new PropertyValidationListener(artifact, complexPropertyName, propertyName, this, propertyBox, userInputImageLabel, packageOntologyService, messages, fieldValidProperty));
+       // propertyValue.addListener(new PropertyValidationListener(artifact, complexPropertyName, propertyName, this, propertyBox, userInputImageLabel, packageOntologyService, messages, fieldValidProperty));
 
         propertyEntryBox.getChildren().add(userInputImageLabel);
 

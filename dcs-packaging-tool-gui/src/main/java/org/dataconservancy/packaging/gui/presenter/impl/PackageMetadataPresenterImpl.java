@@ -187,7 +187,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 }
             } else if (node instanceof DatePicker) {
                 if (((DatePicker) node).getValue() != null) {
-                    DateTime dateTime = new DateTime(((DatePicker) node).getValue());
+                    org.joda.time.LocalDate date  = new org.joda.time.LocalDate(((DatePicker) node).getValue());
+                    DateTime dateTime = date.toDateTimeAtCurrentTime();
                     getController().getPackageState().addPackageMetadata(node.getId(), DateUtility.toCommonUSDate(dateTime));
                 }
             }

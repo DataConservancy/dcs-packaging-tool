@@ -25,14 +25,15 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
  * can be set in the config_default.properties file to override the hard coded default of US. The mapping of
  * these codes can be found in google's CountryCodeToRegionCodeMap.java source file.
  */
-public class PhoneNumberValidator {
+public class PhoneNumberValidator implements Validator {
 
     /* this is set in the config_default.properties file as the property "localCountryCode" */
     /* which will override the default set to US here */
     private static String localCountryCode = "US";
     private static String genericExitPrefix = "+";
 
-    public static boolean isValid(String phoneNumber) {
+    @Override
+    public boolean isValid(String phoneNumber) {
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         PhoneNumber numberProto;
