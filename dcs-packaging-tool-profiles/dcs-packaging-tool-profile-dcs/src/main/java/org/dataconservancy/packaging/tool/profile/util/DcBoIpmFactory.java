@@ -1,8 +1,9 @@
-package org.dataconservancy.packaging.tool.profile;
+package org.dataconservancy.packaging.tool.profile.util;
 
 
 import org.dataconservancy.packaging.tool.impl.support.IpmTreeFactory;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 
 import java.util.Random;
 
