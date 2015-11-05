@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -30,7 +32,7 @@ import java.text.DecimalFormat;
  * A text widget with a label and text input control, with possibility of adding validation to the text property
  * The VBox is necessary because validation adds an additional Label element above the HBox temporarily, informing the user
  * of a problem with the entry while it is invalid. This Label is removed after successful validation. Any adjustments
- * to the size of the VBox will necessitate andjusting the PropertyValidationListener class, which relies on the size
+ * to the size of the VBox will necessitate adjusting the PropertyValidationListener class, which relies on the size
  * of the VBox in order to control presentation of this Label element.
  */
 public class PropertyBox extends VBox {
