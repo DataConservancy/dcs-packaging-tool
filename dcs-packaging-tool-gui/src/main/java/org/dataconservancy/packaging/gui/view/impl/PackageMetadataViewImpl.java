@@ -179,8 +179,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     /**
      * Set image on the provided label, using a String imageKey
      *
-     * @param label
-     * @param imageKey
+     * @param label The label to set the image on
+     * @param imageKey The url of the image to set.
      */
     private void setLabelImage(Label label, String imageKey) {
         if (imageKey != null) {

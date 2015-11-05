@@ -23,6 +23,7 @@ public class ControlFactory {
      * type of control created.
      * @param type the ControlType of the control to be created
      * @param initialValue the initial text value for a text input control, ignored if not applicable
+     * @param helpText the help text to display with the control
      * @return the Control of the Type specified
      */
     public static Control createControl(ControlType type, String initialValue, final String helpText) {

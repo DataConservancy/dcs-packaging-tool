@@ -19,10 +19,7 @@ package org.dataconservancy.packaging.gui.view;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -67,14 +64,14 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     /**
      * Load the current domain profiles for the user to select
      *
-     * @param domainProfileNames
+     * @param domainProfileNames The list of domain profile names to provide to the user
      */
     void loadDomainProfileNames(List<String> domainProfileNames);
 
     /**
      * Add the selected domain profile as a removable label
      *
-     * @param domainProfile
+     * @param domainProfile The name of the domain profile to add
      */
     void addDomainProfileRemovableLabel(String domainProfile);
 
@@ -87,19 +84,19 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
 
     /**
      * Sets up the required fields in the form.
-     * @param requiredPackageMetadataList
+     * @param requiredPackageMetadataList This PackageMetadata that is required to be entered.
      */
     void setupRequiredFields(List<PackageMetadata> requiredPackageMetadataList);
 
     /**
      * Sets up the recommended fields in the form.
-     * @param recommendedPackageMetadataList
+     * @param recommendedPackageMetadataList The package metadata that's recommended to be entered
      */
     void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList);
 
     /**
      * Sets up the optional fields in the form.
-     * @param optionalPackageMetadataList
+     * @param optionalPackageMetadataList The package metadata that's optional for the user.
      */
     void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
 
@@ -136,7 +133,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     /**
      * Similar to {@code} addDomainProfileRemovableLabel, it adds a label for profile but in a way so the user can't
      * remove it.
-     * @param domainProfile
+     * @param domainProfile The name of the domain profile to add
      */
     void addDomainProfileLabel(String domainProfile);
 
@@ -154,7 +151,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
 
     /**
      * Given a field name, it tells the presenter whether it's failed GUI validation or not.
-     * @param fieldName
+     * @param fieldName The name of the field that failed validation
      * @return true or false
      */
     boolean hasFailedValidation(String fieldName);
