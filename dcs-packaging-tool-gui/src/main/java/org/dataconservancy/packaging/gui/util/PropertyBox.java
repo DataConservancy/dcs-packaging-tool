@@ -84,5 +84,9 @@ public class PropertyBox extends HBox {
     public Label getValidationImageLabel() {
         return this.validationImageLabel;
     }
+
+    public String getValue() {
+        return textInput.getText();
+    }
 }
 
