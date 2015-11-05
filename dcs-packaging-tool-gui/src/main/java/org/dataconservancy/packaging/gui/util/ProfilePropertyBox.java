@@ -49,7 +49,19 @@ public class ProfilePropertyBox extends VBox {
 
             if (existingProperties != null) {
                 for (Property property : existingProperties) {
-                    PropertyBox propertyBox = new PropertyBox(property.getStringValue(), (
+                    String value = "";
+                    switch (property.getPropertyType().getPropertyValueType()) {
+                        case STRING:
+                            value = property.getStringValue();
+                            break;
+                        case LONG:
+                            value = String.valueOf(property.getLongValue());
+                            break;
+                        case DATE_TIME:
+                            //TODO: Parse and format date time
+                            break;
+                    }
+                    PropertyBox propertyBox = new PropertyBox(value, (
                         propertyConstraint.getPropertyType().getPropertyValueHint() ==
                             PropertyValueHint.MULTI_LINE_TEXT), readOnly);
                     textPropertyBoxes.add(propertyBox);
