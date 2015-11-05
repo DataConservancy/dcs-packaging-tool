@@ -410,7 +410,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
      * Apply the named property's value of the parent artifact to its children's applicable property. This method is
      * recursively called to apply the inheritable property's value to all of the offsprings when applicable.
      *
-     * <p/>
      * If the named property is not deemed inHeritable by the PackageOntologyService, then method is a no-op
      *
      */
