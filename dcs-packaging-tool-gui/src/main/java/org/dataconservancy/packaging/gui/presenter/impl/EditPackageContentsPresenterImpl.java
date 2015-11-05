@@ -497,8 +497,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 return 0;
             }
 
-            if (nodeOne.getFileInfo().isFile()
-                        && nodeTwo.getFileInfo().isDirectory()) {
+            if (nodeOne.getFileInfo().isDirectory()
+                        && nodeTwo.getFileInfo().isFile()) {
                 return -1;
             }
 
