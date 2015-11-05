@@ -64,6 +64,15 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
+    public List<Property> getProperties(Node node, PropertyType type) {
+        if (node.getDomainObject() == null) {
+            throw new IllegalArgumentException("Node does not have domain object.");
+        }
+
+        return objstore.getProperties(node.getDomainObject(), type);
+    }
+
+    @Override
     public boolean validateProperties(Node node, NodeType type) {
         if (node.getDomainObject() == null) {
             throw new IllegalArgumentException("Node does not have domain object.");

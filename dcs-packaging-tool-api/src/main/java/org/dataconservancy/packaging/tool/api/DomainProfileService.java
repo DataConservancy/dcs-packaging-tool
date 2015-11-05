@@ -55,6 +55,14 @@ public interface DomainProfileService {
     List<Property> getProperties(Node node, NodeType type);
 
     /**
+     * Gets all properties on the node of the given property type.
+     * @param node The node whose properties should be returned.
+     * @param type The type of node to get the properties for.
+     * @return All properties of the given type on the node.
+     */
+    List<Property> getProperties(Node node, PropertyType type);
+
+    /**
      * Check that all the properties on a node satisfy constraints for that node
      * type.
      * 
