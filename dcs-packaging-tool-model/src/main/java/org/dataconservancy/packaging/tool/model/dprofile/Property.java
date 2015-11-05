@@ -1,9 +1,12 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import java.net.URI;
+
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+
 import org.joda.time.DateTime;
 
 /**
@@ -39,6 +42,11 @@ public class Property {
         check_value_type(PropertyValueType.STRING);
         return String.class.cast(value);
     }
+    
+    public URI getUriValue() {
+        check_value_type(PropertyValueType.URI);
+        return URI.class.cast(value);
+    }
 
     /**
      * @return If type is long, return long value.
@@ -64,7 +72,8 @@ public class Property {
 
     private void check_value_type(PropertyValueType value_type) {
         if (type.getPropertyValueType() != value_type) {
-            throw new IllegalStateException("Expected type of value to be " + value_type);
+            throw new IllegalStateException("Expected type of value to be " + value_type + 
+                                            ", but was " + type.getPropertyValueType());
         }
     }
 
@@ -74,6 +83,15 @@ public class Property {
      */
     public void setStringValue(String value) {
         check_value_type(PropertyValueType.STRING);
+        this.value = value;
+    }
+    
+    /**
+     * @param value
+     *            The value to set.
+     */
+    public void setUriValue(URI value) {
+        check_value_type(PropertyValueType.URI);
         this.value = value;
     }
 
