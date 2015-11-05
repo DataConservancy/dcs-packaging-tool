@@ -140,17 +140,16 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         controller.setPackageState(state);
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
-        view = new EditPackageContentsViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
+        view = new EditPackageContentsViewImpl(propertyLabels, internalProperties, "classpath:/defaultRelationships");
         view.setProfileService(profileService);
         view.setIpmService(ipmService);
 
-        HeaderView headerView = new HeaderViewImpl(labels);
+        HeaderView headerView = new HeaderViewImpl();
         factory.setHeaderView(headerView);
         view.setHeaderView(headerView);
         view.setHelp(help);
         
         presenter = new EditPackageContentsPresenterImpl(view);
-        presenter.setLabels(labels);
         presenter.setController(controller);
         presenter.setProfileService(profileService);
         presenter.setInternalProperties(internalProperties);
@@ -159,7 +158,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         controller.setCreateNewPackage(true);
         controller.getCreateNewPackagePagesStack().clear();
         controller.getCreateNewPackagePagesStack().push(Page.GENERATE_PACKAGE);
-        PackageGenerationViewImpl packageGenerationView = new PackageGenerationViewImpl(labels);
+        PackageGenerationViewImpl packageGenerationView = new PackageGenerationViewImpl();
         packageGenerationView.setHeaderView(headerView);
         factory.setPackageGenerationPresenter(new PackageGenerationPresenterImpl(packageGenerationView));
     }

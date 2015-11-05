@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.tool.model.ValidationType;
 
 import static org.dataconservancy.packaging.tool.model.ValidationType.*;
@@ -32,7 +33,6 @@ import static org.dataconservancy.packaging.tool.model.ValidationType.*;
  */
 public class PropertyValidationListener implements ChangeListener<String>, CssConstants {
 
-    private Messages messages;
     //validationLabel contains the validation error message
     private Label validationLabel;
     //validationImageLabel provides the X or check image as a user guide
@@ -80,13 +80,13 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
 
                 switch (validationType) {
                     case PHONE:
-                        validationLabel.setText(messages.formatPhoneValidationFailure(newValue));
+                        validationLabel.setText(TextFactory.format(Messages.MessageKey.PHONE_VALIDATION_FAILURE, newValue));
                         break;
                     case URL:
-                        validationLabel.setText(messages.formatUrlValidationFailure(newValue));
+                        validationLabel.setText(TextFactory.format(Messages.MessageKey.URL_VALIDATION_FAILURE, newValue));
                         break;
                     case EMAIL:
-                        validationLabel.setText(messages.formatEmailValidationFailure(newValue));
+                        validationLabel.setText(TextFactory.format(Messages.MessageKey.EMAIL_VALIDATION_FAILURE, newValue));
                     default:
                         propertyBox.getChildren().remove(validationLabel);
                 }

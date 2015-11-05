@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
  * localized using String.format.
  */
 public class Messages {
-    private enum Key {
+    public enum MessageKey {
         PACKAGE_DESCRIPTION_BUILDER_SUCCESS("packagedescriptionbuilder.success"),
         PACKAGE_DESCRIPTION_BUILDER_FAILURE("packagedescriptionbuilder.failure"),
         PACKAGE_DESCRIPTION_BUILDER_ERROR("packagedescriptionbuilder.error"),
@@ -37,72 +37,38 @@ public class Messages {
 
         String property;
 
-        Key(String property) {
+        MessageKey(String property) {
             this.property = property;
         }
     }
 
-    private static ResourceBundle bundle;
+    private ResourceBundle bundle;
 
     public Messages(ResourceBundle bundle) {
         this.bundle = bundle;
 
-        for (Key key : Key.values()) {
-            if (!bundle.containsKey(key.property)) {
-                throw new IllegalArgumentException("Missing resource in bundle: " + key);
+        for (MessageKey messageKey : MessageKey.values()) {
+            if (!bundle.containsKey(messageKey.property)) {
+                throw new IllegalArgumentException("Missing resource in bundle: " +
+                                                       messageKey);
             }
         }
     }
 
-    private static String format(Key key, Object... args) {
+    public String get(MessageKey key) {
         if (!bundle.containsKey(key.property)) {
-            throw new IllegalArgumentException("No such resource: " + key);
+            throw new IllegalArgumentException("No such resource: " + key.property);
         }
 
-        return String.format(bundle.getLocale(), bundle.getString(key.property), args);
+        return bundle.getString(key.property);
     }
 
-    public static String formatPackageDescriptionBuilderSuccess(String file) {
-        return format(Key.PACKAGE_DESCRIPTION_BUILDER_SUCCESS, file);
-    }
+    public String format(MessageKey messageKey, Object... args) {
+        if (!bundle.containsKey(messageKey.property)) {
+            throw new IllegalArgumentException("No such resource: " +
+                                                   messageKey);
+        }
 
-    public static String formatPackageDescriptionBuilderFailure(String file) {
-        return format(Key.PACKAGE_DESCRIPTION_BUILDER_FAILURE, file);
-    }
-
-    public static String formatPackageDescriptionBuilderError(String file) {
-        return format(Key.PACKAGE_DESCRIPTION_BUILDER_ERROR, file);
-    }
-    
-    public static String formatPackageGenerationSuccess(String file) {
-        return format(Key.PACKAGE_GENERATION_SUCCESS, file);
-    }
-    
-    public static String formatErrorCreatingNewPackage(String error) {
-        return format(Key.ERROR_CREATING_NEW_PACKAGE, error);
-    }
-
-    public static String formatFilenameLengthWarning(int length) {
-        return format(Key.WARNING_FILENAME_LENGTH, length);
-    }
-
-    public static String formatInvalidPropertyWarning(String type, String properties) {
-        return format(Key.WARNING_INVALID_PROPERTY, type, properties);
-    }
-
-    public static String formatPackageDescriptionModificationWarning(String artifactRef, String oldType, String newType) {
-        return format(Key.WARNING_PACKAGE_DESCRIPTION_MODIFICATION, artifactRef, oldType, newType);
-    }
-
-    public static String formatUrlValidationFailure(String url) {
-        return format(Key.URL_VALIDATION_FAILURE, url);
-    }
-
-    public static String formatPhoneValidationFailure(String phoneNumber) {
-        return format(Key.PHONE_VALIDATION_FAILURE, phoneNumber);
-    }
-
-    public static String formatEmailValidationFailure(String emailAddress) {
-        return format(Key.EMAIL_VALIDATION_FAILURE, emailAddress);
+        return String.format(bundle.getLocale(), bundle.getString(messageKey.property), args);
     }
 }

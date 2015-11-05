@@ -24,6 +24,7 @@ import javafx.scene.text.TextAlignment;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.HomepagePresenter;
 import org.dataconservancy.packaging.gui.view.HomepageView;
 
@@ -36,10 +37,10 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
     private Button createNewPackageButton;
     private Button openExistingPackageButton;
 
-    public HomepageViewImpl(Labels labels) {
-        super(labels);
-        createNewPackageButton = new Button(labels.get(Labels.LabelKey.CREATE_NEW_PACKAGE));
-        openExistingPackageButton = new Button(labels.get(Labels.LabelKey.OPEN_EXISTING_PACKAGE));
+    public HomepageViewImpl() {
+        super();
+        createNewPackageButton = new Button(TextFactory.getText(Labels.LabelKey.CREATE_NEW_PACKAGE));
+        openExistingPackageButton = new Button(TextFactory.getText(Labels.LabelKey.OPEN_EXISTING_PACKAGE));
 
         getContinueButton().setVisible(false);
         getSaveButton().setVisible(false);

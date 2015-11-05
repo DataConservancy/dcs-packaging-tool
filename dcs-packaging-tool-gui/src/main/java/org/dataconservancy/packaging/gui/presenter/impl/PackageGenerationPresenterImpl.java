@@ -32,6 +32,8 @@ import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
@@ -123,7 +125,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     workerStateEvent.getSource().getMessage().isEmpty()) {
                 Throwable e = workerStateEvent.getSource().getException();
                 view.getStatusLabel().setText(
-                        errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
+                    TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
                                 " " + e.getMessage());
             } else {
                 view.getStatusLabel().setText(workerStateEvent.getSource().getMessage());
@@ -290,10 +292,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             packageDescription = packageDescriptionBuilder.deserialize(fis);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage());
-            return errors.get(ErrorKey.PACKAGE_DESCRIPTION_BUILD_ERROR) + " " + e.getMessage();
+            return TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_BUILD_ERROR) + " " + e.getMessage();
         } catch (NullPointerException e) {
             log.error(e.getMessage());
-            return errors.get(ErrorKey.PACKAGE_DESCRIPTION_BUILD_ERROR) + " " + e.getMessage();
+            return TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_BUILD_ERROR) + " " + e.getMessage();
         }
 
         Package createdPackage;
@@ -303,15 +305,15 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 createdPackage = packageGenerationService.generatePackage(packageDescription, generationParams);
             } catch (PackageToolException e) {
                 log.error(e.getMessage());
-                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
+                return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             } catch (RuntimeException e) {
                 log.error(e.getMessage());
-                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
+                return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             }
 
         } else {
-            log.error(errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " generation params or package description was null.");
-            return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
+            log.error(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " generation params or package description was null.");
+            return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
         }
 
         if (!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded") && !Thread.currentThread().isInterrupted()) {
@@ -331,12 +333,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     }
                 } catch (IOException e) {
                     log.error(e.getMessage());
-                    return errors.get(ErrorKey.PACKAGE_GENERATION_SAVE);
+                    return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_SAVE);
                 }
 
             } else {
-                log.error(errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " created package was null");
-                return errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
+                log.error(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " created package was null");
+                return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
             }
         }
 
@@ -551,7 +553,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     if (!outputDirectory.mkdirs()) {
                         // If the directory could not be created, reset outputDirectory, and display a warning
                         controller.getPackageState().setOutputDirectory(null);
-                        view.getStatusLabel().setText(errors.get(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR));
+                        view.getStatusLabel().setText(TextFactory.getText(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR));
                         view.getStatusLabel().setTextFill(Color.RED);
                         view.getStatusLabel().setVisible(true);
                     } else {
@@ -607,16 +609,16 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         if (!hasPackageName || controller.getPackageState().getOutputDirectory() == null) {
             if (hasPackageName) {
-                errorText = errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING);
+                errorText = TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_MISSING);
             } else if (controller.getPackageState().getOutputDirectory() != null) {
-                errorText = errors.get(ErrorKey.MISSING_REQUIRED_FIELDS);
+                errorText = TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS);
             } else {
-                errorText = errors.get(ErrorKey.OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING);
+                errorText = TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING);
             }
         }
 
         if (StringUtils.containsAny(getPackageName(), controller.getPackageFilenameIllegalCharacters())) {
-            errorText = errors.get(ErrorKey.PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS)
+            errorText = TextFactory.getText(ErrorKey.PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS)
                     + "   " + controller.getPackageFilenameIllegalCharacters();
         }
 
@@ -648,7 +650,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         // Warning for long filenames, won't prevent you from continuing but may cause an error when you actually save
         // Mostly affects Windows machines
         if (currentOutput.length() > 259) {
-            view.getStatusLabel().setText(messages.formatFilenameLengthWarning(currentOutput.length()));
+            view.getStatusLabel().setText(TextFactory.format(Messages.MessageKey.WARNING_FILENAME_LENGTH, currentOutput.length()));
             view.getStatusLabel().setTextFill(Color.RED);
             view.getStatusLabel().setVisible(true);
         }
@@ -780,7 +782,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                         File packageFile = getPackageFile();
 
                         if (controller.getPackageState().getOutputDirectory() == null) {
-                            updateMessage(errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING));
+                            updateMessage(TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_MISSING));
                             cancel();
                         } else {
                             if (!packageFile.exists() || overwriteFile) {
@@ -828,7 +830,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
             if (controller.getPackageState().getOutputDirectory() == null) {
 
-                worker.setMessage(errors.get(ErrorKey.OUTPUT_DIRECTORY_MISSING));
+                worker.setMessage(TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_MISSING));
                 worker.setState(Worker.State.CANCELLED);
                 cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
             } else {

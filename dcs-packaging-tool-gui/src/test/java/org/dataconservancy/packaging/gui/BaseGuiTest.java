@@ -34,15 +34,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 public abstract class BaseGuiTest {
     private static CountDownLatch javafx_setup_latch = null; 
-    
-    @Autowired
-    protected Labels labels;
-
-    @Autowired
-    protected Messages messages;
-    
-    @Autowired
-    protected Errors errors;
 
     @Autowired
     protected Configuration configuration;
@@ -90,12 +81,7 @@ public abstract class BaseGuiTest {
         
         javafx_setup_latch = new CountDownLatch(1);
         
-        Runnable init = new Runnable() {
-            @Override
-            public void run() {
-                Application.launch(SkeletonApp.class);
-            }
-        };        
+        Runnable init = () -> Application.launch(SkeletonApp.class);
         
         System.out.println("JavaFx initialising...");
         long timeMillis = System.currentTimeMillis();

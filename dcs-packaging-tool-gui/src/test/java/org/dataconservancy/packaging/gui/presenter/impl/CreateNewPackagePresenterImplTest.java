@@ -36,7 +36,6 @@ import javafx.stage.FileChooser;
 
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
@@ -55,7 +54,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test for the create new package presenter implementation. Tests that elements are retrieved correctly, properties are set correctly,
@@ -78,8 +76,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     @Rule
     public ExecuteContinueRule continueRule = new ExecuteContinueRule();
 
-    @Autowired
-    private Messages msgs;
 
     private boolean initialized = false;
     
@@ -98,13 +94,13 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             chosenFile = null;
             chosenDirectory = null;
 
-            HeaderView header = new HeaderViewImpl(labels);
+            HeaderView header = new HeaderViewImpl();
 
             // Setup next page
-            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(labels, errors, messages, propertyLabels, internalProperties, "classpath:/defaultRelationships");
+            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(propertyLabels, internalProperties, "classpath:/defaultRelationships");
             editPackageContentsView.setHeaderView(header);
             packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
-            factory.setPackageDescriptionPresenter(packageDescriptionPresenter);
+            factory.setEditPackageContentsPresenter(packageDescriptionPresenter);
 
             Controller controller = new Controller() {
 
@@ -131,7 +127,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 }
 
                 @Override
-                public EditPackageContentsPresenter showPackageDescriptionViewer() {
+                public EditPackageContentsPresenter showEditPackageContents() {
                     showNextPage = true;
                     return packageDescriptionPresenter;
                 }
@@ -139,14 +135,13 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             controller.setFactory(factory);
             factory.setController(controller);
 
-            view = new CreateNewPackageViewImpl(labels);
+            view = new CreateNewPackageViewImpl();
             view.setHelp(help);
 
             view.setHeaderView(header);
             presenter = new CreateNewPackagePresenterImpl(view);
 
             presenter.setController(controller);
-            presenter.setMessages(msgs);
 
             PackageDescription description = new PackageDescription();
 
@@ -267,16 +262,14 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 if (methodName.equalsIgnoreCase("testContinue")) {
                     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-                    Platform.runLater(new Runnable() {
-                       @Override
-                       public void run() {
-                           try {
-                               executeContinue();
-                           } catch (Throwable e) {
-                               rethrownException = e;
-                           }
-                           countDownLatch.countDown();
-                       }});
+                    Platform.runLater(() -> {
+                        try {
+                            executeContinue();
+                        } catch (Throwable e) {
+                            rethrownException = e;
+                        }
+                        countDownLatch.countDown();
+                    });
 
                     countDownLatch.await();
                     if (rethrownException != null) {

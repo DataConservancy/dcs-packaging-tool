@@ -54,13 +54,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
-import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.OntologyLabels;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
@@ -87,8 +85,6 @@ import java.util.prefs.Preferences;
  */
 public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContentsPresenter> implements EditPackageContentsView {
 
-    private Labels labels;
-    private Messages messages;
     private TreeTableView<Node> artifactTree;
 
     private Stage artifactDetailsWindow;
@@ -126,7 +122,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     //Storage for mapping popup fields to properties on the artifacts. 
     private Set<NodeRelationshipContainer> artifactRelationshipFields;
 
-    private Errors errors;
     private OntologyLabels ontologyLabels;
     private InternalProperties internalProperties;
 
@@ -142,20 +137,17 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Button refreshPopupPositiveButton;
     private Button refreshPopupNegativeButton;
 
-    public EditPackageContentsViewImpl(final Labels labels, final Errors errors, final Messages messages, final OntologyLabels ontologyLabels,
+    public EditPackageContentsViewImpl(final OntologyLabels ontologyLabels,
                                        final InternalProperties internalProperties, final String availableRelationshipsPath) {
-        super(labels);
-        this.labels = labels;
-        this.errors = errors;
-        this.messages = messages;
+        super();
         this.ontologyLabels = ontologyLabels;
         this.internalProperties = internalProperties;
         this.availableRelationshipsPath = availableRelationshipsPath;
 
         //Sets the text of the footer controls.
-        getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
-        getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
-        getSaveButton().setText(labels.get(LabelKey.SAVE_BUTTON));
+        getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
+        getCancelLink().setText(TextFactory.getText(LabelKey.BACK_LINK));
+        getSaveButton().setText(TextFactory.getText(LabelKey.SAVE_BUTTON));
         getSaveButton().setVisible(true);
         VBox content = new VBox();
 
@@ -173,7 +165,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         HBox buttonBar = new HBox(24);
         buttonBar.setAlignment(Pos.TOP_RIGHT);
-        reenableWarningsButton = new Button(labels.get(LabelKey.RENABLE_PROPERTY_WARNINGS_BUTTON));
+        reenableWarningsButton = new Button(TextFactory.getText(LabelKey.RENABLE_PROPERTY_WARNINGS_BUTTON));
         reenableWarningsButton.setVisible(hideWarningPopup);
         reenableWarningsButton.setPrefWidth(23 * rem);
         buttonBar.getChildren().add(reenableWarningsButton);
@@ -189,30 +181,30 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         //Creates the file chooser that's used to save the package description to a file.
         packageDescriptionFileChooser = new FileChooser();
-        packageDescriptionFileChooser.setTitle(labels.get(LabelKey.PACKAGE_DESCRIPTION_FILE_CHOOSER_KEY));
+        packageDescriptionFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_DESCRIPTION_FILE_CHOOSER_KEY));
         packageDescriptionFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
         packageDescriptionFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 
         //Toggles whether the full paths should be displayed in the package artifact tree. 
-        fullPath = new CheckBox(labels.get(LabelKey.SHOW_FULL_PATHS));
+        fullPath = new CheckBox(TextFactory.getText(LabelKey.SHOW_FULL_PATHS));
         fullPath.selectedProperty().addListener((ov, old_val, new_val) -> {
             presenter.rebuildTreeView();
         });
 
-        showIgnored = new CheckBox(labels.get(LabelKey.SHOW_IGNORED));
+        showIgnored = new CheckBox(TextFactory.getText(LabelKey.SHOW_IGNORED));
         showIgnored.selectedProperty().setValue(true);
         showIgnored.selectedProperty().addListener((observableValue, aBoolean, aBoolean2) -> {
             presenter.rebuildTreeView();
         });
 
         if(Platform.isFxApplicationThread()){
-            Tooltip t = new Tooltip(labels.get(LabelKey.SHOW_FULL_PATHS_TIP));
+            Tooltip t = new Tooltip(TextFactory.getText(LabelKey.SHOW_FULL_PATHS_TIP));
             t.setPrefWidth(300);
             t.setWrapText(true);
             fullPath.setTooltip(t);
         }
         if(Platform.isFxApplicationThread()){
-            Tooltip t = new Tooltip(labels.get(LabelKey.SHOW_IGNORED_TIP));
+            Tooltip t = new Tooltip(TextFactory.getText(LabelKey.SHOW_IGNORED_TIP));
             t.setPrefWidth(300);
             t.setWrapText(true);
             showIgnored.setTooltip(t);
@@ -221,7 +213,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(fullPath);
         content.getChildren().add(showIgnored);
 
-        Label syntheticArtifactLabel = new Label(labels.get(LabelKey.SYNTHESIZED_ARTIFACT_NOTATION));
+        Label syntheticArtifactLabel = new Label(TextFactory.getText(LabelKey.SYNTHESIZED_ARTIFACT_NOTATION));
 
         content.getChildren().add(syntheticArtifactLabel);
 
@@ -373,23 +365,23 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         VBox.setVgrow(artifactTree, Priority.ALWAYS);
 
         //Controls for the package artifact popup
-        cancelPopupLink = new Hyperlink(labels.get(LabelKey.CANCEL_BUTTON));
-        applyPopupButton = new Button(labels.get(LabelKey.APPLY_BUTTON));
+        cancelPopupLink = new Hyperlink(TextFactory.getText(LabelKey.CANCEL_BUTTON));
+        applyPopupButton = new Button(TextFactory.getText(LabelKey.APPLY_BUTTON));
 
         //Controls for the validation error popup.
-        warningPopupPositiveButton = new Button(labels.get(LabelKey.OK_BUTTON));
+        warningPopupPositiveButton = new Button(TextFactory.getText(LabelKey.OK_BUTTON));
         warningPopupPositiveButton.getStyleClass().add(CLICKABLE);
-        warningPopupNegativeButton = new Button(labels.get(LabelKey.CANCEL_BUTTON));
+        warningPopupNegativeButton = new Button(TextFactory.getText(LabelKey.CANCEL_BUTTON));
         warningPopupNegativeButton.getStyleClass().add(CLICKABLE);
-        hideFutureWarningPopupCheckBox = new CheckBox(labels.get(LabelKey.DONT_SHOW_WARNING_AGAIN_CHECKBOX));
+        hideFutureWarningPopupCheckBox = new CheckBox(TextFactory.getText(LabelKey.DONT_SHOW_WARNING_AGAIN_CHECKBOX));
 
         //Instantiating metadata inheritance button map
         metadataInheritanceButtonMap = new HashMap<>();
 
         // controls for the refresh popup
-        refreshPopupPositiveButton = new Button(labels.get(LabelKey.ACCEPT_BUTTON));
+        refreshPopupPositiveButton = new Button(TextFactory.getText(LabelKey.ACCEPT_BUTTON));
         refreshPopupPositiveButton.getStyleClass().add(CLICKABLE);
-        refreshPopupNegativeButton = new Button(labels.get(LabelKey.REJECT_BUTTON));
+        refreshPopupNegativeButton = new Button(TextFactory.getText(LabelKey.REJECT_BUTTON));
         refreshPopupNegativeButton.getStyleClass().add(CLICKABLE);
 
        // windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
@@ -446,7 +438,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         final Node packageNode = treeItem.getValue();
 
         //Create a menu item that will show the package artifacts popup.
-        MenuItem propertiesItem = new MenuItem(labels.get(LabelKey.PROPERTIES_LABEL));
+        MenuItem propertiesItem = new MenuItem(TextFactory.getText(LabelKey.PROPERTIES_LABEL));
         itemList.add(propertiesItem);
         propertiesItem.setOnAction(actionEvent -> {
             VBox detailsBox = new VBox();
@@ -457,7 +449,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         // TODO: Addition of these items to the list should be determined by the service
         //Create a menu item that will allow the user to pick a file.
-        MenuItem addFileItem = new MenuItem(labels.get(LabelKey.ADD_ITEM_LABEL));
+        MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_ITEM_LABEL));
         itemList.add(addFileItem);
         addFileItem.setOnAction(event -> {
             File file = presenter.getController().showOpenFileDialog(new FileChooser());
@@ -465,7 +457,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //Create a menu item that will allow the user to pick a folder.
-        MenuItem addDirItem = new MenuItem(labels.get(LabelKey.ADD_ITEM_LABEL));
+        MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_ITEM_LABEL));
         itemList.add(addDirItem);
         addDirItem.setOnAction(event -> {
             File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
@@ -474,7 +466,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         //Create a menu item that will allow the user to refresh the tree.
         // TODO: the showing of this item should be determined by a service
-        MenuItem refreshItem = new MenuItem(labels.get(LabelKey.REFRESH_ITEM_LABEL));
+        MenuItem refreshItem = new MenuItem(TextFactory.getText(LabelKey.REFRESH_ITEM_LABEL));
         itemList.add(refreshItem);
         refreshItem.setOnAction(event -> {
             // TODO: Do the refresh and pass in a RefreshResults object of some sort
@@ -483,7 +475,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //Create a menu item that will allow the user to pick a file.
-        MenuItem remapFileItem = new MenuItem(labels.get(LabelKey.REMAP_ITEM_LABEL));
+        MenuItem remapFileItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
         itemList.add(remapFileItem);
         // TODO: the showing of this item should be determined by a service
         remapFileItem.setOnAction(event -> {
@@ -493,7 +485,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //Create a menu item that will allow the user to pick a folder.
-        MenuItem remapDirItem = new MenuItem(labels.get(LabelKey.REMAP_ITEM_LABEL));
+        MenuItem remapDirItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
         itemList.add(remapDirItem);
         // TODO: the showing of this item should be determined by a service
         remapDirItem.setOnAction(event -> {
@@ -559,7 +551,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     private MenuItem createIgnoreMenuItem(final TreeItem<Node> treeItem) {
-        final CheckMenuItem ignoreCheck = new CheckMenuItem(labels.get(LabelKey.IGNORE_CHECKBOX));
+        final CheckMenuItem ignoreCheck = new CheckMenuItem(TextFactory.getText(LabelKey.IGNORE_CHECKBOX));
         ignoreCheck.setSelected(treeItem.getValue().isIgnored());
 
         ignoreCheck.setOnAction(event -> toggleItemIgnore(treeItem, ignoreCheck.isSelected()));
@@ -759,7 +751,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             refreshPopup = new PackageToolPopup();
         }
 
-        refreshPopup.setTitleText(labels.get(LabelKey.DETECTED_CHANGES_LABEL));
+        refreshPopup.setTitleText(TextFactory.getText(LabelKey.DETECTED_CHANGES_LABEL));
 
         VBox content = new VBox(48);
         content.setPrefWidth(300);
@@ -872,7 +864,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public void setupWindowBuilder(String disciplineFilePath){
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
-        windowBuilder = new PackageArtifactWindowBuilder(labels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
+        windowBuilder = new PackageArtifactWindowBuilder(cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService);
     }
 
     @Override

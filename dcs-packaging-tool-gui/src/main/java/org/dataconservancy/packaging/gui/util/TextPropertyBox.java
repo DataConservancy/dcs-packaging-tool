@@ -35,7 +35,7 @@ import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.App;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.tool.api.PackageOntologyService;
 import org.dataconservancy.packaging.tool.model.PackageArtifact;
 
@@ -55,7 +55,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
 
     public TextPropertyBox(PackageArtifact artifact, final String complexPropertyName, String propertyLabel, final String propertyName, Set<String> propertyValues,
                                             int maxOccurs, final Set<StringProperty> fields, int minOccurs, boolean systemGenerated,
-                                            final PackageOntologyService packageOntologyService, final Labels labels, final Messages messages,
+                                            final PackageOntologyService packageOntologyService,
                                             ApplyButtonValidationListener applyButtonValidationListener) {
         setSpacing(6);
 
@@ -81,16 +81,16 @@ public class TextPropertyBox extends VBox implements CssConstants {
         if (propertyValues != null && !propertyValues.isEmpty()) {
             for (String originalValue : propertyValues) {
 
-                HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, labels, applyButtonValidationListener,
-                                    artifact, complexPropertyName, propertyBox, messages, originalValue);
+                HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, applyButtonValidationListener,
+                                    artifact, complexPropertyName, propertyBox, originalValue);
                 propertyValuesBox.getChildren().add(propertyEntryBox);
             }
             hasValue = true;
             //Otherwise create an empty text field for the value.
         } else {
 
-            HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, labels, applyButtonValidationListener,
-                    artifact, complexPropertyName, propertyBox, messages, "");
+            HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, applyButtonValidationListener,
+                    artifact, complexPropertyName, propertyBox, "");
             propertyValuesBox.getChildren().add(propertyEntryBox);
         }
 
@@ -102,8 +102,8 @@ public class TextPropertyBox extends VBox implements CssConstants {
             propertyBox.getChildren().add(addNewButton);
 
             addNewButton.setOnAction(arg0 -> {
-                HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, labels, applyButtonValidationListener,
-                        artifact, complexPropertyName, propertyBox, messages, "");
+                HBox propertyEntryBox = createPropertyEntryBox(addNewListener, fields, systemGenerated, packageOntologyService, propertyName, applyButtonValidationListener,
+                        artifact, complexPropertyName, propertyBox, "");
                 propertyValuesBox.getChildren().add(propertyEntryBox);
                 addNewButton.setDisable(true);
                 propertyEntryBox.getChildren().get(0).requestFocus();
@@ -137,8 +137,8 @@ public class TextPropertyBox extends VBox implements CssConstants {
     }
 
     private HBox createPropertyEntryBox(EmptyFieldButtonDisableListener addNewListener, Set<StringProperty> fields, boolean systemGenerated, PackageOntologyService packageOntologyService,
-                                        String propertyName, Labels labels, ApplyButtonValidationListener applyButtonValidationListener, PackageArtifact artifact, String complexPropertyName,
-                                        HBox propertyBox, Messages messages, String value) {
+                                        String propertyName, ApplyButtonValidationListener applyButtonValidationListener, PackageArtifact artifact, String complexPropertyName,
+                                        HBox propertyBox, String value) {
 
         HBox propertyEntryBox = new HBox(2);
 
@@ -225,7 +225,7 @@ public class TextPropertyBox extends VBox implements CssConstants {
         propertyControl.setPrefWidth(250);
         propertyControl.setEditable(!systemGenerated);
         if (packageOntologyService.isDateProperty(null, propertyName)) {
-            propertyControl.setPromptText(labels.get(Labels.LabelKey.UTC_HINT));
+            propertyControl.setPromptText(TextFactory.getText(Labels.LabelKey.UTC_HINT));
         }
 
         if(!propertyControl.isEditable()){

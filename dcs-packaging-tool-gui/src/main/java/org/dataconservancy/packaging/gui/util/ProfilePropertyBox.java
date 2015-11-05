@@ -9,6 +9,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
@@ -48,14 +49,14 @@ public class ProfilePropertyBox extends VBox {
 
             if (existingProperties != null) {
                 for (Property property : existingProperties) {
-                    PropertyBox propertyBox = new PropertyBox(property.getStringValue(), false, (
+                    PropertyBox propertyBox = new PropertyBox(property.getStringValue(), (
                         propertyConstraint.getPropertyType().getPropertyValueHint() ==
                             PropertyValueHint.MULTI_LINE_TEXT), readOnly);
                     textPropertyBoxes.add(propertyBox);
                     getChildren().add(propertyBox);
                 }
             } else {
-                PropertyBox propertyBox = new PropertyBox("", false, (
+                PropertyBox propertyBox = new PropertyBox("", (
                     propertyConstraint.getPropertyType().getPropertyValueHint() ==
                         PropertyValueHint.MULTI_LINE_TEXT), readOnly);
                 textPropertyBoxes.add(propertyBox);
@@ -65,7 +66,7 @@ public class ProfilePropertyBox extends VBox {
 
         if (propertyConstraint.getMaximum() > 1) {
             final Button addNewButton = new Button(
-                Labels.getLabel(Labels.LabelKey.ADD_NEW_BUTTON));
+                TextFactory.getText(Labels.LabelKey.ADD_NEW_BUTTON));
             addNewButton.setMaxWidth(addNewButtonMaxWidth);
             addNewButton.setDisable(true);
             getChildren().add(addNewButton);

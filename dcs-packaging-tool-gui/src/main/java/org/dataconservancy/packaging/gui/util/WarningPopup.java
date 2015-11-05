@@ -24,6 +24,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.TextFactory;
 
 /**
  * A popup that has a warning message for the user with confirm and cancel actions.
@@ -34,7 +35,7 @@ public class WarningPopup extends PackageToolPopup {
     private Button cancelButton;
     private Button confirmButton;
 
-    public WarningPopup(Labels labels) {
+    public WarningPopup() {
         super();
 
         VBox content = new VBox();
@@ -46,12 +47,12 @@ public class WarningPopup extends PackageToolPopup {
         buttonsHBox.setAlignment(Pos.CENTER);
 
         confirmButton = new Button();
-        confirmButton.setText(labels.get(Labels.LabelKey.CONTINUE_BUTTON));
+        confirmButton.setText(TextFactory.getText(Labels.LabelKey.CONTINUE_BUTTON));
         confirmButton.getStyleClass().add(CLICKABLE);
         buttonsHBox.getChildren().add(confirmButton);
 
         cancelButton = new Button();
-        cancelButton.setText(labels.get(Labels.LabelKey.CANCEL_BUTTON));
+        cancelButton.setText(TextFactory.getText(Labels.LabelKey.CANCEL_BUTTON));
         cancelButton.getStyleClass().add(CLICKABLE);
         buttonsHBox.getChildren().add(cancelButton);
 

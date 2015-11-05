@@ -148,7 +148,7 @@ public class Controller {
         factory.getPackageMetadataPresenter().clear();
         factory.getCreateNewPackagePresenter().clear();
         factory.getOpenExistingPackagePresenter().clear();
-        factory.getPackageDescriptionPresenter().clear();
+        factory.getEditPackageContentsPresenter().clear();
         factory.getPackageGenerationPresenter().clear();
     }
 
@@ -204,8 +204,8 @@ public class Controller {
         show(factory.getPackageGenerationPresenter());
     }
 
-    public EditPackageContentsPresenter showPackageDescriptionViewer() {
-        EditPackageContentsPresenter presenter = factory.getPackageDescriptionPresenter();
+    public EditPackageContentsPresenter showEditPackageContents() {
+        EditPackageContentsPresenter presenter = factory.getEditPackageContentsPresenter();
         show(presenter);
         return presenter;
     }
@@ -325,7 +325,7 @@ public class Controller {
                 showCreatePackageDescription();
                 break;
             case DEFINE_RELATIONSHIPS:
-                showPackageDescriptionViewer();
+                showEditPackageContents();
                 break;
             case GENERATE_PACKAGE:
                 showGeneratePackage();

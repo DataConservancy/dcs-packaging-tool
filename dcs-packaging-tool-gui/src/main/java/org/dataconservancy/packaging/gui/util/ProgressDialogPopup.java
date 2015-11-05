@@ -24,6 +24,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.TextFactory;
 
 /**
  * A popup that includes a progress dialog. You don't use setContent with this popup only setTitle and setMessage.
@@ -32,7 +33,7 @@ public class ProgressDialogPopup extends PackageToolPopup {
 
     Label message;
     Button cancelButton;
-    public ProgressDialogPopup(Labels labels) {
+    public ProgressDialogPopup() {
         super();
 
         VBox content = new VBox();
@@ -45,7 +46,7 @@ public class ProgressDialogPopup extends PackageToolPopup {
         content.getChildren().add(progressBar);
 
         cancelButton = new Button();
-        cancelButton.setText(labels.get(Labels.LabelKey.CANCEL_BUTTON));
+        cancelButton.setText(TextFactory.getText(Labels.LabelKey.CANCEL_BUTTON));
         content.getChildren().add(cancelButton);
 
         super.setContent(content);

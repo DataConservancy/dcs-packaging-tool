@@ -17,11 +17,8 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Errors;
-import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.Messages;
-import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.View;
 
 /**
@@ -31,9 +28,6 @@ import org.dataconservancy.packaging.gui.view.View;
 public abstract class BasePresenterImpl implements Presenter {
     
     private View<?> view;
-    protected Labels labels;
-    protected Messages messages;
-    protected Errors errors;
     protected InternalProperties internalProperties;
     protected Controller controller;
 
@@ -47,21 +41,6 @@ public abstract class BasePresenterImpl implements Presenter {
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
 
         bindCancelLink();
-    }
-
-    @Override
-    public void setMessages(Messages messages) {
-        this.messages = messages;        
-    }
-
-    @Override
-    public void setErrors(Errors errors) {
-        this.errors = errors;        
-    }
-
-    @Override
-    public void setLabels(Labels labels) {
-        this.labels = labels;        
     }
 
     @Override

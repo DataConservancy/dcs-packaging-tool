@@ -16,28 +16,21 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import javafx.scene.control.TextField;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
-import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Page;
-import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl;
-import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -76,12 +69,11 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
 
         factory.setController(controller);
 
-        view = new HomepageViewImpl(labels);
+        view = new HomepageViewImpl();
         view.setHelp(help);
-        header = new HeaderViewImpl(labels);
+        header = new HeaderViewImpl();
         view.setHeaderView(header);
         presenter = new HomepagePresenterImpl(view);
-        presenter.setErrors(errors);
 
         presenter.setController(controller);
 
@@ -107,7 +99,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
         // Setup controller to handle going to the next page.
         controller.getCreateNewPackagePagesStack().clear();
         controller.getCreateNewPackagePagesStack().push(Page.CREATE_NEW_PACKAGE);
-        CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(labels);
+        CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl();
         createNewPackageView.setHeaderView(header);
         factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
 
@@ -127,7 +119,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
         // Setup controller to handle going to the next page.
         controller.getOpenExistingPackagePagesStack().clear();
         controller.getOpenExistingPackagePagesStack().push(Page.OPEN_EXISTING_PACKAGE);
-        OpenExistingPackageView openExistingPackageView = new OpenExistingPackageViewImpl(labels);
+        OpenExistingPackageView openExistingPackageView = new OpenExistingPackageViewImpl();
         openExistingPackageView.setHeaderView(header);
         factory.setOpenExistingPackagePresenter(new OpenExistingPackagePresenterImpl(openExistingPackageView));
 

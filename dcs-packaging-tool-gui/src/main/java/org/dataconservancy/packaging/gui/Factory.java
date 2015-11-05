@@ -56,16 +56,13 @@ public class Factory {
     private TestPackageGenerator testPkgGenerator;
     private PackageGenerationPresenter pkgGenerationPresenter;
     private PackageGenerationView pkgGenerationView;
-    private EditPackageContentsPresenter pkgDescriptionPresenter;
-    private EditPackageContentsView pkgDescriptionView;
+    private EditPackageContentsPresenter editPackageContentsPresenter;
+    private EditPackageContentsView editPackageContentsView;
     private HeaderView headerView;
     private OpenExistingPackagePresenterImpl openExistingPackagePresenter;
     private OpenExistingPackageView openExistingPackageView;
     private PackageMetadataPresenter packageMetadataPresenter;
     private PackageMetadataView packageMetadataView;
-
-    private Labels labels;
-    private Messages messages;
 
     private Configuration config;
 
@@ -86,12 +83,6 @@ public class Factory {
 
     public Stage getStage() { return stage; }
     public void setStage(Stage stage) { this.stage = stage; }
-
-    public Labels getLabels() { return labels; }
-    public void setLabels(Labels labels) { this.labels = labels; }
-
-    public Messages getMessages() { return messages; }
-    public void setMessages(Messages messages) { this.messages = messages; }
 
     public Configuration getConfiguration() { return config; }
     public void setConfiguration(Configuration config) { this.config = config; }
@@ -119,11 +110,11 @@ public class Factory {
     public PackageGenerationPresenter getPackageGenerationPresenter() { return pkgGenerationPresenter; }
     public void setPackageGenerationPresenter(PackageGenerationPresenter presenter) { this.pkgGenerationPresenter = presenter; }
 
-    public EditPackageContentsView getPackageDescriptionView() { return pkgDescriptionView; }
-    public void setPackageDescriptionView(EditPackageContentsView view) { this.pkgDescriptionView = view; }
+    public EditPackageContentsView getEditPackageContentsView() { return editPackageContentsView; }
+    public void setEditPackageContentsView(EditPackageContentsView view) { this.editPackageContentsView = view; }
 
-    public EditPackageContentsPresenter getPackageDescriptionPresenter() { return pkgDescriptionPresenter; }
-    public void setPackageDescriptionPresenter(EditPackageContentsPresenter presenter) { this.pkgDescriptionPresenter = presenter; }
+    public EditPackageContentsPresenter getEditPackageContentsPresenter() { return editPackageContentsPresenter; }
+    public void setEditPackageContentsPresenter(EditPackageContentsPresenter presenter) { this.editPackageContentsPresenter = presenter; }
 
     public PackageDescriptionValidator getPackageDescriptionValidator() { return packageDescriptionValidator; }
     public void setPackageDescriptionValidator(PackageDescriptionValidator validator ) { this.packageDescriptionValidator = validator; }

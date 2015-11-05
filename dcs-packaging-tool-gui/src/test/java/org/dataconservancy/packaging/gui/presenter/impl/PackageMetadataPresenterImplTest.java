@@ -76,12 +76,11 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
             factory.setController(controller);
 
-            view = new PackageMetadataViewImpl(labels);
+            view = new PackageMetadataViewImpl();
             view.setHelp(help);
-            HeaderView header = new HeaderViewImpl(labels);
+            HeaderView header = new HeaderViewImpl();
             view.setHeaderView(header);
             presenter = new PackageMetadataPresenterImpl(view);
-            presenter.setErrors(errors);
 
             presenter.setController(controller);
 
@@ -92,7 +91,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             controller.setCreateNewPackage(true);
             controller.getCreateNewPackagePagesStack().clear();
             controller.getCreateNewPackagePagesStack().push(Page.CREATE_NEW_PACKAGE);
-            CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(labels);
+            CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl();
             createNewPackageView.setHeaderView(header);
             factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
 
@@ -117,9 +116,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
         view.getPackageNameField().setText(null);
         view.addDomainProfileLabel("Some Domain");
         for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
-                ((TextField) node).setText("Some Text");
-            });
+            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> ((TextField) node).setText("Some Text"));
         }
 
         assertEquals(0, view.getErrorLabel().getText().length());
@@ -138,9 +135,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
         view.getPackageNameField().setText("Some name");
         for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
-                ((TextField) node).setText("Some Text");
-            });
+            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> ((TextField) node).setText("Some Text"));
         }
 
         assertEquals(0, view.getErrorLabel().getText().length());

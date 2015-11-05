@@ -27,6 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 
@@ -43,11 +44,11 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
 
     private Label errorMessage;
 
-    public OpenExistingPackageViewImpl(Labels labels) {
-        super(labels);
+    public OpenExistingPackageViewImpl() {
+        super();
 
-        getContinueButton().setText(labels.get(Labels.LabelKey.CONTINUE_BUTTON));
-        getCancelLink().setText(labels.get(Labels.LabelKey.BACK_LINK));
+        getContinueButton().setText(TextFactory.getText(Labels.LabelKey.CONTINUE_BUTTON));
+        getCancelLink().setText(TextFactory.getText(Labels.LabelKey.BACK_LINK));
 
         VBox content = new VBox();
         content.setSpacing(32);
@@ -62,7 +63,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         content.getChildren().add(errorMessage);
 
         VBox infoVBox = new VBox(4);
-        Label selectOneOptionLabel = new Label(labels.get(Labels.LabelKey.SELECT_ONE_OPTION_LABEL));
+        Label selectOneOptionLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_ONE_OPTION_LABEL));
         selectOneOptionLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
         infoVBox.getChildren().add(selectOneOptionLabel);
         infoVBox.getChildren().add(new Separator(Orientation.HORIZONTAL));
@@ -72,14 +73,14 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         VBox chooseFileDirSelectionFields = new VBox(4);
         chooseFileDirSelectionFields.setAlignment(Pos.TOP_LEFT);
 
-        Label chooseFileLabel = new Label(labels.get(Labels.LabelKey.SELECT_IN_PROGRESS_PACKAGE_FILE_LABEL));
+        Label chooseFileLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_IN_PROGRESS_PACKAGE_FILE_LABEL));
         chooseFileDirSelectionFields.getChildren().add(chooseFileLabel);
 
         HBox fileChooserSelector = new HBox(6);
         fileChooserSelector.getStyleClass().add(DIRECTORY_BOX);
         fileChooserSelector.setMaxWidth(420);
 
-        chooseInProgressPackageFileButton = new Button(labels.get(Labels.LabelKey.BROWSE_BUTTON));
+        chooseInProgressPackageFileButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
         chooseInProgressPackageFileButton.setMinWidth(60);
         fileChooserSelector.getChildren().add(chooseInProgressPackageFileButton);
 
@@ -90,14 +91,14 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         fileChooserSelector.getChildren().add(chooseInProgressFileTextField);
         chooseFileDirSelectionFields.getChildren().add(fileChooserSelector);
 
-        Label choosePackageFileLabel = new Label(labels.get(Labels.LabelKey.SELECT_PACKAGE_FILE_LABEL));
+        Label choosePackageFileLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_PACKAGE_FILE_LABEL));
         chooseFileDirSelectionFields.getChildren().add(choosePackageFileLabel);
 
         HBox packageFileChooserSelector = new HBox(6);
         packageFileChooserSelector.getStyleClass().add(DIRECTORY_BOX);
         packageFileChooserSelector.setMaxWidth(420);
 
-        choosePackageFileButton = new Button(labels.get(Labels.LabelKey.BROWSE_BUTTON));
+        choosePackageFileButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
         choosePackageFileButton.setMinWidth(60);
         packageFileChooserSelector.getChildren().add(choosePackageFileButton);
 
@@ -108,14 +109,14 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         packageFileChooserSelector.getChildren().add(choosePackageFileTextField);
         chooseFileDirSelectionFields.getChildren().add(packageFileChooserSelector);
 
-        Label choosePackageDirectoryLabel = new Label(labels.get(Labels.LabelKey.PACKAGE_DIRECTORY_LABEL));
+        Label choosePackageDirectoryLabel = new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_DIRECTORY_LABEL));
         chooseFileDirSelectionFields.getChildren().add(choosePackageDirectoryLabel);
 
         HBox baseDirectorySelector = new HBox(6);
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);
         baseDirectorySelector.setMaxWidth(420);
 
-        choosePackageDirectoryButton = new Button(labels.get(Labels.LabelKey.BROWSE_BUTTON));
+        choosePackageDirectoryButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
         choosePackageDirectoryButton.setMinWidth(60);
         baseDirectorySelector.getChildren().add(choosePackageDirectoryButton);
 

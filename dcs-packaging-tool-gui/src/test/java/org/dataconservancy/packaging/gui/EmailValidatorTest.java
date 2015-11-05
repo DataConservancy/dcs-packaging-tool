@@ -17,7 +17,6 @@
 
 package org.dataconservancy.packaging.gui;
 
-import org.dataconservancy.packaging.gui.util.EmailValidator;
 import org.dataconservancy.packaging.gui.util.Validator;
 import org.dataconservancy.packaging.gui.util.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.ValidationType;

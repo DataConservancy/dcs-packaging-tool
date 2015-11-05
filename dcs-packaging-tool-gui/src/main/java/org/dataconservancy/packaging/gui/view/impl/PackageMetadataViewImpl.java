@@ -38,6 +38,7 @@ import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
@@ -77,17 +78,15 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private VBox requiredVBox;
     private VBox bottomContent;
 
-    private Labels labels;
     private List<Node> allDynamicFields;
     private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
     private FileChooser packageMetadataFileChooser;
     private Set<String> failedValidation;
 
-    public PackageMetadataViewImpl(Labels labels) {
-        super(labels);
-        this.labels = labels;
-
+    public PackageMetadataViewImpl() {
+        super();
+        
         allDynamicFields = new ArrayList<>();
         failedValidation = new HashSet<>();
 
@@ -96,15 +95,15 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         content = new VBox();
 
         if (Platform.isFxApplicationThread()) {
-            warningPopup = new WarningPopup(labels);
+            warningPopup = new WarningPopup();
         }
 
         packageMetadataFileChooser = new FileChooser();
 
         //Set up the text for the controls in the footer.
-        getContinueButton().setText(labels.get(LabelKey.SAVE_AND_CONTINUE_BUTTON));
-        getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
-        getSaveButton().setText(labels.get(LabelKey.SAVE_BUTTON));
+        getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
+        getCancelLink().setText(TextFactory.getText(LabelKey.BACK_LINK));
+        getSaveButton().setText(TextFactory.getText(LabelKey.SAVE_BUTTON));
         getSaveButton().setVisible(true);
 
         content.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
@@ -124,7 +123,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         requiredVBox = new VBox(5);
 
-        VBox requiredLabelVBox = createSectionLabel(labels.get(LabelKey.REQUIRED_FIELDS_LABEL));
+        VBox requiredLabelVBox = createSectionLabel(TextFactory.getText(LabelKey.REQUIRED_FIELDS_LABEL));
         requiredVBox.getChildren().add(requiredLabelVBox);
 
         // setup static fields
@@ -133,7 +132,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         VBox packageNameEntryFields = new VBox(4);
         packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
 
-        Label packageNameLabel = new Label(labels.get(LabelKey.PACKAGE_NAME_LABEL));
+        Label packageNameLabel = new Label(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL));
         packageNameEntryFields.getChildren().add(packageNameLabel);
 
         packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
@@ -144,14 +143,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         VBox domainProfileVBox = new VBox(4);
 
-        Label domainProfileLabel = new Label(labels.get(LabelKey.SELECT_DOMAIN_PROFILE_LABEL));
+        Label domainProfileLabel = new Label(TextFactory.getText(LabelKey.SELECT_DOMAIN_PROFILE_LABEL));
         domainProfileVBox.getChildren().add(domainProfileLabel);
 
         HBox domainProfileAndButton = new HBox(4);
         domainProfilesComboBox = new ComboBox<>();
         domainProfilesComboBox.setPrefWidth(267);
 
-        addDomainProfileButton = new Button(labels.get(LabelKey.ADD_BUTTON));
+        addDomainProfileButton = new Button(TextFactory.getText(LabelKey.ADD_BUTTON));
         addDomainProfileButton.setPrefHeight(28);
         addDomainProfileButton.getStyleClass().add(CLICKABLE);
 
@@ -255,7 +254,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void setupRecommendedFields(List<PackageMetadata> recommendedPackageMetadataList) {
         if (recommendedPackageMetadataList != null && !recommendedPackageMetadataList.isEmpty()) {
 
-            VBox recommendedLabelVBox = createSectionLabel(labels.get(LabelKey.RECOMMENDED_FIELDS_LABEL));
+            VBox recommendedLabelVBox = createSectionLabel(TextFactory.getText(LabelKey.RECOMMENDED_FIELDS_LABEL));
             bottomContent.getChildren().add(recommendedLabelVBox);
 
             recommendedPackageMetadataList.stream().filter(PackageMetadata::isVisible).forEach(packageMetadata -> {
@@ -271,7 +270,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList) {
         if (optionalPackageMetadataList != null && !optionalPackageMetadataList.isEmpty()) {
 
-            VBox optionalLabelVBox = createSectionLabel(labels.get(LabelKey.OPTIONAL_FIELDS_LABEL));
+            VBox optionalLabelVBox = createSectionLabel(TextFactory.getText(LabelKey.OPTIONAL_FIELDS_LABEL));
             bottomContent.getChildren().add(optionalLabelVBox);
 
             optionalPackageMetadataList.stream().filter(PackageMetadata::isVisible).forEach(packageMetadata -> {
@@ -317,12 +316,12 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     public void showWarningPopup() {
 
         if (warningPopup == null) {
-            warningPopup = new WarningPopup(labels);
+            warningPopup = new WarningPopup();
         }
 
-        warningPopup.setTitleText(labels.get(Labels.LabelKey.WARNING_POPUP_TITLE));
+        warningPopup.setTitleText(TextFactory.getText(Labels.LabelKey.WARNING_POPUP_TITLE));
         warningPopup.setMoveable(true);
-        warningPopup.setMessage(labels.get(Labels.LabelKey.ALL_FIELDS_CLEAR_WARNING_MESSAGE));
+        warningPopup.setMessage(TextFactory.getText(Labels.LabelKey.ALL_FIELDS_CLEAR_WARNING_MESSAGE));
 
         if (getScene() != null && getScene().getWindow() != null) {
             double x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 - 150;
@@ -394,7 +393,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             parentContainer.setId(packageMetadata.getName());
             allDynamicFields.add(parentContainer);
 
-            TextField textField = (TextField) ControlFactory.createControl(labels.get(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
+            TextField textField = (TextField) ControlFactory.createControl(TextFactory.getText(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
 
             if (packageMetadata.getValidationType().equals(ValidationType.URL)) {
                 // TODO: this may have to be done via a button

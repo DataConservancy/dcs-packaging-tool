@@ -16,11 +16,7 @@
 package org.dataconservancy.packaging.gui.presenter;
 
 import javafx.scene.Node;
-
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Errors;
-import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.InternalProperties;
 
 /**
@@ -45,27 +41,6 @@ public interface Presenter {
      */
     Controller getController();
     void setController(Controller controller);
-    
-    /**
-     * Sets the messages object to use for the presenter. 
-     * Messages is a helper class the loads strings from the errors resource bundle.
-     * @param messages the Messages object
-     */
-    void setMessages(Messages messages);
-    
-    /**
-     * Sets the errors object to use for the presenter.
-     * Errors is a helper class that loads strings from the errors resource bundle.
-     * @param errors the Errors object
-     */
-    void setErrors(Errors errors);
-    
-    /**
-     * Sets the labels object to use for the presenter.
-     * Labels is a helper class that loads strings from the labels resource bundle.
-     * @param labels the Labels object
-     */
-    void setLabels(Labels labels);
 
     /**
      * Sets the internal properties object to use for the presenter.

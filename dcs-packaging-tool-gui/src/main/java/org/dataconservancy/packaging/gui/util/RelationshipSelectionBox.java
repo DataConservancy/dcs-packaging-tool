@@ -34,10 +34,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.model.RelationshipGroup;
 import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl;
@@ -60,7 +62,6 @@ import java.util.Set;
  */
 public class RelationshipSelectionBox extends VBox implements CssConstants {
 
-    private Labels labels;
     private List<RelationshipGroup> availableGroups;
     private RelationshipGroupCellFactory relationshipGroupCellFactory;
     private RelationshipCellFactory relationshipCellFactory;
@@ -72,8 +73,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
 
     public RelationshipSelectionBox(final PackageArtifact artifact, PackageRelationship packageRelationship,
                                     EditPackageContentsViewImpl.NodeRelationshipContainer container, List<RelationshipGroup> availableGroups,
-                                    Labels labels, PackageOntologyService ontologyService, EmptyFieldButtonDisableListener addNewRelationshipListener) {
-        this.labels = labels;
+                                    PackageOntologyService ontologyService, EmptyFieldButtonDisableListener addNewRelationshipListener) {
         this.availableGroups = availableGroups;
         relationshipGroupCellFactory = new RelationshipGroupCellFactory();
         relationshipCellFactory = new RelationshipCellFactory();
@@ -88,7 +88,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
 
         RelationshipGroup startingGroup = null;
         Relationship startingRelationship = null;
-        targetType = new SimpleStringProperty(labels.get(Labels.LabelKey.URI_LABEL));
+        targetType = new SimpleStringProperty(TextFactory.getText(Labels.LabelKey.URI_LABEL));
 
         if (packageRelationship != null) {
             if (packageRelationship.getName() != null && !packageRelationship.getName().isEmpty()) {
@@ -116,12 +116,12 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         Separator groupSeparator = new Separator();
         getChildren().add(groupSeparator);
 
-        Label relationshipDefintionLabel = new Label(labels.get(Labels.LabelKey.RELATIONSHIP_DEFINITION_LABEL));
+        Label relationshipDefintionLabel = new Label(TextFactory.getText(Labels.LabelKey.RELATIONSHIP_DEFINITION_LABEL));
         getChildren().add(relationshipDefintionLabel);
 
         //Create a box for the namespace selection elements
         final HBox namespaceBox = new HBox(15);
-        Label schemaLabel = new Label(labels.get(Labels.LabelKey.NAMESPACE_LABEL));
+        Label schemaLabel = new Label(TextFactory.getText(Labels.LabelKey.NAMESPACE_LABEL));
         schemaLabel.setMinWidth(100);
         schemaLabel.setWrapText(true);
         namespaceBox.getChildren().add(schemaLabel);
@@ -170,7 +170,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
 
         //Create a box for the actual namespace definition.
         HBox relationshipDefinitionBox = new HBox(15);
-        Label relationshipLabel = new Label(labels.get(Labels.LabelKey.RELATIONSHIP_LABEL));
+        Label relationshipLabel = new Label(TextFactory.getText(Labels.LabelKey.RELATIONSHIP_LABEL));
         relationshipLabel.setMinWidth(100);
         relationshipLabel.setWrapText(true);
         relationshipDefinitionBox.getChildren().add(relationshipLabel);
@@ -222,7 +222,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         }
 
         //Error label that lets the user know they either need to specify a URI or one of our known relationship types. Hopefully at some point known relationship types will go away.
-        final Label requiresURILabel = new Label(labels.get(Labels.LabelKey.RELATIONSHIP_MUST_BE_URI_OR_KNOWN));
+        final Label requiresURILabel = new Label(TextFactory.getText(Labels.LabelKey.RELATIONSHIP_MUST_BE_URI_OR_KNOWN));
         requiresURILabel.setTextFill(Color.RED);
         requiresURILabel.setVisible(false);
 
@@ -303,7 +303,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         //Checkbox that denotes whether or not the target needs to be a uri or a literal string is allowed.
         //Built in relationships define this value, and so the checkbox will be disabled for them. Entered fields can specify this value.
         //This controls whether we do URI checking in the presenter so it's important this field is correct.
-        CheckBox requiresURICheckBox = new CheckBox(labels.get(Labels.LabelKey.REQURIRES_URI_LABEL));
+        CheckBox requiresURICheckBox = new CheckBox(TextFactory.getText(Labels.LabelKey.REQURIRES_URI_LABEL));
 
         boolean startingRequiresURI = false;
         boolean startingRequiresDisabled = false;
@@ -329,13 +329,13 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
         final VBox relatedItemsBox = new VBox(3);
         relatedItemsBox.setPrefWidth(ControlFactory.textPrefWidth);
 
-        Label relatedToLabel = new Label(labels.get(Labels.LabelKey.RELATIONSHIP_TARGET_LABEL));
+        Label relatedToLabel = new Label(TextFactory.getText(Labels.LabelKey.RELATIONSHIP_TARGET_LABEL));
         relatedItemsBox.getChildren().add(relatedToLabel);
         boolean empty = true;
 
         //create a HBox to hold text field and validating result image label
         final HBox singleItemInputBox = new HBox(15);
-        targetType.bind(Bindings.when(requiresUri).then(labels.get(Labels.LabelKey.URI_LABEL)).otherwise(labels.get(Labels.LabelKey.LITERAL_LABEL)));
+        targetType.bind(Bindings.when(requiresUri).then(TextFactory.getText(Labels.LabelKey.URI_LABEL)).otherwise(TextFactory.getText(Labels.LabelKey.LITERAL_LABEL)));
 
         Label typeLabel = new Label();
         typeLabel.textProperty().bind(targetType);
@@ -353,7 +353,7 @@ public class RelationshipSelectionBox extends VBox implements CssConstants {
             userInputImageLabel.setPrefWidth(18);
             TextField relatedItem = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
             //Add listener which displays a blank, a green check or a red cross, according to the validity of user's input
-            relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));;
+            relatedItem.textProperty().addListener(getNewChangeListenerForRelatedItem(userInputImageLabel));
             relatedItem.setMinWidth(260);
 
             relatedItem.textProperty().addListener(targetChangeListener);

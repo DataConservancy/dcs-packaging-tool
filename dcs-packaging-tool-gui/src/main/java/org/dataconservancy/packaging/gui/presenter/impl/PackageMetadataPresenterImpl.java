@@ -24,6 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DateUtility;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
@@ -126,7 +127,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 view.getErrorLabel().setVisible(false);
                 getController().goToNextPage();
             } else {
-                view.getErrorLabel().setText(errors.get(ErrorKey.MISSING_REQUIRED_FIELDS));
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
                 view.getErrorLabel().setVisible(true);
             }
 

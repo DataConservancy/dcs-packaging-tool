@@ -83,11 +83,13 @@ public class Errors {
 
         return bundle.getString(key.getProperty());
     }
-    
-    public String get(String property) {
-        if (!bundle.containsKey(property)) {
-            return null;
+
+    public String format(ErrorKey key, Object... args) {
+        if (!bundle.containsKey(key.property)) {
+            throw new IllegalArgumentException("No such resource: " +
+                                                   key);
         }
-        return bundle.getString(property);
+
+        return String.format(bundle.getLocale(), bundle.getString(key.property), args);
     }
 }

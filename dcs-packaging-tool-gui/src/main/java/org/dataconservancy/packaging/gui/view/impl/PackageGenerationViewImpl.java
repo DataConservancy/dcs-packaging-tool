@@ -37,6 +37,7 @@ import javafx.stage.DirectoryChooser;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
@@ -93,8 +94,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     private CheckBox md5CheckBox;
     private CheckBox sha1CheckBox;
 
-    private Labels labels;
-
     //Popup to warn of existing package file overwrite
     public PackageToolPopup packageFileExistsWarningPopup;
     public Button cancelOverwriteButton;
@@ -111,17 +110,16 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
     private ScrollPane contentScrollPane;
 
-    public PackageGenerationViewImpl(Labels labels) {
-        super(labels);
-        this.labels = labels;
+    public PackageGenerationViewImpl() {
+        super();
         
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
         VBox content = new VBox();
 
         //Set up the text for the controls in the footer.
-        getContinueButton().setText(labels.get(LabelKey.FINISH_BUTTON));
-        getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
+        getContinueButton().setText(TextFactory.getText(LabelKey.FINISH_BUTTON));
+        getCancelLink().setText(TextFactory.getText(LabelKey.BACK_LINK));
 
         content.getStyleClass().add(PACKAGE_GENERATION_VIEW_CLASS);
         contentScrollPane.setContent(content);
@@ -141,7 +139,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         //Create a section for setting the packaging options.
         VBox packagingSection = new VBox(4);
-        Label packagingOptionsLabel = new Label(labels.get(LabelKey.PACKAGING_OPTIONS_LABEL));
+        Label packagingOptionsLabel = new Label(TextFactory.getText(LabelKey.PACKAGING_OPTIONS_LABEL));
         packagingOptionsLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
         packagingSection.getChildren().add(packagingOptionsLabel);
         packagingSection.getChildren().add(new Separator(Orientation.HORIZONTAL));
@@ -152,27 +150,27 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         //Create a vbox for the archiving options.
         VBox archivingOptions = new VBox(10);
         archivingOptions.setAlignment(Pos.TOP_LEFT);
-        Label archivingLabel = new Label(labels.get(LabelKey.ARCHIVE_FORMAT_LABEL));
+        Label archivingLabel = new Label(TextFactory.getText(LabelKey.ARCHIVE_FORMAT_LABEL));
         archivingOptions.getChildren().add(archivingLabel);
         
         //Create a toggle group for the archiving options. 
         archiveToggleGroup = new ToggleGroup();
         
-        tarArchiveButton = new RadioButton(labels.get(LabelKey.TAR_BUTTON));
+        tarArchiveButton = new RadioButton(TextFactory.getText(LabelKey.TAR_BUTTON));
         tarArchiveButton.setToggleGroup(archiveToggleGroup);
         tarArchiveButton.setUserData("tar");
         
         tarArchiveButton.setSelected(true);
         archivingOptions.getChildren().add(tarArchiveButton);
         
-        zipArchiveButton = new RadioButton(labels.get(LabelKey.ZIP_BUTTON));
+        zipArchiveButton = new RadioButton(TextFactory.getText(LabelKey.ZIP_BUTTON));
         zipArchiveButton.setToggleGroup(archiveToggleGroup);
         zipArchiveButton.setUserData("zip");
         
         zipArchiveButton.setSelected(false);
         archivingOptions.getChildren().add(zipArchiveButton);
 
-        explodedArchiveButton = new RadioButton(labels.get(LabelKey.EXPLODED_BUTTON));
+        explodedArchiveButton = new RadioButton(TextFactory.getText(LabelKey.EXPLODED_BUTTON));
         explodedArchiveButton.setToggleGroup(archiveToggleGroup);
         explodedArchiveButton.setUserData("exploded");
         archivingOptions.getChildren().add(explodedArchiveButton);
@@ -183,32 +181,32 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         VBox compressionOptions = new VBox(10);
         compressionOptions.setAlignment(Pos.TOP_LEFT);
 
-        Label compressionLabel = new Label(labels.get(LabelKey.COMPRESSION_FORMAT_LABEL));
+        Label compressionLabel = new Label(TextFactory.getText(LabelKey.COMPRESSION_FORMAT_LABEL));
         compressionOptions.getChildren().add(compressionLabel);
         
         //Create a toggle group for the compression options.
         compressionToggleGroup = new ToggleGroup();
         
-        gZipCompressionButton = new RadioButton(labels.get(LabelKey.GZIP_BUTTON));
+        gZipCompressionButton = new RadioButton(TextFactory.getText(LabelKey.GZIP_BUTTON));
         gZipCompressionButton.setToggleGroup(compressionToggleGroup);
         gZipCompressionButton.setSelected(true);
         gZipCompressionButton.setUserData("gz");
 
         compressionOptions.getChildren().add(gZipCompressionButton);
         
-        zipCompressionButton = new RadioButton(labels.get(LabelKey.ZIP_BUTTON));
+        zipCompressionButton = new RadioButton(TextFactory.getText(LabelKey.ZIP_BUTTON));
         zipCompressionButton.setToggleGroup(compressionToggleGroup);
         zipCompressionButton.setSelected(false);
         zipCompressionButton.setUserData("zip");
         //compressionOptions.getChildren().add(zipCompressionButton);
         
-        noneCompressionButton = new RadioButton(labels.get(LabelKey.NONE_LABEL));
+        noneCompressionButton = new RadioButton(TextFactory.getText(LabelKey.NONE_LABEL));
         noneCompressionButton.setToggleGroup(compressionToggleGroup);
         noneCompressionButton.setSelected(false);
         noneCompressionButton.setUserData("");
         compressionOptions.getChildren().add(noneCompressionButton);
 
-        gZipCompressionButton = new RadioButton(labels.get(LabelKey.GZIP_BUTTON));
+        gZipCompressionButton = new RadioButton(TextFactory.getText(LabelKey.GZIP_BUTTON));
         gZipCompressionButton.setToggleGroup(compressionToggleGroup);
         gZipCompressionButton.setSelected(true);
         gZipCompressionButton.setUserData("gz");
@@ -219,22 +217,22 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         VBox serializationOptions = new VBox(10);
         serializationOptions.setAlignment(Pos.TOP_LEFT);
 
-        Label serializationLabel = new Label(labels.get(LabelKey.SERIALIZATION_FORMAT_LABEL));
+        Label serializationLabel = new Label(TextFactory.getText(LabelKey.SERIALIZATION_FORMAT_LABEL));
         serializationOptions.getChildren().add(serializationLabel);
 
         //Create a toggle group for the compression options.
         serializationToggleGroup = new ToggleGroup();
 
-        jsonRadioButton = new RadioButton(labels.get(LabelKey.JSON_BUTTON));
+        jsonRadioButton = new RadioButton(TextFactory.getText(LabelKey.JSON_BUTTON));
         jsonRadioButton.setToggleGroup(serializationToggleGroup);
         jsonRadioButton.setSelected(true);
         serializationOptions.getChildren().add(jsonRadioButton);
 
-        xmlRadioButton = new RadioButton(labels.get(LabelKey.XML_BUTTON));
+        xmlRadioButton = new RadioButton(TextFactory.getText(LabelKey.XML_BUTTON));
         xmlRadioButton.setToggleGroup(serializationToggleGroup);
         serializationOptions.getChildren().add(xmlRadioButton);
 
-        turtleRadioButton = new RadioButton(labels.get(LabelKey.TURTLE_BUTTON));
+        turtleRadioButton = new RadioButton(TextFactory.getText(LabelKey.TURTLE_BUTTON));
         turtleRadioButton.setToggleGroup(serializationToggleGroup);
         serializationOptions.getChildren().add(turtleRadioButton);
 
@@ -244,13 +242,13 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         VBox checksumOptions = new VBox(10);
         checksumOptions.setAlignment(Pos.TOP_LEFT);
 
-        Label checksumLabel = new Label(labels.get(LabelKey.CHECKSUM_LABEL));
+        Label checksumLabel = new Label(TextFactory.getText(LabelKey.CHECKSUM_LABEL));
         checksumOptions.getChildren().add(checksumLabel);
         
-        md5CheckBox = new CheckBox(labels.get(LabelKey.MD5_CHECKBOX));
+        md5CheckBox = new CheckBox(TextFactory.getText(LabelKey.MD5_CHECKBOX));
         checksumOptions.getChildren().add(md5CheckBox);
         
-        sha1CheckBox = new CheckBox(labels.get(LabelKey.SHA1_CHECKBOX));
+        sha1CheckBox = new CheckBox(TextFactory.getText(LabelKey.SHA1_CHECKBOX));
         checksumOptions.getChildren().add(sha1CheckBox);
         
         packagingOptions.getChildren().add(checksumOptions);
@@ -263,7 +261,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         VBox outputDirectoryBox = new VBox(4);
         outputDirectoryBox.setAlignment(Pos.CENTER_LEFT);
 
-        Label outputDirectoryLabel = new Label(labels.get(LabelKey.PACKAGE_OUTPUT_DIRECTORY_LABEL));
+        Label outputDirectoryLabel = new Label(TextFactory.getText(LabelKey.PACKAGE_OUTPUT_DIRECTORY_LABEL));
         outputDirectoryBox.getChildren().add(outputDirectoryLabel);
 
         HBox directorySelectionBox = new HBox(8);
@@ -283,23 +281,23 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         HBox.setHgrow(currentOutputDirectoryTextField, Priority.ALWAYS);
         directorySelectionBox.getChildren().add(directoryBox);
         HBox.setHgrow(directoryBox, Priority.ALWAYS);
-        selectOutputDirectoryButton = new Button(labels.get(LabelKey.BROWSEDIR_BUTTON));
+        selectOutputDirectoryButton = new Button(TextFactory.getText(LabelKey.BROWSEDIR_BUTTON));
         directorySelectionBox.getChildren().add(selectOutputDirectoryButton);
 
         outputDirectoryBox.getChildren().add(directorySelectionBox);
 
         outputDirectoryChooser = new DirectoryChooser();
-        outputDirectoryChooser.setTitle(labels.get(LabelKey.OUTPUT_DIRECTORY_CHOOSER_KEY));
+        outputDirectoryChooser.setTitle(TextFactory.getText(LabelKey.OUTPUT_DIRECTORY_CHOOSER_KEY));
 
         content.getChildren().add(outputDirectoryBox);
 
         //PopupControls
-        noThanksLink = new Hyperlink(labels.get(LabelKey.NO_THANKS_LINK));
-        createAnotherPackageButton = new Button(labels.get(LabelKey.CREATE_ANOTHER_PACKAGE_BUTTON));
+        noThanksLink = new Hyperlink(TextFactory.getText(LabelKey.NO_THANKS_LINK));
+        createAnotherPackageButton = new Button(TextFactory.getText(LabelKey.CREATE_ANOTHER_PACKAGE_BUTTON));
         createAnotherPackageButton.setPrefWidth(20*rem);
 
-        cancelOverwriteButton = new Button(labels.get(LabelKey.CANCEL_BUTTON));
-        okOverwriteButton = new Button(labels.get(LabelKey.OK_BUTTON));
+        cancelOverwriteButton = new Button(TextFactory.getText(LabelKey.CANCEL_BUTTON));
+        okOverwriteButton = new Button(TextFactory.getText(LabelKey.OK_BUTTON));
 
     }
 
@@ -337,7 +335,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     public void showSuccessPopup() {
         //Create a simple package tool popup for the generation success message.
         packageGenerationSuccessPopup = new PackageToolPopup();
-        packageGenerationSuccessPopup.setTitleText(labels.get(LabelKey.SUCCESS_LABEL));
+        packageGenerationSuccessPopup.setTitleText(TextFactory.getText(LabelKey.SUCCESS_LABEL));
         packageGenerationSuccessPopup.setMoveable(false);
         
         VBox popupContent = new VBox();
@@ -345,7 +343,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         
         popupContent.setAlignment(Pos.TOP_CENTER);
         
-        Label anotherFormatMessage = new Label(labels.get(LabelKey.ANOTHER_FORMAT_LABEL));
+        Label anotherFormatMessage = new Label(TextFactory.getText(LabelKey.ANOTHER_FORMAT_LABEL));
         anotherFormatMessage.setWrapText(true);
         
         popupContent.getChildren().add(anotherFormatMessage);
@@ -384,14 +382,14 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     public void showFileOverwriteWarningPopup() {
         //Create simple warning popup for the warning message
         packageFileExistsWarningPopup = new PackageToolPopup();
-        packageFileExistsWarningPopup.setTitleText(labels.get(LabelKey.FILE_EXISTS_WARNING_TITLE_LABEL));
+        packageFileExistsWarningPopup.setTitleText(TextFactory.getText(LabelKey.FILE_EXISTS_WARNING_TITLE_LABEL));
 
         VBox popupContent = new VBox();
         popupContent.setMaxWidth(400);
 
         popupContent.setAlignment(Pos.TOP_CENTER);
 
-        Label warningText = new Label(labels.get(LabelKey.FILE_EXISTS_WARNING_TEXT_LABEL));
+        Label warningText = new Label(TextFactory.getText(LabelKey.FILE_EXISTS_WARNING_TEXT_LABEL));
         warningText.setWrapText(true);
 
         popupContent.getChildren().add(warningText);
@@ -467,8 +465,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     @Override
     public PackageToolPopup getProgressPopup() {
         if (progressDialogPopup == null) {
-            progressDialogPopup = new ProgressDialogPopup(labels);
-            progressDialogPopup.setTitleText(labels.get(LabelKey.GENERATING_PACKAGE_LABEL));
+            progressDialogPopup = new ProgressDialogPopup();
+            progressDialogPopup.setTitleText(TextFactory.getText(LabelKey.GENERATING_PACKAGE_LABEL));
         }
         if (getScene() != null && getScene().getWindow() != null) {
             double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;

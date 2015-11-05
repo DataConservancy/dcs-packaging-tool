@@ -15,9 +15,6 @@
  */
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -27,33 +24,23 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.RelationshipGroup;
 import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
-import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
-import org.dataconservancy.packaging.gui.util.DisciplinePropertyBox;
-import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
-import org.dataconservancy.packaging.gui.util.RelationshipSelectionBox;
-import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
-import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,16 +52,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class PackageArtifactWindowBuilder implements CssConstants {
 
     private BorderPane artifactDetailsLayout;
-    private Labels labels;
-    private Messages messages;
 
     //Controls that are displayed in the package artifact popup.
     private Hyperlink cancelPopupLink;
@@ -96,16 +79,12 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public PackageArtifactWindowBuilder(Labels labels,
-                                        Hyperlink cancelPopupLink,
+    public PackageArtifactWindowBuilder(Hyperlink cancelPopupLink,
                                         Button applyPopupButton,
                                         String availableRelationshipsPath,
-                                        DisciplineLoadingService disciplineLoadingService,
-                                        Messages messages) {
-        this.labels = labels;
+                                        DisciplineLoadingService disciplineLoadingService) {
         this.cancelPopupLink = cancelPopupLink;
         this.applyPopupButton = applyPopupButton;
-        this.messages = messages;
 
         applyButtonValidationListener = new ApplyButtonValidationListener(applyPopupButton);
         availableDisciplines = disciplineLoadingService.getAllDisciplines();
@@ -160,7 +139,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         //Create the relationship tab that displays all relationships the artifact has.
         Tab relationshipTab = new Tab();
         relationshipTab.setClosable(false);
-        relationshipTab.setText(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_RELATIONSHIPS));
+        relationshipTab.setText(TextFactory.getText(Labels.LabelKey.PACKAGE_ARTIFACT_RELATIONSHIPS));
         ScrollPane relationshipPane = new ScrollPane();
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -234,7 +213,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         }
 
         //Add the inheritance controls
-        propertyContent.getChildren().add(new Label(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE)));
+        propertyContent.getChildren().add(new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE)));
         propertyContent.getChildren().add(createInheritanceGroup(node));
 
         return propertiesTab;
@@ -253,13 +232,13 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         boolean hasInheritableProperties = false;
 
         //create label to explain what this tab is about.
-        Label inheritanceTabIntroLabel = new Label(labels.get(Labels.LabelKey.INHERITANCE_TAB_INTRO));
+        Label inheritanceTabIntroLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_TAB_INTRO));
         inheritanceTabIntroLabel.setPrefWidth(450);
         inheritanceTabIntroLabel.setWrapText(true);
         inheritanceBox.getChildren().add(inheritanceTabIntroLabel);
 
         //create label to explain usage of buttons.
-        Label inheritanceButtonExplainedLabel = new Label(labels.get(Labels.LabelKey.INHERITANCE_BUTTON_EXPLAINED));
+        Label inheritanceButtonExplainedLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_BUTTON_EXPLAINED));
         inheritanceButtonExplainedLabel.setPrefWidth(450);
         inheritanceButtonExplainedLabel.setWrapText(true);
         inheritanceBox.getChildren().add(inheritanceButtonExplainedLabel);
@@ -280,7 +259,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         }
 
         if (!hasInheritableProperties) {
-            Label noInheritablePropertyLabel = new Label(labels.get(Labels.LabelKey.NO_INHERITABLE_PROPERTY));
+            Label noInheritablePropertyLabel = new Label(TextFactory.getText(Labels.LabelKey.NO_INHERITABLE_PROPERTY));
             inheritanceTabIntroLabel.setPrefWidth(450);
             inheritanceTabIntroLabel.setWrapText(true);
             inheritanceBox.getChildren().add(noInheritablePropertyLabel);

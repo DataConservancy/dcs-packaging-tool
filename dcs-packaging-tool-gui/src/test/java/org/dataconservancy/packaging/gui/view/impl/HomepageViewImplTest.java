@@ -30,7 +30,7 @@ public class HomepageViewImplTest extends BaseGuiTest {
 
     @Before
     public void setup() {
-        view = new HomepageViewImpl(labels);
+        view = new HomepageViewImpl();
     }
 
     /**

@@ -29,8 +29,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
 import org.dataconservancy.packaging.gui.Help.HelpKey;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
@@ -53,16 +53,13 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     private Label errorMessage;
     private VBox content;
 
-    private Labels labels;
-    
     private Map<String, TextField> propertyFields = new HashMap<>();
     
-    public CreateNewPackageViewImpl(Labels labels) {
-        super(labels); 
-        this.labels = labels;
-        
-        getContinueButton().setText(labels.get(LabelKey.CONTINUE_BUTTON));
-        getCancelLink().setText(labels.get(LabelKey.BACK_LINK));
+    public CreateNewPackageViewImpl() {
+        super();
+
+        getContinueButton().setText(TextFactory.getText(LabelKey.CONTINUE_BUTTON));
+        getCancelLink().setText(TextFactory.getText(LabelKey.BACK_LINK));
 
         content = new VBox();
         content.setSpacing(32);
@@ -85,14 +82,14 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         VBox baseDirectorySelectionFields = new VBox(4);
         baseDirectorySelectionFields.setAlignment(Pos.TOP_LEFT);
         
-        Label chooseBaseDirectoryLabel = new Label(labels.get(LabelKey.BASE_DIRECTORY_LABEL));
+        Label chooseBaseDirectoryLabel = new Label(TextFactory.getText(LabelKey.BASE_DIRECTORY_LABEL));
         baseDirectorySelectionFields.getChildren().add(chooseBaseDirectoryLabel);
         
         HBox baseDirectorySelector = new HBox(6);
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);
         baseDirectorySelector.setPrefWidth(ControlFactory.textPrefWidth);
         
-        chooseBaseDirectoryButton = new Button(labels.get(LabelKey.BROWSE_BUTTON));
+        chooseBaseDirectoryButton = new Button(TextFactory.getText(LabelKey.BROWSE_BUTTON));
         chooseBaseDirectoryButton.setMinWidth(80);
         baseDirectorySelector.getChildren().add(chooseBaseDirectoryButton);
         
@@ -138,7 +135,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         if (!mgr.getAllProperties().isEmpty()) {
             final VBox propertiesBox = new VBox(12);
 
-            propertiesBox.getChildren().add(new Label(labels.get(LabelKey.PROPERTY_INPUT_LABEL)));
+            propertiesBox.getChildren().add(new Label(TextFactory.getText(LabelKey.PROPERTY_INPUT_LABEL)));
             propertiesBox.setAlignment(Pos.TOP_LEFT);
             propertiesBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
 
@@ -202,13 +199,13 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     public void showProgressIndicatorPopUp() {
 
         if (progressIndicatorPopUp == null) {
-            progressIndicatorPopUp = new ProgressDialogPopup(labels);
+            progressIndicatorPopUp = new ProgressDialogPopup();
         }
 
 
-        progressIndicatorPopUp.setTitleText(labels.get(LabelKey.PROGRESS_INDICATOR));
+        progressIndicatorPopUp.setTitleText(TextFactory.getText(LabelKey.PROGRESS_INDICATOR));
         progressIndicatorPopUp.setMoveable(true);
-        progressIndicatorPopUp.setMessage(labels.get(LabelKey.BUILDING_PACKAGE_DESCRIPTION));
+        progressIndicatorPopUp.setMessage(TextFactory.getText(LabelKey.BUILDING_PACKAGE_DESCRIPTION));
 
         //Quickly display the popup so we can measure the content
         //Check for scene == null in the case of unit tests, or massive disaster..

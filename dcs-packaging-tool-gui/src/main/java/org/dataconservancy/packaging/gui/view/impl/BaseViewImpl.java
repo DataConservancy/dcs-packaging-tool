@@ -29,8 +29,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Help;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.View;
@@ -48,14 +48,13 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     protected HeaderView headerView;
     protected Popup helpPopup;
     protected Popup aboutPopup;
-    private Labels labels;
     private Node helpContent;
     private Node aboutContent;
     protected Help help;
 
     final double rem = javafx.scene.text.Font.getDefault().getSize();
 
-    public BaseViewImpl(Labels labels) {
+    public BaseViewImpl() {
 
         getStyleClass().add(VIEW_CLASS);
 
@@ -93,8 +92,6 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         footerView.setRight(footerControls);
         
         setBottom(footerView);
-        
-        this.labels = labels;
     }
 
     public Node asNode() {
@@ -150,7 +147,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
             HBox header = new HBox();
 
             Label titleLabel = new Label();
-            titleLabel.setText(labels.get(LabelKey.BASIC_HELP_TITLE));
+            titleLabel.setText(TextFactory.getText(LabelKey.BASIC_HELP_TITLE));
             titleLabel.setMaxWidth(400);
             titleLabel.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
             header.getStyleClass().add(PACKAGE_TOOL_POPUP_HEADER_CLASS);
@@ -165,7 +162,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
                 defaultHelpContent.setPrefHeight(200);
                 defaultHelpContent.setPrefWidth(200);
 
-                Label helpText = new Label(labels.get(LabelKey.BASIC_HELP_TEXT));
+                Label helpText = new Label(TextFactory.getText(LabelKey.BASIC_HELP_TEXT));
                 helpText.setWrapText(true);
                 defaultHelpContent.getChildren().add(helpText);
                 popupHelpView.setCenter(defaultHelpContent);
@@ -200,7 +197,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
             HBox header = new HBox();
 
             Label titleLabel = new Label();
-            titleLabel.setText(labels.get(LabelKey.BASIC_ABOUT_TITLE));
+            titleLabel.setText(TextFactory.getText(LabelKey.BASIC_ABOUT_TITLE));
             titleLabel.setMaxWidth(400);
             titleLabel.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
             header.getStyleClass().add(PACKAGE_TOOL_POPUP_HEADER_CLASS);
@@ -213,7 +210,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
                 defaultAboutContent.setPrefHeight(200);
                 defaultAboutContent.setPrefWidth(200);
 
-                Label aboutText = new Label(labels.get(LabelKey.BASIC_ABOUT_TEXT));
+                Label aboutText = new Label(TextFactory.getText(LabelKey.BASIC_ABOUT_TEXT));
                 aboutText.setWrapText(true);
                 defaultAboutContent.getChildren().add(aboutText);
                 defaultAboutContent.getStyleClass().add(PACKAGE_TOOL_POPUP_CONTENT_CLASS);
@@ -230,15 +227,15 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
 
             HBox buildRow = new HBox(30);
             buildRow.setAlignment(Pos.CENTER);
-            Label buildNumberLabel = new Label(labels.get(LabelKey.BUILD_NUMBER_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildNumber());
+            Label buildNumberLabel = new Label(TextFactory.getText(LabelKey.BUILD_NUMBER_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildNumber());
             buildRow.getChildren().add(buildNumberLabel);
 
-            Label buildRevisionLabel = new Label(labels.get(LabelKey.BUILD_REVISION_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildRevision());
+            Label buildRevisionLabel = new Label(TextFactory.getText(LabelKey.BUILD_REVISION_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildRevision());
             buildRow.getChildren().add(buildRevisionLabel);
 
             versionFooter.getChildren().add(buildRow);
 
-            String timeStampString = labels.get(LabelKey.BUILD_TIMESTAMP_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildTimeStamp();
+            String timeStampString = TextFactory.getText(LabelKey.BUILD_TIMESTAMP_LABEL) + " " + presenter.getController().getPackageState().getCreationToolVersion().getBuildTimeStamp();
             Label timeStampLabel = new Label(timeStampString);
             versionFooter.getChildren().add(timeStampLabel);
 

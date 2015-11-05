@@ -30,7 +30,7 @@ public class OpenExistingPackageViewImplTest extends BaseGuiTest {
 
     @Before
     public void setup() {
-        view = new OpenExistingPackageViewImpl(labels);
+        view = new OpenExistingPackageViewImpl();
     }
 
     /**

@@ -25,6 +25,8 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
@@ -146,16 +148,16 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 } else if (root_artifact_dir != null &&
                         (!root_artifact_dir.exists() ||
                              !root_artifact_dir.canRead())) {
-                    view.getErrorMessage().setText(errors.get(ErrorKey.INACCESSIBLE_CONTENT_DIR));
+                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
                     view.getErrorMessage().setVisible(true);
                 } else if (controller.getPackageDescription() != null) {
                     controller.goToNextPage();
                 } else {
-                    view.getErrorMessage().setText(errors.get(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
+                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
                     view.getErrorMessage().setVisible(true);
                 }
             } catch (Exception e) {
-                view.getErrorMessage().setText(messages.formatErrorCreatingNewPackage(e.getMessage()));
+                view.getErrorMessage().setText(TextFactory.format(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE, e.getMessage()));
                 view.getErrorMessage().setVisible(true);
                 log.error(e.getMessage());
             }

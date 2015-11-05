@@ -24,6 +24,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
@@ -47,7 +48,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -94,7 +94,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         worker.setOnFailed(workerStateEvent -> {
             Throwable e = workerStateEvent.getSource().getException();
 
-            view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+            view.getErrorMessageLabel().setText(
+                TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
             view.getErrorMessageLabel().setVisible(true);
             log.error("Error processing package description", e);
 
@@ -143,7 +144,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     stream = new FileOutputStream(packageDescriptionFile);
                 } catch (IOException e) {
                     log.error(e.getMessage());
-                    view.getErrorMessageLabel().setText(errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+                    view.getErrorMessageLabel().setText(TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
                     view.getErrorMessageLabel().setVisible(true);
                 }
 
@@ -166,7 +167,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                         view.getWarningPopup().hide();
                     }
                 });
-                view.showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), "Tree was not valid", false, false);
+                view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), "Tree was not valid", false, false);
                 return;
             }
 
@@ -181,7 +182,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 } catch (IOException e) {
                     log.error(e.getMessage());
                     view.getErrorMessageLabel().setText(
-                        errors.get(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) +
+                        TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) +
                             e.getMessage());
                     view.getErrorMessageLabel().setVisible(true);
                 }

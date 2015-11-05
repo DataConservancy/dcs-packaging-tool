@@ -26,10 +26,11 @@ import java.io.PrintWriter;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
-import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Messages;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
@@ -125,18 +126,16 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         controller.setPackageFilenameIllegalCharacters(factory.getConfiguration().getPackageFilenameIllegalCharacters());
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
-        view = new PackageGenerationViewImpl(labels);
+        view = new PackageGenerationViewImpl();
         view.setHelp(help);
 
-        HeaderView headerView = new HeaderViewImpl(labels);
+        HeaderView headerView = new HeaderViewImpl();
         view.setHeaderView(headerView);
 
         presenter = new PackageGenerationPresenterImpl(view);
         presenter.setPackageGenerationService(packageGenerationService);
         presenter.setPackageGenerationParametersBuilder(packageGenerationParamsBuilder);
         presenter.setPackageDescriptionBuilder(builder);
-        presenter.setMessages(messages);
-        presenter.setErrors(errors);
 
         presenter.setController(controller);
     }
@@ -188,7 +187,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         presenter.display();
 
         assertTrue(view.getStatusLabel().isVisible());
-        assertEquals(errors.get(ErrorKey.PARAM_LOADING_ERROR), view.getStatusLabel().getText());
+        assertEquals(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR), view.getStatusLabel().getText());
     }
 
     /**
@@ -219,15 +218,8 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         });
 
-        presenter.setPackageGenerationService(new PackageGenerationService() {
-
-            @Override
-            public Package generatePackage(PackageDescription desc,
-                                           PackageGenerationParameters params)
-                    throws PackageToolException {
-                throw new PackageToolException(PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT);
-            }
-
+        presenter.setPackageGenerationService((desc, params) -> {
+            throw new PackageToolException(PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT);
         });
 
         outputDirectory = new File("./");
@@ -239,7 +231,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         view.getContinueButton().fire();
 
         assertTrue(view.getStatusLabel().isVisible());
-        assertEquals(errors.get(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(), view.getStatusLabel().getText());
+        assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(), view.getStatusLabel().getText());
     }
 
     /**
@@ -289,16 +281,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         });
 
-        presenter.setPackageGenerationService(new PackageGenerationService() {
-
-            @Override
-            public Package generatePackage(PackageDescription desc,
-                                         PackageGenerationParameters params)
-                  throws PackageToolException {
-                return pkg;
-            }
-
-        });
+        presenter.setPackageGenerationService((desc, params) -> pkg);
         presenter.display();
 
         outputDirectory = new File("./");
@@ -363,7 +346,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         assertTrue(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
         assertTrue(view.getStatusLabel().isVisible());
-        assertTrue(view.getStatusLabel().getText().startsWith(errors.get(ErrorKey.PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS)));
+        assertTrue(view.getStatusLabel().getText().startsWith(TextFactory.getText(ErrorKey.PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS)));
     }
 
     @Ignore
@@ -378,6 +361,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         assertFalse(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
         assertTrue(view.getStatusLabel().isVisible());
 
-        assertEquals(messages.formatFilenameLengthWarning(view.getCurrentOutputDirectoryTextField().getText().length()), view.getStatusLabel().getText());
+        assertEquals(TextFactory.format(Messages.MessageKey.WARNING_FILENAME_LENGTH, view.getCurrentOutputDirectoryTextField().getText().length()), view.getStatusLabel().getText());
     }
 }

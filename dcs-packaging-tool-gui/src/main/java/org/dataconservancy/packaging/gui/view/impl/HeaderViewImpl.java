@@ -24,8 +24,8 @@ import javafx.scene.layout.VBox;
 
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.CssConstants;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 
 /**
@@ -37,7 +37,7 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
     private Hyperlink helpLink;
     private Hyperlink aboutLink;
     
-    public HeaderViewImpl(Labels labels) {
+    public HeaderViewImpl() {
 
         HBox titleBar = new HBox();
         titleBar.getStyleClass().add(VIEW_HEADER_CLASS);
@@ -45,10 +45,10 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
         titleBar.setAlignment(Pos.CENTER_RIGHT);
 
         //Create the help and about links that will appear at the top of the screen.
-        helpLink = new Hyperlink(labels.get(LabelKey.HELP_LABEL));
+        helpLink = new Hyperlink(TextFactory.getText(LabelKey.HELP_LABEL));
         titleBar.getChildren().add(helpLink);
         
-        aboutLink = new Hyperlink(labels.get(LabelKey.ABOUT_LABEL));
+        aboutLink = new Hyperlink(TextFactory.getText(LabelKey.ABOUT_LABEL));
         titleBar.getChildren().add(aboutLink);
 
         getChildren().add(titleBar);
@@ -58,7 +58,7 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
         locationBar.getStyleClass().add(VIEW_LOCATION_CLASS);
         
         for (Page page : Page.values()) {
-            Label pageLabel = new Label(labels.get(page.getLabelKey()));
+            Label pageLabel = new Label(TextFactory.getText(page.getLabelKey()));
             switch (page) {
                 case HOMEPAGE:
                     break;
