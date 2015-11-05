@@ -35,24 +35,6 @@
 
 
   <!-- RESOURCE BUNDLES -->
-  <bean id="labelResource" class="java.util.ResourceBundle" factory-method="getBundle">
-    <constructor-arg type="java.lang.String">
-      <value>bundles/labels</value>
-    </constructor-arg>
-  </bean>
-
-  <bean id="messageResource" class="java.util.ResourceBundle" factory-method="getBundle">
-    <constructor-arg type="java.lang.String">
-      <value>bundles/messages</value>
-    </constructor-arg>
-  </bean>
-  
-  <bean id="errorResource" class="java.util.ResourceBundle" factory-method="getBundle">
-  	<constructor-arg type="java.lang.String">
-  	  <value>bundles/errors</value>
-  	</constructor-arg>
-  </bean>
-  
   <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
   	<constructor-arg type="java.lang.String">
   		<value>${ontologyLabels.file}</value>
@@ -79,18 +61,6 @@
     <property name="configurationDirectory" value="${configuration.dir}"/>
   </bean>
 
-  <bean id="labels" class="org.dataconservancy.packaging.gui.Labels">
-    <constructor-arg ref="labelResource" />
-  </bean>
-
-  <bean id="messages" class="org.dataconservancy.packaging.gui.Messages">
-    <constructor-arg ref="messageResource" />
-  </bean>
-
-  <bean id="errors" class="org.dataconservancy.packaging.gui.Errors">
-  	<constructor-arg ref="errorResource" />
-  </bean>
-  
   <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
   	<constructor-arg ref="ontologyLabelResource"/>
   </bean>
@@ -104,7 +74,6 @@
   </bean>
 
   <bean id="headerView" class="org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl">
-    <constructor-arg ref="labels"/>
   </bean>
 
   <!-- SERVICES AND BUILDERS -->
@@ -148,7 +117,6 @@
 
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
-    <property name="labels" ref="labels" />
     <property name="configuration" ref="configuration" />
     <property name="headerView" ref="headerView"/>
   </bean>

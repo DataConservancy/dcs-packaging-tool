@@ -37,24 +37,7 @@
 
 
   <!-- RESOURCE BUNDLES -->
-  <bean id="labelResource" class="java.util.ResourceBundle" factory-method="getBundle">
-    <constructor-arg type="java.lang.String">
-      <value>bundles/labels</value>
-    </constructor-arg>
-  </bean>
 
-  <bean id="messageResource" class="java.util.ResourceBundle" factory-method="getBundle">
-    <constructor-arg type="java.lang.String">
-      <value>bundles/messages</value>
-    </constructor-arg>
-  </bean>
-
-  <bean id="errorResource" class="java.util.ResourceBundle" factory-method="getBundle">
-  	<constructor-arg type="java.lang.String">
-  	  <value>bundles/errors</value>
-  	</constructor-arg>
-  </bean>
-  
   <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
   	<constructor-arg type="java.lang.String">
   		<value>${ontologyLabels.file}</value>
@@ -84,18 +67,6 @@
     <property name="packageMetadataParametersFile" value = "${packageMetadataParametersFile}" />
   </bean>
 
-  <bean id="labels" class="org.dataconservancy.packaging.gui.Labels">
-    <constructor-arg ref="labelResource" />
-  </bean>
-
-  <bean id="messages" class="org.dataconservancy.packaging.gui.Messages">
-    <constructor-arg ref="messageResource" />
-  </bean>
-  
-  <bean id="errors" class="org.dataconservancy.packaging.gui.Errors">
-  	<constructor-arg ref="errorResource"/>
-  </bean>
-  
   <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
   	<constructor-arg ref="ontologyLabelResource"/>
   </bean>
@@ -156,33 +127,26 @@
 
   <!-- VIEWS -->
   <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
-    <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
   </bean>
 
   <bean id="packageMetadataView" class="org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl">
-    <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
   </bean>
 
   <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
-    <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>    
   </bean>
 
   <bean id="packageGenerationView" class="org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl">
-    <constructor-arg ref="labels" />
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>    
   </bean>
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
-    <constructor-arg ref="labels" />
-    <constructor-arg ref="errors" />
-    <constructor-arg ref="messages"/>
     <constructor-arg ref="ontologyLabels"/>
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
@@ -194,11 +158,9 @@
   </bean>
   
   <bean id="headerView" class="org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl">
-  	<constructor-arg ref="labels"/>
   </bean>
 
   <bean id="openExistingPackageView" class="org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl">
-    <constructor-arg ref="labels"/>
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
   </bean>
@@ -213,22 +175,16 @@
   <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
     <constructor-arg ref="createNewPackageView" />
     <property name="controller" ref="controller" />
-    <property name="messages" ref="messages" />  
-    <property name="errors" ref="errors"/>  
     <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
   <bean id="editPackageContentsPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.EditPackageContentsPresenterImpl">
-    <constructor-arg ref="packageDescriptionView" />
+    <constructor-arg ref="editPackageContentsView" />
     <property name="controller" ref="controller" />
-    <property name="labels" ref="labels" />
     <property name="profileService" ref="profileService" />
     <property name="ipmService" ref="ipmService"/>
     <property name="propertyFormatService" ref="propertyFormatService"/>
-    <property name="errors" ref="errors"/>
-    <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
-    <property name="packageDescriptionValidator" ref="packageDescriptionValidator"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
@@ -238,8 +194,6 @@
     <property name="packageGenerationParametersBuilder" ref="propertiesConfigurationParametersBuilder"/>
     <property name="packageGenerationService" ref="packageGenerationService"/>
     <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
-    <property name="messages" ref="messages"/>
-    <property name="errors" ref="errors"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
@@ -247,36 +201,30 @@
     <constructor-arg ref="packageMetadataView"/>
     <property name="controller" ref="controller"/>
     <property name="packageMetadataService" ref="packageMetadataService"/>
-    <property name="messages" ref="messages"/>
-    <property name="errors" ref="errors"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
   <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
     <constructor-arg ref="openExistingPackageView"/>
     <property name="controller" ref="controller" />
-    <property name="messages" ref="messages" />
-    <property name="errors" ref="errors"/>
-    <property name="labels" ref="labels" />
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
-    <property name="labels" ref="labels" />
     <property name="configuration" ref="configuration" />
 
     <property name="homepageView" ref="homepageView" />
     <property name="packageMetadataView" ref="packageMetadataView" />
     <property name="createNewPackageView" ref="createNewPackageView" />
     <property name="packageGenerationView" ref="packageGenerationView" />
-    <property name="packageDescriptionView" ref="packageDescriptionView" />
+    <property name="editPackageContentsView" ref="editPackageContentsView" />
     <property name="openExistingPackageView" ref="openExistingPackageView" />
 
     <property name="homepagePresenter" ref="homepagePresenter" />
     <property name="packageMetadataPresenter" ref="packageMetadataPresenter" />
     <property name="createNewPackagePresenter" ref="createNewPackagePresenter" />
-    <property name="packageDescriptionPresenter" ref="packageDescriptionPresenter" />
+    <property name="editPackageContentsPresenter" ref="editPackageContentsPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
     <property name="openExistingPackagePresenter" ref="openExistingPackagePresenter" />
 
