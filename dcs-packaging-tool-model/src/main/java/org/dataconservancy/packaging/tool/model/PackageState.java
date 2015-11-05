@@ -140,6 +140,10 @@ public class PackageState {
         return packageTree;
     }
 
+    public List<DomainProfile> getDomainProfileList() {
+        return domainProfileList;
+    }
+
     public void setPackageTree(Node treeRoot) {
         packageTree = treeRoot;
     }
