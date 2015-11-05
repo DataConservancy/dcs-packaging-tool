@@ -421,11 +421,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 textField.setEditable(packageMetadata.isEditable());
                 textField.setDisable(!packageMetadata.isEditable());
                 textField.setId(packageMetadata.getName());
-                allDynamicFields.add(textField);
-
-                PropertyBox propertyBox = new PropertyBox("", false, false, packageMetadata.getValidationType());
+                //allDynamicFields.add(textField);
+                PropertyBox propertyBox = new PropertyBox(textField, packageMetadata.getValidationType());
                 fieldContainer.getChildren().add(propertyBox);
-              /*  if (packageMetadata.getValidationType().equals(ValidationType.PHONE)) {
+                /*
+                if (packageMetadata.getValidationType().equals(ValidationType.PHONE)) {
                     HBox horizontalBox = createHBoxForType(textField, ValidationType.PHONE);
                     fieldContainer.getChildren().add(horizontalBox);
                 } else if (packageMetadata.getValidationType().equals(ValidationType.EMAIL)) {
