@@ -16,6 +16,38 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import javafx.application.Platform;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import org.dataconservancy.packaging.gui.BaseGuiTest;
+import org.dataconservancy.packaging.gui.Controller;
+import org.dataconservancy.packaging.gui.Page;
+import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
+import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
+import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
+import org.dataconservancy.packaging.gui.view.HeaderView;
+import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
+import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl;
+import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
+import org.dataconservancy.packaging.tool.model.PackageDescription;
+import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.CountDownLatch;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,36 +56,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.CountDownLatch;
-
-import javafx.application.Platform;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-
-import org.dataconservancy.packaging.gui.BaseGuiTest;
-import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Page;
-import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
-import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
-import org.dataconservancy.packaging.gui.view.HeaderView;
-import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
-import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl;
-import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 /**
  * Test for the create new package presenter implementation. Tests that elements are retrieved correctly, properties are set correctly,
@@ -70,12 +72,11 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     
     private boolean showNextPage;
     private File chosenDirectory;
-    private PackageDescription description = null;
-    private PackageDescriptionBuilder builder;
+    private Node root = null;
+    private PackageState packageState;
 
     @Rule
     public ExecuteContinueRule continueRule = new ExecuteContinueRule();
-
 
     private boolean initialized = false;
     
@@ -85,7 +86,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     private EditPackageContentsPresenterImpl packageDescriptionPresenter;
 
     @Before
-    public void setup() throws InterruptedException {
+    public void setup() throws InterruptedException, IOException {
         if (!initialized) {
 
             showDirectoryDialog = false;
@@ -101,6 +102,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             editPackageContentsView.setHeaderView(header);
             packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
             factory.setEditPackageContentsPresenter(packageDescriptionPresenter);
+            packageState = new PackageState();
 
             Controller controller = new Controller() {
 
@@ -108,16 +110,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 public File showOpenDirectoryDialog(DirectoryChooser chooser) {
                     showDirectoryDialog = true;
                     return chosenDirectory;
-                }
-
-                @Override
-                public void setPackageDescription(PackageDescription desc) {
-                    description = desc;
-                }
-
-                @Override
-                public PackageDescription getPackageDescription() {
-                    return description;
                 }
 
                 @Override
@@ -131,6 +123,11 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                     showNextPage = true;
                     return packageDescriptionPresenter;
                 }
+
+                @Override
+                public PackageState getPackageState() {
+                    return packageState;
+                }
             };
             controller.setFactory(factory);
             factory.setController(controller);
@@ -143,12 +140,12 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
 
             presenter.setController(controller);
 
-            PackageDescription description = new PackageDescription();
+            IPMService ipmService = mock(IPMService.class);
+            when(ipmService.createTreeFromFileSystem(any(Path.class))).thenReturn(root);
+            presenter.setIpmService(ipmService);
 
-            builder = mock(PackageDescriptionBuilder.class);
-            when(builder.deserialize(any(InputStream.class))).thenReturn(description);
-
-            presenter.setPackageDescriptionBuilder(builder);
+            DomainProfileService profileService = mock(DomainProfileService.class);
+            presenter.setProfileService(profileService);
 
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);
@@ -195,31 +192,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
         assertFalse(showNextPage);
 
         assertTrue(view.getErrorMessage().getText().length() > 0);
-    }
-    
-    /**
-     * Test that continue works correctly when all required fields are set.
-     */
-    @Test
-    public void testContinue() throws InterruptedException {
-        waitForInitialization();
-        assertTrue(showNextPage);
-
-        assertEquals(0, view.getErrorMessage().getText().length());
-        assertNotNull(description);
-    }
-
-    /*
-     * This method will wait for the thread that creates the tree to finish so that everything is initialized before executing the tests.
-     */
-    private void waitForInitialization() throws InterruptedException {
-        final int sleepCount = 25;
-        int sleep = 0;
-
-        while (sleep < sleepCount && description == null) {
-            Thread.sleep(2000);
-            sleep++;
-        }
     }
 
     /**
@@ -282,7 +254,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
 
             protected void executeContinue() throws InterruptedException, IOException {
                 setup();
-                assertNull(description);
+                assertNull(packageState.getPackageTree());
                 assertFalse(showDirectoryDialog);
 
                 try {
