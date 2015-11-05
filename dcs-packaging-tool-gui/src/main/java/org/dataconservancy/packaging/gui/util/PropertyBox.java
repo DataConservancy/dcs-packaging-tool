@@ -21,64 +21,50 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
-import org.dataconservancy.packaging.gui.Messages;
-import org.dataconservancy.packaging.tool.model.PropertyValidationResult;
+import javafx.scene.layout.VBox;;
 import org.dataconservancy.packaging.tool.model.ValidationType;
 
 import java.text.DecimalFormat;
 
 /**
- * A text widget with a label and text input control, with possibility of adding validationto the text property
+ * A text widget with a label and text input control, with possibility of adding validation to the text property
+ * The VBox is necessary because validation adds an additional Label element above the HBox temporarily, informing the user
+ * of a problem with the entry while it is invalid. This Label is removed after successful validation. Any adjustments
+ * to the size of the VBox will necessitate andjusting the PropertyValidationListener class, which relies on the size
+ * of the VBox in order to control presentation of this Label element.
  */
-public class PropertyBox extends HBox {
-    private Label propertyNameLabel;
-    private Label validationImageLabel;
+public class PropertyBox extends VBox {
     private TextInputControl textInput;
-    private boolean isSizeProperty;
-    private boolean isMultiLine;
-    private boolean isEditable;
+    private HBox propertyInputBox = new HBox(4);
+    private Label validationImageLabel = new Label();
 
-    // array of labels used to format file size into B, kB, MB, GB, TB, PB, EB, ZB or YB value
-    private static final String[] sizeLabels = {" Bytes", " kB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB"};
-
-    public PropertyBox(String initialText, boolean isSizeProperty, boolean isMultiLine, boolean isEditable) {
-        this.isSizeProperty = isSizeProperty;
-        this.isMultiLine = isMultiLine;
-        this.isEditable = isEditable;
+    public PropertyBox(String initialText, boolean isMultiLine, boolean isEditable) {
         textInput = (isMultiLine ? new TextArea(initialText) : new TextField(initialText));
-        getChildren().add(propertyNameLabel);
-        getChildren().add(textInput);
+        textInput.setEditable(isEditable);
+        propertyInputBox.getChildren().add(textInput);
+        getChildren().add(propertyInputBox);
     }
 
-    public PropertyBox(String initialText, boolean isSizeProperty, boolean isMultiLine, ValidationType validationType) {
-        this.isSizeProperty = isSizeProperty;
-        this.isMultiLine = isMultiLine;
-        this.isEditable = true;
+    public PropertyBox(String initialText, boolean isMultiLine, ValidationType validationType) {;
         textInput = (isMultiLine ? new TextArea(initialText) : new TextField(initialText));
-        textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
-        getChildren().add(propertyNameLabel);
-        getChildren().add(textInput);
+        textInput.setEditable(true);
+        if(!validationType.equals(ValidationType.NONE)) {
+            textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
+        }
+        propertyInputBox.getChildren().add(textInput);
+        propertyInputBox.getChildren().add(validationImageLabel);
+        getChildren().add(propertyInputBox);
+
     }
 
     public PropertyBox(TextField textField, ValidationType validationType){
         textInput = textField;
-        textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
-        getChildren().add(propertyNameLabel);
-        getChildren().add(textInput);
-    }
-
-
-    private String formatSizePropertyValue(String propertyName, String originalValue) {
-        final DecimalFormat twoDecimalForm = new DecimalFormat("#.##");
-        double doubleValue = Double.parseDouble(originalValue);
-        int i = 0;
-        int test = 1;
-        while (doubleValue >= test * 1000 && i < sizeLabels.length - 1) {
-            test *= 1000;
-            i++;
+        if(!validationType.equals(ValidationType.NONE)) {
+            textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
         }
-        String sizeLabel = (doubleValue == 1) ? " Byte" : sizeLabels[i];
-        return twoDecimalForm.format(doubleValue / test) + sizeLabel;
+        propertyInputBox.getChildren().add(textInput);
+        propertyInputBox.getChildren().add(validationImageLabel);
+        getChildren().add(propertyInputBox);
     }
 
     public Label getValidationImageLabel() {

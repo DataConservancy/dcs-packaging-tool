@@ -32,8 +32,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests that package metadata view impl initializes all fields correctly based on the given service.
  */
-//ignore until refactoring is done
-    @Ignore
 public class PackageMetadataViewImplTest extends BaseGuiTest {
 
     private PackageMetadataViewImpl view;

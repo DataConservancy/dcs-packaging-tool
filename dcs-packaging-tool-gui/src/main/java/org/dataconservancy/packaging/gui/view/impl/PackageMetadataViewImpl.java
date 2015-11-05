@@ -17,7 +17,6 @@
 package org.dataconservancy.packaging.gui.view.impl;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -36,17 +35,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
-import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
-import org.dataconservancy.packaging.gui.util.EmailValidator;
-import org.dataconservancy.packaging.gui.util.PhoneNumberValidator;
 import org.dataconservancy.packaging.gui.util.PropertyBox;
-import org.dataconservancy.packaging.gui.util.PropertyValidationListener;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
@@ -422,49 +417,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 textField.setDisable(!packageMetadata.isEditable());
                 textField.setId(packageMetadata.getName());
                 allDynamicFields.add(textField);
-
-                PropertyBox propertyBox = new PropertyBox("", false, false, packageMetadata.getValidationType());
+                PropertyBox propertyBox = new PropertyBox(textField, packageMetadata.getValidationType());
                 fieldContainer.getChildren().add(propertyBox);
-              /*  if (packageMetadata.getValidationType().equals(ValidationType.PHONE)) {
-                    HBox horizontalBox = createHBoxForType(textField, ValidationType.PHONE);
-                    fieldContainer.getChildren().add(horizontalBox);
-                } else if (packageMetadata.getValidationType().equals(ValidationType.EMAIL)) {
-                    HBox horizontalBox = createHBoxForType(textField, ValidationType.EMAIL);
-                    fieldContainer.getChildren().add(horizontalBox);
-                } else {
-                    fieldContainer.getChildren().add(textField);
-                } */
             }
         }
         return fieldContainer;
     }
 
-    /**
-     * Helper method to createFields helper method to create the HBox for fields that need validation.
-     *
-     * @param textField
-     * @param validationType
-     * @return container hbox with the validation
-     */
-  /*  private HBox createHBoxForType(TextField textField, ValidationType validationType) {
-        HBox horizontalBox = new HBox();
-        Label inputVerificationLabel = new Label();
-        inputVerificationLabel.setPadding(new Insets(3, 0, 0, 3));
-        if (validationType != null){
-            textField.textProperty().addListener(new PropertyValidationListener(validationType));
-        }
-        if (validationType.equals(ValidationType.URL)) {
-            textField.textProperty().addListener(getNewChangeListenerForUrl(textField.getId(), inputVerificationLabel));
-        } else if (validationType.equals(ValidationType.PHONE)) {
-            textField.textProperty().addListener(getNewChangeListenerForPhoneNumber(textField.getId(), inputVerificationLabel));
-        } else if (validationType.equals(ValidationType.EMAIL)) {
-            textField.textProperty().addListener(getNewChangeListenerForEmail(textField.getId(), inputVerificationLabel));
-        }
-        horizontalBox.getChildren().add(textField);
-        horizontalBox.getChildren().add(inputVerificationLabel);
-        return horizontalBox;
-    }
-    */
     /**
      * Helper method that creates labels with tooltips for a given text.
      *
@@ -481,67 +440,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         return labelVBox;
     }
 
-    /**
-     * Listener to validate phone number.
-     *
-     * @param errorMessageLabel
-     * @return ChangeListener
-     */
- /*   private ChangeListener<String> getNewChangeListenerForPhoneNumber(final String packageMetadataName, final Label errorMessageLabel) {
-        //Add a listener for text entry in the phone number box
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (PhoneNumberValidator.isValid(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-                failedValidation.remove(packageMetadataName);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-                failedValidation.add(packageMetadataName);
-            }
-        };
-    }
-   */
-    /**
-     * Listener to validate email.
-     *
-     * @param errorMessageLabel
-     * @return ChangeListener
-     */
- /*   private ChangeListener<String> getNewChangeListenerForEmail(final String packageMetadataName, final Label errorMessageLabel) {
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (EmailValidator.isValid(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-                failedValidation.remove(packageMetadataName);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-                failedValidation.add(packageMetadataName);
-            }
-        };
-    }
-
- */   /**
-     * Listener to validate URL.
-     *
-     *
-     * @return ChangeListener
-     */
-/*    private ChangeListener<String> getNewChangeListenerForUrl(final String packageMetadataName, final Label errorMessageLabel) {
-        return (observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                setLabelImage(errorMessageLabel, null);
-            } else if (UriUtility.isHttpUrl(newValue)) {
-                setLabelImage(errorMessageLabel, GOOD_INPUT_IMAGE);
-                failedValidation.remove(packageMetadataName);
-            } else {
-                setLabelImage(errorMessageLabel, BAD_INPUT_IMAGE);
-                failedValidation.add(packageMetadataName);
-            }
-        };
-    }
-*/
     @Override
     public boolean hasFailedValidation(String fieldName) {
         return failedValidation.contains(fieldName);

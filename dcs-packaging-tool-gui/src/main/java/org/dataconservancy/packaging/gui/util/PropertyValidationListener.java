@@ -19,10 +19,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Messages;
-import org.dataconservancy.packaging.tool.model.PropertyValidationResult;
 import org.dataconservancy.packaging.tool.model.ValidationType;
 
 import static org.dataconservancy.packaging.tool.model.ValidationType.*;
@@ -35,48 +35,50 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     private Messages messages;
     //validationLabel contains the validation error message
     private Label validationLabel;
+    //validationImageLabel provides the X or check image as a user guide
+    private Label validationImageLabel;
     private PropertyBox propertyBox;
     private ValidationType validationType;
 
     public PropertyValidationListener(PropertyBox propertyBox, ValidationType validationType) {
         this.propertyBox = propertyBox;
         this.validationType = validationType;
-        validationLabel = new Label();
-        validationLabel.setMaxWidth(350);
-        validationLabel.setWrapText(true);
-        validationLabel.setTextFill(Color.RED);
-
+        this.validationImageLabel = new Label();
     }
 
     @Override
     public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-       Label validationImageLabel = propertyBox.getValidationImageLabel();
+        //If the field contains an invalid entry, we will have two children the propertyBox
+        if(propertyBox.getChildren().size() == 2){
+            validationLabel = (Label) propertyBox.getChildren().get(0);
+        } else { //otherwise, we add the validation label, then see if the changed value is valid
+            validationLabel = createValidationLabel();
+            propertyBox.getChildren().add(0,validationLabel);
+        }
+
+        HBox propertyInputBox = (HBox) propertyBox.getChildren().get(1);
+        validationImageLabel = (Label) propertyInputBox.getChildren().get(1);
 
         if (newValue != null && !newValue.isEmpty()) {
             Validator validator = ValidatorFactory.getValidator(validationType);
-            PropertyValidationResult result = new PropertyValidationResult(validator.isValid(newValue), validationType);
+            boolean result = validator.isValid(newValue);
 
-            if (result.isValid()) {
-                switch (result.getValidationType()) {
+            if (result) {
+                switch (validationType) {
                     case PHONE:
                     case URL:
                     case EMAIL:
-                        ImageView image = new ImageView();
-                        image.getStyleClass().add(GOOD_INPUT_IMAGE);
-                        validationImageLabel.setGraphic(image);
-                        validationImageLabel.setVisible(true);
                         propertyBox.getChildren().remove(validationLabel);
+                        validationImageLabel.setGraphic(createSuccessImageView());
                         break;
                 }
             } else {
                 validationImageLabel.setVisible(true);
-                if (result.getValidationType() != NONE) {
-                    ImageView image = new ImageView();
-                    image.getStyleClass().add(BAD_INPUT_IMAGE);
-                    validationImageLabel.setGraphic(image);
+                if (validationType != NONE) {
+                    validationImageLabel.setGraphic(createFailureImageView());
                 }
 
-                switch (result.getValidationType()) {
+                switch (validationType) {
                     case PHONE:
                         validationLabel.setText(messages.formatPhoneValidationFailure(newValue));
                         break;
@@ -86,13 +88,35 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case EMAIL:
                         validationLabel.setText(messages.formatEmailValidationFailure(newValue));
                     default:
-                        validationLabel.setText("");
+                        propertyBox.getChildren().remove(validationLabel);
                 }
             }
         } else {
             //This listener doesn't validate if a property is required or not so an empty value is considered valid
+            //If user has deleted all contents of a validating field, reset the property box to its initial state
             validationImageLabel.setVisible(false);
             propertyBox.getChildren().remove(validationLabel);
+
         }
+    }
+
+    private Label createValidationLabel(){
+        Label vLabel = new Label();
+        vLabel.setMaxWidth(500);
+        vLabel.setWrapText(true);
+        vLabel.setTextFill(Color.RED);
+        return vLabel;
+    }
+
+    private ImageView createSuccessImageView(){
+        ImageView image = new ImageView();
+        image.getStyleClass().add(GOOD_INPUT_IMAGE);
+        return image;
+    }
+
+    private ImageView createFailureImageView(){
+        ImageView image = new ImageView();
+        image.getStyleClass().add(BAD_INPUT_IMAGE);
+        return image;
     }
 }
