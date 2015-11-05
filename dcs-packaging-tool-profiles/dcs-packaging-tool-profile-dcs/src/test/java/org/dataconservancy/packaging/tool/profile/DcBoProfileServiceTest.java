@@ -11,6 +11,7 @@ import org.dataconservancy.packaging.tool.impl.support.IpmTreeFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.profile.util.DcBoIpmFactory;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
