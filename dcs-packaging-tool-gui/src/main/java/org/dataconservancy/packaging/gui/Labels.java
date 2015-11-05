@@ -178,6 +178,12 @@ public class Labels {
     }
 
     private ResourceBundle bundle;
+    private static Labels instance;
+
+    public Labels() {
+        ResourceBundle myResources =
+              ResourceBundle.getBundle("bundles/labels");
+    }
 
     public Labels(ResourceBundle bundle) {
         this.bundle = bundle;
@@ -196,11 +202,27 @@ public class Labels {
 
         return bundle.getString(key.getProperty());
     }
+
+    public static String getLabel(LabelKey key) {
+        if (instance == null) {
+            instance = new Labels();
+        }
+
+        return instance.get(key);
+    }
     
     public String get(String property) {
         if (!bundle.containsKey(property)) {
             return null;
         }
         return bundle.getString(property);
+    }
+
+    public static String getLabel(String property) {
+        if (instance == null) {
+            instance = new Labels();
+        }
+
+        return instance.get(property);
     }
 }
