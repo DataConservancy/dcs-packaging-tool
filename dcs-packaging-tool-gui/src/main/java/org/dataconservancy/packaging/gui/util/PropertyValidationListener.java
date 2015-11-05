@@ -39,11 +39,15 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     private Label validationImageLabel;
     private PropertyBox propertyBox;
     private ValidationType validationType;
+    private ImageView successImage;
+    private ImageView failureImage;
 
     public PropertyValidationListener(PropertyBox propertyBox, ValidationType validationType) {
         this.propertyBox = propertyBox;
         this.validationType = validationType;
         this.validationImageLabel = new Label();
+        this.successImage = createSuccessImageView();
+        this.failureImage = createFailureImageView();
     }
 
     @Override
@@ -69,13 +73,13 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case URL:
                     case EMAIL:
                         propertyBox.getChildren().remove(validationLabel);
-                        validationImageLabel.setGraphic(createSuccessImageView());
+                        validationImageLabel.setGraphic(successImage);
                         break;
                 }
             } else {
                 validationImageLabel.setVisible(true);
                 if (validationType != NONE) {
-                    validationImageLabel.setGraphic(createFailureImageView());
+                    validationImageLabel.setGraphic(failureImage);
                 }
 
                 switch (validationType) {

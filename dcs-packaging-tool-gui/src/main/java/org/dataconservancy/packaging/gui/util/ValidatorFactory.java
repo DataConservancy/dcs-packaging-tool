@@ -19,7 +19,7 @@ package org.dataconservancy.packaging.gui.util;
 import org.dataconservancy.packaging.tool.model.ValidationType;
 
 /**
- * An enum of the different kinds of validation types for properties
+ * A simple factory class which, when provided a validator type, provides an appropriate validator for property values
  */
 public class ValidatorFactory {
     public static Validator getValidator(ValidationType type){
