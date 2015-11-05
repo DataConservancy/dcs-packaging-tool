@@ -16,37 +16,25 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import java.io.File;
-import java.io.InputStream;
-
-import java.util.Map;
-
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
-import org.dataconservancy.packaging.tool.api.PackageDescriptionCreator;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
-import org.dataconservancy.packaging.tool.api.support.RulePropertiesManager;
-import org.dataconservancy.packaging.tool.impl.GeneralPackageDescriptionCreator;
-import org.dataconservancy.packaging.tool.impl.support.SystemPropertyPreferencesRulePropertiesManager;
-import org.dataconservancy.packaging.tool.model.DcsPackageDescriptionSpec;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionRulesBuilder;
-import org.dataconservancy.packaging.tool.model.builder.xstream.JaxbPackageDescriptionRulesBuilder;
-import org.dataconservancy.packaging.tool.model.description.RulesSpec;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.stage.FileChooser;
-import javafx.scene.Node;
-import javafx.stage.DirectoryChooser;
+import java.io.File;
 
 /**
  * The implementation for the presenter that will handle the creation of a new package either from a content directory,
@@ -60,12 +48,12 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     private File content_dir;
     private File root_artifact_dir; //has content_dir as parent
 
-    private PackageDescriptionCreator creator;
-    private PackageDescriptionBuilder packageDescriptionBuilder;
     private DirectoryChooser directoryChooser;
     private FileChooser fileChooser;
-    private RulePropertiesManager ruleProperties;
-    
+
+    private IPMService ipmService;
+    private DomainProfileService profileService;
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public CreateNewPackagePresenterImpl(CreateNewPackageView view) {
@@ -77,23 +65,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
-        
-        InputStream defaultRulesStream =
-                Thread.currentThread().getContextClassLoader()
-                        .getResourceAsStream("rules/default-rules.xml");
-
-        PackageDescriptionRulesBuilder builder =
-                new JaxbPackageDescriptionRulesBuilder();
-
-        RulesSpec packageDescriptionPrefs = builder.buildPackageDescriptionRules(defaultRulesStream);
-        
-        ruleProperties = new SystemPropertyPreferencesRulePropertiesManager();
-        ruleProperties.init(packageDescriptionPrefs);
-
-        creator = new GeneralPackageDescriptionCreator(packageDescriptionPrefs);
 
         view.setPresenter(this);
-        view.promptForUndefinedProperties(ruleProperties);
         bind();
     }
 
@@ -106,44 +79,36 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 if (root_artifact_dir != null && root_artifact_dir.exists() &&
                     root_artifact_dir.canRead()) {
 
-                    /* Insert properties, if any */
-                    for (Map.Entry<String, String> property : view.getPropertyValues().entrySet()) {
-                        ruleProperties.setProperty(property.getKey(), property.getValue());
-                    }
-                    //TODO: when we support multiple ontologies we will need to adjust the handling of the user's
-                    // choice of ontology identifier instead of hardcoded value here
-
-                    final PackageDescriptionServiceWorker packageDescriptionService = new PackageDescriptionServiceWorker(DcsPackageDescriptionSpec.SPECIFICATION_ID, root_artifact_dir);
+                    final PackageIpmBuilderService ipmBuilderService = new PackageIpmBuilderService(root_artifact_dir);
 
                     view.showProgressIndicatorPopUp();
 
-                    ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> packageDescriptionService.cancel());
+                    ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> ipmBuilderService.cancel());
 
                     controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
                     controller.setContentRoot(content_dir);
                     controller.setRootArtifactDir(root_artifact_dir);
 
-                    packageDescriptionService.setOnCancelled(event -> {
-                        packageDescriptionService.reset();
+                    ipmBuilderService.setOnCancelled(event -> {
+                        ipmBuilderService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
                     });
 
-                    packageDescriptionService.setOnFailed(workerStateEvent -> {
+                    ipmBuilderService.setOnFailed(workerStateEvent -> {
                         displayExceptionMessage(workerStateEvent.getSource().getException());
                         view.getErrorMessage().setVisible(true);
-                        packageDescriptionService.reset();
+                        ipmBuilderService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
                     });
 
-                    packageDescriptionService.setOnSucceeded(workerStateEvent -> {
-                        PackageDescription packageDescription = (PackageDescription) workerStateEvent.getSource().getValue();
-                        controller.setPackageDescription(packageDescription);
-                        controller.setPackageDescriptionFile(null);
-                        packageDescriptionService.reset();
+                    ipmBuilderService.setOnSucceeded(workerStateEvent -> {
+                        Node rootNode = (Node) workerStateEvent.getSource().getValue();
+                        controller.getPackageState().setPackageTree(rootNode);
+                        ipmBuilderService.reset();
                         controller.goToNextPage();
                     });
 
-                    packageDescriptionService.start();
+                    ipmBuilderService.start();
 
                 } else if (root_artifact_dir != null &&
                         (!root_artifact_dir.exists() ||
@@ -195,7 +160,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
         root_artifact_dir = null;
     }
 
-    public Node display() {
+    public javafx.scene.Node display() {
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);
@@ -203,33 +168,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
         
         return view.asNode();
     }
-
-    @Override
-    public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder) {
-        this.packageDescriptionBuilder = packageDescriptionBuilder;
-    }
-
-    /*
-     * TODO Currently the UI Doesn't allow for setting the preferences file
-    private void loadPreferences() {
-
-        try {
-            InputStream rulesStream = new FileInputStream(preferences_file);
-
-            PackageDescriptionRulesBuilder packageDescriptionBuilder =
-                    new XstreamPackageDescriptionRulesBuilder(XstreamPackageDescriptionRulesBuilderFactory
-                            .newInstance());
-
-            packageDescriptionPrefs =
-                    packageDescriptionBuilder.buildPackageDescriptionRules(rulesStream);
-
-            creator =
-                    new GeneralPackageDescriptionCreator(packageDescriptionPrefs);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error reading preferences file");
-        }
-    }*/
 
     protected void displayExceptionMessage(Throwable throwable) {
         String errorMessage = throwable.getMessage();
@@ -241,27 +179,39 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
         view.getErrorMessage().setVisible(true);
     }
 
+    @Override
+    public void setProfileService(DomainProfileService profileService){
+        this.profileService = profileService;
+    }
+
+    @Override
+    public void setIpmService(IPMService ipmService) {
+        this.ipmService = ipmService;
+    }
+
     /**
      * A {@link javafx.concurrent.Service} which executes the {@link javafx.concurrent.Task} of obtaining a
      * {@link org.dataconservancy.packaging.tool.model.PackageDescription} given a package ontology identifier and
      * a content directory
      */
-    private class PackageDescriptionServiceWorker extends Service<PackageDescription> {
+    private class PackageIpmBuilderService extends Service<Node> {
 
         private File root_artifact_dir;
-        private String packageOntologyIdentifier;
 
-        public PackageDescriptionServiceWorker(String packageOntologyIdentifier, File root_artifact_dir) {
+        public PackageIpmBuilderService(File root_artifact_dir) {
             this.root_artifact_dir = root_artifact_dir;
-            this.packageOntologyIdentifier = packageOntologyIdentifier;
         }
 
         @Override
-        protected Task<PackageDescription> createTask() {
-            return new Task<PackageDescription>() {
+        protected Task<Node> createTask() {
+            return new Task<Node>() {
                 @Override
-                protected PackageDescription call() throws Exception {
-                    return creator.createPackageDescription(packageOntologyIdentifier, root_artifact_dir);
+                protected Node call() throws Exception {
+                    Node root = ipmService.createTreeFromFileSystem(root_artifact_dir.toPath());
+                    //TODO Replace hardcoded profile with the one from package state when it's finished
+                    profileService.assignNodeTypes(new DcsBOProfile(), root);
+
+                    return root;
                 }
             };
         }

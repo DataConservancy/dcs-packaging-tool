@@ -175,7 +175,8 @@
   <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
     <constructor-arg ref="createNewPackageView" />
     <property name="controller" ref="controller" />
-    <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
+    <property name="profileService" ref="profileService"/>
+    <property name="ipmService" ref="ipmService"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 

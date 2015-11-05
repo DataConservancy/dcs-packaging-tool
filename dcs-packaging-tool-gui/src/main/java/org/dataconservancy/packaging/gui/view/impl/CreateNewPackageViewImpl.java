@@ -16,9 +16,6 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,7 +34,6 @@ import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
-import org.dataconservancy.packaging.tool.api.support.RulePropertiesManager;
 
 /**
  * Implementation for the view that controls how the user will create a package either by setting a content directory, or,
@@ -53,8 +49,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     private Label errorMessage;
     private VBox content;
 
-    private Map<String, TextField> propertyFields = new HashMap<>();
-    
     public CreateNewPackageViewImpl() {
         super();
 
@@ -127,72 +121,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         helpText.setWrapText(true);
         helpText.setTextAlignment(TextAlignment.CENTER);
         setHelpPopupContent(helpText);         
-    }
-
-    @Override
-    public void promptForUndefinedProperties(RulePropertiesManager mgr) {
-        /* Add property definition boxes, where appropriate */
-        if (!mgr.getAllProperties().isEmpty()) {
-            final VBox propertiesBox = new VBox(12);
-
-            propertiesBox.getChildren().add(new Label(TextFactory.getText(LabelKey.PROPERTY_INPUT_LABEL)));
-            propertiesBox.setAlignment(Pos.TOP_LEFT);
-            propertiesBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
-
-            /*
-             * Populate a map of property description (human name) and value (if
-             * any)
-             */
-            for (Map.Entry<String, String> propDesc : mgr.getAllProperties()
-                    .entrySet()) {
-                propertiesBox
-                        .getChildren()
-                        .add(createPropertyBox(propDesc.getKey(), propDesc.getValue(),
-                                System.getProperty(propDesc.getKey())));
-            }
-
-            content.getChildren().add(propertiesBox);
-        }
-    }
-    
-    private HBox createPropertyBox(String propertyKey, String propertyName, String propertyValue) {
-        HBox propertyBox = new HBox(30);
-        propertyBox.setAlignment(Pos.TOP_LEFT);
-        Label propertyNameLabel = new Label(propertyName);
-        propertyNameLabel.setPrefWidth(100);
-        propertyNameLabel.setWrapText(true);
-        propertyBox.getChildren().add(propertyNameLabel);
-        
-        final VBox propertyValuesBox = new VBox(6);
-        TextField propertyValueField;
-  
-        if (propertyValue != null) {
-                propertyValueField = new TextField(propertyValue); 
-        } else {
-            propertyValueField = new TextField();
-        }
-        propertyValueField.setPrefWidth(250);
-        propertyValueField.setEditable(true);
-        propertyFields.put(propertyKey, propertyValueField);
-        propertyValuesBox.getChildren().add(propertyValueField);
-        
-        propertyBox.getChildren().add(propertyValuesBox);
-        
-        return propertyBox;
-    }
-
-    @Override
-    public Map<String, String> getPropertyValues() {
-        
-        Map<String, String> propertyValues = new HashMap<>();
-        for (Map.Entry<String, TextField> field : propertyFields.entrySet()) {
-            String value = field.getValue().getText();
-            if (value != null && !value.equals("")) {
-                propertyValues.put(field.getKey(), value);
-            }
-        }
-        
-        return propertyValues;
     }
 
     @Override

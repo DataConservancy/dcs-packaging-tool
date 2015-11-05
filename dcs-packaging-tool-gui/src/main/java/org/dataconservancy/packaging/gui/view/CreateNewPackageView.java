@@ -37,7 +37,7 @@ public interface CreateNewPackageView extends View<CreateNewPackagePresenter> {
      * The button for choosing a base directory to generate a package description from.
      * @return The button for chossing the content directory
      */
-    public Button getChooseContentDirectoryButton();
+    Button getChooseContentDirectoryButton();
     
     /**
      * A text field that is used for displaying the currently selected directory. Note a text field
@@ -45,27 +45,15 @@ public interface CreateNewPackageView extends View<CreateNewPackagePresenter> {
      * editable.
      * @return The TextField to use for entering the in base directory.
      */
-    public TextField getChooseContentDirectoryTextField();
+    TextField getChooseContentDirectoryTextField();
 
     /**
      * Label for displaying an error message to the user, typically when a required field has not been selected.
      * @return Label for displaying an error message to the user
      */
-    public Label getErrorMessage();
-    
-    /**
-     * This brings up input fields for defining any properties (such as project ID) to use during package description creation.
-     * @param mgr The rules manager that will be used to determine undefined properties
-     */
-    public void promptForUndefinedProperties(RulePropertiesManager mgr);
-    
-    /**
-     * This returns a map of property names (keys) and their associated value, as input by the user.
-     * @return A map of the property values input by the user.
-     */
-    public Map<String, String> getPropertyValues();
+    Label getErrorMessage();
 
-    public void showProgressIndicatorPopUp();
+    void showProgressIndicatorPopUp();
 
-    public PackageToolPopup getProgressIndicatorPopUp();
+    PackageToolPopup getProgressIndicatorPopUp();
 }
