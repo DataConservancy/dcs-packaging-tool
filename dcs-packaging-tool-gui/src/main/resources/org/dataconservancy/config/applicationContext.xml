@@ -137,7 +137,22 @@
     <property name="localCountryCode" value="${localCountryCode}"/>
   </bean>
 
-  <bean id="emailValidator" class="org.dataconservancy.packaging.gui.util.EmailValidator" />
+  <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
+
+  <bean id="domainProfileObjectStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl">
+    <constructor-arg ref="uriGenerator"/>
+  </bean>
+
+  <bean id="profileService" class="org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl">
+    <constructor-arg ref="domainProfileObjectStore"/>
+    <constructor-arg ref="uriGenerator"/>
+  </bean>
+
+  <bean id="propertyFormatService" class="org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl"/>
+
+  <bean id="ipmService" class="org.dataconservancy.packaging.tool.impl.IPMServiceImpl">
+    <constructor-arg ref="uriGenerator"/>
+  </bean>
 
   <!-- VIEWS -->
   <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
@@ -164,7 +179,7 @@
     <property name="help" ref="help"/>    
   </bean>
 
-  <bean id="packageDescriptionView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
+  <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
     <constructor-arg ref="labels" />
     <constructor-arg ref="errors" />
     <constructor-arg ref="messages"/>
@@ -172,7 +187,8 @@
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
-    <property name="packageOntologyService" ref="packageOntologyService"/>
+    <property name="profileService" ref="profileService"/>
+    <property name="ipmService" ref="ipmService"/>
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
   </bean>
@@ -203,11 +219,13 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
-  <bean id="packageDescriptionPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.EditPackageContentsPresenterImpl">
+  <bean id="editPackageContentsPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.EditPackageContentsPresenterImpl">
     <constructor-arg ref="packageDescriptionView" />
     <property name="controller" ref="controller" />
     <property name="labels" ref="labels" />
-    <property name="packageOntologyService" ref="packageOntologyService" />
+    <property name="profileService" ref="profileService" />
+    <property name="ipmService" ref="ipmService"/>
+    <property name="propertyFormatService" ref="propertyFormatService"/>
     <property name="errors" ref="errors"/>
     <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
     <property name="packageDescriptionValidator" ref="packageDescriptionValidator"/>
