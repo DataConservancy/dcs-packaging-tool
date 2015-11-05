@@ -16,17 +16,13 @@
 
 package org.dataconservancy.packaging.gui.util;
 
-import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;;
+import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.tool.model.ValidationType;
-
-import java.text.DecimalFormat;
 
 /**
  * A text widget with a label and text input control, with possibility of adding validation to the text property
@@ -40,6 +36,13 @@ public class PropertyBox extends VBox {
     private HBox propertyInputBox = new HBox(4);
     private Label validationImageLabel = new Label();
 
+    /**
+     * Creates a non-validating property box for a property, with an initial String value
+     * @param initialText the initial string value
+     * @param isMultiLine indicates whether this text input control should be multi-line (TextArea) or
+     *                    single-line (TextField)
+     * @param isEditable  indicates whether the text input control should be user-editable
+     */
     public PropertyBox(String initialText, boolean isMultiLine, boolean isEditable) {
         textInput = (isMultiLine ? new TextArea(initialText) : new TextField(initialText));
         textInput.setEditable(isEditable);
@@ -47,7 +50,15 @@ public class PropertyBox extends VBox {
         getChildren().add(propertyInputBox);
     }
 
-    public PropertyBox(String initialText, boolean isMultiLine, ValidationType validationType) {;
+    /**
+     * Creates a validating property box for a property, with an initial String value
+     * @param initialText the initial string value
+     * @param isMultiLine indicates whether this text input control should be multi-line (TextArea) or
+     *                    single-line (TextField)
+     * @param validationType indicates the ValidationType of validator that should be supplied to
+     *                       the text control input
+     */
+    public PropertyBox(String initialText, boolean isMultiLine, ValidationType validationType) {
         textInput = (isMultiLine ? new TextArea(initialText) : new TextField(initialText));
         textInput.setEditable(true);
         if(!validationType.equals(ValidationType.NONE)) {
@@ -59,6 +70,12 @@ public class PropertyBox extends VBox {
 
     }
 
+    /**
+     * Creates a validating PropertyBox with a supplied TextField
+     * @param textField the supplied TextField
+     * @param validationType  indicates the ValidationType of validator that should be supplied to
+     *                       the text control input
+     */
     public PropertyBox(TextField textField, ValidationType validationType){
         textInput = textField;
         if(!validationType.equals(ValidationType.NONE)) {
@@ -69,10 +86,10 @@ public class PropertyBox extends VBox {
         getChildren().add(propertyInputBox);
     }
 
-    public Label getValidationImageLabel() {
-        return this.validationImageLabel;
-    }
-
+    /**
+     * Returns the value of the TextInputControl in the PropertyBox
+     * @return the value of the TextInputControl in the PropertyBox
+     */
     public String getValue() {
         return textInput.getText();
     }

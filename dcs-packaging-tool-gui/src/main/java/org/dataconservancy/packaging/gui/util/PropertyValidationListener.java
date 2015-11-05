@@ -33,8 +33,6 @@ import static org.dataconservancy.packaging.tool.model.ValidationType.*;
  */
 public class PropertyValidationListener implements ChangeListener<String>, CssConstants {
 
-    //validationLabel contains the validation error message
-    private Label validationLabel;
     //validationImageLabel provides the X or check image as a user guide
     private Label validationImageLabel;
     private PropertyBox propertyBox;
@@ -42,6 +40,11 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     private ImageView successImage;
     private ImageView failureImage;
 
+    /**
+     * A validation listener for a property box.
+     * @param propertyBox the property box whose text input control is to be listened to
+     * @param validationType the type of validation this input control's value requires
+     */
     public PropertyValidationListener(PropertyBox propertyBox, ValidationType validationType) {
         this.propertyBox = propertyBox;
         this.validationType = validationType;
@@ -53,11 +56,12 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     @Override
     public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
         //If the field contains an invalid entry, we will have two children the propertyBox
+        Label validationLabel;
         if(propertyBox.getChildren().size() == 2){
             validationLabel = (Label) propertyBox.getChildren().get(0);
         } else { //otherwise, we add the validation label, then see if the changed value is valid
             validationLabel = createValidationLabel();
-            propertyBox.getChildren().add(0,validationLabel);
+            propertyBox.getChildren().add(0, validationLabel);
         }
 
         HBox propertyInputBox = (HBox) propertyBox.getChildren().get(1);
@@ -77,9 +81,9 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                         break;
                 }
             } else {
-                validationImageLabel.setVisible(true);
                 if (validationType != NONE) {
                     validationImageLabel.setGraphic(failureImage);
+                    validationImageLabel.setVisible(true);
                 }
 
                 switch (validationType) {
