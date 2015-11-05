@@ -157,7 +157,6 @@
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-ontologies</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
