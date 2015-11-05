@@ -19,7 +19,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
@@ -38,18 +37,24 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Messages;
-import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.model.RelationshipGroup;
 import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
 import org.dataconservancy.packaging.gui.util.DisciplinePropertyBox;
 import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
+import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.util.RelationshipSelectionBox;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
-import org.dataconservancy.packaging.tool.api.PackageOntologyService;
-import org.dataconservancy.packaging.tool.model.PackageArtifact;
-import org.dataconservancy.packaging.tool.model.PackageRelationship;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,40 +74,35 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
     private BorderPane artifactDetailsLayout;
     private Labels labels;
-    private OntologyLabels ontologyLabels;
     private Messages messages;
-
-    private Map<String, EditPackageContentsViewImpl.ArtifactPropertyContainer> artifactPropertyFields;
-    private Set<EditPackageContentsViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields;
 
     //Controls that are displayed in the package artifact popup.
     private Hyperlink cancelPopupLink;
     private Button applyPopupButton;
 
-    private PackageOntologyService packageOntologyService;
     //maximum width for addNewButtons, so that text appears on button
-    private double addNewButtonMaxWidth = 200;
+
 
     private Map<String, CheckBox> metadataInheritanceButtonMap;
-
-    EditPackageContentsPresenter presenter;
 
     List<RelationshipGroup> availableRelationshipGroups;
     Map<String, List<String>> availableDisciplines;
 
     private ApplyButtonValidationListener applyButtonValidationListener;
+    private DomainProfileService profileService;
+
+    private Map<PropertyCategory, PropertyCategoryBox> categoryMap;
+    private List<ProfilePropertyBox> nodePropertyBoxes;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public PackageArtifactWindowBuilder(Labels labels,
-                                        OntologyLabels ontologyLabels,
                                         Hyperlink cancelPopupLink,
                                         Button applyPopupButton,
                                         String availableRelationshipsPath,
                                         DisciplineLoadingService disciplineLoadingService,
                                         Messages messages) {
         this.labels = labels;
-        this.ontologyLabels = ontologyLabels;
         this.cancelPopupLink = cancelPopupLink;
         this.applyPopupButton = applyPopupButton;
         this.messages = messages;
@@ -112,15 +112,11 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         loadAvailableRelationships(availableRelationshipsPath);
     }
 
-    public Pane buildArtifactPropertiesLayout(PackageArtifact artifact,
-                                              Map<String, EditPackageContentsViewImpl.ArtifactPropertyContainer> artifactPropertyFields,
-                                              Set<EditPackageContentsViewImpl.ArtifactRelationshipContainer> artifactRelationshipFields,
+    public Pane buildArtifactPropertiesLayout(Node node,
                                               Map<String, CheckBox> metadataInheritanceButtonMap,
-                                              EditPackageContentsPresenter editPackageContentsPresenter,
-                                              PackageOntologyService packageOntologyService) {
-
-        this.artifactPropertyFields = artifactPropertyFields;
-        this.artifactRelationshipFields = artifactRelationshipFields;
+                                              DomainProfileService profileService) {
+        categoryMap = new HashMap<>();
+        nodePropertyBoxes = new ArrayList<>();
 
         artifactDetailsLayout = new BorderPane();
         artifactDetailsLayout.setMinHeight(500);
@@ -130,12 +126,15 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         artifactDetailsLayout.getStyleClass().add(PACKAGE_TOOL_POPUP_CLASS);
 
         this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
-        this.presenter = editPackageContentsPresenter;
-        this.packageOntologyService = packageOntologyService;
+        this.profileService = profileService;
 
-        createArtifactDetailsPopup(artifact);
+        createArtifactDetailsPopup(node);
 
         return artifactDetailsLayout;
+    }
+
+    public List<ProfilePropertyBox> getNodePropertyBoxes() {
+        return nodePropertyBoxes;
     }
 
     /*
@@ -143,44 +142,21 @@ public class PackageArtifactWindowBuilder implements CssConstants {
      * creator properties, and relationships.
      * @param artifact
      */
-    private void createArtifactDetailsPopup(PackageArtifact artifact) {
+    private void createArtifactDetailsPopup(Node node) {
 
         //The property popup will consist of the three tabs, general, creator and relationships.
         TabPane propertiesPopup = new TabPane();
-        propertiesPopup.getStyleClass().add(PROPERTIES_POPUP_CLASS);
 
-        //Create the general tab, all the properties that are not creator properties, as
-        //defined by the ontology will be located here.
-        Tab generalTab = new Tab();
-        generalTab.setClosable(false);
-        generalTab.setText(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_GENERAL));
-        ScrollPane generalPane = new ScrollPane();
-        generalPane.setHvalue(500);
-        generalPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        generalPane.setContent(createGeneralTab(artifact));
-        generalPane.setMinWidth(500);
-        generalPane.setFitToWidth(true);
-        generalTab.setContent(generalPane);
-        
-        propertiesPopup.getTabs().add(generalTab);
+        //Create the property tab for the main node type.
+        propertiesPopup.getTabs().add(createNodeTypeTab(node, node.getNodeType()));
 
-        //Displays all the properties that are labeled as creator properties by the
-        //ontology.
-        Tab creatorTab = new Tab();
-        creatorTab.setClosable(false);
-        ScrollPane creatorPane = new ScrollPane();
-        creatorPane.setHvalue(500);
-        creatorPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        creatorPane.setContent(createCreatorTab(artifact));
-        creatorPane.setMinWidth(500);
-        creatorPane.setFitToWidth(true);
-        creatorTab.setText(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_CREATOR));
-        creatorTab.setContent(creatorPane);
-        
-        if (creatorPane.getContent() != null) {
-            propertiesPopup.getTabs().add(creatorTab);
+        //Loop through and create the tabs for all the sub types
+        if (node.getSubNodeTypes() != null) {
+            for (NodeType type : node.getSubNodeTypes()) {
+                propertiesPopup.getTabs().add(createNodeTypeTab(node, type));
+            }
         }
-        
+
         //Create the relationship tab that displays all relationships the artifact has.
         Tab relationshipTab = new Tab();
         relationshipTab.setClosable(false);
@@ -188,24 +164,11 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         ScrollPane relationshipPane = new ScrollPane();
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        relationshipPane.setContent(createRelationshipTab(artifact));
+        relationshipPane.setContent(createRelationshipTab(node));
         relationshipPane.setMinWidth(500);
         relationshipPane.setFitToWidth(true);
         relationshipTab.setContent(relationshipPane);
         propertiesPopup.getTabs().add(relationshipTab);
-
-        //Create the inheritance tab that displays all inheritable properties that an artifact has.
-        Tab inheritanceTab = new Tab();
-        inheritanceTab.setClosable(false);
-        inheritanceTab.setText(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE));
-        ScrollPane inheritancePane = new ScrollPane();
-        inheritancePane.setHvalue(500);
-        inheritancePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        inheritancePane.setContent(createInheritanceTab(artifact));
-        inheritancePane.setMinWidth(500);
-        inheritancePane.setFitToWidth(true);
-        inheritanceTab.setContent(inheritancePane);
-        propertiesPopup.getTabs().add(inheritanceTab);
 
         artifactDetailsLayout.setCenter(propertiesPopup);
 
@@ -222,310 +185,68 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         artifactDetailsLayout.setBottom(popupControls);
     }
 
-    /*
-     * Creates the general properties tab, general properties are any properties that aren't defined to be creator properties,
-     * by the ontology.
-     * @param artifact
-     * @return the VBox for the general tab
-     */
-    private VBox createGeneralTab(final PackageArtifact artifact) {
-        final VBox propertiesBox = new VBox(12);
+    public void saveNode() {
 
-        propertiesBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
-        Set<String> creatorProperties = packageOntologyService.getCreatorProperties(artifact);
-        final Map<String, String> properties = packageOntologyService.getProperties(artifact);
+    }
 
-        Label requiredLabel = new Label(labels.get(Labels.LabelKey.REQUIRED_FIELDS_LABEL));
-        requiredLabel.setMaxWidth(400);
-        requiredLabel.setWrapText(true);
-        requiredLabel.setTextAlignment(TextAlignment.CENTER);
+    private Tab createNodeTypeTab(Node node, NodeType nodeType) {
+        Tab propertiesTab = new Tab();
+        propertiesTab.setClosable(false);
+        propertiesTab.setText(nodeType.getLabel());
+        ScrollPane propertiesPane = new ScrollPane();
+        propertiesPane.getStyleClass().add(PROPERTIES_POPUP_CLASS);
+        propertiesPane.setHvalue(500);
+        propertiesPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        propertiesPane.setMinWidth(500);
+        propertiesPane.setFitToWidth(true);
 
-        propertiesBox.getChildren().add(requiredLabel);
-        List<String> sortedProperties = new ArrayList<>();
+        VBox propertyContent = new VBox(8);
+        propertiesPane.setContent(propertyContent);
+
+        PropertyCategoryBox generalPropertyBox = new PropertyCategoryBox(nodeType.getLabel());
+        propertyContent.getChildren().add(generalPropertyBox);
+
+        List<PropertyConstraint> sortedProperties = new ArrayList<>();
 
         //Get the property name key set and then create a sorted list from it.
-        sortedProperties.addAll(properties.keySet());
-        sortProperties(sortedProperties, artifact, "");
+        sortedProperties.addAll(nodeType.getPropertyConstraints());
+        sortProperties(sortedProperties);
 
-        //Loop through all the available properties
-        for (final String property : sortedProperties) {
-            //If the property isn't a creator property we include it in this tab
-            if (!creatorProperties.contains(property)) {
-                final EditPackageContentsViewImpl.ArtifactPropertyContainer container = new EditPackageContentsViewImpl.ArtifactPropertyContainer();
-
-                //If the property is complex use the group property creation.
-                if (packageOntologyService.isPropertyComplex(properties.get(property))) {
-                    container.isComplex = true;
-                    VBox complexPropertyBox = createGroupPropertySection(artifact, property, properties.get(property), false, container);
-                    propertiesBox.getChildren().add(complexPropertyBox);
-                    int maxOccurrences = packageOntologyService.getPropertyMaxOccurrences(artifact, property, "");
-
-                    //If the property allows for more than one value include a button to add more fields.
-                    if (maxOccurrences > 1) {
-                        final Button addNewButton = new Button(labels.get(Labels.LabelKey.ADD_NEW_BUTTON) + " " + ontologyLabels.get(property));
-                        addNewButton.setMaxWidth(addNewButtonMaxWidth);
-                        addNewButton.setDisable(true);
-                        propertiesBox.getChildren().add(addNewButton);
-
-                        final GroupPropertyChangeListener listener = new GroupPropertyChangeListener(addNewButton, container);
-
-                        for (Node n : propertiesBox.getChildren()) {
-                            if (n instanceof VBox) {
-                                addChangeListenerToSectionFields((VBox) n, listener);
-                            }
-                        }
-
-                        listener.changed(null, "n/a", "n/a");
-
-                        addNewButton.setOnAction(arg0 -> {
-                            VBox complexPropertyBox1 = createGroupPropertySection(artifact, property, properties.get(property), true, container);
-                            int buttonIndex = propertiesBox.getChildren().indexOf(addNewButton);
-
-                            propertiesBox.getChildren().add(buttonIndex, complexPropertyBox1);
-
-                            addChangeListenerToSectionFields(complexPropertyBox1, listener);
-                            addNewButton.setDisable(true);
-                            requestFocusForNewGroup(complexPropertyBox1);
-                        });
-                        Separator groupSeparator = new Separator();
-                        propertiesBox.getChildren().add(groupSeparator);
-                    }
-
+        //To get the properties on a node we loop through the constraints on the type
+        for (PropertyConstraint propertyConstraint : sortedProperties) {
+            PropertyType type = propertyConstraint.getPropertyType();
+            if (type.getPropertyCategory() != null) {
+                if (categoryMap.containsKey(type.getPropertyCategory())) {
+                    categoryMap.get(type.getPropertyCategory()).addProperty(propertyConstraint, node);
                 } else {
-                    //If it's a simple property use the create property box.
-                    int maxOccurances = packageOntologyService.getPropertyMaxOccurrences(artifact, property, "");
-                    int minOccurances = packageOntologyService.getPropertyMinOccurrences(artifact, property, "");
-                    boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, property);
+                    PropertyCategoryBox categoryBox = new PropertyCategoryBox(type.getPropertyCategory().getLabel());
+                    categoryMap.put(type.getPropertyCategory(), categoryBox);
 
-                    Set<StringProperty> fieldProperties = new HashSet<>();
-                    if (packageOntologyService.isDisciplineProperty(artifact, property)) {
-                        propertiesBox.getChildren().add(new DisciplinePropertyBox(ontologyLabels.get(property), artifact.getSimplePropertyValues(property), maxOccurances, fieldProperties, minOccurances, systemGenerated, availableDisciplines));
-                    } else {
-                        propertiesBox.getChildren().add(new TextPropertyBox(artifact, "", ontologyLabels.get(property), property, artifact.getSimplePropertyValues(property),
-                                maxOccurances, fieldProperties, minOccurances, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
-                    }
-                    container.values = fieldProperties;
-                }
-
-                artifactPropertyFields.put(property, container);
-            }
-        }
-        return propertiesBox;
-    }
-
-    /**
-     * Creates the tab for displaying creator properties. This tab is constructed using the {@code createPropertyBox} and {@code createGroupPropertySection} methods found below.
-     * @param artifact The popup artifact
-     * @return content or null if nothing for user to do
-     */
-    private VBox createCreatorTab(final PackageArtifact artifact) {
-        final VBox propertiesBox = new VBox(12);
-        propertiesBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
-
-        Label requiredLabel = new Label(labels.get(Labels.LabelKey.REQUIRED_FIELDS_LABEL));
-        requiredLabel.setMaxWidth(300);
-        requiredLabel.setWrapText(true);
-        requiredLabel.setTextAlignment(TextAlignment.CENTER);
-
-        propertiesBox.getChildren().add(requiredLabel);
-
-        final Map<String, String> properties = packageOntologyService.getProperties(artifact);
-
-        List<String> sortedProperties = new ArrayList<>();
-
-        //Get the creator property set and then create a sorted list from it.
-        sortedProperties.addAll(packageOntologyService.getCreatorProperties(artifact));
-        sortProperties(sortedProperties, artifact, "");
-
-        //Loop through all the creator properties as defined in the ontology.
-        for (final String property : sortedProperties) {
-            final EditPackageContentsViewImpl.ArtifactPropertyContainer container = new EditPackageContentsViewImpl.ArtifactPropertyContainer();
-
-            //If the property is complex use the group property creation, otherwise use the simple property set up.
-            if (packageOntologyService.isPropertyComplex(properties.get(property))) {
-                container.isComplex = true;
-                VBox complexPropertyBox = createGroupPropertySection(artifact, property, properties.get(property), false, container);
-                propertiesBox.getChildren().add(complexPropertyBox);
-                int maxOccurances = packageOntologyService.getPropertyMaxOccurrences(artifact, property, "");
-
-                //If the ontology allows for more than one of the property add a button which will add more groups when pressed.
-                if (maxOccurances > 1) {
-                    final Button addNewButton = new Button(labels.get(Labels.LabelKey.ADD_NEW_BUTTON) + " " + property);
-                    addNewButton.setMaxWidth(addNewButtonMaxWidth);
-                    propertiesBox.getChildren().add(addNewButton);
-                    addNewButton.setDisable(true);
-
-                    final GroupPropertyChangeListener listener = new GroupPropertyChangeListener(addNewButton, container);
-
-                    for (Node n : propertiesBox.getChildren()) {
-                        if (n instanceof VBox) {
-                            addChangeListenerToSectionFields((VBox) n, listener);
-                        }
-                    }
-
-                    listener.changed(null, "n/a", "n/a");
-
-                    addNewButton.setOnAction(arg0 -> {
-                        VBox complexPropertyBox1 = createGroupPropertySection(artifact, property, properties.get(property), true, container);
-                        int buttonIndex = propertiesBox.getChildren().indexOf(addNewButton);
-
-                        propertiesBox.getChildren().add(buttonIndex, complexPropertyBox1);
-
-                        addChangeListenerToSectionFields(complexPropertyBox1, listener);
-                        addNewButton.setDisable(true);
-                        requestFocusForNewGroup(complexPropertyBox1);
-                    });
+                    categoryBox.addProperty(propertyConstraint, node);
                 }
             } else {
-                //Otherwise create just the simple property
-                int maxOccurances = packageOntologyService.getPropertyMaxOccurrences(artifact, property, "");
-                int minOccurances = packageOntologyService.getPropertyMinOccurrences(artifact, property, "");
-                boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, property);
-
-                Set<StringProperty> fields = new HashSet<>();
-
-                propertiesBox.getChildren().add(new TextPropertyBox(artifact, "", ontologyLabels.get(property), property, artifact.getSimplePropertyValues(property),
-                        maxOccurances, fields, minOccurances, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
-                container.values = fields;
-            }
-
-            artifactPropertyFields.put(property, container);
-        }
-        
-        // Return null if nothing to edit.
-        if (propertiesBox.getChildren().size() == 1) {
-            return null;
-        }
-        
-        return propertiesBox;
-    }
-
-    /**
-     * Handles the creation of group properties, group properties are properties that are linked together in some manner.
-     * Group properties are constructed using the {@code createPropertyBox) method found below.
-     *
-     * @param artifact
-     * @param propertyName
-     * @param propertyType
-     * @param empty
-     * @param container
-     * @return  the VBox
-     */
-    private VBox createGroupPropertySection(PackageArtifact artifact, String propertyName, String propertyType, boolean empty, EditPackageContentsViewImpl.ArtifactPropertyContainer container) {
-        VBox complexPropertyBox = new VBox(8);
-        Separator separator = new Separator();
-        complexPropertyBox.getChildren().add(separator);
-
-
-        //If the artifact has the property and we're not adding an empty field add the sub property values
-        if (artifact.getPropertyNames().contains(propertyName) && !empty) {
-            for (PackageArtifact.PropertyValueGroup group : artifact.getPropertyValueGroups(propertyName)) {
-                Map<String, Set<StringProperty>> subPropertyFields = new HashMap<>();
-
-                Label propertyNameLabel = new Label(ontologyLabels.get(propertyName));
-                propertyNameLabel.setPrefWidth(100);
-                propertyNameLabel.setWrapText(true);
-                complexPropertyBox.getChildren().add(propertyNameLabel);
-
-                List<String> sortedProperties = new ArrayList<>();
-
-                //Get the creator property set and then create a sorted list from it.
-                sortedProperties.addAll(packageOntologyService.getGroupPropertyNames(propertyType));
-                sortProperties(sortedProperties, artifact, propertyType);
-
-                for (String fieldName : sortedProperties) {
-                    Set<String> values = group.getSubPropertyValues(fieldName);
-                    int maxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, fieldName, propertyType);
-                    int minOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, fieldName, propertyType);
-                    boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, fieldName);
-                    Set<StringProperty> fields = new HashSet<>();
-                    complexPropertyBox.getChildren().add(new TextPropertyBox(artifact, propertyName, ontologyLabels.get(fieldName), fieldName, values,
-                            maxOccurs, fields, minOccurs, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
-                    subPropertyFields.put(fieldName, fields);
-
-                }
-                container.subProperties.add(subPropertyFields);
-            }
-            //Otherwise just add the empty text fields for the possible property values.
-        } else {
-            Map<String, Set<StringProperty>> subPropertyFields = new HashMap<>();
-
-            Label propertyNameLabel = new Label(ontologyLabels.get(propertyName));
-            propertyNameLabel.setPrefWidth(100);
-            propertyNameLabel.setWrapText(true);
-            complexPropertyBox.getChildren().add(propertyNameLabel);
-
-            List<String> sortedProperties = new ArrayList<>();
-
-            //Get the creator property set and then create a sorted list from it.
-            sortedProperties.addAll(packageOntologyService.getGroupPropertyNames(propertyType));
-            sortProperties(sortedProperties, artifact, propertyType);
-
-            //For each field create a property box
-            for (String fieldName : sortedProperties) {
-                //String fieldType = packageOntologyService.getComplexPropertySubPropertyType(propertyType, fieldName);
-                int maxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, fieldName, propertyType);
-                int minOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, fieldName, propertyType);
-                boolean systemGenerated = packageOntologyService.isSystemSuppliedProperty(artifact, fieldName);
-                Set<StringProperty> fields = new HashSet<>();
-                complexPropertyBox.getChildren().add(new TextPropertyBox(artifact, propertyName, ontologyLabels.get(fieldName), fieldName,
-                        null, maxOccurs, fields, minOccurs, systemGenerated, packageOntologyService, labels, messages, applyButtonValidationListener));
-
-                subPropertyFields.put(fieldName, fields);
-            }
-
-            container.subProperties.add(subPropertyFields);
-        }
-        return complexPropertyBox;
-    }
-
-    /**
-     * Adds a listener to all TextFields or TextInputControl within the specified pane.  Will dive into sub-panes as needed.
-     *
-     * @param group    The pane to add the listener to
-     * @param listener The listener to attach to the TextInputControl
-     */
-    private void addChangeListenerToSectionFields(Pane group, ChangeListener<? super String> listener) {
-        for (Node n : group.getChildren()) {
-            if (n instanceof Pane) {
-                addChangeListenerToSectionFields((Pane) n, listener);
-            } else if (n instanceof TextInputControl) {
-                TextInputControl text = (TextInputControl) n;
-                text.textProperty().addListener(listener);
-            }
-        }
-    }
-
-
-    /**
-     * Requests focus for the first TextInputControl within a pane.  Will dig into sub-panes as needed
-     *
-     * @param pane The pane to look for a TextInputControl in.
-     * @return True if it successfully found a node to request focus for, false if not.  This is mostly
-     * needed internally so it knows when to stop the recursion.
-     */
-    private boolean requestFocusForNewGroup(Pane pane) {
-        for (Node n : pane.getChildren()) {
-            if (n instanceof TextInputControl) {
-                n.requestFocus();
-                return true;
-            } else if (n instanceof Pane) {
-                Pane p = (Pane) n;
-                if (requestFocusForNewGroup(p)) {
-                    return true;
-                }
+                generalPropertyBox.addProperty(propertyConstraint, node);
             }
         }
 
-        return false;
+        for (PropertyCategory category : categoryMap.keySet()) {
+            propertyContent.getChildren().add(categoryMap.get(category));
+        }
+
+        //Add the inheritance controls
+        propertyContent.getChildren().add(new Label(labels.get(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE)));
+        propertyContent.getChildren().add(createInheritanceGroup(node));
+
+        return propertiesTab;
+
     }
 
     /**
      * Creates the inheritance tab in the popup.
-     * @param artifact The popup artifact
+     * @param node The popup node
      * @return inheritance tab or null if nothing to do
      */
-    public VBox createInheritanceTab(final PackageArtifact artifact) {
+    public VBox createInheritanceGroup(final Node node) {
 
         final VBox inheritanceBox = new VBox(12);
         inheritanceBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
@@ -547,16 +268,15 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         inheritanceBox.getChildren().add(groupSeparator);
 
         //Loop through properties for the given artifact.
-        for (String propertyName : packageOntologyService.getProperties(artifact).keySet()) {
+        for (PropertyType inhertiableProperty : node.getNodeType().getInheritableProperties()) {
             //If the property is inheritable, create a button which would allow the values to be apply to children
             //appropriately
-            if (packageOntologyService.isInheritableProperty(artifact, propertyName)) {
-                inheritanceBox.getChildren().add(createInheritanceBox(artifact.getType(), propertyName));
 
-                groupSeparator = new Separator();
-                inheritanceBox.getChildren().add(groupSeparator);
-                hasInheritableProperties = true;
-            }
+            inheritanceBox.getChildren().add(createInheritanceBox(inhertiableProperty.getLabel()));
+
+            groupSeparator = new Separator();
+            inheritanceBox.getChildren().add(groupSeparator);
+            hasInheritableProperties = true;
         }
 
         if (!hasInheritableProperties) {
@@ -569,15 +289,16 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         return inheritanceBox;
     }
 
-    private HBox createInheritanceBox(String artifactType, String propertyName) {
+    private HBox createInheritanceBox(String propertyName) {
         HBox propertyBox = new HBox(30);
 
         VBox propNameAndExplation = new VBox();
-        final Label propertyNameLabel = new Label(ontologyLabels.get(propertyName));
+        final Label propertyNameLabel = new Label(propertyName);
         propertyNameLabel.setPrefWidth(400);
         propertyNameLabel.getStyleClass().add(CssConstants.BOLD_TEXT_CLASS);
         //propertyNameLabel.setStyle(CssConstants.BOLD_TEXT_CLASS);
 
+        /* TODO: If we want to list the node types that can inherit a property we need to loop through types and check if it has that property
         StringBuilder sb = new StringBuilder();
         final String typeSeparator = ", ";
         for (String inheritingTypes : presenter.getInheritingTypes(artifactType, propertyName)) {
@@ -590,10 +311,10 @@ public class PackageArtifactWindowBuilder implements CssConstants {
                 sb.toString()));
         descendantTypesLabel.setPrefWidth(400);
         descendantTypesLabel.setWrapText(true);
-
+        */
 
         propNameAndExplation.getChildren().add(propertyNameLabel);
-        propNameAndExplation.getChildren().add(descendantTypesLabel);
+        //propNameAndExplation.getChildren().add(descendantTypesLabel);
 
         //propertyBox.getChildren().add(propertyNameLabel);
         propertyBox.getChildren().add(propNameAndExplation);
@@ -611,8 +332,10 @@ public class PackageArtifactWindowBuilder implements CssConstants {
      * @param artifact
      * @return
      */
-    private VBox createRelationshipTab(final PackageArtifact artifact) {
+    private VBox createRelationshipTab(final Node node) {
         final VBox relationshipsBox = new VBox(38);
+
+        /* TODO: NO idea how were going to do this just diplay all triples on the node??
         relationshipsBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
         //If there aren't any existing relationships add an empty relationship box
 
@@ -628,14 +351,14 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewRelationshipButton);
 
         if (artifact.getRelationships().isEmpty()) {
-            EditPackageContentsViewImpl.ArtifactRelationshipContainer container = new EditPackageContentsViewImpl.ArtifactRelationshipContainer();
+            EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
             artifactRelationshipFields.add(container);
             relationshipsBox.getChildren().add(new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener));
             addNewRelationshipButton.setDisable(true);
         } else {
             //Otherwise loop through the relationships and create a box for each one.
             for (PackageRelationship relationship : artifact.getRelationships()) {
-                EditPackageContentsViewImpl.ArtifactRelationshipContainer container = new EditPackageContentsViewImpl.ArtifactRelationshipContainer();
+                EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
                 artifactRelationshipFields.add(container);
                 relationshipsBox.getChildren().add(new RelationshipSelectionBox(artifact, relationship, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener));
                 if (relationship.getTargets() == null || relationship.getTargets().isEmpty()) {
@@ -647,7 +370,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         relationshipsBox.getChildren().add(addNewRelationshipButton);
 
         addNewRelationshipButton.setOnAction(arg0 -> {
-            EditPackageContentsViewImpl.ArtifactRelationshipContainer container = new EditPackageContentsViewImpl.ArtifactRelationshipContainer();
+            EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
             artifactRelationshipFields.add(container);
             VBox newRelationshipBox = new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener);
             int buttonIndex = relationshipsBox.getChildren().indexOf(addNewRelationshipButton);
@@ -657,70 +380,21 @@ public class PackageArtifactWindowBuilder implements CssConstants {
             addNewRelationshipButton.setDisable(true);
             requestFocusForNewGroup(newRelationshipBox);
         });
+        */
         return relationshipsBox;
     }
 
-    /**
-     * Class to capture changes to Group Properties (ie, any change to a field within the group), so as
-     * to enable/disable the "Add New" button as appropriate
-     */
-    private class GroupPropertyChangeListener implements ChangeListener<String> {
-        private Button propertyAddButton;
-        private EditPackageContentsViewImpl.ArtifactPropertyContainer container;
 
-        public GroupPropertyChangeListener(Button propertyAddButton, EditPackageContentsViewImpl.ArtifactPropertyContainer container) {
-            this.propertyAddButton = propertyAddButton;
-            this.container = container;
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-            propertyAddButton.setDisable(anyGroupsEmpty());
-        }
-
-        /**
-         * Determines if any of the groups are empty
-         *
-         * @return True if there is at least one group that has no values, false if every group has
-         * at least one value in it.
-         */
-        private boolean anyGroupsEmpty() {
-            for (Map<String, Set<StringProperty>> group : container.getSubProperties()) {
-                if (groupEmpty(group)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Determines if a group is empty
-         *
-         * @param group The group to check
-         * @return true if the group has no values, false if there is at least one value in the group
-         */
-        private boolean groupEmpty(Map<String, Set<StringProperty>> group) {
-            for (Map.Entry<String, Set<StringProperty>> entry : group.entrySet()) {
-                for (StringProperty property : entry.getValue()) {
-                    if (property != null && property.getValue() != null && !property.getValue().isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-    }
 
     //Sorts properties in the order of single value required, multi value required, optional single value, optional multi value
-    private void sortProperties(List<String> propertyNames, final PackageArtifact artifact, final String type) {
-        Collections.sort(propertyNames, (propertyOne, propertyTwo) -> {
+    private void sortProperties(List<PropertyConstraint> propertyConstraints) {
+        Collections.sort(propertyConstraints, (propertyOne, propertyTwo) -> {
 
-            int propertyOneMaxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, propertyOne, type);
-            int propertyOneMinOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, propertyOne, type);
+            int propertyOneMaxOccurs = propertyOne.getMaximum();
+            int propertyOneMinOccurs = propertyOne.getMinimum();
 
-            int propertyTwoMaxOccurs = packageOntologyService.getPropertyMaxOccurrences(artifact, propertyTwo, type);
-            int propertyTwoMinOccurs = packageOntologyService.getPropertyMinOccurrences(artifact, propertyTwo, type);
+            int propertyTwoMaxOccurs = propertyTwo.getMaximum();
+            int propertyTwoMinOccurs = propertyTwo.getMinimum();
 
             if (propertyOneMinOccurs == propertyTwoMinOccurs && propertyOneMaxOccurs == propertyTwoMaxOccurs) {
                 return 0;
@@ -774,6 +448,23 @@ public class PackageArtifactWindowBuilder implements CssConstants {
             else {
                 log.error("Error reading default relationships file. Couldn't find classpath file: /defaultRelationships");
             }
+        }
+    }
+
+    private class PropertyCategoryBox extends VBox {
+        PropertyCategoryBox(String title) {
+            setSpacing(10);
+            getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
+            Label titleLabel = new Label();
+            titleLabel.setText(title);
+
+            getChildren().add(titleLabel);
+        }
+
+        void addProperty(PropertyConstraint constraint, Node node) {
+            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService, nodePropertyBoxes);
+            nodePropertyBoxes.add(profilePropertyBox);
+            getChildren().add(profilePropertyBox);
         }
     }
 }
