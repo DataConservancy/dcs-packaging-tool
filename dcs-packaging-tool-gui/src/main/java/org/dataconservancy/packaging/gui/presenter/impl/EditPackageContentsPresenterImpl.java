@@ -17,39 +17,33 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
-import org.dataconservancy.packaging.gui.util.RDFURIValidator;
+import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.ArtifactPropertyContainer;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.ArtifactRelationshipContainer;
-import org.dataconservancy.packaging.tool.api.PackageOntologyService;
-import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
-import org.dataconservancy.packaging.tool.model.DcsPackageDescriptionSpec.ArtifactType;
-import org.dataconservancy.packaging.tool.model.PackageArtifact;
-import org.dataconservancy.packaging.tool.model.PackageArtifact.PropertyValueGroup;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
-import org.dataconservancy.packaging.tool.model.PackageNode;
-import org.dataconservancy.packaging.tool.model.PackageOntologyException;
+import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.NodeRelationshipContainer;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
-import org.dataconservancy.packaging.tool.model.PackageTree;
-import org.dataconservancy.packaging.validation.PackageValidationException;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -66,22 +60,19 @@ import java.util.prefs.Preferences;
 public class EditPackageContentsPresenterImpl extends BasePresenterImpl implements EditPackageContentsPresenter, PreferenceChangeListener {
 
     private EditPackageContentsView view;
-    private PackageDescription packageDescription; 
-    private PackageOntologyService packageOntologyService;
-    private PackageTree packageTree;
-    private PackageDescriptionBuilder packageDescriptionBuilder;
-    private PackageDescriptionValidator packageDescriptionValidator;
+    private DomainProfileService profileService;
+    private IPMService ipmService;
+    private PropertyFormatService propertyFormatService;
     private File packageDescriptionFile;
     private Preferences preferences;
 
-    private Set<String> expandedArtifacts;
+    private Set<URI> expandedNodes;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public EditPackageContentsPresenterImpl(EditPackageContentsView view) {
         super(view);
         this.view = view;
-        packageDescription = null;
-        expandedArtifacts = new HashSet<>();
+        expandedNodes = new HashSet<>();
         view.setPresenter(this);
 
         bind();
@@ -92,7 +83,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         //This presenter has no information to clear
     }
 
-    public Node display() {
+    public javafx.scene.Node display() {
         String disciplinePath = controller.getFactory().getConfiguration().getDisciplineMap();
         view.setupWindowBuilder(disciplinePath);
         final PackageArtifactTreeServiceWorker worker =
@@ -161,26 +152,21 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 }
 
                 //save the PackageDescription to the file
-                trimInvalidProperties(packageDescription);
-                packageDescriptionBuilder.serialize(packageDescription, stream);
+                trimEmptyProperties(controller.getPackageState().getPackageTree());
             }
         });
         
         //Validates the package description, saves it, then moves on to the next page.
         view.getContinueButton().setOnAction(arg0 -> {
             //Perform simple validation to make sure the package description is valid.
-            try {
-                packageDescriptionValidator.validate(packageDescription);
-            } catch (PackageValidationException e1) {
-                //Gets the button that's used to dismiss validation error popup.
+            if (!profileService.validateTree(controller.getPackageState().getPackageTree())) {
                 view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
                     if (view.getWarningPopup() != null &&
                         view.getWarningPopup().isShowing()) {
                         view.getWarningPopup().hide();
                     }
                 });
-                view.showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), e1.getMessage(), false, false);
-                log.error(e1.getMessage());
+                view.showWarningPopup(errors.get(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), "Tree was not valid", false, false);
                 return;
             }
 
@@ -204,8 +190,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
                 //save the PackageDescription to the file
 
-                trimInvalidProperties(packageDescription);
-                packageDescriptionBuilder.serialize(packageDescription, stream);
+                trimEmptyProperties(controller.getPackageState().getPackageTree());
 
                 controller.setPackageDescriptionFile(packageDescriptionFile);
                 controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
@@ -221,12 +206,12 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         });
 
         if (view.getArtifactDetailsWindow() != null) {
-            view.getArtifactDetailsWindow().setOnCloseRequest(event -> saveCurrentArtifact());
+            view.getArtifactDetailsWindow().setOnCloseRequest(event -> saveCurrentNode());
         }
         
         //Saves any changes made in the package artifact property popup
         view.getApplyPopupButton().setOnAction(arg0 -> {
-            saveCurrentArtifact();
+            saveCurrentNode();
             if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
                 view.getArtifactDetailsWindow().hide();
             }
@@ -246,64 +231,53 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         });
     }
 
-    @Override
-    public void saveCurrentArtifact() {
-        if (view.getPopupArtifact() != null) {
-            //First loop through all the properties in the popup
-            for (String property : view.getArtifactPropertyFields().keySet()) {
-
-                //Get the field container for the property
-                ArtifactPropertyContainer container = view.getArtifactPropertyFields().get(property);
-                Set<PropertyValueGroup> propertyGroups = new HashSet<>();
-
-                //If the property is complex create a property group
-                if (container.isComplex()) {
-
-                    //Loop through all the sub properties making up the property group.
-                    for (Map<String, Set<StringProperty>> groupValues : container.getSubProperties()) {
-                        PropertyValueGroup group = new PropertyValueGroup();
-                        for (String subPropertyName : groupValues.keySet()) {
-                            Set<String> values = new HashSet<>();
-                            for (StringProperty field : groupValues.get(subPropertyName)) {
-                                if (field.getValue() != null && !field.getValue().isEmpty()) {
-                                    values.add(packageOntologyService.getFormattedProperty(view.getPopupArtifact(), property, subPropertyName,field.getValue()));
-                                }
-                            }
-
-                            group.setSubPropertyValues(subPropertyName, values);
-                        }
-
-                        propertyGroups.add(group);
-                    }
-
-                    //Set the property groups on the artifact, this will wipe out any previous property groups.
-                    view.getPopupArtifact().setPropertyValueGroups(property, propertyGroups);
-
-                } else {
-                    //Otherwise set the simple property values.
-                    Set<String> values = new HashSet<>();
-                    for (StringProperty propertyValue : container.getValues()) {
-                        if (propertyValue.getValue() != null && !propertyValue.getValue().isEmpty()) {
-                            values.add(packageOntologyService.getFormattedProperty(view.getPopupArtifact(), "", property, propertyValue.getValue()));
-                        }
-                    }
-                    //Sets the simple property values this will wipe out any previously existing simple properties.
-                    view.getPopupArtifact().setSimplePropertyValues(property, values);
+    private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
+        //First remove all properties of the given type, to be replaced with the new ones
+        profileService.removeProperty(view.getPopupNode(), propertyBox.getPropertyConstraint().getPropertyType());
+        //If it's not complex loop through the values and set them on the node
+        if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
+            PropertyValueType.COMPLEX) {
+            for (String value : propertyBox.getValues()) {
+                Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                switch (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType()) {
+                    case STRING:
+                        newProperty.setStringValue(value);
+                        break;
+                    case LONG:
+                        newProperty.setLongValue(Long.valueOf(value));
+                        break;
+                    case DATE_TIME:
+                        //TODO: Parse and format date time
+                        break;
                 }
+
+                profileService.addProperty(view.getPopupNode(), newProperty);
             }
+        } else {
+            propertyBox.getSubPropertyBoxes().forEach(this::savePropertyFromBox);
+        }
+    }
+    @Override
+    public void saveCurrentNode() {
+        if (view.getPopupNode() != null) {
+            //First loop through all the properties in the popup
+            view.getProfilePropertyBoxes().forEach(this::savePropertyFromBox);
 
             //Then loop through all relationships and set them on the artifact.
             List<PackageRelationship> relationships = new ArrayList<>();
-            for(ArtifactRelationshipContainer relationshipContainer : view.getArtifactRelationshipFields()) {
+            for(NodeRelationshipContainer relationshipContainer : view.getArtifactRelationshipFields()) {
                 if (relationshipContainer.getRelationship().getValue() != null) {
                     Relationship relationship = relationshipContainer.getRelationship().getValue();
                     if (relationship.getRelationshipUri() != null && !relationship.getRelationshipUri().isEmpty()) {
 
                         String relationshipUri = relationship.getRelationshipUri();
                         //Only save a hierarchical relationship if it was already on the object and thus created by the system.
-                        if (packageOntologyService.isRelationshipHierarchical(view.getPopupArtifact(), relationshipUri)) {
-                            if (view.getPopupArtifact().getRelationshipByName(relationshipUri) != null) {
-                                relationships.add(new PackageRelationship(relationshipUri, relationshipContainer.requiresURI.get(), view.getPopupArtifact().getRelationshipByName(relationshipUri).getTargets()));
+                        //TODO Are we still going to ban structural relationships??
+                        //TODO Can we store generic triples on domain objects?
+                        /*
+                        if (packageOntologyService.isRelationshipHierarchical(view.getPopupNode(), relationshipUri)) {
+                            if (view.getPopupNode().getRelationshipByName(relationshipUri) != null) {
+                                relationships.add(new PackageRelationship(relationshipUri, relationshipContainer.requiresURI.get(), view.getPopupNode().getRelationshipByName(relationshipUri).getTargets()));
                             }
                         } else if (RDFURIValidator.isValid(relationshipUri)) {
                             //If it's not hierarchical we just add it
@@ -327,90 +301,72 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                             if (!targets.isEmpty()) {
                                 relationships.add(new PackageRelationship(relationshipUri, relationshipContainer.requiresURI.get(), targets));
                             }
-                        }
+                        } */
                     }
                 }
 
             }
 
             //Finally prune any empty properties that already exist on the artifact
-            view.getPopupArtifact().pruneEmptyProperties();
-
-            view.getPopupArtifact().setRelationships(relationships);
+            //TODO Figure out how to track and remove empty properties
+            //view.getPopupNode().pruneEmptyProperties();
 
             //apply metadata inheritance
             applyMetadataInheritance();
         }
     }
 
-    protected TreeItem<PackageArtifact> buildTree(PackageNode pkg_node, boolean showIgnoredArtifacts) {
-        final TreeItem<PackageArtifact> item = new TreeItem<>(pkg_node.getValue());
+    protected TreeItem<Node> buildTree(Node node, boolean showIgnoredArtifacts) {
+        final TreeItem<Node> item = new TreeItem<>(node);
 
         item.expandedProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!oldValue && newValue) {
-                expandedArtifacts.add(item.getValue().getId());
+                expandedNodes.add(item.getValue().getIdentifier());
             } else if (oldValue && !newValue) {
-                expandedArtifacts.remove(item.getValue().getId());
+                expandedNodes.remove(item.getValue().getIdentifier());
             }
         });
-        for (PackageNode pkg_kid: pkg_node.getChildrenNodes()) {
-            if (!showIgnoredArtifacts && pkg_kid.getValue().isIgnored()) {
-                continue;
-            } else {
-                item.getChildren().add(buildTree(pkg_kid, showIgnoredArtifacts));
+
+        if (node.getChildren() != null) {
+            for (Node child : node.getChildren()) {
+                if (!showIgnoredArtifacts && child.isIgnored()) {
+                    continue;
+                } else {
+                    item.getChildren().add(buildTree(child, showIgnoredArtifacts));
+                }
             }
         }
         
         return item;
     }
     
-    public TreeItem<PackageArtifact> findItem(PackageArtifact artifact) {
-        return findItem(view.getArtifactTreeView().getRoot(), artifact);
+    public TreeItem<Node> findItem(Node node) {
+        return findItem(view.getArtifactTreeView().getRoot(), node);
     }
 
-    @Override
-    public void collapseParentArtifact(PackageArtifact packageArtifact) {
-        try {
-            String removedArtifactId = packageOntologyService.collapseParentArtifact(packageDescription, packageTree, packageArtifact.getId());
+    private TreeItem<Node> findItem(TreeItem<Node> treeNode, URI id) {
+        if (treeNode.getValue().getIdentifier().equals(id)) {
+            return treeNode;
+        }
 
-            if (removedArtifactId != null) {
-                expandedArtifacts.remove(removedArtifactId);
+        for (TreeItem<Node> child : treeNode.getChildren()) {
+            TreeItem<Node> result = findItem(child, id);
+
+            if (result != null) {
+                return result;
             }
-        } catch (PackageOntologyException e) {
-            view.getErrorMessageLabel().setText(errors.get(ErrorKey.ARTIFACT_GRAPH_ERROR) + e.getMessage());
-            view.getErrorMessageLabel().setVisible(true);
-            log.error(e.getMessage());
         }
 
-        if (view.getErrorMessageLabel().isVisible()) {
-            view.getErrorMessageLabel().setVisible(false);
-        }
+        return null;
     }
 
-    @Override
-    public boolean canCollapseParentArtifact(PackageArtifact packageArtifact) {
-        try {
-            return packageOntologyService.canCollapseParentArtifact(packageTree, packageArtifact.getId());
-        } catch (PackageOntologyException e) {
-            view.getErrorMessageLabel().setText(e.getMessage());
-            view.getErrorMessageLabel().setVisible(true);
-            log.error(e.getMessage());
-        }
-
-        if (view.getErrorMessageLabel().isVisible()) {
-            view.getErrorMessageLabel().setVisible(false);
-        }
-
-        return false;
-    }
-
-    private TreeItem<PackageArtifact> findItem(TreeItem<PackageArtifact> tree, PackageArtifact artifact) {
-        if (artifact.equals(tree.getValue())) {
+    private TreeItem<Node> findItem(TreeItem<Node> tree, Node node) {
+        if (node.equals(tree.getValue())) {
             return tree;
         }
         
-        for (TreeItem<PackageArtifact> child : tree.getChildren()) {
-            TreeItem<PackageArtifact> result = findItem(child, artifact);
+        for (TreeItem<Node> child : tree.getChildren()) {
+            TreeItem<Node> result = findItem(child, node);
             
             if (result != null) {
                 return result;
@@ -419,121 +375,23 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         
         return null;
     }
-    
-    @Override
-    public List<String> findInvalidProperties(PackageArtifact packageArtifact, String type) {
-        List<String> invalidProps = new ArrayList<>();
 
-        // If there's no description object, nothing to trim
-        if (packageArtifact == null) {
-            return invalidProps;
-        }
-
-        Set<String> validProps = packageOntologyService.getProperties(type).keySet();
-        for (String prop : packageArtifact.getPropertyNames()) {
-            // Make sure the property is valid for the artifact type
-            if (!validProps.contains(prop)) {
-                invalidProps.add(prop);
-            }
-        }
-
-        return invalidProps;
-    }
 
     @Override
-    public void trimInvalidProperties(PackageDescription packageDescription) {
-        // If there's no description object, nothing to trim
-        if (packageDescription == null) {
-            return;
-        }
+    public void trimEmptyProperties(Node node) {
 
-        for (PackageArtifact artifact : packageDescription.getPackageArtifacts()) {
-            List<String> invalidArtifactProps = findInvalidProperties(artifact, artifact.getType());
-
-            for (String prop : artifact.getPropertyNames()) {
-                // Make sure the property is valid for the artifact type
-                if (!invalidArtifactProps.contains(prop)) {
-
-                    // Also remove properties with no non-empty values
-                    boolean hasValue = false;
-                    if (artifact.getSimplePropertyValues(prop) != null) {
-                        for (String val : artifact.getSimplePropertyValues(prop)) {
-                            if (val != null && !val.trim().isEmpty()) {
-                                hasValue = true;
-                                break;
-                            }
-                        }
-                    } else if (artifact.getPropertyValueGroups(prop) != null) {
-                        // clean up property groups
-
-                        Set<PropertyValueGroup> emptyGroups = new HashSet<>();
-                        for (PropertyValueGroup group : artifact.getPropertyValueGroups(prop)) {
-                            boolean groupEmpty = true;
-                            Set<String> invalidSubProps = new HashSet<>();
-
-                            // Clean up any empty subproperties from a group.  If the group has at least one
-                            // non-empty subproperty, the group is not empty
-                            for (String subProp : group.getSubPropertyNames()) {
-                                boolean hasSubPropValue = false;
-                                if (group.getSubPropertyValues(subProp) != null) {
-                                    for (String val : group.getSubPropertyValues(subProp)) {
-                                        if (val != null && !val.trim().isEmpty()) {
-                                            groupEmpty = false;
-                                            hasSubPropValue = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!hasSubPropValue) {
-                                    invalidSubProps.add(subProp);
-                                }
-                            }
-                            // remove the subproperties outside the loop to not collide with the iterator
-                            for (String invalidProp : invalidSubProps) {
-                                group.removeSubProperty(invalidProp);
-                            }
-                            if (groupEmpty) {
-                                emptyGroups.add(group);
-                            }
-                        }
-
-                        // If there is at least one empty group, get a set of non-empty groups and reset the
-                        // artifact's property with the new set
-                        if (!emptyGroups.isEmpty()) {
-                            Set<PropertyValueGroup> goodGroups = artifact.getPropertyValueGroups(prop);
-                            goodGroups.removeAll(emptyGroups);
-                            artifact.setPropertyValueGroups(prop, goodGroups);
-                        }
-                        // If there is at least one non-empty group for the property, the property is valid
-                        if (!artifact.getPropertyValueGroups(prop).isEmpty()) {
-                            hasValue = true;
-                        }
-                    }
-
-                    // if no value (simple or complex) is found for the property, prepare to trim it
-                    if (!hasValue) {
-                        invalidArtifactProps.add(prop);
-                    }
-                }
-            }
-
-            // Remove all invalid properties from the artifact.  Done outside the property loop to avoid
-            // colliding with the iterator
-            for (String prop : invalidArtifactProps) {
-                artifact.removeProperty(prop);
-            }
-        }
     }
 
     protected void applyMetadataInheritance() {
+        /*TODO Reimplement inheritance
         Set<String> inheritablePropertyNames = view.getInheritMetadataCheckBoxMap().keySet();
-        TreeItem<PackageArtifact> item = findItem(view.getRoot(), view.getPopupArtifact());
+        TreeItem<Node> item = findItem(view.getRoot(), view.getPopupNode());
         
         for (final String inheritablePropertyName : inheritablePropertyNames) {
             if (view.getInheritMetadataCheckBoxMap().get(inheritablePropertyName).isSelected()) {
                 try {
                     if (item != null) {
-                        applyParentPropertyValue(view.getPopupArtifact(), item.getChildren(), inheritablePropertyName);
+                        applyParentPropertyValue(view.getPopupNode(), item.getChildren(), inheritablePropertyName);
                     }
                 } catch (PackageOntologyException e) {
                     log.error(e.getMessage());
@@ -543,6 +401,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
         }
+        */
     }
     
 
@@ -554,7 +413,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
      * If the named property is not deemed inHeritable by the PackageOntologyService, then method is a no-op
      *
      */
-    private void applyParentPropertyValue(PackageArtifact parent, ObservableList<TreeItem<PackageArtifact>> children, String propertyName)
+    /* TODO: Reimplement inheritance
+    private void applyParentPropertyValue(Node parent, ObservableList<TreeItem<Node>> children, String propertyName)
             throws PackageOntologyException {
 
         //If the named property is not an inheritable property on the parent artifact, return.
@@ -563,7 +423,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
 
         //Loop through the children to apply values.
-        for (TreeItem<PackageArtifact> child : children) {
+        for (TreeItem<Node> child : children) {
 
             //get the type of the named property
             String propertyType = packageOntologyService.getProperties(parent).get(propertyName);
@@ -582,108 +442,71 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
         }
     }
-
+    */
     @Override
-    public Set<String> getValidTypes(PackageArtifact packageArtifact){
-        Set<String> validTypeSet = new HashSet<>();
-        if(packageArtifact.getId() != null && packageTree != null) {
-            try {
-                validTypeSet.addAll(packageOntologyService.getValidTypes(packageTree, packageArtifact.getId()));
-            } catch (PackageOntologyException e) {
-                view.getErrorMessageLabel().setText(errors.get(ErrorKey.ARTIFACT_TYPE_ERROR) + e.getMessage());
-                view.getErrorMessageLabel().setVisible(true);
-                log.error(e.getMessage());
-            }
-            
-            if (view.getErrorMessageLabel().isVisible()) {
-                view.getErrorMessageLabel().setVisible(false);
-            }
-        }
-        return validTypeSet;
-    }
+    public void changeType(Node node, NodeTransform transform) {
+        if (node != null && transform != null) {
+            profileService.transformNode(node, transform);
 
-    @Override
-    public void changeType(PackageArtifact packageArtifact, String type) {
-        if (packageArtifact.getId() != null && packageTree != null) {
-            try {
-                packageOntologyService.changeType(packageDescription, packageTree, packageArtifact, controller.getContentRoot(), type);
+            displayPackageTree();
 
-                displayPackageTree();
-
-                //Resort the tree if necessary
-                TreeItem<PackageArtifact> selectedItem = view.getArtifactTreeView().getSelectionModel().getSelectedItem();
-                if (selectedItem != null) {
-                    //This should never be the case since we don't show the root but just to be safe
-                    if (selectedItem.getParent() != null) {
-                        sortChildren(selectedItem.getParent().getChildren());
-                    }
+            //Resort the tree if necessary
+            TreeItem<Node> selectedItem = view.getArtifactTreeView().getSelectionModel().getSelectedItem();
+            if (selectedItem != null) {
+                //This should never be the case since we don't show the root but just to be safe
+                if (selectedItem.getParent() != null) {
+                    sortChildren(selectedItem.getParent().getChildren());
                 }
-
-            } catch (PackageOntologyException e) {
-                view.getErrorMessageLabel().setText(errors.get(ErrorKey.ARTIFACT_TYPE_ERROR) + e.getMessage());
-                view.getErrorMessageLabel().setVisible(true);
-                log.error(e.getMessage());
-            }
-
-            if (view.getErrorMessageLabel().isVisible()) {
-                view.getErrorMessageLabel().setVisible(false);
             }
         }
     }
 
     @Override
-    public void setPackageOntologyService(PackageOntologyService packageOntologyService){
-        this.packageOntologyService = packageOntologyService;
+    public void setProfileService(DomainProfileService profileService){
+        this.profileService = profileService;
     }
 
     @Override
-    public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder){
-        this.packageDescriptionBuilder = packageDescriptionBuilder;
+    public void setIpmService(IPMService ipmService) {
+        this.ipmService = ipmService;
     }
-    
+
     @Override
-    public void setPackageDescriptionValidator(PackageDescriptionValidator packageDescriptionValidator) {
-        this.packageDescriptionValidator = packageDescriptionValidator;
+    public void setPropertyFormatService(PropertyFormatService formatService) {
+        this.propertyFormatService = formatService;
     }
-    
+
     //Recursively sorts all children elements of the tree.
-    private void sortTree(TreeItem<PackageArtifact> node) {
-        if (!node.isLeaf()) {
-            sortChildren(node.getChildren());
+    private void sortTree(TreeItem<Node> treeNode) {
+        if (!treeNode.isLeaf()) {
+            sortChildren(treeNode.getChildren());
             
             //Recurse through all the children and sort them
-            for (TreeItem<PackageArtifact> child : node.getChildren()) {
-                sortTree(child);
-            }
+            treeNode.getChildren().forEach(this::sortTree);
         }    
     }
-    
-    //Sorts the tree items in the provided list. The order of the list will be dataFiles, followed by metadata files, followed by collections, followed by data items
-    private void sortChildren(ObservableList<TreeItem<PackageArtifact>> children) {
+
+    //Sorts the tree items in the provided list. //This has been made profile agnostic it now just sorts based on whether the node is a directory
+    private void sortChildren(ObservableList<TreeItem<Node>> children) {
         FXCollections.sort(children, (o1, o2) -> {
 
-            PackageArtifact artifactOne = o1.getValue();
-            PackageArtifact artifactTwo = o2.getValue();
+            Node nodeOne = o1.getValue();
+            Node nodeTwo = o2.getValue();
 
-            if (artifactOne.getType().equalsIgnoreCase(artifactTwo.getType())) {
+            if (nodeOne.getFileInfo().isDirectory() == nodeTwo.getFileInfo().isDirectory()) {
                 return 0;
             }
 
-            if (artifactOne.getType().equalsIgnoreCase(ArtifactType.DataFile.name())) {
-                return -1;
-            } else if (artifactOne.getType().equalsIgnoreCase(ArtifactType.MetadataFile.name())) {
-                if (artifactTwo.getType().equalsIgnoreCase(ArtifactType.Collection.name())
-                        || artifactTwo.getType().equalsIgnoreCase(ArtifactType.DataItem.name())) {
-                    return -1;
-                }
-            } else if (artifactOne.getType().equalsIgnoreCase(ArtifactType.Collection.name())
-                        && artifactTwo.getType().equalsIgnoreCase(ArtifactType.DataItem.name())) {
+            if (nodeOne.getFileInfo().isFile()
+                        && nodeTwo.getFileInfo().isDirectory()) {
                 return -1;
             }
 
             return 1;
         });
     }
+
+    /* TODO: RE-implement inheritance
     @Override
     public Set<String> getInheritingTypes(String parentType, String propertyName) {
         Set<String> typesWithProperty = packageOntologyService.getArtifactTypesContainProperty(propertyName);
@@ -691,7 +514,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         inheritingType.retainAll(typesWithProperty);
         return inheritingType;
     }
-
+    */
     @Override
     public void preferenceChange(PreferenceChangeEvent evt) {
         if(evt.getKey().equals(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE))) {
@@ -715,37 +538,22 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 @Override
                 protected Void call() throws Exception {
                     // Thread cannot modify UI so call displayPackageTree on success.
-                    setupPackageTree();
                     return null;
                 }
             };
         }
     }
-    
-    private void setupPackageTree() {
-        packageDescription = controller.getPackageDescription();
-        
-        if (packageDescription != null) {
-            try {
-                packageTree = packageOntologyService.buildPackageTree(packageDescription, controller.getContentRoot());
-                //controller.setContentRoot(new File(packageTree.getRoot().getValue().getArtifactRef().getRefString()));
-            } catch (PackageOntologyException e) {
-                log.error("Unable to create package tree", e);
-                // TODO User message?
-            }
-        }
-    }
+
 
     public void displayPackageTree() {
-        if (packageDescription != null && packageTree != null) {
-            view.getArtifactTreeView().setRoot(buildTree(packageTree.getRoot(),
+        if (controller.getPackageState() != null && controller.getPackageState().getPackageTree() != null) {
+            view.getArtifactTreeView().setRoot(buildTree(controller.getPackageState().getPackageTree(),
                     view.getShowIgnored().selectedProperty().getValue()));
             view.getRoot().setExpanded(true);
             sortTree(view.getRoot());
-            for (String artifactId : expandedArtifacts) {
-                PackageNode node = packageTree.getNodesMap().get(artifactId);
-                if (node !=null) {
-                    TreeItem expandedItem = findItem(node.getValue());
+            for (URI nodeID : expandedNodes) {
+                if (nodeID !=null) {
+                    TreeItem expandedItem = findItem(view.getRoot(), nodeID);
                     if (expandedItem != null) {
                         expandedItem.setExpanded(true);
                     }
@@ -755,7 +563,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     public void rebuildTreeView() {
-        setupPackageTree();
         displayPackageTree();
     }
 }
