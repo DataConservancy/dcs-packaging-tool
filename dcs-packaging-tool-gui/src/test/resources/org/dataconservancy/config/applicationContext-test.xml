@@ -129,6 +129,23 @@
     <property name="creatorPropertiesByString" value="${ontology.creatorProperties}"/>
   </bean>
 
+  <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
+
+  <bean id="domainProfileObjectStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl">
+     <constructor-arg ref="uriGenerator"/>
+   </bean>
+
+   <bean id="profileService" class="org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl">
+     <constructor-arg ref="domainProfileObjectStore"/>
+     <constructor-arg ref="uriGenerator"/>
+   </bean>
+
+   <bean id="propertyFormatService" class="org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl"/>
+
+   <bean id="ipmService" class="org.dataconservancy.packaging.tool.impl.IPMServiceImpl">
+     <constructor-arg ref="uriGenerator"/>
+   </bean>
+
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
     <property name="labels" ref="labels" />
