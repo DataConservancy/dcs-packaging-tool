@@ -18,7 +18,7 @@ package org.dataconservancy.packaging.tool.impl.support;
 
 import org.dataconservancy.packaging.tool.api.support.OntologyPropertyValidator;
 import org.dataconservancy.packaging.tool.model.PropertyValidationResult;
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +34,6 @@ public class EmailPropertyValidator implements OntologyPropertyValidator {
     @Override
     public PropertyValidationResult validate(String propertyValue) {
         Matcher matcher =  emailPattern.matcher(propertyValue);
-        return new PropertyValidationResult(matcher.matches(), ValidationType.EMAIL);
+        return new PropertyValidationResult(matcher.matches(), PropertyValueHint.EMAIL);
     }
 }

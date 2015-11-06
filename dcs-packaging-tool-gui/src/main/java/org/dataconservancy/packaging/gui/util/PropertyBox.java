@@ -22,7 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 /**
  * A text widget with a label and text input control, with possibility of adding validation to the text property
@@ -58,10 +58,10 @@ public class PropertyBox extends VBox {
      * @param validationType indicates the ValidationType of validator that should be supplied to
      *                       the text control input
      */
-    public PropertyBox(String initialText, boolean isMultiLine, ValidationType validationType) {
+    public PropertyBox(String initialText, boolean isMultiLine, PropertyValueHint validationType) {
         textInput = (isMultiLine ? new TextArea(initialText) : new TextField(initialText));
         textInput.setEditable(true);
-        if(!validationType.equals(ValidationType.NONE)) {
+        if(validationType != null) {
             textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
         }
         propertyInputBox.getChildren().add(textInput);
@@ -76,9 +76,9 @@ public class PropertyBox extends VBox {
      * @param validationType  indicates the ValidationType of validator that should be supplied to
      *                       the text control input
      */
-    public PropertyBox(TextField textField, ValidationType validationType){
+    public PropertyBox(TextField textField, PropertyValueHint validationType){
         textInput = textField;
-        if(!validationType.equals(ValidationType.NONE)) {
+        if(validationType != null) {
             textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
         }
         propertyInputBox.getChildren().add(textInput);

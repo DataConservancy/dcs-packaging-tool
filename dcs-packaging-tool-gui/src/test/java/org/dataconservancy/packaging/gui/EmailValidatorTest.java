@@ -19,7 +19,7 @@ package org.dataconservancy.packaging.gui;
 
 import org.dataconservancy.packaging.gui.util.Validator;
 import org.dataconservancy.packaging.gui.util.ValidatorFactory;
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -32,7 +32,7 @@ public class EmailValidatorTest {
 
 
     ValidatorFactory vf = new ValidatorFactory();
-    Validator ev = ValidatorFactory.getValidator(ValidationType.EMAIL);
+    Validator ev = ValidatorFactory.getValidator(PropertyValueHint.EMAIL);
 
     @Test
     public void testValidEmails() {

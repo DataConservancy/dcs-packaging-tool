@@ -15,6 +15,8 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
+
 /**
  * Class that holds the validation result from validating a property of an ontology.
  * Class contains a boolean representing the validation result, and an enum that tells the system what hint to display to the user.
@@ -22,15 +24,15 @@ package org.dataconservancy.packaging.tool.model;
  */
 public class PropertyValidationResult {
 
-    private ValidationType validationType;
+    private PropertyValueHint validationType;
     private boolean valid;
 
-    public PropertyValidationResult(boolean valid, ValidationType type) {
+    public PropertyValidationResult(boolean valid, PropertyValueHint type) {
         this.valid = valid;
         this.validationType = type;
     }
 
-    public ValidationType getValidationType() {
+    public PropertyValueHint getValidationType() {
         return validationType;
     }
 

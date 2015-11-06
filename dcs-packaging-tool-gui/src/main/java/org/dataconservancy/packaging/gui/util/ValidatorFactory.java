@@ -16,7 +16,7 @@
 
 package org.dataconservancy.packaging.gui.util;
 
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 /**
  * A simple factory class which, when provided a validator type, provides an appropriate validator for property values
@@ -27,11 +27,11 @@ public class ValidatorFactory {
      * @param type  the given ValidatorType
      * @return  the Validator
      */
-    public static Validator getValidator(ValidationType type){
+    public static Validator getValidator(PropertyValueHint type){
         switch(type){
             case EMAIL:
                 return new EmailValidator();
-            case PHONE:
+            case PHONE_NUMBER:
                 return new PhoneNumberValidator();
             case URL:
                 return new UrlValidator();

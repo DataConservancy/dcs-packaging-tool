@@ -40,7 +40,7 @@
     <packageMetadata>
         <name>Phone-Metadata</name>
         <requiredness>RECOMMENDED</requiredness>
-        <validationType>PHONE</validationType>
+        <validationType>PHONE_NUMBER</validationType>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>

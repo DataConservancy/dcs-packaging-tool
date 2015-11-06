@@ -19,10 +19,10 @@ package org.dataconservancy.packaging.gui.services;
 
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.junit.Assert;
 
-import org.junit.Before;;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -62,7 +61,7 @@ public class PackageMetadataServiceTest {
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
         Assert.assertEquals("This is the help text for Package-Metadata-1",pm.getHelpText());
-        Assert.assertEquals(ValidationType.NONE, pm.getValidationType());
+        Assert.assertEquals(null, pm.getValidationType());
     }
 
     @Test
@@ -76,15 +75,15 @@ public class PackageMetadataServiceTest {
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
         Assert.assertEquals("This is the help text for Package-Metadata-2",pm.getHelpText());
-        Assert.assertEquals(ValidationType.NONE, pm.getValidationType());
+        Assert.assertEquals(null, pm.getValidationType());
 
         pm = recommendedMetadata.get(1);
         Assert.assertEquals("Email-Metadata", pm.getName());
-        Assert.assertEquals(ValidationType.EMAIL, pm.getValidationType());
+        Assert.assertEquals(PropertyValueHint.EMAIL, pm.getValidationType());
 
         pm = recommendedMetadata.get(2);
         Assert.assertEquals("Phone-Metadata", pm.getName());
-        Assert.assertEquals(ValidationType.PHONE, pm.getValidationType());
+        Assert.assertEquals(PropertyValueHint.PHONE_NUMBER, pm.getValidationType());
     }
 
     @Test
@@ -98,7 +97,7 @@ public class PackageMetadataServiceTest {
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertFalse(pm.isEditable());
         Assert.assertEquals("This is the help text for Package-Metadata-2",pm.getHelpText());
-        Assert.assertEquals(ValidationType.NONE, pm.getValidationType());
+        Assert.assertEquals(null, pm.getValidationType());
 
         pm = optionalMetadata.get(1);
         Assert.assertEquals("Repeatable-Metadata", pm.getName());
@@ -110,7 +109,7 @@ public class PackageMetadataServiceTest {
         Assert.assertNull(pm.getHelpText());
         //This last assert checks that misspelled or invalid specification for the validation type
         //defaults to NONE - was set to MISSPELLED in the xml file
-        Assert.assertEquals(ValidationType.NONE, pm.getValidationType());
+        Assert.assertEquals(null, pm.getValidationType());
 
         pm = optionalMetadata.get(2);
         Assert.assertEquals("Editable-Metadata", pm.getName());
@@ -118,7 +117,7 @@ public class PackageMetadataServiceTest {
         Assert.assertFalse(pm.isRepeatable());
         Assert.assertTrue(pm.isEditable());
         Assert.assertNull(pm.getHelpText());
-        Assert.assertEquals(ValidationType.NONE, pm.getValidationType());
+        Assert.assertEquals(null, pm.getValidationType());
     }
 
     @Test
@@ -140,6 +139,6 @@ public class PackageMetadataServiceTest {
 
         pm = allMetadata.get(10);//missing enums are set in the service
         Assert.assertEquals(PackageMetadata.Requiredness.OPTIONAL, pm.getRequiredness());
-        Assert.assertEquals(ValidationType.NONE, pm.getValidationType());
+        Assert.assertNull(pm.getValidationType());
     }
 }

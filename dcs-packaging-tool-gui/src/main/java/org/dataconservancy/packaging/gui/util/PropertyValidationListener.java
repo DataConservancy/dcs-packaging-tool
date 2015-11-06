@@ -24,9 +24,7 @@ import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
-import org.dataconservancy.packaging.tool.model.ValidationType;
-
-import static org.dataconservancy.packaging.tool.model.ValidationType.*;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 /**
  * Simple String property listener that validates the string field on change, and displays the correct information in the provided labels.
@@ -36,7 +34,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     //validationImageLabel provides the X or check image as a user guide
     private Label validationImageLabel;
     private PropertyBox propertyBox;
-    private ValidationType validationType;
+    private PropertyValueHint validationType;
     private ImageView successImage;
     private ImageView failureImage;
 
@@ -45,7 +43,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
      * @param propertyBox the property box whose text input control is to be listened to
      * @param validationType the type of validation this input control's value requires
      */
-    public PropertyValidationListener(PropertyBox propertyBox, ValidationType validationType) {
+    public PropertyValidationListener(PropertyBox propertyBox, PropertyValueHint validationType) {
         this.propertyBox = propertyBox;
         this.validationType = validationType;
         this.validationImageLabel = new Label();
@@ -66,14 +64,17 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
 
         HBox propertyInputBox = (HBox) propertyBox.getChildren().get(1);
         validationImageLabel = (Label) propertyInputBox.getChildren().get(1);
+        Validator validator = null;
+        if (validationType != null) {
+            validator = ValidatorFactory.getValidator(validationType);
+        }
 
-        if (newValue != null && !newValue.isEmpty()) {
-            Validator validator = ValidatorFactory.getValidator(validationType);
+        if (validator != null && newValue != null && !newValue.isEmpty()) {
             boolean result = validator.isValid(newValue);
 
             if (result) {
                 switch (validationType) {
-                    case PHONE:
+                    case PHONE_NUMBER:
                     case URL:
                     case EMAIL:
                         propertyBox.getChildren().remove(validationLabel);
@@ -81,13 +82,11 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                         break;
                 }
             } else {
-                if (validationType != NONE) {
-                    validationImageLabel.setGraphic(failureImage);
-                    validationImageLabel.setVisible(true);
-                }
+                validationImageLabel.setGraphic(failureImage);
+                validationImageLabel.setVisible(true);
 
                 switch (validationType) {
-                    case PHONE:
+                    case PHONE_NUMBER:
                         validationLabel.setText(TextFactory.format(Messages.MessageKey.PHONE_VALIDATION_FAILURE, newValue));
                         break;
                     case URL:

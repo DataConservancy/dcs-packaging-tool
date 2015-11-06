@@ -37,7 +37,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     <packageMetadata>
         <name>Contact-Phone</name>
         <requiredness>RECOMMENDED</requiredness>
-        <validationType>PHONE</validationType>
+        <validationType>PHONE_NUMBER</validationType>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>

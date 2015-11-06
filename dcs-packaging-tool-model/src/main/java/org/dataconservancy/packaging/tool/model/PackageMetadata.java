@@ -15,6 +15,8 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,7 +36,7 @@ public class PackageMetadata {
     }
 
     private String name;
-    private ValidationType validationType;
+    private PropertyValueHint validationType;
     private String helpText;
     @XmlAttribute(name = "editable")
     private boolean isEditable;
@@ -57,11 +59,11 @@ public class PackageMetadata {
     }
 
     /**
-     * Returns the type of validation ({@link org.dataconservancy.packaging.tool.model.ValidationType})
-     * that should be performed on the field's value. These types include: {@code NONE}, {@code EMAIL}, {@code PHONE},
+     * Returns the type of validation ({@link org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint})
+     * that should be performed on the field's value. These types include: {@code NONE}, {@code EMAIL}, {@code PHONE_NUMBER},
      * {@code DATE}, {@code URL}, {@code FILENAME}.
      */
-    public ValidationType getValidationType() {
+    public PropertyValueHint getValidationType() {
         return validationType;
     }
 
@@ -69,7 +71,7 @@ public class PackageMetadata {
         this.name = name;
     }
 
-    public void setValidationType(ValidationType validationType) {
+    public void setValidationType(PropertyValueHint validationType) {
         this.validationType = validationType;
     }
 

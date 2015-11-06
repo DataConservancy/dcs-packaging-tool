@@ -48,7 +48,7 @@ import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -395,7 +395,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             TextField textField = (TextField) ControlFactory.createControl(TextFactory.getText(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
 
-            if (packageMetadata.getValidationType().equals(ValidationType.URL)) {
+            if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.URL)) {
                 // TODO: this may have to be done via a button
                 PropertyBox propertyBox = new PropertyBox(textField, packageMetadata.getValidationType());
                 fieldContainer.getChildren().add(propertyBox);
@@ -406,7 +406,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         } else {
 
-            if (packageMetadata.getValidationType().equals(ValidationType.DATE)) {
+            if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.DATE_TIME)) {
                 DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, null, packageMetadata.getHelpText());
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);

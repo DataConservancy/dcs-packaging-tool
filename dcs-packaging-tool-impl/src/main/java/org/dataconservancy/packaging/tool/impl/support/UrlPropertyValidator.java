@@ -19,7 +19,7 @@ package org.dataconservancy.packaging.tool.impl.support;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.api.support.OntologyPropertyValidator;
 import org.dataconservancy.packaging.tool.model.PropertyValidationResult;
-import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 /**
  * Simply checks that a url is proper uri format, and starts with either http:// or https://.
@@ -29,6 +29,6 @@ public class UrlPropertyValidator implements OntologyPropertyValidator {
     public PropertyValidationResult validate(String propertyValue) {
         boolean valid = UriUtility.isHttpUrl(propertyValue);
 
-        return new PropertyValidationResult(valid, ValidationType.URL);
+        return new PropertyValidationResult(valid, PropertyValueHint.URL);
     }
 }
