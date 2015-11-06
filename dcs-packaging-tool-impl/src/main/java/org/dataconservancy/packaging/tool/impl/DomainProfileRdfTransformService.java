@@ -152,7 +152,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
      * Transforms a DomainProfile into a Jena RDF Model.  The profile will be a blank node.
      * @param profile The DomainProfile to transform.
      * @return The Jena model containing the RDF representation of the DomainProfile
-     * @throws RDFTransformException
+     * @throws RDFTransformException if an error is encountered performing the transformation
      */
     public Model transformToRdf(DomainProfile profile) throws RDFTransformException {
         return transformToRdf(profile, null);
@@ -164,7 +164,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
      * @param profileResourceURI If defined, the Profile resource will have this URI. 
      *        If null, it will be a blank node.
      * @return The Jena model containing the RDF representation of the DomainProfile
-     * @throws RDFTransformException
+     * @throws RDFTransformException if an error is encountered performing the transformation
      */
     public Model transformToRdf(DomainProfile profile, String profileResourceURI)
         throws RDFTransformException {
@@ -523,7 +523,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
      * Transforms a Jena model representing a DomainProfile in RDF into a DomainProfile object.
      * @param model The model containing the DomainProfile
      * @return The DomainProfile object that corresponds to the RDF
-     * @throws RDFTransformException
+     * @throws RDFTransformException if an error is encountered performing the transformation
      */
     public DomainProfile transformToProfile(Model model) throws RDFTransformException {
         transformedNodeTypes = new HashMap<>();
