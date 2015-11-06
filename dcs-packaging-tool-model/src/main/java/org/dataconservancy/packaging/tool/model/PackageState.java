@@ -71,6 +71,9 @@ public class PackageState {
     @Serialize(streamId = StreamId.APPLICATION_VERSION)
     private ApplicationVersion creationToolVersion;
 
+    // TODO: remove; I don't think this should be part of the package state
+    private File outputDirectory;
+
     public PackageState() {
         packageMetadataList = new LinkedHashMap<>();
     }
@@ -158,6 +161,16 @@ public class PackageState {
      */
     public boolean hasPackageMetadataValues() {
         return packageMetadataList != null && !packageMetadataList.isEmpty();
+    }
+
+    // TODO: remove; I don't think this should be part of the package state
+    public File getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    // TODO: remove; I don't think this should be part of the package state
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
     }
 
     @Override
