@@ -236,6 +236,7 @@ public class DcsBOProfile
         project.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "Project")));
         project.setDomainProfile(this);
+        project.setInheritableProperties(Arrays.asList(hasDescription, hasPublisher));
 
         //This sets the preference of project assignment to no files, this is to mirror the existing package tool behavior
         //Note this is just a preference the type can still be changed by the user.
@@ -250,6 +251,7 @@ public class DcsBOProfile
         collection.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "Collection")));
         collection.setDomainProfile(this);
+        collection.setInheritableProperties(Arrays.asList(hasDescription, hasDiscipline, hasCreator, hasContact, hasPublisher, hasPublicationDate));
         //This sets the preference of collection assignment to a single file, this is to mirror the existing package tool behavior
         //Note this is just a preference the type can still be changed by the user.
         CardinalityConstraint collectionFilePreference = new CardinalityConstraint();
@@ -269,6 +271,7 @@ public class DcsBOProfile
         CardinalityConstraint dataItemPreferences = new CardinalityConstraint();
         dataItemPreferences.setMin(2);
         dataItem.setChildFileConstraint(dataItemPreferences);
+        dataItem.setInheritableProperties(Collections.singletonList(hasDescription));
 
         file.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "File"));
         file.setLabel("DataFile");
@@ -402,7 +405,7 @@ public class DcsBOProfile
         hasContact.setPropertyValueType(PropertyValueType.COMPLEX);
         hasContact.setPropertyValueHint(PropertyValueHint.CONTACT_INFO);
 
-        hasCreator.setLabel("Contact Info");
+        hasCreator.setLabel("Creator");
         hasCreator
                 .setDescription("A data property specifying a creator for the Collection or DataItem");
         hasCreator.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
