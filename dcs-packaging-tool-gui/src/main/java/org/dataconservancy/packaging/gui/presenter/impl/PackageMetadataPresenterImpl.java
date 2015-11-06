@@ -183,8 +183,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         // Clear the domain profile list and reset the values on the current state of the form
         getController().getPackageState().setDomainProfileIdList(getSelectedDomainProfileIdList());
-        System.out.println("######################### " + getSelectedDomainProfileLabelList().toString());
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% " + getSelectedDomainProfileIdList().toString());
 
         // FIXME: This ID should come from somewhere? Setting something now so the page moves on.
         getController().getPackageState().addPackageMetadata("BagIt-Profile-Identifier", view.getDomainProfilesComboBox().getValue());
