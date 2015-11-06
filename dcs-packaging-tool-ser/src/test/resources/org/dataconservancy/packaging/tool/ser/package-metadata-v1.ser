@@ -1,6 +1,11 @@
 <serialization version="1" converterClass="org.dataconservancy.packaging.tool.ser.PackageMetadataConverter" streamId="PACKAGE_METADATA">
   <packageMetadata>
-    <foo>bar</foo>
-    <baz>bar</baz>
+    <foo>
+      <bar/>
+      <biz/>
+    </foo>
+    <baz>
+      <bar/>
+    </baz>
   </packageMetadata>
 </serialization>
