@@ -91,7 +91,7 @@ public class ProfilePropertyBox extends VBox {
                     String value = formatService.formatPropertyValue(property);
                     PropertyBox propertyBox = new PropertyBox(value, (
                         propertyConstraint.getPropertyType().getPropertyValueHint() ==
-                            PropertyValueHint.MULTI_LINE_TEXT), editable);
+                            PropertyValueHint.MULTI_LINE_TEXT), editable, property.getPropertyType().getPropertyValueHint());
                     textPropertyBoxes.add(propertyBox);
                     propertyValuesBox.getChildren().add(propertyBox);
                     addChangeListenerToPropertyFields(propertyBox, listener);
@@ -102,7 +102,7 @@ public class ProfilePropertyBox extends VBox {
             } else {
                 PropertyBox propertyBox = new PropertyBox("", (
                     propertyConstraint.getPropertyType().getPropertyValueHint() ==
-                        PropertyValueHint.MULTI_LINE_TEXT), editable);
+                        PropertyValueHint.MULTI_LINE_TEXT), editable, propertyConstraint.getPropertyType().getPropertyValueHint());
                 textPropertyBoxes.add(propertyBox);
                 addChangeListenerToPropertyFields(propertyBox, listener);
                 listener.changed(null, "n/a", "n/a");

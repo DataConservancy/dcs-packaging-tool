@@ -58,9 +58,9 @@ public class PropertyBox extends VBox {
      * @param validationType indicates the ValidationType of validator that should be supplied to
      *                       the text control input
      */
-    public PropertyBox(String initialText, boolean isMultiLine, PropertyValueHint validationType) {
+    public PropertyBox(String initialText, boolean isMultiLine, boolean isEditable, PropertyValueHint validationType) {
         textInput = (isMultiLine ? new TextArea(initialText) : new TextField(initialText));
-        textInput.setEditable(true);
+        textInput.setEditable(isEditable);
         if(validationType != null) {
             textInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
         }
