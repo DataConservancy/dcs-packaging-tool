@@ -47,9 +47,9 @@ public class PackageState {
     private Node packageTree;
 
     /**
-     * List of domain profiles in-use in this package.
+     * List of domain profile ids in-use in this package.
      */
-    private List<DomainProfile> domainProfileList;
+    private List<String> domainProfileIdList;
 
     /**
      * Container of all of the domain objects in this package.
@@ -151,12 +151,12 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
-    public void setDomainProfileList(List<DomainProfile> domainProfileList){
-        this.domainProfileList = domainProfileList;
+    public void setDomainProfileIdList(List<String> domainProfileIdList){
+        this.domainProfileIdList = domainProfileIdList;
     }
 
-    public List<DomainProfile> getDomainProfileList() {
-        return domainProfileList;
+    public List<String> getDomainProfileIdList() {
+        return domainProfileIdList;
     }
 
     /**
@@ -200,9 +200,9 @@ public class PackageState {
             that.packageTree != null) {
             return false;
         }
-        if (domainProfileList !=
-            null ? !domainProfileList.equals(that.domainProfileList) :
-            that.domainProfileList != null) {
+        if (domainProfileIdList !=
+            null ? !domainProfileIdList.equals(that.domainProfileIdList) :
+            that.domainProfileIdList != null) {
             return false;
         }
         if (packageMetadataList !=
@@ -222,7 +222,7 @@ public class PackageState {
         result =
             31 * result + (packageTree != null ? packageTree.hashCode() : 0);
         result = 31 * result +
-            (domainProfileList != null ? domainProfileList.hashCode() : 0);
+            (domainProfileIdList != null ? domainProfileIdList.hashCode() : 0);
         result = 31 * result +
             (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
         result = 31 * result +
