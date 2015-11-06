@@ -58,6 +58,7 @@ import java.util.zip.CRC32;
  * </p>
  * <p>
  * Example usage: Serializing package metadata to a file
+ * </p>
  * <pre>
  *     // Assume the existence of a populated PackageState instance
  *     PackageState state = ...
@@ -69,9 +70,9 @@ import java.util.zip.CRC32;
  *     File packageMd = new File("packageMetadata.out");
  *     serializer.serialize(state, StreamId.PACKAGE_METADATA, new FileOutputStream(packageMd));
  * </pre>
- * </p>
- *  <p>
+ * <p>
  * Example usage: Serializing package state before closing the Package Tool GUI
+ * </p>
  * <pre>
  *     // Assume the existence of a populated PackageState instance
  *     PackageState state = ...
@@ -83,7 +84,6 @@ import java.util.zip.CRC32;
  *     File myPackage = new File("mypackage.zip");
  *     serializer.serialize(state, new FileOutputStream(packageMd));
  * </pre>
- * </p>
  */
 public class AnnotationDrivenPackageStateSerializer implements PackageStateSerializer {
 
