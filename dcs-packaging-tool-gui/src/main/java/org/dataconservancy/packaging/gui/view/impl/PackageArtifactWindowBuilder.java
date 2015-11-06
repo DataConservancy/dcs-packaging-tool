@@ -164,10 +164,6 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         artifactDetailsLayout.setBottom(popupControls);
     }
 
-    public void saveNode() {
-
-    }
-
     private Tab createNodeTypeTab(Node node, NodeType nodeType) {
         Tab propertiesTab = new Tab();
         propertiesTab.setClosable(false);
@@ -436,7 +432,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
         }
 
         void addProperty(PropertyConstraint constraint, Node node) {
-            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService, nodePropertyBoxes);
+            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService);
             nodePropertyBoxes.add(profilePropertyBox);
             getChildren().add(profilePropertyBox);
         }

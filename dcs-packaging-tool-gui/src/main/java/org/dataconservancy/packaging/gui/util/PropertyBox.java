@@ -93,5 +93,13 @@ public class PropertyBox extends VBox {
     public String getValue() {
         return textInput.getText();
     }
+
+    /**
+     * Gets the text input control used to enter values, this allows externally setting listeners on the control.
+     * @return The text input control for the PropertyBox.
+     */
+    public TextInputControl getTextInput() {
+        return textInput;
+    }
 }
 
