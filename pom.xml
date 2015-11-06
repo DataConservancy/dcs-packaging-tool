@@ -236,6 +236,7 @@
       </dependency>
 
       <dependency>
+        <groupId>org.dataconservancy.pkgtool</groupId>
         <artifactId>dcs-packaging-tool-profiles</artifactId>
         <version>${project.version}</version>
       </dependency>
