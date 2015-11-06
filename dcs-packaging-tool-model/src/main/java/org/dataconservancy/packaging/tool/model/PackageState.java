@@ -125,6 +125,18 @@ public class PackageState {
         this.packageMetadataList = metadataList;
     }
 
+    public LinkedHashMap<String, List<String>> getPackageMetadataList() {
+        return packageMetadataList;
+    }
+
+    public Node getPackageTree() {
+        return packageTree;
+    }
+
+    public void setPackageTree(Node packageTree) {
+        this.packageTree = packageTree;
+    }
+
     /**
      * Returns version information about the tool used to create this package.
      */
