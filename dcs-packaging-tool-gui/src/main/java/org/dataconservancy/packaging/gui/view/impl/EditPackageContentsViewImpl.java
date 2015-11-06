@@ -277,13 +277,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
                 String labelText;
 
-                if (getFullPathCheckBox().selectedProperty().getValue()) {
-                    labelText = packageNode.getFileInfo().getLocation().toString();
-                } else {
-                    labelText = packageNode.getFileInfo().getName();
+                if (packageNode.getFileInfo() != null) {
+                    if (getFullPathCheckBox().selectedProperty().getValue()) {
+                        labelText = packageNode.getFileInfo().getLocation().toString();
+                    } else {
+                        labelText = packageNode.getFileInfo().getName();
+                    }
+                    viewLabel.setText(labelText);
                 }
-
-                viewLabel.setText(labelText);
 
                 Tooltip t = new Tooltip(viewLabel.getText());
                 t.setPrefWidth(300);
@@ -537,7 +538,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     } else {
                         presenter.changeType(packageNode, type);
                     } */
-                    profileService.transformNode(packageNode, transform);
+                    presenter.changeType(packageNode, transform);
                 });
             }
         }

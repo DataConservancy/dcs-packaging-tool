@@ -372,7 +372,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         return null;
     }
 
-
     @Override
     public void trimEmptyProperties(Node node) {
 
@@ -400,45 +399,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             });
         }
     }
-    
 
-    /**
-     * Apply the named property's value of the parent artifact to its children's applicable property. This method is
-     * recursively called to apply the inheritable property's value to all of the offsprings when applicable.
-     *
-     * If the named property is not deemed inHeritable by the PackageOntologyService, then method is a no-op
-     *
-     */
-    /* TODO: Reimplement inheritance
-    private void applyParentPropertyValue(Node parent, ObservableList<TreeItem<Node>> children, String propertyName)
-            throws PackageOntologyException {
-
-        //If the named property is not an inheritable property on the parent artifact, return.
-        if (!packageOntologyService.isInheritableProperty(parent, propertyName)) {
-            return;
-        }
-
-        //Loop through the children to apply values.
-        for (TreeItem<Node> child : children) {
-
-            //get the type of the named property
-            String propertyType = packageOntologyService.getProperties(parent).get(propertyName);
-            if (propertyType != null && !propertyType.isEmpty()) {
-                //assign parent's property's value to child's property
-                //if child already has a value for the named property, that value will be overwritten.
-                if (!packageOntologyService.isPropertyComplex(propertyType)) {
-                    child.getValue().setSimplePropertyValues(propertyName, parent.getSimplePropertyValues(propertyName));
-                } else {
-                    child.getValue().setPropertyValueGroups(propertyName, parent.getPropertyValueGroups(propertyName));
-                }
-                //if child has children, trigger cascading inheritance by calling the method recursively.
-                if (child.getChildren().size() > 0) {
-                    applyParentPropertyValue(child.getValue(), child.getChildren(), propertyName);
-                }
-            }
-        }
-    }
-    */
     @Override
     public void changeType(Node node, NodeTransform transform) {
         if (node != null && transform != null) {
@@ -489,6 +450,19 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             Node nodeOne = o1.getValue();
             Node nodeTwo = o2.getValue();
 
+            //File info is null if it's a data item created for a metadata file transformation.
+            if (nodeOne.getFileInfo() == null) {
+                if (nodeTwo.getFileInfo() == null) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else {
+                if (nodeTwo.getFileInfo() == null) {
+                    return -1;
+                }
+            }
+
             if (nodeOne.getFileInfo().isDirectory() == nodeTwo.getFileInfo().isDirectory()) {
                 return 0;
             }
@@ -502,15 +476,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         });
     }
 
-    /* TODO: RE-implement inheritance
-    @Override
-    public Set<String> getInheritingTypes(String parentType, String propertyName) {
-        Set<String> typesWithProperty = packageOntologyService.getArtifactTypesContainProperty(propertyName);
-        Set<String> inheritingType = packageOntologyService.getValidDescendantTypes(parentType);
-        inheritingType.retainAll(typesWithProperty);
-        return inheritingType;
-    }
-    */
     @Override
     public void preferenceChange(PreferenceChangeEvent evt) {
         if(evt.getKey().equals(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE))) {
