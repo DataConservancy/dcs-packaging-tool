@@ -24,12 +24,11 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 
 import java.io.OutputStream;
 import java.nio.file.attribute.FileTime;
-import java.util.Date;
 
 /**
  *
  */
-public class ZipArchiveOutputStreamFactory implements ArchiveStreamFactory {
+public class ZipArchiveStreamFactory implements ArchiveStreamFactory {
 
     private String encoding;
 
@@ -56,12 +55,13 @@ public class ZipArchiveOutputStreamFactory implements ArchiveStreamFactory {
     }
 
     public ZipArchiveEntry newArchiveEntry(String name, long sizeBytes, FileTime created, FileTime lastModified,
-                                           int unixPermissions) {
+                                           int unixPermissions, long crc) {
         ZipArchiveEntry zipArxEntry = new ZipArchiveEntry(name);
         zipArxEntry.setSize(sizeBytes);
         zipArxEntry.setUnixMode(unixPermissions);
         zipArxEntry.setLastModifiedTime(lastModified);
         zipArxEntry.setCreationTime(created);
+        zipArxEntry.setCrc(crc);
         return zipArxEntry;
     }
 
