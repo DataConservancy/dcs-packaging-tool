@@ -67,6 +67,7 @@ import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Label errorMessageLabel;
 
     //Metadata Inheritance Controls
-    private Map<String, CheckBox> metadataInheritanceButtonMap;
+    private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
     //File chooser for where to save package description. 
     private FileChooser packageDescriptionFileChooser;
@@ -848,7 +849,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     @Override
-    public Map<String, CheckBox> getInheritMetadataCheckBoxMap() {
+    public Map<PropertyType, CheckBox> getInheritMetadataCheckBoxMap() {
         return metadataInheritanceButtonMap;
     }
 

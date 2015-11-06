@@ -34,6 +34,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import javafx.scene.control.Button;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
@@ -155,7 +156,7 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * Gets metadata inheritance button
      * @return A map of the inherited property checkboxes.
      */
-    Map<String, CheckBox> getInheritMetadataCheckBoxMap();
+    Map<PropertyType, CheckBox> getInheritMetadataCheckBoxMap();
 
     /**
      * Gets the button to renable warnings

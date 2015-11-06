@@ -36,8 +36,11 @@ import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -238,7 +241,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         //If it's not complex loop through the values and set them on the node
         if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
             PropertyValueType.COMPLEX) {
-            for (String value : propertyBox.getValues()) {
+
+            propertyBox.getValues().stream().filter(value -> value != null &&
+                !value.isEmpty()).forEach(value -> {
                 Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
                 switch (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType()) {
                     case STRING:
@@ -248,16 +253,19 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                         newProperty.setLongValue(Long.valueOf(value));
                         break;
                     case DATE_TIME:
-                        //TODO: Parse and format date time
+                        //TODO: Fix this to wire up date picker
+                        newProperty.setDateTimeValue(new DateTime());
                         break;
                 }
 
                 profileService.addProperty(view.getPopupNode(), newProperty);
-            }
+            });
         } else {
             propertyBox.getSubPropertyBoxes().forEach(this::savePropertyFromBox);
         }
     }
+
+
     @Override
     public void saveCurrentNode() {
         if (view.getPopupNode() != null) {
@@ -313,7 +321,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             //view.getPopupNode().pruneEmptyProperties();
 
             //apply metadata inheritance
-            applyMetadataInheritance();
+            applyMetadataInheritance(view.getPopupNode());
         }
     }
 
@@ -383,26 +391,27 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     }
 
-    protected void applyMetadataInheritance() {
-        /*TODO Reimplement inheritance
-        Set<String> inheritablePropertyNames = view.getInheritMetadataCheckBoxMap().keySet();
-        TreeItem<Node> item = findItem(view.getRoot(), view.getPopupNode());
-        
-        for (final String inheritablePropertyName : inheritablePropertyNames) {
-            if (view.getInheritMetadataCheckBoxMap().get(inheritablePropertyName).isSelected()) {
-                try {
-                    if (item != null) {
-                        applyParentPropertyValue(view.getPopupNode(), item.getChildren(), inheritablePropertyName);
-                    }
-                } catch (PackageOntologyException e) {
-                    log.error(e.getMessage());
-                    view.getErrorMessageLabel().setText(e.getMessage());
-                    view.getErrorMessageLabel().setVisible(true);
-                }
-            }
+    protected void applyMetadataInheritance(Node node) {
+        Set<PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
 
+        if (node.getChildren() != null) {
+            inheritablePropertyTypes.stream().filter(inheritablePropertyType -> view.getInheritMetadataCheckBoxMap().get(inheritablePropertyType).isSelected()).forEach(inheritablePropertyType -> {
+                List<Property> inheritablePropertyValues = profileService.getProperties(node, inheritablePropertyType);
+                if (inheritablePropertyValues != null) {
+                    for (Property inheritablePropertyValue : inheritablePropertyValues) {
+                        for (Node child : node.getChildren()) {
+                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> {
+                                profileService.addProperty(child, inheritablePropertyValue);
+                            });
+
+                            if (child.getChildren() != null) {
+                                child.getChildren().forEach(this::applyMetadataInheritance);
+                            }
+                        }
+                    }
+                }
+            });
         }
-        */
     }
     
 

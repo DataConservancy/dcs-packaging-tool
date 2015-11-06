@@ -66,7 +66,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
     //maximum width for addNewButtons, so that text appears on button
 
 
-    private Map<String, CheckBox> metadataInheritanceButtonMap;
+    private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
     List<RelationshipGroup> availableRelationshipGroups;
     Map<String, List<String>> availableDisciplines;
@@ -92,7 +92,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
     }
 
     public Pane buildArtifactPropertiesLayout(Node node,
-                                              Map<String, CheckBox> metadataInheritanceButtonMap,
+                                              Map<PropertyType, CheckBox> metadataInheritanceButtonMap,
                                               DomainProfileService profileService) {
         categoryMap = new HashMap<>();
         nodePropertyBoxes = new ArrayList<>();
@@ -107,7 +107,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
         this.profileService = profileService;
 
-        createArtifactDetailsPopup(node);
+        createNodePropertiesView(node);
 
         return artifactDetailsLayout;
     }
@@ -121,7 +121,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
      * creator properties, and relationships.
      * @param artifact
      */
-    private void createArtifactDetailsPopup(Node node) {
+    private void createNodePropertiesView(Node node) {
 
         //The property popup will consist of the three tabs, general, creator and relationships.
         TabPane propertiesPopup = new TabPane();
@@ -210,7 +210,6 @@ public class NodePropertyWindowBuilder implements CssConstants {
         }
 
         //Add the inheritance controls
-        propertyContent.getChildren().add(new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE)));
         propertyContent.getChildren().add(createInheritanceGroup(node));
 
         return propertiesTab;
@@ -226,8 +225,9 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         final VBox inheritanceBox = new VBox(12);
         if (node.getNodeType().getInheritableProperties() != null) {
+            inheritanceBox.getChildren().add(new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE)));
+
             inheritanceBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
-            boolean hasInheritableProperties = false;
 
             //create label to explain what this tab is about.
             Label inheritanceTabIntroLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_TAB_INTRO));
@@ -246,11 +246,11 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
             //Loop through properties for the given artifact.
 
-            for (PropertyType inhertiableProperty : node.getNodeType().getInheritableProperties()) {
+            for (PropertyType inheritableProperty : node.getNodeType().getInheritableProperties()) {
                 //If the property is inheritable, create a button which would allow the values to be apply to children
                 //appropriately
 
-                inheritanceBox.getChildren().add(createInheritanceBox(inhertiableProperty.getLabel()));
+                inheritanceBox.getChildren().add(createInheritanceBox(inheritableProperty));
 
                 groupSeparator = new Separator();
                 inheritanceBox.getChildren().add(groupSeparator);
@@ -259,11 +259,11 @@ public class NodePropertyWindowBuilder implements CssConstants {
         return inheritanceBox;
     }
 
-    private HBox createInheritanceBox(String propertyName) {
+    private HBox createInheritanceBox(PropertyType propertyType) {
         HBox propertyBox = new HBox(30);
 
         VBox propNameAndExplation = new VBox();
-        final Label propertyNameLabel = new Label(propertyName);
+        final Label propertyNameLabel = new Label(propertyType.getLabel());
         propertyNameLabel.setPrefWidth(400);
         propertyNameLabel.getStyleClass().add(CssConstants.BOLD_TEXT_CLASS);
         //propertyNameLabel.setStyle(CssConstants.BOLD_TEXT_CLASS);
@@ -293,7 +293,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         propertyBox.getChildren().add(applyPropertyValueToChildrenCheckBox);
 
         //Add inheritance to map
-        metadataInheritanceButtonMap.put(propertyName, applyPropertyValueToChildrenCheckBox);
+        metadataInheritanceButtonMap.put(propertyType, applyPropertyValueToChildrenCheckBox);
         return propertyBox;
     }
 
@@ -305,17 +305,18 @@ public class NodePropertyWindowBuilder implements CssConstants {
     private VBox createRelationshipTab(final Node node) {
         final VBox relationshipsBox = new VBox(38);
 
-        /* TODO: NO idea how were going to do this just diplay all triples on the node??
+        //TODO: NO idea how were going to do this just diplay all triples on the node??
         relationshipsBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
         //If there aren't any existing relationships add an empty relationship box
 
         //add advice explaining that hierarchical relationships are not modifiable
-        Label hierarchicalAdviceLabel = new Label(labels.get(Labels.LabelKey.HIERARCHICAL_ADVICE_LABEL));
+        Label hierarchicalAdviceLabel = new Label(TextFactory.getText(Labels.LabelKey.HIERARCHICAL_ADVICE_LABEL));
         hierarchicalAdviceLabel.setAlignment(Pos.TOP_LEFT);
 
         relationshipsBox.getChildren().add(hierarchicalAdviceLabel);
         //Create the button for adding new relationships this will add a new set of relationship controls.
-        final Button addNewRelationshipButton = new Button(labels.get(Labels.LabelKey.ADD_RELATIONSHIP_BUTTON));
+        final Button addNewRelationshipButton = new Button(TextFactory.getText(Labels.LabelKey.ADD_RELATIONSHIP_BUTTON));
+        /*
         addNewRelationshipButton.setMaxWidth(addNewButtonMaxWidth);
 
         final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewRelationshipButton);
@@ -336,9 +337,10 @@ public class NodePropertyWindowBuilder implements CssConstants {
                 }
             }
         }
-
+        */
         relationshipsBox.getChildren().add(addNewRelationshipButton);
 
+        /*
         addNewRelationshipButton.setOnAction(arg0 -> {
             EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
             artifactRelationshipFields.add(container);
