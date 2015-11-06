@@ -23,6 +23,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
 /**
  * Responsible for serializing the name of a package, a simple string.
@@ -30,6 +31,10 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public class PackageNameConverter extends AbstractPackageToolConverter {
 
     static final String E_PACKAGE_NAME = "packageName";
+
+    public PackageNameConverter() {
+        setStreamId(StreamId.PACKAGE_NAME.name());
+    }
 
     @Override
     public boolean canConvert(Class type) {

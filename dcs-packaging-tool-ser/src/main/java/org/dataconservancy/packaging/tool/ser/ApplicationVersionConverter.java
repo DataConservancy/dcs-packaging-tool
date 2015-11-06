@@ -24,6 +24,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
+import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
 /**
  *
@@ -38,8 +39,12 @@ public class ApplicationVersionConverter extends AbstractPackageToolConverter {
 
     static final String E_BUILDTS = "buildTs";
 
+    public ApplicationVersionConverter() {
+        setStreamId(StreamId.APPLICATION_VERSION.name());
+    }
+
     @Override
-    void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+    public void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         ApplicationVersion versionInfo = (ApplicationVersion) source;
 
         writer.startNode(E_APPLICATION_VERSION);
@@ -60,7 +65,7 @@ public class ApplicationVersionConverter extends AbstractPackageToolConverter {
     }
 
     @Override
-    Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    public Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         if (!E_APPLICATION_VERSION.equals(reader.getNodeName())) {
             throw new ConversionException(
                     String.format(ERR_MISSING_EXPECTED_ELEMENT, E_APPLICATION_VERSION, reader.getNodeName()));
