@@ -19,7 +19,17 @@ import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
-import java.util.*;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.model.ser.SerializationScope;
+import org.dataconservancy.packaging.tool.model.ser.Serialize;
+import org.dataconservancy.packaging.tool.model.ser.StreamId;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+
 
 /**
  * {@code PackageState} is an object responsible for maintaining the state information of individual package at any
@@ -27,11 +37,13 @@ import java.util.*;
  */
 public class PackageState {
 
+    @Serialize(streamId = StreamId.PACKAGE_NAME)
     private String packageName;
 
     /**
      * Package's tree structure
      */
+    @Serialize(streamId = StreamId.PACKAGE_TREE, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
     private Node packageTree;
 
     /**
@@ -42,23 +54,25 @@ public class PackageState {
     /**
      * Container of all of the domain objects in this package.
      */
-    //private DomainProfileObjectStore domainProfileObjectStore;
+    // TODO: Figure out approach to serializing domain objects
+//    @Serialize(streamId = "package-domain-objects", scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
+//    private DomainProfileObjectStore domainProfileObjectStore;
 
     /**
      * A map of metadata fields relevant to this package, keyed by the name of the metadata field to their associated
      * list of values. The map maintains entry by the order of insertion.
      */
+    @Serialize(streamId = StreamId.PACKAGE_METADATA)
     private LinkedHashMap<String, List<String>> packageMetadataList;
-
-    /**
-     * Package serialization/generation information
-     */
-    private File outputDirectory;
 
     /**
      * Metadata about the tools used to create this package
      */
+    @Serialize(streamId = StreamId.APPLICATION_VERSION)
     private ApplicationVersion creationToolVersion;
+
+    // TODO: remove; I don't think this should be part of the package state
+    private File outputDirectory;
 
     public PackageState() {
         packageMetadataList = new LinkedHashMap<>();
@@ -81,23 +95,11 @@ public class PackageState {
     }
 
     /**
-     * Returns location at which the final package file/directory will be placed
-     */
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    /**
      * Returns the set of metadata fields used to describe this package.
      */
     public Set<String> getMetadataFields() {
         return packageMetadataList.keySet();
     }
-
 
     /**
      * Returns list of values for package metadata named {@code fieldName}
@@ -125,6 +127,19 @@ public class PackageState {
     public void setPackageMetadataList(LinkedHashMap <String, List<String>> metadataList) {
         this.packageMetadataList = metadataList;
     }
+
+    public LinkedHashMap<String, List<String>> getPackageMetadataList() {
+        return packageMetadataList;
+    }
+
+    public Node getPackageTree() {
+        return packageTree;
+    }
+
+    public void setPackageTree(Node packageTree) {
+        this.packageTree = packageTree;
+    }
+
     /**
      * Returns version information about the tool used to create this package.
      */
@@ -136,16 +151,8 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
-    public Node getPackageTree() {
-        return packageTree;
-    }
-
     public List<DomainProfile> getDomainProfileList() {
         return domainProfileList;
-    }
-
-    public void setPackageTree(Node treeRoot) {
-        packageTree = treeRoot;
     }
 
     /**
@@ -154,6 +161,16 @@ public class PackageState {
      */
     public boolean hasPackageMetadataValues() {
         return packageMetadataList != null && !packageMetadataList.isEmpty();
+    }
+
+    // TODO: remove; I don't think this should be part of the package state
+    public File getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    // TODO: remove; I don't think this should be part of the package state
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
     }
 
     @Override
@@ -185,11 +202,6 @@ public class PackageState {
             that.packageMetadataList != null) {
             return false;
         }
-        if (outputDirectory !=
-            null ? !outputDirectory.equals(that.outputDirectory) :
-            that.outputDirectory != null) {
-            return false;
-        }
         return !(creationToolVersion !=
                      null ? !creationToolVersion.equals(that.creationToolVersion) :
                      that.creationToolVersion != null);
@@ -205,8 +217,6 @@ public class PackageState {
             (domainProfileList != null ? domainProfileList.hashCode() : 0);
         result = 31 * result +
             (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
-        result = 31 * result +
-            (outputDirectory != null ? outputDirectory.hashCode() : 0);
         result = 31 * result +
             (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;

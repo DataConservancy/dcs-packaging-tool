@@ -1,0 +1,7 @@
+<serialization version="1" converterClass="org.dataconservancy.packaging.tool.ser.ApplicationVersionConverter" streamId="APPLICATION_VERSION">
+  <applicationVersion>
+    <buildNumber>1</buildNumber>
+    <buildRevision>ee7326fefa2b38933bda12c2ba0a45e859fd565e</buildRevision>
+    <buildTs>1446650377</buildTs>
+  </applicationVersion>
+</serialization>

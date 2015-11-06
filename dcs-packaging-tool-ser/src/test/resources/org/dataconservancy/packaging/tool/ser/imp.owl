@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+  <!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY imp "http://www.dataconservancy.org/internal-package-model#" >
+  ]>
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:imp="http://www.dataconservancy.org/internal-package-model#"
+  xml:base="http://www.dataconservancy.org/internal-package-model#"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <owl:Ontology rdf:about="">
+    <owl:versionIRI>
+      http://www.dataconservancy.org/internal-package-model/moo
+    </owl:versionIRI>
+    <rdfs:comment>Internal Package Model ontology for the DCS Packaging Tool</rdfs:comment>
+  </owl:Ontology>
+
+  <owl:Class rdf:about="&imp;Node">
+    <rdfs:comment>Nodes represent a single item in a package. They are roughly analogous to a package artifact.</rdfs:comment>
+
+    <owl:intersectonOf rdf:parseType="Collection">
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasDomainObject"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </owl:intersectonOf>    
+  </owl:Class>
+
+  <owl:Class rdf:about="&imp;NodeType">
+    <rdfs:comment>NodeType describes contraints on a Node and how it maps to a domain object.</rdfs:comment>
+
+    <owl:intersectonOf rdf:parseType="Collection">
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasLabel"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+      
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasDescription"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasDomainType"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasParentConstraint"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </owl:intersectonOf>
+  </owl:Class>
+
+  <owl:Class rdf:about="&imp;Property">
+    <rdfs:comment>Represents the properties that define the node.</rdfs:comment>
+    <owl:intersectonOf rdf:parseType="Collection">
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasPropertyValue"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasPropertyType"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </owl:intersectonOf>
+  </owl:Class>
+
+  <owl:Class rdf:about="&imp;PropertyType">
+    <rdfs:comment>Represents the properties that define the node.</rdfs:comment>
+    <!-- Define property attributes here -->
+    <owl:intersectonOf rdf:parseType="Collection">
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasDomainPredicate"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;isReadOnly"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasValueType"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasLabel"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasDescription"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </owl:intersectonOf>
+  </owl:Class>
+
+  <owl:Class rdf:about="&imp;PropertyConstraint">
+    <rdfs:comment>Defines contraints on a property in a node.</rdfs:comment>
+    <owl:intersectonOf rdf:parseType="Collection">
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasPropertyType"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasMinCount"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasMaxCount"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </owl:intersectonOf>
+  </owl:Class>
+
+  <owl:Class rdf:about="&imp;RootNode">
+    <rdfs:comment>This is the top most element of the package. This node can have no parents.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="&imp;Node"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasParent"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <owl:Class rdf:about="&imp;LeafNode">
+    <rdfs:comment>Leaf nodes are nodes that have no children.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="&imp;Node"/>
+    <rdfs:subClassOf>
+      <owl:Restriction>
+        <owl:onProperty rdf:resource="&imp;hasChild"/>
+        <owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasDomainType">
+    <rdfs:comment>Maps a node to a domain type.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;NodeType"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasParentConstraint">
+    <rdfs:comment>Allowed parents</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;NodeType"/>
+    <rdfs:range rdf:resource="&imp;NodeType"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasChildConstraint">
+    <rdfs:comment>Allowed children</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;NodeType"/>
+    <rdfs:range rdf:resource="&imp;NodeType"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasPropertyConstraint">
+    <rdfs:comment>Allowed properties</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;NodeType"/>
+    <rdfs:range rdf:resource="&imp;PropertyContraint"/>
+  </owl:DatatypeProperty>  
+
+  <owl:DatatypeProperty rdf:about="&imp;hasMinCount">
+    <rdfs:comment>Min count a property must have in a node.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyConstraint"/> 
+    <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasMinCount">
+    <rdfs:comment>Min count a property must have in a node.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyConstraint"/>
+    <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;isReadonly">
+    <rdfs:comment>Used to set whether the property is read only and thus can not be edited by the user.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyType"/>
+    <rdfs:range rdf:resource="&xsd;boolean"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasLabel">
+    <rdfs:comment>The human readable label for a property or type that will be displayed the interface.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyType"/> <!-- or NodeType -->
+    <rdfs:range rdf:resource="&xsd;string"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasDescription">
+    <rdfs:comment>The human readable description for a property or type that will be displayed the interface.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyType"/> <!-- or NodeType -->
+    <rdfs:range rdf:resource="&xsd;string"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasValueType">
+    <rdfs:comment>The type of value which the property holds</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyType"/> 
+    <rdfs:range rdf:resource="&xsd;string"/>  <!-- create enum for value types -->
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:about="&imp;hasDomainPredicate">
+    <rdfs:comment>The domain predicate which this property maps to.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;PropertyType"/> 
+    <!-- range is some uri -->
+  </owl:DatatypeProperty>
+  
+  <owl:ObjectProperty rdf:about="&imp;hasPropertyValue">
+    <rdfs:comment>The actual value of the property either supplied by the tool or entered by a user.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;Property"/>
+    <rdfs:range rdf:resource="&rdfs;Literal"/>
+  </owl:ObjectProperty>
+  
+  <owl:ObjectProperty rdf:about="&imp;hasPropertyType">
+    <rdfs:comment>The type of a property. </rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;Property"/> <!-- or PropertyConstraint -->
+    <rdfs:range rdf:resource="&imp;PropertyType"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="&imp;hasProperty">
+    <rdfs:comment>A single property on a node</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;Node"/>
+    <rdfs:range rdf:resource="&imp;Property"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="&imp;hasProperty">
+    <rdfs:comment>A single property on a node</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;Node"/>
+    <rdfs:range rdf:resource="&imp;Property"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:about="&imp;hasDomainObject">
+    <rdfs:comment>The domain object associated with a node.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;Node"/>
+    <!-- range: some object -->
+  </owl:ObjectProperty>
+
+  <!-- owl:same as some known parent child relationship?? -->
+  <owl:IrreflexiveProperty rdf:about="&imp;hasChild">
+    <rdfs:comment>Used to represent that a node has another node as it's child.</rdfs:comment>
+    <rdfs:domain rdf:resource="&imp;Node"/>
+    <rdfs:range rdf:resource="&imp;Node"/>
+  </owl:IrreflexiveProperty>
+
+  <owl:IrreflexiveProperty rdf:about="&imp;hasParent">
+    <rdfs:comment>Used to represent that a node has another node as it's parent.</rdfs:comment>
+    <owl:inverseOf rdf:resource="#hasChild"/>
+    <rdfs:domain rdf:resource="&imp;Node"/>
+    <rdfs:range rdf:resource="&imp;Node"/>
+  </owl:IrreflexiveProperty>
+</rdf:RDF>

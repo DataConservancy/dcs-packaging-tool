@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.dataconservancy.pkgtool</groupId>
+  <artifactId>dcs-packaging-tool-ser</artifactId>
+  <packaging>jar</packaging>
+  <name>Package Tool Serialization</name>
+  <description>Serialization routines for the packaging tool</description>
+  
+  <parent>
+    <groupId>org.dataconservancy.pkgtool</groupId>
+    <artifactId>dcs-packaging-tool</artifactId>
+    <version>0.10.1-SNAPSHOT</version>
+  </parent>
+    
+  <!-- Dependency Management ====================================== -->
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.11.0</version>
+      </dependency> 
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- Dependencies =============================================== -->
+  
+  <dependencies>
+
+    <!-- Provided ================================================= -->
+    
+    <!-- Runtime ================================================== -->     
+    
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <scope>runtime</scope>
+    </dependency> 
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency> 
+
+    <!-- Compile ================================================== -->
+
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-model</artifactId>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.jena</groupId>
+          <artifactId>jena-arq</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.dataconservancy.shared</groupId>
+          <artifactId>dcs-shared-util</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-ontologies</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-oxm</artifactId>
+      <scope>compile</scope>
+    </dependency> 
+
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>compile</scope>
+    </dependency> 
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
+    <!-- Test ===================================================== -->
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ogce</groupId>
+      <artifactId>xpp3</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <scope>test</scope>
+    </dependency> 
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency> 
+    
+  </dependencies>
+
+</project>
