@@ -79,20 +79,24 @@ public class PropertyFormatServiceImpl implements PropertyFormatService {
         Property formattedProperty = new Property(type);
 
         String formattedValue = value;
-        switch(type.getPropertyValueHint()) {
-            case PHONE_NUMBER:
-                PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                try {
-                    formattedValue = phoneUtil.format(phoneUtil.parseAndKeepRawInput(value, "US"), PhoneNumberUtil.PhoneNumberFormat.RFC3966);
-                } catch (NumberParseException e) {
-                    log.error("Phone number wasn't properly formed, unable to generate uri: " + formattedValue);
-                }
-                break;
-            case EMAIL:
-                if (!value.startsWith("mailto:")) {
-                    formattedValue = "mailto:" + value;
-                }
-                break;
+        if (type.getPropertyValueHint() != null) {
+            switch (type.getPropertyValueHint()) {
+                case PHONE_NUMBER:
+                    PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+                    try {
+                        formattedValue = phoneUtil.format(phoneUtil.parseAndKeepRawInput(value, "US"), PhoneNumberUtil.PhoneNumberFormat.RFC3966);
+                    } catch (NumberParseException e) {
+                        log.error(
+                            "Phone number wasn't properly formed, unable to generate uri: " +
+                                formattedValue);
+                    }
+                    break;
+                case EMAIL:
+                    if (!value.startsWith("mailto:")) {
+                        formattedValue = "mailto:" + value;
+                    }
+                    break;
+            }
         }
 
         switch (type.getPropertyValueType()) {
