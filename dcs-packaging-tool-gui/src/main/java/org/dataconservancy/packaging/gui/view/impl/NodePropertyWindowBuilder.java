@@ -37,6 +37,7 @@ import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;

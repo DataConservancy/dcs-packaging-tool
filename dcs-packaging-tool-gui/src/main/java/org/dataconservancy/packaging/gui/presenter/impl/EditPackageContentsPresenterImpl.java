@@ -236,32 +236,23 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
-        //First remove all properties of the given type, to be replaced with the new ones
-        profileService.removeProperty(view.getPopupNode(), propertyBox.getPropertyConstraint().getPropertyType());
-        //If it's not complex loop through the values and set them on the node
-        if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
-            PropertyValueType.COMPLEX) {
+        if (!propertyBox.getPropertyConstraint().getPropertyType().isReadOnly()) {
+            //First remove all properties of the given type, to be replaced with the new ones
+            profileService.removeProperty(view.getPopupNode(), propertyBox.getPropertyConstraint().getPropertyType());
+            //If it's not complex loop through the values and set them on the node
 
-            propertyBox.getValues().stream().filter(value -> value != null &&
-                !value.isEmpty()).forEach(value -> {
-                Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
-                switch (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType()) {
-                    case STRING:
-                        newProperty.setStringValue(value);
-                        break;
-                    case LONG:
-                        newProperty.setLongValue(Long.valueOf(value));
-                        break;
-                    case DATE_TIME:
-                        //TODO: Fix this to wire up date picker
-                        newProperty.setDateTimeValue(new DateTime());
-                        break;
-                }
+            if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
+                PropertyValueType.COMPLEX) {
 
-                profileService.addProperty(view.getPopupNode(), newProperty);
-            });
-        } else {
-            propertyBox.getSubPropertyBoxes().forEach(this::savePropertyFromBox);
+                propertyBox.getValues().stream().filter(value -> value != null &&
+                    !value.isEmpty()).forEach(value -> {
+                    Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), value);
+
+                    profileService.addProperty(view.getPopupNode(), newProperty);
+                });
+            } else {
+                propertyBox.getSubPropertyBoxes().forEach(this::savePropertyFromBox);
+            }
         }
     }
 
@@ -315,10 +306,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 }
 
             }
-
-            //Finally prune any empty properties that already exist on the artifact
-            //TODO Figure out how to track and remove empty properties
-            //view.getPopupNode().pruneEmptyProperties();
 
             //apply metadata inheritance
             applyMetadataInheritance(view.getPopupNode());

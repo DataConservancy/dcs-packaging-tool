@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.PropertyFormatService;
+import org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
@@ -28,15 +30,17 @@ public class ProfilePropertyBox extends VBox {
     List<PropertyBox> textPropertyBoxes;
     List<ProfilePropertyBox> subPropertyBoxes;
     private double addNewButtonMaxWidth = 200;
+    private PropertyFormatService formatService;
 
     public ProfilePropertyBox(PropertyConstraint propertyConstraint, Node node,
                               DomainProfileService profileService) {
+        formatService = new PropertyFormatServiceImpl();
+
         this.propertyConstraint = propertyConstraint;
 
         setSpacing(6);
 
         HBox propertyLabelAndValueBox = new HBox(12);
-
 
         Label propertyNameLabel = new Label(propertyConstraint.getPropertyType().getLabel());
         propertyNameLabel.setPrefWidth(100);
@@ -84,18 +88,7 @@ public class ProfilePropertyBox extends VBox {
 
             if (existingProperties != null && !existingProperties.isEmpty()) {
                 for (Property property : existingProperties) {
-                    String value = "";
-                    switch (property.getPropertyType().getPropertyValueType()) {
-                        case STRING:
-                            value = property.getStringValue();
-                            break;
-                        case LONG:
-                            value = String.valueOf(property.getLongValue());
-                            break;
-                        case DATE_TIME:
-                            //TODO: Parse and format date time
-                            break;
-                    }
+                    String value = formatService.formatPropertyValue(property);
                     PropertyBox propertyBox = new PropertyBox(value, (
                         propertyConstraint.getPropertyType().getPropertyValueHint() ==
                             PropertyValueHint.MULTI_LINE_TEXT), editable);

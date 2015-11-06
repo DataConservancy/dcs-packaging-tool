@@ -36,34 +36,39 @@ public class PropertyFormatServiceImpl implements PropertyFormatService {
                 break;
         }
 
-        switch(type.getPropertyValueHint()) {
-            case PHONE_NUMBER:
-                PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-                try {
-                    Phonenumber.PhoneNumber number = phoneUtil.parseAndKeepRawInput(rawPropertyValue, "US");
-                    String regionCode = phoneUtil.getRegionCodeForNumber(number);
-                    rawPropertyValue = phoneUtil.formatInOriginalFormat(number, regionCode);
-                } catch (NumberParseException e) {
-                    log.warn("Phone number wasn't properly formatted uri, using provided value as is: " + rawPropertyValue);
-                }
-                break;
-            case EMAIL:
-                if (rawPropertyValue.startsWith("mailto:")) {
-                    rawPropertyValue = rawPropertyValue.substring(7);
-                }
-                break;
-            case FILE_SIZE:
-                final DecimalFormat twoDecimalForm = new DecimalFormat("#.##");
-                double doubleValue = Double.parseDouble(rawPropertyValue);
-                int i=0;
-                int test = 1;
-                while(doubleValue >= test*1000 && i < sizeLabels.length - 1){
-                    test *= 1000;
-                    i++;
-                }
-                String sizeLabel = (doubleValue == 1) ? " Byte" : sizeLabels[i];
-                rawPropertyValue = twoDecimalForm.format(doubleValue / test) + sizeLabel;
-                break;
+        if (type.getPropertyValueHint() != null) {
+            switch (type.getPropertyValueHint()) {
+                case PHONE_NUMBER:
+                    PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+                    try {
+                        Phonenumber.PhoneNumber number = phoneUtil.parseAndKeepRawInput(rawPropertyValue, "US");
+                        String regionCode = phoneUtil.getRegionCodeForNumber(number);
+                        rawPropertyValue = phoneUtil.formatInOriginalFormat(number, regionCode);
+                    } catch (NumberParseException e) {
+                        log.warn(
+                            "Phone number wasn't properly formatted uri, using provided value as is: " +
+                                rawPropertyValue);
+                    }
+                    break;
+                case EMAIL:
+                    if (rawPropertyValue.startsWith("mailto:")) {
+                        rawPropertyValue = rawPropertyValue.substring(7);
+                    }
+                    break;
+                case FILE_SIZE:
+                    final DecimalFormat twoDecimalForm = new DecimalFormat("#.##");
+                    double doubleValue = Double.parseDouble(rawPropertyValue);
+                    int i = 0;
+                    int test = 1;
+                    while (doubleValue >= test * 1000 &&
+                        i < sizeLabels.length - 1) {
+                        test *= 1000;
+                        i++;
+                    }
+                    String sizeLabel = (doubleValue == 1) ? " Byte" : sizeLabels[i];
+                    rawPropertyValue = twoDecimalForm.format(doubleValue / test) + sizeLabel;
+                    break;
+            }
         }
 
         return rawPropertyValue;
