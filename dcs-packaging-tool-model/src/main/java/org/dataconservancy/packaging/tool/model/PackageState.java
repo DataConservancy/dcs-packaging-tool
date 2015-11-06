@@ -188,6 +188,10 @@ public class PackageState {
             that.packageName != null) {
             return false;
         }
+        if (outputDirectory != null ? !outputDirectory.equals(that.outputDirectory) :
+                that.outputDirectory != null) {
+                return false;
+        }
         if (packageTree != null ? !packageTree.equals(that.packageTree) :
             that.packageTree != null) {
             return false;
@@ -217,6 +221,8 @@ public class PackageState {
             (domainProfileList != null ? domainProfileList.hashCode() : 0);
         result = 31 * result +
             (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
+        result = 31 * result +
+            (outputDirectory != null ? outputDirectory.hashCode() : 0);
         result = 31 * result +
             (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;
