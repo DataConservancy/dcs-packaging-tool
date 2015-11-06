@@ -59,14 +59,15 @@ public class ProfilePropertyBox extends VBox {
 
         if (propertyConstraint.getPropertyType().getPropertyValueType().equals(PropertyValueType.COMPLEX)) {
             subPropertyBoxes = new ArrayList<>();
-            createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener);
+            createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener, propertyValuesBox);
+            getChildren().add(propertyValuesBox);
 
             if (propertyConstraint.getMaximum() > 1 || propertyConstraint.getMaximum() == -1) {
 
                 getChildren().add(addNewButton);
 
                 addNewButton.setOnAction(arg0 -> {
-                    createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener);
+                    createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener, propertyValuesBox);
 
                     addNewButton.setDisable(true);
                     requestFocusForNewGroup(subPropertyBoxes.get(subPropertyBoxes.size()-1));
@@ -136,11 +137,11 @@ public class ProfilePropertyBox extends VBox {
 
     }
 
-    private void createChildProfilePropertyBoxes(List<ProfilePropertyBox> nodePropertyBoxes, Node node, DomainProfileService profileService, GroupPropertyChangeListener listener) {
+    private void createChildProfilePropertyBoxes(List<ProfilePropertyBox> nodePropertyBoxes, Node node, DomainProfileService profileService, GroupPropertyChangeListener listener, VBox propertyValueBox) {
         for (PropertyConstraint subConstraint : propertyConstraint.getPropertyType().getComplexPropertyConstraints()) {
             ProfilePropertyBox subProfilePropertyBox = new ProfilePropertyBox(subConstraint, node, profileService);
             nodePropertyBoxes.add(subProfilePropertyBox);
-            getChildren().add(subProfilePropertyBox);
+            propertyValueBox.getChildren().add(subProfilePropertyBox);
             addChangeListenerToProfileBox(subProfilePropertyBox, listener);
         }
     }
