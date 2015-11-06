@@ -415,6 +415,7 @@ public class DcsBOProfile
                 .setDescription("A data property specifying a publisher for a Project");
         hasPublisher.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasPublisher"));
+        hasPublisher.setPropertyValueType(PropertyValueType.STRING);
 
         hasAlottedStorage.setLabel("Alotted Storage");
         hasAlottedStorage
@@ -467,7 +468,6 @@ public class DcsBOProfile
                 .create(NS_DCS_ONTOLOGY_BOM + "hasPrincipalInvestigator"));
         hasPrincipalInvestigator.setPropertyValueType(PropertyValueType.STRING);
 
-        hasPublisher.setPropertyValueType(PropertyValueType.STRING);
         name.setLabel("Name");
         name.setDescription("Person name");
         name.setDomainPredicate(URI.create(NS_FOAF + "name"));
@@ -489,7 +489,7 @@ public class DcsBOProfile
         homepage.setLabel("Web Page");
         homepage.setDescription("Web Page");
         homepage.setDomainPredicate(URI.create(NS_FOAF + "homepage"));
-        // TODO:  resource properties
+        homepage.setPropertyValueType(PropertyValueType.STRING);
         homepage.setPropertyValueHint(PropertyValueHint.URL);
 
     }
