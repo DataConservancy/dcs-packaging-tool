@@ -30,7 +30,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -42,10 +45,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest {
 
-    private HashMap<String, String> testMap = new HashMap<String, String>() {
+    private HashMap<String, List<String>> testMap = new HashMap<String, List<String>>() {
         {
-            put("foo", "bar");
-            put("baz", "bar");
+            put("foo", Arrays.asList("bar", "biz"));
+            put("baz", Arrays.asList("bar"));
         }
     };
 
@@ -77,12 +80,12 @@ public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest
 
     @Test
     public void testCanConvert() throws Exception {
-        assertTrue(underTest.canConvert(new HashMap<String, String>().getClass()));
+        assertTrue(underTest.canConvert(new HashMap<String, List<String>>().getClass()));
 
         // this can happen due to type erasure.  We could defend against runtime exceptions
         // by using String.valueOf(...) every time we read an element of the map, but at
         // this juncture we don't do that.
-        assertTrue(underTest.canConvert(new HashMap<Number, Number>().getClass()));
+        assertTrue(underTest.canConvert(new HashMap<Number, List<Number>>().getClass()));
     }
 
     @Test

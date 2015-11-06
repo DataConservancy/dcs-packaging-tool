@@ -23,8 +23,11 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,16 +37,25 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
 
     static final String E_PACKAGE_METADATA = "packageMetadata";
 
+    public PackageMetadataConverter() {
+        setStreamId(StreamId.PACKAGE_METADATA.name());
+    }
+
     @Override
-    void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+    public void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         @SuppressWarnings("unchecked")
-        Map<String, String> map = (Map<String, String>) source;
+        Map<String, List<String>> map = (Map<String, List<String>>) source;
 
         writer.startNode(E_PACKAGE_METADATA);
 
-        map.forEach((k, v) -> {
-            writer.startNode(k);
-            writer.setValue(v);
+        map.forEach((key, valueList) -> {
+            writer.startNode(key);
+
+            valueList.forEach(value -> {
+                writer.startNode(value);
+                writer.endNode();
+            });
+
             writer.endNode();
         });
 
@@ -51,8 +63,8 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
     }
 
     @Override
-    Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        HashMap<String, String> result = new HashMap<>();
+    public Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        HashMap<String, List<String>> result = new HashMap<>();
 
         if (!E_PACKAGE_METADATA.equals(reader.getNodeName())) {
             throw new ConversionException(
@@ -61,8 +73,15 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
 
         while (reader.hasMoreChildren()) {
             reader.moveDown();
-            result.put(reader.getNodeName(), reader.getValue());
+            String key = reader.getNodeName();
+            ArrayList<String> values = new ArrayList<>();
+            while (reader.hasMoreChildren()) {
+                reader.moveDown();
+                values.add(reader.getNodeName());
+                reader.moveUp();
+            }
             reader.moveUp();
+            result.put(key, values);
         }
 
         return result;
@@ -76,7 +95,7 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
 
         try {
             @SuppressWarnings("unchecked")
-            Class<Map<String, String>> foo = (Class<Map<String, String>>) type;
+            Class<Map<String, List<String>>> foo = (Class<Map<String, List<String>>>) type;
         } catch (Exception e) {
             return false;
         }
