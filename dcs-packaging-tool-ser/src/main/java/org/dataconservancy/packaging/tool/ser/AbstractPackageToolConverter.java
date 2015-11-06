@@ -315,7 +315,7 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * @param writer a stream to write to
      * @param context a context that allows nested objects to be processed by XStream.
      */
-    abstract void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context);
+    public abstract void marshalInternal(Object source, HierarchicalStreamWriter writer, MarshallingContext context);
 
 
     /**
@@ -326,6 +326,6 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * @param context a context that allows nested objects to be processed by XStream.
      * @return the resulting object
      */
-    abstract Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context);
+    public abstract Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context);
 
 }

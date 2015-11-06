@@ -24,7 +24,7 @@ import org.apache.jena.rdf.model.Model;
  * Simple interface responsible for creating new instances of a Jena {@code Model}.  Implementations of this interface
  * configure the concrete {@link Model} instances returned from this method.
  */
-interface JenaModelFactory {
+public interface JenaModelFactory {
 
     /**
      * Answers a configured, ready-to-use {@link Model}.  Each invocation of this method should return a new instance.

@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Creates instances of the default Jena {@code Model} with support for prefix maps.
  */
-class DefaultModelFactory implements JenaModelFactory {
+public class DefaultModelFactory implements JenaModelFactory {
 
     /**
      * Prefix maps used when (de)serializing Model instances.
@@ -55,7 +55,7 @@ class DefaultModelFactory implements JenaModelFactory {
      * @return the prefix mapping
      * @see Ontologies#PREFIX_MAP
      */
-    PrefixMapping getPrefixMapping() {
+    public PrefixMapping getPrefixMapping() {
         return prefixMapping;
     }
 
@@ -65,7 +65,7 @@ class DefaultModelFactory implements JenaModelFactory {
      * @param prefixMapping the prefix mapping
      * @see Ontologies#PREFIX_MAP
      */
-    void setPrefixMapping(PrefixMapping prefixMapping) {
+    public void setPrefixMapping(PrefixMapping prefixMapping) {
         ModelFactory.setDefaultModelPrefixes(prefixMapping);
     }
 
@@ -75,7 +75,7 @@ class DefaultModelFactory implements JenaModelFactory {
      * @param prefixMapping values are URIs keyed by their prefix
      * @see Ontologies#PREFIX_MAP
      */
-    void setPrefixMapping(Map<String, String> prefixMapping) {
+    public void setPrefixMapping(Map<String, String> prefixMapping) {
         PrefixMapping mapping = PrefixMapping.Factory.create();
         mapping.setNsPrefixes(prefixMapping);
         setPrefixMapping(prefixMapping);
