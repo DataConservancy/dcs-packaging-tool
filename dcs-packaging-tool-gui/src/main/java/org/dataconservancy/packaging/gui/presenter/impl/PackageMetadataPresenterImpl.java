@@ -29,16 +29,19 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Implementation for the screen that will handle package metadata.
@@ -49,6 +52,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     private PackageMetadataView view;
     private PackageMetadataService packageMetadataService;
     private File packageMetadataFile;
+    private DomainProfileStore domainProfileStore;
+    private List<DomainProfile> domainProfileList;
 
     public PackageMetadataPresenterImpl(PackageMetadataView view) {
         super(view);
@@ -105,8 +110,12 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     private void bind() {
 
-        // FIXME: The profile names should come from an actual service
-        view.loadDomainProfileNames(Arrays.asList("Bag-It", "Custom Profile", "Custom Profile 2"));
+        domainProfileList = domainProfileStore.getPrimaryDomainProfiles();
+        List<String> domainProfileLabels = new ArrayList<>();
+        for (DomainProfile domainProfile : domainProfileList){
+            domainProfileLabels.add(domainProfile.getLabel());
+        }
+        view.loadDomainProfileNames(domainProfileLabels);
         view.getAddDomainProfileButton().setOnAction(event -> {
             if (view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem() != null &&
                     !view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem().isEmpty()) {
@@ -165,8 +174,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         // Clear the package metadata list and reset the values based on the current state of form
         getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
 
+        // Clear the domain profile list and reset the values on the current state of the form
+        getController().getPackageState().setDomainProfileList(domainProfileList);
+
         // FIXME: This ID should come from somewhere? Setting something now so the page moves on.
-        getController().getPackageState().addPackageMetadata("BagIt-Profile-Identifier", "SomeFakeId");
+        getController().getPackageState().addPackageMetadata("BagIt-Profile-Identifier", view.getDomainProfilesComboBox().getValue());
 
         for (Node removableLabel : view.getDomainProfileRemovableLabelVBox().getChildren()) {
             if (removableLabel instanceof RemovableLabel) {
@@ -224,6 +236,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     @Override
     public void setPackageMetadataService(PackageMetadataService packageMetadataService) {
         this.packageMetadataService = packageMetadataService;
+    }
+
+    @Override
+    public void setDomainProfileStore(DomainProfileStore domainProfileStore) {
+        this.domainProfileStore = domainProfileStore;
     }
 
 }

@@ -103,6 +103,9 @@ public class PCDMProfile
 
         setSuppliedValues();
 
+        /*set the label to display in the GUI profile picker */
+        setLabel("PCDM Profile");
+
         /* Now, populate the profile with our profile data */
         setDomainIdentifier(URI.create("http://example.org/myDomainIdentifier"));
 

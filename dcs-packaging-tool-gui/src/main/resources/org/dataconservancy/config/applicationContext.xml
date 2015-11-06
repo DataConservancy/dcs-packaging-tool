@@ -203,6 +203,7 @@
     <property name="controller" ref="controller"/>
     <property name="packageMetadataService" ref="packageMetadataService"/>
     <property name="internalProperties" ref="internalProperties"/>
+    <property name="domainProfileStore" ref="domainProfileStore"/>
   </bean>
 
   <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
@@ -241,5 +242,21 @@
     <property name="toolBuildTimestamp" value="${build.timeStamp}"/>
     <property name="toolBuildRevision" value="${build.revision}"/>
   </bean>
+
+  <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
+    <property name="primaryDomainProfiles">
+        <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
+          <ref bean="dcsBoProfile"/>
+          <ref bean="pcdmProfile"/>
+        </list>
+    </property>
+    <property name="secondaryDomainProfiles">
+        <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
+    </property>
+  </bean>
+
+  <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>
+
+  <bean id="pcdmProfile" class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile"/>
 
 </beans>

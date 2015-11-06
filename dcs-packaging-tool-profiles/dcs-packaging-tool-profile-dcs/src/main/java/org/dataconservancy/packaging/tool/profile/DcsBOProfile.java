@@ -184,6 +184,9 @@ public class DcsBOProfile
 
         setSuppliedValues();
 
+        /* set the label to display in the GUI Proflie picker */
+        setLabel("DCS Business Object Profile");
+
         /* Now, populate the profile with our profile data */
         setDomainIdentifier(URI.create("http://example.org/myDomainIdentifier"));
 

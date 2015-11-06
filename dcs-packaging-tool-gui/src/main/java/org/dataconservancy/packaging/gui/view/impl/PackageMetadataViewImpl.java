@@ -49,8 +49,6 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.ValidationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,8 +59,6 @@ import java.util.Set;
  * Implementation of the view that displays the controls for package metadata.
  */
 public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresenter> implements PackageMetadataView {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PackageMetadataViewImpl.class);
 
     //Controls for setting the package name and output directory
     private TextField packageNameField;
@@ -174,22 +170,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         content.getChildren().add(bottomContent);
 
-    }
-
-    /**
-     * Set image on the provided label, using a String imageKey
-     *
-     * @param label The label to set the image on
-     * @param imageKey The url of the image to set.
-     */
-    private void setLabelImage(Label label, String imageKey) {
-        if (imageKey != null) {
-            ImageView image = new ImageView();
-            image.getStyleClass().add(imageKey);
-            label.setGraphic(image);
-        } else {
-            label.setGraphic(null);
-        }
     }
 
     @Override
@@ -364,7 +344,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     /**
      * Helper method that creates the field based on the given package metadata.
      *
-     * @param packageMetadata
+     * @param packageMetadata the given package metadata
      * @return container vbox with the field
      */
     private VBox createFieldsView(PackageMetadata packageMetadata) {
@@ -426,7 +406,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     /**
      * Helper method that creates labels with tooltips for a given text.
      *
-     * @param text
+     * @param text  the supplied text
      * @return container vbox
      */
     private VBox createSectionLabel(String text) {

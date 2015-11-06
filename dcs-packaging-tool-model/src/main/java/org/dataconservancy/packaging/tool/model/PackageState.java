@@ -151,6 +151,10 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
+    public void setDomainProfileList(List<DomainProfile> domainProfileList){
+        this.domainProfileList = domainProfileList;
+    }
+
     public List<DomainProfile> getDomainProfileList() {
         return domainProfileList;
     }
