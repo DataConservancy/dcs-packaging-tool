@@ -128,7 +128,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Preferences preferences;
-    private PackageArtifactWindowBuilder windowBuilder;
+    private NodePropertyWindowBuilder windowBuilder;
 
     private static final String synthesizedArtifactMarker = " *";
 
@@ -864,7 +864,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public void setupWindowBuilder(String disciplineFilePath){
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
-        windowBuilder = new PackageArtifactWindowBuilder(cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService);
+        windowBuilder = new NodePropertyWindowBuilder(cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService);
     }
 
     @Override

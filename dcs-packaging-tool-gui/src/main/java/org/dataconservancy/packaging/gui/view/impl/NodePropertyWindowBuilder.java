@@ -55,7 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PackageArtifactWindowBuilder implements CssConstants {
+public class NodePropertyWindowBuilder implements CssConstants {
 
     private BorderPane artifactDetailsLayout;
 
@@ -79,10 +79,10 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public PackageArtifactWindowBuilder(Hyperlink cancelPopupLink,
-                                        Button applyPopupButton,
-                                        String availableRelationshipsPath,
-                                        DisciplineLoadingService disciplineLoadingService) {
+    public NodePropertyWindowBuilder(Hyperlink cancelPopupLink,
+                                     Button applyPopupButton,
+                                     String availableRelationshipsPath,
+                                     DisciplineLoadingService disciplineLoadingService) {
         this.cancelPopupLink = cancelPopupLink;
         this.applyPopupButton = applyPopupButton;
 
@@ -390,7 +390,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
                 if(!path.startsWith("/")){
                     path = "/" + path;
                 }
-                InputStream fileStream = PackageArtifactWindowBuilder.class.getResourceAsStream(path);
+                InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream(path);
                 if (fileStream != null) {
                     availableRelationshipGroups = RelationshipGroupJSONBuilder.deserialize(fileStream);
                 } else {
@@ -411,7 +411,7 @@ public class PackageArtifactWindowBuilder implements CssConstants {
 
         //If the file is null attempt to load the built in resource file.
         if (availableRelationshipGroups.isEmpty()) {
-            InputStream fileStream = PackageArtifactWindowBuilder.class.getResourceAsStream("/defaultRelationships");
+            InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream("/defaultRelationships");
             if (fileStream != null) {
                 availableRelationshipGroups = RelationshipGroupJSONBuilder.deserialize(fileStream);
             }
