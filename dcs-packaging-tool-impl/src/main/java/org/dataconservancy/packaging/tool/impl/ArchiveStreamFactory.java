@@ -29,10 +29,10 @@ import java.nio.file.attribute.FileTime;
  */
 public interface ArchiveStreamFactory {
 
-    public ArchiveOutputStream newArchiveOutputStream(OutputStream out);
+    ArchiveOutputStream newArchiveOutputStream(OutputStream out);
 
-    public ArchiveEntry newArchiveEntry(String name, long sizeBytes, FileTime created, FileTime lastModified,
-                                        int unixPermissions);
+    ArchiveEntry newArchiveEntry(String name, long sizeBytes, FileTime created, FileTime lastModified,
+                                 int unixPermissions, long crc);
 
 
 }
