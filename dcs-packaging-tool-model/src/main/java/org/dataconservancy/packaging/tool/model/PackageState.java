@@ -148,16 +148,8 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
-    public Node getPackageTree() {
-        return packageTree;
-    }
-
     public List<DomainProfile> getDomainProfileList() {
         return domainProfileList;
-    }
-
-    public void setPackageTree(Node treeRoot) {
-        packageTree = treeRoot;
     }
 
     /**
@@ -197,11 +189,6 @@ public class PackageState {
             that.packageMetadataList != null) {
             return false;
         }
-        if (outputDirectory !=
-            null ? !outputDirectory.equals(that.outputDirectory) :
-            that.outputDirectory != null) {
-            return false;
-        }
         return !(creationToolVersion !=
                      null ? !creationToolVersion.equals(that.creationToolVersion) :
                      that.creationToolVersion != null);
@@ -217,8 +204,6 @@ public class PackageState {
             (domainProfileList != null ? domainProfileList.hashCode() : 0);
         result = 31 * result +
             (packageMetadataList != null ? packageMetadataList.hashCode() : 0);
-        result = 31 * result +
-            (outputDirectory != null ? outputDirectory.hashCode() : 0);
         result = 31 * result +
             (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         return result;
