@@ -33,6 +33,7 @@ import org.springframework.oxm.Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
 import java.beans.PropertyDescriptor;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,6 +43,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.zip.CRC32;
 
 /**
  *
@@ -49,10 +51,12 @@ import java.util.stream.Collectors;
 public class DefaultPackageStateSerializer implements PackageStateSerializer {
 
     /**
-     * Placeholders: requested stream id, list of possible stream ids from the PackageState class (obtained at runtime)
+     * Placeholders: requested stream id, PackageState class name, list of possible stream ids from the PackageState
+     * class (obtained at runtime)
      */
-    private static final String ERR_INVALID_STREAMID = "Invalid streamId '%s'.  Possible stream identifiers " +
-            "available at runtime are: %s";
+    private static final String ERR_INVALID_STREAMID = "Unable to obtain streamId '%s' from the '%s' class.  The " +
+            "streamId may be invalid, or the expected JavaBean accessor method is missing or not accessible.  " +
+            "Allowed stream identifiers are: %s.";
 
     /**
      * Placeholders: method name, class name, error message
@@ -140,7 +144,7 @@ public class DefaultPackageStateSerializer implements PackageStateSerializer {
             try (ArchiveOutputStream aos = arxStreamFactory.newArchiveOutputStream(out)) {
                 serializeToArchive(state, streamId, aos);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(String.format(ERR_MARSHALLING_STREAM, streamId, e.getMessage()), e);
             }
         } else {
             StreamResult result = new StreamResult(out);
@@ -148,6 +152,14 @@ public class DefaultPackageStateSerializer implements PackageStateSerializer {
         }
     }
 
+    /**
+     * Serializes the identified stream from the package state to the supplied archive output stream.
+     *
+     * @param state the package state object containing the identified stream
+     * @param streamId the stream identifier for the content being serialized
+     * @param aos the archive output stream to serialize the stream to
+     * @throws IOException
+     */
     void serializeToArchive(PackageState state, StreamId streamId, ArchiveOutputStream aos) throws IOException {
 
         // when writing to an archive file:
@@ -159,21 +171,18 @@ public class DefaultPackageStateSerializer implements PackageStateSerializer {
         final FileTime now = FileTime.fromMillis(Calendar.getInstance().getTimeInMillis());
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(1024 * 4);
-        StreamResult result = new StreamResult(baos);
+        CRC32CalculatingOutputStream crc = new CRC32CalculatingOutputStream(baos);
+        StreamResult result = new StreamResult(crc);
         serializeToResult(state, streamId, result);
         ArchiveEntry arxEntry = arxStreamFactory
-                .newArchiveEntry(streamId.name(), baos.size(), now, now, 0644);
+                .newArchiveEntry(streamId.name(), baos.size(), now, now, 0644, crc.reset());
+
         try {
             aos.putArchiveEntry(arxEntry);
             baos.writeTo(aos);
+            aos.closeArchiveEntry();
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            try {
-                aos.closeArchiveEntry();
-            } catch (IOException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
         }
     }
 
@@ -190,6 +199,7 @@ public class DefaultPackageStateSerializer implements PackageStateSerializer {
 
         if (pd == null) {
             throw new IllegalArgumentException(String.format(ERR_INVALID_STREAMID, streamId.name(),
+                    PackageState.class.getName(),
                     propertyDescriptors.keySet().stream().map(Enum::name).collect(Collectors.joining(", "))));
         }
 
@@ -265,6 +275,20 @@ public class DefaultPackageStateSerializer implements PackageStateSerializer {
         this.archive = archive;
     }
 
+    /**
+     * Answers a {@code Map} of {@link PropertyDescriptor} instances, which are used to reflectively access the
+     * {@link Serialize serializable} streams on {@link PackageState} instances.
+     * <p>
+     * Use of {@code PropertyDescriptor} is simply a convenience in lieu of the use of underlying Java reflection.
+     * </p>
+     * <p>
+     * This method looks for fields annotated by the {@code Serialize} annotation on the {@code PackageState.class}.
+     * A {@code PropertyDescriptor} is created for each field, and is keyed by the {@code StreamId} in the returned
+     * {@code Map}.
+     * </p>
+     *
+     * @return a Map of PropertyDescriptors keyed by their StreamId.
+     */
     static Map<StreamId, PropertyDescriptor> getStreamDescriptors() {
         HashMap<StreamId, PropertyDescriptor> results = new HashMap<>();
 
@@ -280,6 +304,50 @@ public class DefaultPackageStateSerializer implements PackageStateSerializer {
                 });
 
         return results;
+    }
+
+    private class CRC32CalculatingOutputStream extends FilterOutputStream {
+
+        private CRC32 crc32 = new CRC32();
+
+        public CRC32CalculatingOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void close() throws IOException {
+            out.close();
+        }
+
+        @Override
+        public void flush() throws IOException {
+            out.flush();
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            crc32.update(b);
+            out.write(b);
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            crc32.update(b);
+            out.write(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            crc32.update(b, off, len);
+            out.write(b, off, len);
+        }
+
+        long reset() {
+            long crc = crc32.getValue();
+            crc32.reset();
+            return crc;
+        }
+
     }
 
 }
