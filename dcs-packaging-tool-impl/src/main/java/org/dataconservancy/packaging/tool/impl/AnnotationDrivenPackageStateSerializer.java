@@ -46,9 +46,46 @@ import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 /**
+ * Responsible for (de)serializing <em>specified</em> fields of {@link PackageState}.  Callers may request all
+ * annotated fields to be serialized by calling {@code serialize(PackageState, OutputStream)}, or callers may specify
+ * a particular stream of content to be serialized by calling {@code serialize(PackageState, StreamId, OutputStream)}.
+ * <p>
+ * In order for fields of {@code PackageState} to be serialized, they must be annotated with
+ * {@link org.dataconservancy.packaging.tool.model.ser.Serialize}, and have a so-called "stream identifier" assigned.
+ * Therefore, this interface <em>does not serialize the entirety</em> of a {@code PackageState} instance; it will only
+ * serialize fields that have been annotated, and that have standard JavaBean accessors and mutators
+ * (getXXX and setXXX methods).
+ * </p>
+ * <p>
+ * Example usage: Serializing package metadata to a file
+ * <pre>
+ *     // Assume the existence of a populated PackageState instance
+ *     PackageState state = ...
  *
+ *     // Instantiate and configure the serializer, or have it dependency injected
+ *     AnnotationDrivenPackageStateSerializer serializer = new AnnotationDrivenPackageStateSerializer();
+ *     serializer.setArchive(false)
+ *
+ *     File packageMd = new File("packageMetadata.out");
+ *     serializer.serialize(state, StreamId.PACKAGE_METADATA, new FileOutputStream(packageMd));
+ * </pre>
+ * </p>
+ *  <p>
+ * Example usage: Serializing package state before closing the Package Tool GUI
+ * <pre>
+ *     // Assume the existence of a populated PackageState instance
+ *     PackageState state = ...
+ *
+ *     // Instantiate and configure the serializer, or have it dependency injected
+ *     AnnotationDrivenPackageStateSerializer serializer = new AnnotationDrivenPackageStateSerializer();
+ *     serializer.setArchive(true)
+ *
+ *     File myPackage = new File("mypackage.zip");
+ *     serializer.serialize(state, new FileOutputStream(packageMd));
+ * </pre>
+ * </p>
  */
-public class DefaultPackageStateSerializer implements PackageStateSerializer {
+public class AnnotationDrivenPackageStateSerializer implements PackageStateSerializer {
 
     /**
      * Placeholders: requested stream id, PackageState class name, list of possible stream ids from the PackageState

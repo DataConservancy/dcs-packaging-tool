@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
 /**
  *
  */
-public class DefaultPackageStateSerializerTest {
+public class AnnotationDrivenPackageStateSerializerTest {
 
     /**
      * A mock ArchiveStreamFactory, producing mock ArchiveOutputStream and mock ArchiveEntry objects.
@@ -84,7 +84,7 @@ public class DefaultPackageStateSerializerTest {
 
     /**
      * A live PackageState object, typically populated by objects in the
-     * {@link DefaultPackageStateSerializerTest.TestObjects} class.
+     * {@link AnnotationDrivenPackageStateSerializerTest.TestObjects} class.
      */
     private PackageState state = new PackageState();
 
@@ -157,7 +157,7 @@ public class DefaultPackageStateSerializerTest {
     /**
      * The instance under test.
      */
-    private DefaultPackageStateSerializer underTest = new DefaultPackageStateSerializer();
+    private AnnotationDrivenPackageStateSerializer underTest = new AnnotationDrivenPackageStateSerializer();
 
     @Before
     public void setUp() throws Exception {
