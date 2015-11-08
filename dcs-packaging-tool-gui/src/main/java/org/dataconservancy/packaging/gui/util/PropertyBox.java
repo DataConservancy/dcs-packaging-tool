@@ -107,8 +107,8 @@ public class PropertyBox extends VBox {
      * Gets the text input control used to enter values, this allows externally setting listeners on the control.
      * @return The text input control for the PropertyBox.
      */
-    public TextInputControl getPropertyInput() {
-        return (TextInputControl) propertyInput;
+    public Control getPropertyInput() {
+        return propertyInput;
     }
 }
 

@@ -1,12 +1,17 @@
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import org.dataconservancy.packaging.gui.App;
 
 import java.time.LocalDate;
 
@@ -19,6 +24,8 @@ public class ControlFactory {
 
     public static double textPrefWidth = 1600; //make this big enough so that text input controls will widen when widening
     // the window. this property is public so it can be used in other classes.
+
+    private static final double startingTextHeight = 105.0;
 
     /**
      * This method creates various types of Controls for the GUI, setting various properties etc. as appropriate for the
@@ -61,6 +68,52 @@ public class ControlFactory {
             case TEXT_AREA:
                 control = initialValue != null && initialValue instanceof String ? new TextArea((String)initialValue) : new TextArea();
                 control.setPrefWidth(textPrefWidth);
+                ((TextArea)control).setPrefRowCount(5);
+                ((TextArea)control).setWrapText(true);
+                //The following code handles the growing of the text area to fit the text. It starts as 5 rows of text and is locked to never go below that size.
+                //This code only handles changes when the box is already visible for handling when the box is first visible see above.
+                ((TextArea)control).textProperty().addListener((observableValue, s, newValue) -> {
+
+                    //Account for the padding inside of the text area
+                    final int textAreaPaddingSize = 20;
+
+                    // This code can only be executed after the window is shown, because it needs to be laid out to get sized, and for the stylesheet to be set:
+
+                    //Hide the vertical scroll bar, the scroll bar sometimes appears briefly when resizing, this prevents that.
+                    ScrollBar scrollBarv = (ScrollBar)control.lookup(".scroll-bar:vertical");
+                    if (scrollBarv != null ) {
+                        scrollBarv.setDisable(true);
+                    }
+
+                    if (newValue.length() > 0) {
+                        // Perform a lookup for an element with a css class of "text"
+                        // This will give the Node that actually renders the text inside the
+                        // TextArea
+                        final Node text = control.lookup(".text");
+
+                        //Text will be null if the view has text already when the pop up is being shown
+                        //TODO: In java 8 this can be avoided by calling applyCSS
+                        if (text != null) {
+                            //If the text area is now bigger then starting size increase the size to fit the text plus the space for padding.
+                            if (text.getBoundsInLocal().getHeight() + textAreaPaddingSize > startingTextHeight) {
+
+                                control.setPrefHeight(text.getBoundsInLocal().getHeight() + textAreaPaddingSize);
+                            } else { //Otherwise set to the minimum size, this needs to be checked everytime in case the user selects all the text and deletes it
+                                control.setPrefHeight(startingTextHeight);
+                            }
+                        } else {
+                            //In the case where the text is set before the view is laid out we measure the text and then set the size to it.
+                            double textHeight = computeTextHeight(newValue, 170.0) + textAreaPaddingSize;
+                            if (textHeight + textAreaPaddingSize > startingTextHeight) {
+                                 control.setPrefHeight(textHeight);
+                            } else {
+                                control.setPrefHeight(startingTextHeight);
+                            }
+                        }
+                    } else {
+                        control.setPrefHeight(startingTextHeight);
+                    }
+                });
                 break;
 
             case TEXT_FIELD:
@@ -148,6 +201,11 @@ public class ControlFactory {
         return control;
     }
 
-
-
+    private static double computeTextHeight(String text, double wrappingWidth) {
+        Text helper = new Text();
+        helper.setText(text);
+        helper.setFont(Font.loadFont(App.class.getResource("/fonts/OpenSans-Regular.ttf").toExternalForm(), 14));
+        helper.setWrappingWidth((int)wrappingWidth);
+        return helper.getLayoutBounds().getHeight();
+    }
 }

@@ -89,6 +89,8 @@ public class ProfilePropertyBox extends VBox {
                 for (Property property : existingProperties) {
                     String value = formatService.formatPropertyValue(property);
                     PropertyBox propertyBox = new PropertyBox(value, editable, property.getPropertyType().getPropertyValueHint(), "");
+                    propertyBox.getPropertyInput().setPrefWidth(250);
+
                     textPropertyBoxes.add(propertyBox);
                     propertyValuesBox.getChildren().add(propertyBox);
                     addChangeListenerToPropertyFields(propertyBox, listener);
@@ -98,6 +100,8 @@ public class ProfilePropertyBox extends VBox {
                 }
             } else {
                 PropertyBox propertyBox = new PropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
+                propertyBox.getPropertyInput().setPrefWidth(250);
+
                 textPropertyBoxes.add(propertyBox);
                 addChangeListenerToPropertyFields(propertyBox, listener);
                 listener.changed(null, "n/a", "n/a");
@@ -112,6 +116,7 @@ public class ProfilePropertyBox extends VBox {
 
                 addNewButton.setOnAction(arg0 -> {
                     PropertyBox propertyBox = new PropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
+                    propertyBox.getPropertyInput().setPrefWidth(250);
 
                     propertyValuesBox.getChildren().add(propertyBox);
                     addChangeListenerToPropertyFields(propertyBox, listener);
@@ -153,7 +158,9 @@ public class ProfilePropertyBox extends VBox {
     private void addChangeListenerToPropertyFields(PropertyBox propertyBox,
                                                    ChangeListener<? super String> listener) {
 
-        propertyBox.getPropertyInput().textProperty().addListener(listener);
+        if (propertyBox.getPropertyInput() instanceof TextInputControl) {
+            ((TextInputControl) propertyBox.getPropertyInput()).textProperty().addListener(listener);
+        }
     }
 
     private void addChangeListenerToProfileBox(ProfilePropertyBox profilePropertyBox,
