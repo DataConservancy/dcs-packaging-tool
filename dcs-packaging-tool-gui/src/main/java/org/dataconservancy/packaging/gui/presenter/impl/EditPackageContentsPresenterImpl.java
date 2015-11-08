@@ -48,6 +48,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -244,12 +246,20 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
                 PropertyValueType.COMPLEX) {
 
-                propertyBox.getValues().stream().filter(value -> value != null &&
-                    !value.isEmpty()).forEach(value -> {
-                    Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), value);
-
-                    profileService.addProperty(view.getPopupNode(), newProperty);
+                propertyBox.getValues().stream().filter(value -> value !=
+                    null).forEach(value -> {
+                    if (value instanceof String) {
+                        if (!((String) value).isEmpty()) {
+                            Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                            profileService.addProperty(view.getPopupNode(), newProperty);
+                        }
+                    } else if (value instanceof LocalDate) {
+                        Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                        newProperty.setDateTimeValue(new DateTime(((LocalDate) value).getYear(), ((LocalDate) value).getMonthValue(), ((LocalDate) value).getDayOfMonth(), 0, 0, 0));
+                        profileService.addProperty(view.getPopupNode(), newProperty);
+                    }
                 });
+
             } else {
                 propertyBox.getSubPropertyBoxes().forEach(this::savePropertyFromBox);
             }

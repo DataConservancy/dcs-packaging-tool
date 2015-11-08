@@ -130,7 +130,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Bagging-Date</name>
         <requiredness>RECOMMENDED</requiredness>
         <visible>true</visible>
-        <validationType>DATE</validationType>
+        <validationType>DATE_TIME</validationType>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Size</name>

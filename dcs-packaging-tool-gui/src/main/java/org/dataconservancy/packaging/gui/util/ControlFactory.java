@@ -12,8 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.App;
+import org.joda.time.DateTime;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 
 /**
@@ -137,8 +139,13 @@ public class ControlFactory {
                 control = new DatePicker();
                 control.setPrefWidth(1600);
                 ((DatePicker) control).setEditable(false);
-                if (initialValue != null && initialValue instanceof LocalDate) {
-                    ((DatePicker)control).setValue((LocalDate) initialValue);
+                if (initialValue != null && (initialValue instanceof LocalDate || initialValue instanceof DateTime)) {
+                    if (initialValue instanceof LocalDate) {
+                        ((DatePicker) control).setValue((LocalDate) initialValue);
+                    } else {
+                        DateTime value = (DateTime) initialValue;
+                        ((DatePicker) control).setValue(LocalDate.of(value.getYear(), value.getMonthOfYear(), value.getDayOfMonth()));
+                    }
                 } else {
                     ((DatePicker) control).setPromptText("Select Date ->");
                 }

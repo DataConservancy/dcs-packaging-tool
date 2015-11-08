@@ -104,6 +104,17 @@ public class PropertyBox extends VBox {
     }
 
     /**
+     * @return the value of the property box as an object, it's up to the client to determine the type.
+     */
+    public Object getValue() {
+        if (propertyInput instanceof TextInputControl) {
+            return getValueAsString();
+        } else {
+            return getValueAsDate();
+        }
+    }
+
+    /**
      * Gets the text input control used to enter values, this allows externally setting listeners on the control.
      * @return The text input control for the PropertyBox.
      */

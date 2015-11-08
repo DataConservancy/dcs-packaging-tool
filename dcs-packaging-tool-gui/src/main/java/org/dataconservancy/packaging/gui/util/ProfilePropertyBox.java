@@ -17,6 +17,7 @@ import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -87,7 +88,12 @@ public class ProfilePropertyBox extends VBox {
 
             if (existingProperties != null && !existingProperties.isEmpty()) {
                 for (Property property : existingProperties) {
-                    String value = formatService.formatPropertyValue(property);
+                    Object value;
+                    if (property.getPropertyType().getPropertyValueHint() != null && property.getPropertyType().getPropertyValueHint().equals(PropertyValueHint.DATE_TIME)) {
+                        value = property.getDateTimeValue();
+                    } else {
+                        value = formatService.formatPropertyValue(property);
+                    }
                     PropertyBox propertyBox = new PropertyBox(value, editable, property.getPropertyType().getPropertyValueHint(), "");
                     propertyBox.getPropertyInput().setPrefWidth(250);
 
@@ -137,8 +143,8 @@ public class ProfilePropertyBox extends VBox {
         }
     }
 
-    public List<String> getValues() {
-        return textPropertyBoxes.stream().map(PropertyBox::getValueAsString).collect(Collectors.toList());
+    public List<Object> getValues() {
+        return textPropertyBoxes.stream().map(PropertyBox::getValue).collect(Collectors.toList());
     }
 
     public List<ProfilePropertyBox> getSubPropertyBoxes() {
@@ -220,8 +226,15 @@ public class ProfilePropertyBox extends VBox {
         private boolean anyGroupsEmpty() {
             if (textPropertyBoxes != null) {
                 for (PropertyBox textPropertyBox : textPropertyBoxes) {
-                    if (textPropertyBox.getValueAsString() == null || textPropertyBox.getValueAsString().isEmpty()) {
-                        return true;
+                    if (textPropertyBox.getPropertyInput() instanceof TextInputControl) {
+                        if (textPropertyBox.getValueAsString() == null ||
+                            textPropertyBox.getValueAsString().isEmpty()) {
+                            return true;
+                        }
+                    } else {
+                        if (textPropertyBox.getValueAsDate() == null) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -229,9 +242,15 @@ public class ProfilePropertyBox extends VBox {
             if (subPropertyBoxes != null) {
                 for (ProfilePropertyBox profilePropertyBox : subPropertyBoxes) {
                     for (PropertyBox textPropertyBox : profilePropertyBox.textPropertyBoxes) {
-                        if (textPropertyBox.getValueAsString() == null ||
-                            textPropertyBox.getValueAsString().isEmpty()) {
-                            return true;
+                        if (textPropertyBox.getPropertyInput() instanceof TextInputControl) {
+                            if (textPropertyBox.getValueAsString() == null ||
+                                textPropertyBox.getValueAsString().isEmpty()) {
+                                return true;
+                            }
+                        } else {
+                            if (textPropertyBox.getValueAsDate() == null) {
+                                return true;
+                            }
                         }
                     }
                 }
