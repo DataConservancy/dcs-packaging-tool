@@ -16,6 +16,7 @@
 package org.dataconservancy.packaging.gui.presenter;
 
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
@@ -35,5 +36,11 @@ public interface PackageMetadataPresenter extends Presenter {
      * Sets the existing values on the form's fields if they can be retrieved from the PackageState
      */
     public void setExistingValues();
+
+    /**
+     * Sets the DomainProfileStore to be used to retrieve the available DomainProfiles
+     * @param domainProfileStore
+     */
+    public void setDomainProfileStore(DomainProfileStore domainProfileStore);
 
 }

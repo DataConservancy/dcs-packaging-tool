@@ -26,14 +26,22 @@ import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
+import org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -76,6 +84,17 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
             factory.setController(controller);
 
+            DomainProfileStore domainProfileStore = new DomainProfileStoreJenaImpl(){
+
+              @Override
+              public List<DomainProfile> getPrimaryDomainProfiles(){
+                  List<DomainProfile> domainProfileList= new ArrayList<>();
+                  domainProfileList.add(new DcsBOProfile());
+                  return domainProfileList;
+              }
+
+            };
+
             view = new PackageMetadataViewImpl();
             view.setHelp(help);
             HeaderView header = new HeaderViewImpl();
@@ -86,7 +105,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
             service = new PackageMetadataService(configuration);
             presenter.setPackageMetadataService(service);
-
+            presenter.setDomainProfileStore(domainProfileStore);
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);
             controller.getCreateNewPackagePagesStack().clear();

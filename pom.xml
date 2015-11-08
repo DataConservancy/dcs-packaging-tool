@@ -249,6 +249,12 @@
 
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>
+        <artifactId>dcs-packaging-tool-profile-pcdm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.dataconservancy.pkgtool</groupId>
         <artifactId>dcs-packaging-tool-ontologies</artifactId>
         <version>${project.version}</version>
       </dependency>

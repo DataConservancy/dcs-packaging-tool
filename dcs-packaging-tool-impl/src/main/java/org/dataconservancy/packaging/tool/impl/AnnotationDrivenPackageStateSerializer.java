@@ -46,18 +46,22 @@ import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 /**
- * Responsible for (de)serializing <em>specified</em> fields of {@link PackageState}.  Callers may request all
- * annotated fields to be serialized by calling {@code serialize(PackageState, OutputStream)}, or callers may specify
- * a particular stream of content to be serialized by calling {@code serialize(PackageState, StreamId, OutputStream)}.
+ * Responsible for (de)serializing <em>annotated</em> fields of {@link PackageState}.  Callers may request that all
+ * annotated fields be serialized by calling {@code serialize(PackageState, OutputStream)}, or callers may specify a
+ * particular annotated field to be serialized by calling {@code serialize(PackageState, StreamId, OutputStream)}
+ * (i.e. by specifying the annotated field's stream identifier).
  * <p>
  * In order for fields of {@code PackageState} to be serialized, they must be annotated with
  * {@link org.dataconservancy.packaging.tool.model.ser.Serialize}, and have a so-called "stream identifier" assigned.
- * Therefore, this interface <em>does not serialize the entirety</em> of a {@code PackageState} instance; it will only
- * serialize fields that have been annotated, and that have standard JavaBean accessors and mutators
- * (getXXX and setXXX methods).
+ * If a field has not been annotated, then it cannot be serialized by this implementation.  This implementation
+ * <em>does not serialize the entirety</em> of a {@code PackageState} instance; it will only serialize fields that are
+ * annotated.  Annotated fields must have standard JavaBean accessors and mutators (getXXX and setXXX methods).
  * </p>
  * <p>
- * Example usage: Serializing package metadata to a file
+ * <strong>Examples</strong>
+ * </p>
+ * <p>
+ * Serializing package metadata to a file
  * </p>
  * <pre>
  *     // Assume the existence of a populated PackageState instance
@@ -65,13 +69,14 @@ import java.util.zip.CRC32;
  *
  *     // Instantiate and configure the serializer, or have it dependency injected
  *     AnnotationDrivenPackageStateSerializer serializer = new AnnotationDrivenPackageStateSerializer();
- *     serializer.setArchive(false)
+ *     serializer.setArchive(false);  // we're just serializing a single stream,
+ *                                    // so we don't need a zip archive
  *
  *     File packageMd = new File("packageMetadata.out");
  *     serializer.serialize(state, StreamId.PACKAGE_METADATA, new FileOutputStream(packageMd));
  * </pre>
  * <p>
- * Example usage: Serializing package state before closing the Package Tool GUI
+ * Serializing package state before closing the Package Tool GUI
  * </p>
  * <pre>
  *     // Assume the existence of a populated PackageState instance
@@ -79,11 +84,45 @@ import java.util.zip.CRC32;
  *
  *     // Instantiate and configure the serializer, or have it dependency injected
  *     AnnotationDrivenPackageStateSerializer serializer = new AnnotationDrivenPackageStateSerializer();
- *     serializer.setArchive(true)
+ *     serializer.setArchive(true);  // we're serializing all annotated fields,
+ *                                   // so we'll put all the streams in a
+ *                                   // zip archive
  *
  *     File myPackage = new File("mypackage.zip");
  *     serializer.serialize(state, new FileOutputStream(packageMd));
  * </pre>
+ * <p>
+ * <strong>Configuration</strong>
+ * </p>
+ * <p>
+ * This class has two main sets of configuration properties.  Those that pertain to creating archives, and
+ * (un)marshallers used for the fields on the {@code PackageState}.
+ * </p>
+ * <p>
+ * <strong>Archive-related configuration:</strong>
+ * </p>
+ * <dl>
+ *     <dt>archive</dt>
+ *     <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
+ *         When this flag is false, other archive-related properties are not consulted.</dd>
+ *     <dt>archiveFormat</dt>
+ *     <dd>A string indicating the format the archive should take.  Supported value are:
+ *         {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
+ *         {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
+ *     <dt>compress</dt>
+ *     <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
+ *     <dt>arxStreamFactory</dt>
+ *     <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
+ * </dl>
+ * <p>
+ * <strong>Marshalling-related configuration:</strong>
+ * </p>
+ * <dl>
+ *     <dt>marshallerMap</dt>
+ *     <dd>Maps the (un)marshallers to the streams that they (de)serialize.  Typically this will be
+ *         dependency injected.  In order for this implementation to function properly, each {@link StreamId}
+ *         should be represented in this {@code Map} with associated {@link StreamMarshaller}s</dd>
+ * </dl>
  */
 public class AnnotationDrivenPackageStateSerializer implements PackageStateSerializer {
 
@@ -117,29 +156,56 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     private static final String ERR_MARSHALLING_STREAM = "Error marshalling streamId '%s': %s";
 
-//    public enum CompressionFormat {
-//        ZIP,
-//        TAR
-//    }
-//
-//    private CompressionFormat compressionFormat = CompressionFormat.ZIP;
-
+    /**
+     * Whether or not we are serializing streams into an archive (zip or tar)
+     */
     private boolean archive = true;
 
-    private String compressionFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
+    /**
+     * The archive format to use (when {@link #archive} is {@code true})
+     */
+    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
 
+    /**
+     * Whether or not to compress the archive (when {@link #archive} is {@code true})
+     */
     private boolean compress = true;
 
+    /**
+     * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
+     * a particular archive format (currently zip and tar supported) (when {@link #archive} is {@code true})
+     */
     private ArchiveStreamFactory arxStreamFactory;
 
+    /**
+     * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
+     * may be (de)serialized by this implementation.
+     */
     private Map<StreamId, StreamMarshaller> marshallerMap;
 
+    /**
+     * A Map containing PropertyDescriptors for each field in PackageState that may be (de)serialized by this
+     * implementation.  The PropertyDescriptor is used to access the field in the PackageState using reflection.
+     */
     private Map<StreamId, PropertyDescriptor> propertyDescriptors = getStreamDescriptors();
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This will serialize all fields in the {@link PackageState} annotated with {@link Serialize} to the supplied
+     * {@code OutputStream}.  It is recommended that when calling this method, the caller also set the {@link
+     * #setArchive(boolean) archive flag} to {@code true}.  Because {@code PackageState} contains multiple fields, and
+     * because each field is serialized as a distinct stream, this method will result in multiple streams being
+     * serialized to the same {@code OutputStream}.
+     * </p>
+     *
+     * @param state the package state containing the annotated fields to be serialized
+     * @param out   the output stream to serialize to
+     */
     @Override
     public void serialize(PackageState state, OutputStream out) {
 
@@ -168,6 +234,17 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This will serialize the specified field in the {@link PackageState} annotated with {@link Serialize} to the
+     * supplied {@code OutputStream}.
+     * </p>
+     *
+     * @param state    the package state containing the stream identified by {@code streamId}
+     * @param streamId the stream within the package state to serialize
+     * @param out      the output stream to serialize to
+     */
     @Override
     public void serialize(PackageState state, StreamId streamId, OutputStream out) {
 
@@ -192,9 +269,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     /**
      * Serializes the identified stream from the package state to the supplied archive output stream.
      *
-     * @param state the package state object containing the identified stream
+     * @param state    the package state object containing the identified stream
      * @param streamId the stream identifier for the content being serialized
-     * @param aos the archive output stream to serialize the stream to
+     * @param aos      the archive output stream to serialize the stream to
      * @throws IOException
      */
     void serializeToArchive(PackageState state, StreamId streamId, ArchiveOutputStream aos) throws IOException {
@@ -226,9 +303,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     /**
      * Serializes the identified stream from the package state to the supplied result.
      *
-     * @param state the package state object containing the identified stream
+     * @param state    the package state object containing the identified stream
      * @param streamId the stream identifier for the content being serialized
-     * @param result holds the output stream for the serialization result
+     * @param result   holds the output stream for the serialization result
      */
     void serializeToResult(PackageState state, StreamId streamId, StreamResult result) {
 
@@ -272,42 +349,102 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         // TODO
     }
 
+    /**
+     * Whether or not compression will be used when writing to the {@code OutputStream}.  The implementation only
+     * considers this setting when the {@link #archive archive flag} is {@code true}.
+     *
+     * @return true if compression is being used
+     */
     public boolean isCompress() {
         return compress;
     }
 
+    /**
+     * Whether or not compression will be used when writing to the {@code OutputStream}.  The implementation only
+     * considers this setting when the {@link #archive archive flag} is {@code true}.
+     *
+     * @param compress if compression is being used
+     */
     public void setCompress(boolean compress) {
         this.compress = compress;
     }
 
-    public String getCompressionFormat() {
-        return compressionFormat;
+    /**
+     * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
+     * used to represent the format using values from
+     * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory}. The implementation only
+     * considers this setting when the {@link #archive archive flag} is {@code true}.
+     *
+     * @return a string representing the format of the archive
+     */
+    public String getArchiveFormat() {
+        return archiveFormat;
     }
 
-    public void setCompressionFormat(String compressionFormat) {
-        this.compressionFormat = compressionFormat;
+    /**
+     * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
+     * used to represent the format using values from
+     * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory}.  The implementation only
+     * considers this setting when the {@link #archive archive flag} is {@code true}.
+     *
+     * @param archiveFormat a string representing the format of the archive
+     */
+    public void setArchiveFormat(String archiveFormat) {
+        this.archiveFormat = archiveFormat;
     }
 
+    /**
+     * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
+     * may be (de)serialized by this implementation.
+     */
     public Map<StreamId, StreamMarshaller> getMarshallerMap() {
         return marshallerMap;
     }
 
+    /**
+     * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
+     * may be (de)serialized by this implementation.
+     */
     public void setMarshallerMap(Map<StreamId, StreamMarshaller> marshallerMap) {
         this.marshallerMap = marshallerMap;
     }
 
+    /**
+     * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
+     * a particular archive format (currently zip and tar supported).  The implementation only
+     * consults the factory when the {@link #archive archive flag} is {@code true}.
+     *
+     * @return the ArchiveStreamFactory
+     */
     public ArchiveStreamFactory getArxStreamFactory() {
         return arxStreamFactory;
     }
 
+    /**
+     * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
+     * a particular archive format (currently zip and tar supported).  The implementation only
+     * consults the factory when the {@link #archive archive flag} is {@code true}.
+     *
+     * @param arxStreamFactory the ArchiveStreamFactory
+     */
     public void setArxStreamFactory(ArchiveStreamFactory arxStreamFactory) {
         this.arxStreamFactory = arxStreamFactory;
     }
 
+    /**
+     * Whether or not we are serializing streams into an archive (zip or tar)
+     *
+     * @return a flag indicating whether or not we are producing an archive
+     */
     public boolean isArchive() {
         return archive;
     }
 
+    /**
+     * Whether or not we are serializing streams into an archive (zip or tar)
+     *
+     * @param archive a flag indicating whether or not we are producing an archive
+     */
     public void setArchive(boolean archive) {
         this.archive = archive;
     }
@@ -343,6 +480,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         return results;
     }
 
+    /**
+     * Calculates a CRC32 checksum as bytes are written to the wrapped {@code OutputStream}
+     */
     private class CRC32CalculatingOutputStream extends FilterOutputStream {
 
         private CRC32 crc32 = new CRC32();
@@ -379,6 +519,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
             out.write(b, off, len);
         }
 
+        /**
+         * Resets the checksum calculation and returns its value.
+         *
+         * @return the checksum value for the bytes written thus far
+         */
         long reset() {
             long crc = crc32.getValue();
             crc32.reset();
