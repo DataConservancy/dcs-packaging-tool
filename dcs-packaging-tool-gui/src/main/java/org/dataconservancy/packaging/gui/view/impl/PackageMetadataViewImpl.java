@@ -49,6 +49,7 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.ValidationType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 import java.util.ArrayList;
 import java.util.HashSet;
