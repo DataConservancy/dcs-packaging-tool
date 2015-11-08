@@ -284,13 +284,13 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                             Set<String> targets = new HashSet<>();
                             for (StringProperty field : relationshipContainer.getRelationshipTargets()) {
                                 //If target is not empty or null and is a valid RDF URI
-                                if (field.getValue() != null && !field.getValue().isEmpty()) {
-                                    if (relationshipContainer.requiresURI().getValue()) {
-                                        if (RDFURIValidator.isValid(field.getValue())) {
-                                            targets.add(field.getValue());
+                                if (field.getValueAsString() != null && !field.getValueAsString().isEmpty()) {
+                                    if (relationshipContainer.requiresURI().getValueAsString()) {
+                                        if (RDFURIValidator.isValid(field.getValueAsString())) {
+                                            targets.add(field.getValueAsString());
                                         }
                                     } else {
-                                        targets.add(field.getValue());
+                                        targets.add(field.getValueAsString());
                                     }
                                 }
                             }

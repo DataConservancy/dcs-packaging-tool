@@ -8,6 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
+import java.time.LocalDate;
+
 
 /**
  * A class to create Control objects for the Package Tool GUI. The main purpose of this is to provide resizing and tooltip
@@ -26,7 +28,7 @@ public class ControlFactory {
      * @param helpText the help text to display with the control
      * @return the Control of the Type specified
      */
-    public static Control createControl(ControlType type, String initialValue, final String helpText) {
+    public static Control createControl(ControlType type, Object initialValue, final String helpText) {
         if (type == null) {
           throw new IllegalArgumentException("ControlType must not be null");
         }
@@ -57,12 +59,12 @@ public class ControlFactory {
                 break;
 
             case TEXT_AREA:
-                control = initialValue == null ? new TextArea() : new TextArea(initialValue);
+                control = initialValue != null && initialValue instanceof String ? new TextArea((String)initialValue) : new TextArea();
                 control.setPrefWidth(textPrefWidth);
                 break;
 
             case TEXT_FIELD:
-                control = initialValue == null ? new TextField() : new TextField(initialValue);
+                control = initialValue != null && initialValue instanceof String ? new TextField((String)initialValue) : new TextField();
                 control.setPrefWidth(textPrefWidth);
                 control.setOnMouseEntered(event -> {
                     if (helpText != null && !helpText.isEmpty()) {
@@ -82,7 +84,12 @@ public class ControlFactory {
                 control = new DatePicker();
                 control.setPrefWidth(1600);
                 ((DatePicker) control).setEditable(false);
-                ((DatePicker) control).setPromptText("Select Date ->");
+                if (initialValue != null && initialValue instanceof LocalDate) {
+                    ((DatePicker)control).setValue((LocalDate) initialValue);
+                } else {
+                    ((DatePicker) control).setPromptText("Select Date ->");
+                }
+
                 control.setPrefWidth(textPrefWidth);
                 control.setOnMouseEntered(event -> {
                     if (helpText != null && !helpText.isEmpty()) {

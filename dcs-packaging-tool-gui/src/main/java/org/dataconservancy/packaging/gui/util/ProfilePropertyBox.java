@@ -17,7 +17,6 @@ import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -89,9 +88,7 @@ public class ProfilePropertyBox extends VBox {
             if (existingProperties != null && !existingProperties.isEmpty()) {
                 for (Property property : existingProperties) {
                     String value = formatService.formatPropertyValue(property);
-                    PropertyBox propertyBox = new PropertyBox(value, (
-                        propertyConstraint.getPropertyType().getPropertyValueHint() ==
-                            PropertyValueHint.MULTI_LINE_TEXT), editable, property.getPropertyType().getPropertyValueHint());
+                    PropertyBox propertyBox = new PropertyBox(value, editable, property.getPropertyType().getPropertyValueHint(), "");
                     textPropertyBoxes.add(propertyBox);
                     propertyValuesBox.getChildren().add(propertyBox);
                     addChangeListenerToPropertyFields(propertyBox, listener);
@@ -100,9 +97,7 @@ public class ProfilePropertyBox extends VBox {
 
                 }
             } else {
-                PropertyBox propertyBox = new PropertyBox("", (
-                    propertyConstraint.getPropertyType().getPropertyValueHint() ==
-                        PropertyValueHint.MULTI_LINE_TEXT), editable, propertyConstraint.getPropertyType().getPropertyValueHint());
+                PropertyBox propertyBox = new PropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
                 textPropertyBoxes.add(propertyBox);
                 addChangeListenerToPropertyFields(propertyBox, listener);
                 listener.changed(null, "n/a", "n/a");
@@ -116,9 +111,7 @@ public class ProfilePropertyBox extends VBox {
                 propertyLabelAndValueBox.getChildren().add(addNewButton);
 
                 addNewButton.setOnAction(arg0 -> {
-                    PropertyBox propertyBox = new PropertyBox("", (
-                                        propertyConstraint.getPropertyType().getPropertyValueHint() ==
-                                            PropertyValueHint.MULTI_LINE_TEXT), editable);
+                    PropertyBox propertyBox = new PropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
 
                     propertyValuesBox.getChildren().add(propertyBox);
                     addChangeListenerToPropertyFields(propertyBox, listener);
@@ -140,7 +133,7 @@ public class ProfilePropertyBox extends VBox {
     }
 
     public List<String> getValues() {
-        return textPropertyBoxes.stream().map(PropertyBox::getValue).collect(Collectors.toList());
+        return textPropertyBoxes.stream().map(PropertyBox::getValueAsString).collect(Collectors.toList());
     }
 
     public List<ProfilePropertyBox> getSubPropertyBoxes() {
@@ -160,7 +153,7 @@ public class ProfilePropertyBox extends VBox {
     private void addChangeListenerToPropertyFields(PropertyBox propertyBox,
                                                    ChangeListener<? super String> listener) {
 
-        propertyBox.getTextInput().textProperty().addListener(listener);
+        propertyBox.getPropertyInput().textProperty().addListener(listener);
     }
 
     private void addChangeListenerToProfileBox(ProfilePropertyBox profilePropertyBox,
@@ -220,7 +213,7 @@ public class ProfilePropertyBox extends VBox {
         private boolean anyGroupsEmpty() {
             if (textPropertyBoxes != null) {
                 for (PropertyBox textPropertyBox : textPropertyBoxes) {
-                    if (textPropertyBox.getValue() == null || textPropertyBox.getValue().isEmpty()) {
+                    if (textPropertyBox.getValueAsString() == null || textPropertyBox.getValueAsString().isEmpty()) {
                         return true;
                     }
                 }
@@ -229,8 +222,8 @@ public class ProfilePropertyBox extends VBox {
             if (subPropertyBoxes != null) {
                 for (ProfilePropertyBox profilePropertyBox : subPropertyBoxes) {
                     for (PropertyBox textPropertyBox : profilePropertyBox.textPropertyBoxes) {
-                        if (textPropertyBox.getValue() == null ||
-                            textPropertyBox.getValue().isEmpty()) {
+                        if (textPropertyBox.getValueAsString() == null ||
+                            textPropertyBox.getValueAsString().isEmpty()) {
                             return true;
                         }
                     }

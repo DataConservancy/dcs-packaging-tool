@@ -392,12 +392,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
-                TextField textField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, packageMetadata.getHelpText());
-                textField.setEditable(packageMetadata.isEditable());
-                textField.setDisable(!packageMetadata.isEditable());
-                textField.setId(packageMetadata.getName());
-                allDynamicFields.add(textField);
-                PropertyBox propertyBox = new PropertyBox(textField, packageMetadata.getValidationType());
+                PropertyBox propertyBox = new PropertyBox("", packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
+                propertyBox.getPropertyInput().setId(packageMetadata.getName());
+                allDynamicFields.add(propertyBox.getPropertyInput());
+
                 fieldContainer.getChildren().add(propertyBox);
             }
         }

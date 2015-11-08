@@ -247,8 +247,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, HBox>, ObservableValue<HBox>>() {
             public ObservableValue<HBox> call(TreeTableColumn.CellDataFeatures<Node, HBox> p) {
-                // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+                // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
+                // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
                 Node packageNode = p.getValue().getValue();
 
                 HBox hbox = new HBox(3);
@@ -300,8 +300,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         typeColumn.setCellValueFactory(p -> {
-            // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-            // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+            // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
+            // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
             String type = p.getValue().getValue().getNodeType().getLabel();
             Label typeLabel = new Label(type);
             typeLabel.setPrefWidth(typeColumn.getWidth());
@@ -310,8 +310,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         optionsColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, Label>, ObservableValue<Label>>() {
             public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<Node, Label> p) {
-                // p.getValue() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValue().getValue() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+                // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
+                // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
                 Node packageNode = p.getValue().getValue();
                 Label optionsLabel = new Label();
                 final ContextMenu contextMenu = new ContextMenu();
@@ -527,13 +527,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                         showWarningPopup(errors.get(ErrorKey.PROPERTY_LOSS_WARNING), messages.formatInvalidPropertyWarning(type, formatInvalidProperties(invalidProperties)), true, true);
                         getWarningPopupNegativeButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValueAsString());
                         });
 
                         getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
                             presenter.changeType(packageNode, type);
-                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValueAsString());
                         });
                     } else {
                         presenter.changeType(packageNode, type);
