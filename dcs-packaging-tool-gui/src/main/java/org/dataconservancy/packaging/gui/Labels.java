@@ -162,7 +162,9 @@ public class Labels {
         ACCEPT_BUTTON("accept.button"),
         REJECT_BUTTON("reject.button"),
         DETECTED_CHANGES_LABEL("detectedchanges.label"),
-        FILE_MISSING_TIP("backingfilenotfound.tip");
+        FILE_MISSING_TIP("backingfilenotfound.tip"),
+        REFRESH_STATUS_LABEL("refreshstatus.label"),
+        REFRESH_LOCATION_LABEL("refreshlocation.label");
 
         private String property;
 

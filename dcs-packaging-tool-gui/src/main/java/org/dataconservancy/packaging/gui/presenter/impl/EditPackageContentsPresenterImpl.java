@@ -30,6 +30,7 @@ import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.N
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
@@ -49,10 +50,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -205,14 +209,14 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
 
         view.getRefreshPopupPositiveButton().setOnAction(event -> {
-            // TODO: Do something useful
+            ipmService.mergeTree(controller.getPackageState().getPackageTree(), view.getRefreshResult());
+            profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), controller.getPackageState().getPackageTree());
+
+            displayPackageTree();
             view.getRefreshPopup().hide();
         });
 
-        view.getRefreshPopupNegativeButton().setOnAction(event -> {
-            // TODO: Do something useful
-            view.getRefreshPopup().hide();
-        });
+        view.getRefreshPopupNegativeButton().setOnAction(event -> view.getRefreshPopup().hide());
     }
 
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
@@ -504,6 +508,32 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     e.getMessage());
             view.getErrorMessageLabel().setVisible(true);
         }
+    }
+
+    @Override
+    public Map<Node, NodeComparison> refreshTreeContent(Node node) {
+        Map<Node, NodeComparison> resultMap = new HashMap<>();
+        try {
+            Node newTree = buildComparisonTree(node);
+            resultMap = ipmService.compareTree(node, newTree);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return resultMap;
+    }
+
+    private Node buildComparisonTree(Node node) throws IOException {
+        Node newTree = ipmService.createTreeFromFileSystem(Paths.get(node.getFileInfo().getLocation()));
+        for (Node child : node.getChildren()) {
+            if (child.getFileInfo() != null && Paths.get(child.getFileInfo().getLocation()).toFile().exists()) {
+                if (!Paths.get(child.getFileInfo().getLocation()).startsWith(Paths.get(node.getFileInfo().getLocation()))) {
+                    newTree.addChild(buildComparisonTree(child));
+                }
+            }
+        }
+
+        return newTree;
     }
 
     public void displayPackageTree() {

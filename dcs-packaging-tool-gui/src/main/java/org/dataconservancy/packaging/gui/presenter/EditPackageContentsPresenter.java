@@ -19,6 +19,7 @@ import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -26,6 +27,7 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -100,4 +102,11 @@ public interface EditPackageContentsPresenter extends Presenter {
      * @param contentToAdd The path of the content to add to the tree.
      */
     void addToTree(Node parent, Path contentToAdd);
+
+    /**
+     * Refreshes the underlying file system under the given node, and returns the result to be applied or rejected.
+     * @param node The node that everything should be refreshed under.
+     * @return The map containing the results of the comparison of the tree to the file system.
+     */
+    Map<Node, NodeComparison> refreshTreeContent(Node node);
 }
