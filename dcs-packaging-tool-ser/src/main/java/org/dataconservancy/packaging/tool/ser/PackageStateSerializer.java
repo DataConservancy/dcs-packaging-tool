@@ -45,9 +45,9 @@ public interface PackageStateSerializer {
      * the supplied state.
      *
      * @param state the package state to be populated from the input stream, {@code in}
-     * @param in the input stream containing the identified stream to be deserialized onto {@code state}
      * @param streamId identifies an individual stream from the the input stream, {@code in}
+     * @param in the input stream containing the identified stream to be deserialized onto {@code state}
      */
-    void deserialize(PackageState state, InputStream in, StreamId streamId);
+    void deserialize(PackageState state, StreamId streamId, InputStream in);
 
 }
