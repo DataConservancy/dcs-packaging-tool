@@ -164,7 +164,8 @@ public class Labels {
         REMAP_FOLDER_ITEM_LABEL("remapfolderitem.label"),
         ACCEPT_BUTTON("accept.button"),
         REJECT_BUTTON("reject.button"),
-        DETECTED_CHANGES_LABEL("detectedchanges.label");
+        DETECTED_CHANGES_LABEL("detectedchanges.label"),
+        FILE_MISSING_TIP("backingfilenotfound.tip");
 
         private String property;
 

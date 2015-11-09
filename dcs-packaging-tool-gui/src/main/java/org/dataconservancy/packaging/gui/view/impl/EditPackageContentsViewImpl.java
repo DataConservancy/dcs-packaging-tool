@@ -264,8 +264,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 Label exclamLabel = new Label();
                 exclamLabel.setGraphic(exclamImage);
 
-                // TODO: The tooltip text should come from the service?
-                Tooltip exclamTooltip = new Tooltip("This node could not be dereferenced");
+                Tooltip exclamTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
                 exclamTooltip.setPrefWidth(300);
                 exclamTooltip.setWrapText(true);
                 exclamTooltip.setFont(Font.font(12));
