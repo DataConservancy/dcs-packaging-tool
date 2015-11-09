@@ -54,9 +54,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
+import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
@@ -68,6 +70,7 @@ import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -84,6 +87,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the view that displays the package description tree, and the controls for applying inherited metadata.
@@ -516,42 +520,43 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             itemList.add(separator);
 
             for (final NodeTransform transform : nodeTransforms) {
-                //final List<String> invalidProperties = presenter.findInvalidProperties(packageNode, type);
+                final List<PropertyType> invalidProperties = new ArrayList<>();
+
+                List<PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
+                invalidProperties.addAll(packageNode.getNodeType().getPropertyConstraints().stream().filter(newTypeConstraint -> !newTypeProperties.contains(newTypeConstraint.getPropertyType())).map(PropertyConstraint::getPropertyType).collect(Collectors.toList()));
 
                 MenuItem item = new MenuItem(transform.getLabel());
 
                 itemList.add(item);
 
-                /*
-                 TODO: Do we still want to warn users about potential property loss, that seems unsustainable.
-                if (!invalidProperties.isEmpty() && !type.equals(packageNode.getType())) {
+                if (!invalidProperties.isEmpty()) {
                     ImageView invalidImage = new ImageView("/images/orange_exclamation.png");
                     invalidImage.setFitWidth(8);
                     invalidImage.setFitHeight(24);
                     item.setGraphic(invalidImage);
                 }
-                */
+
                 item.setOnAction(actionEvent -> {
                     boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
-                    /*TODO: Determine what we want to do about possible property loss
-                        if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageNode.getType())) {
 
-                        showWarningPopup(errors.get(ErrorKey.PROPERTY_LOSS_WARNING), messages.formatInvalidPropertyWarning(type, formatInvalidProperties(invalidProperties)), true, true);
+                    if (!invalidProperties.isEmpty() && !hideWarningPopup) {
+
+                        showWarningPopup(TextFactory.getText(Errors.ErrorKey.PROPERTY_LOSS_WARNING), TextFactory.format(Messages.MessageKey.WARNING_INVALID_PROPERTY, transform.getResultNodeType().getLabel(), formatInvalidProperties(invalidProperties)), true, true);
                         getWarningPopupNegativeButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValueAsString());
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
                         });
 
                         getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            presenter.changeType(packageNode, type);
-                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValueAsString());
+                            presenter.changeType(packageNode, transform);
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
                         });
                     } else {
-                        presenter.changeType(packageNode, type);
-                    } */
-                    presenter.changeType(packageNode, transform);
+                        presenter.changeType(packageNode, transform);
+                    }
+
                 });
             }
         }
@@ -563,6 +568,17 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         itemList.add(createIgnoreMenuItem(treeItem));
 
        return itemList;
+    }
+
+    //Creates a string that lists all the invalid properties in single line list.
+    private String formatInvalidProperties(List<PropertyType> invalidProperties) {
+        String invalidPropertyString = "";
+
+        for (PropertyType property : invalidProperties) {
+            invalidPropertyString += property.getLabel() + "\n";
+        }
+
+        return invalidPropertyString;
     }
 
     private void remapNode(Node node, Path newPath) {
