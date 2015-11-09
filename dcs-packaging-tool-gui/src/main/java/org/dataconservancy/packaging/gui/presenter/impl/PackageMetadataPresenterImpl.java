@@ -139,7 +139,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         view.getContinueButton().setOnAction(event -> {
             updatePackageState();
 
-            if (validateRequiredFields()) {
+            if (validateEditableRequiredFields()) {
                 view.getErrorLabel().setVisible(false);
                 getController().goToNextPage();
             } else {
@@ -184,9 +184,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         // Clear the domain profile list and reset the values on the current state of the form
         getController().getPackageState().setDomainProfileIdList(getSelectedDomainProfileIdList());
 
-        // FIXME: This ID should come from somewhere? Setting something now so the page moves on.
-        getController().getPackageState().addPackageMetadata("BagIt-Profile-Identifier", view.getDomainProfilesComboBox().getValue());
-
         for (Node removableLabel : view.getDomainProfileRemovableLabelVBox().getChildren()) {
             if (removableLabel instanceof RemovableLabel) {
                 getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((RemovableLabel) removableLabel).getLabel().getText());
@@ -221,10 +218,10 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
      *
      * @return true or false based on validation
      */
-    private boolean validateRequiredFields() {
+    private boolean validateEditableRequiredFields() {
 
         for (PackageMetadata reqField : packageMetadataService.getRequiredPackageMetadata()) {
-            if (getController().getPackageState().getPackageMetadataValues(reqField.getName()) == null) {
+            if (reqField.isEditable() && getController().getPackageState().getPackageMetadataValues(reqField.getName()) == null) {
                 return false;
             }
             else if (view.hasFailedValidation(reqField.getName())) {

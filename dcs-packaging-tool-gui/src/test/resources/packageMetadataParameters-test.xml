@@ -17,6 +17,7 @@
         <name>Package-Metadata-Required</name>
         <requiredness>REQUIRED</requiredness>
         <helpText>This is the help text for Package-Metadata-1</helpText>
+        <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
