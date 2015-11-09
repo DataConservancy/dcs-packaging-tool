@@ -38,12 +38,6 @@
 
   <!-- RESOURCE BUNDLES -->
 
-  <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
-  	<constructor-arg type="java.lang.String">
-  		<value>${ontologyLabels.file}</value>
-  	</constructor-arg>
-  </bean>
-  
   <bean id="helpResource" class="java.util.ResourceBundle" factory-method="getBundle">
   	<constructor-arg type="java.lang.String">
   		<value>bundles/help</value>
@@ -106,9 +100,12 @@
 
   <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
 
+  <bean id="domainProfileObjectStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl">
+    <constructor-arg ref="uriGenerator"/>
+  </bean>
 
   <bean id="profileService" class="org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl">
-    <constructor-arg ref="domainProfileStore"/>
+    <constructor-arg ref="domainProfileObjectStore"/>
     <constructor-arg ref="uriGenerator"/>
   </bean>
 
@@ -140,7 +137,6 @@
   </bean>
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
-    <constructor-arg ref="ontologyLabels"/>
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
@@ -178,7 +174,6 @@
     <property name="controller" ref="controller" />
     <property name="profileService" ref="profileService" />
     <property name="ipmService" ref="ipmService"/>
-    <property name="domainProfileStore" ref="domainProfileStore"/>
     <property name="propertyFormatService" ref="propertyFormatService"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
@@ -235,6 +230,7 @@
     <property name="toolBuildNumber" value="${build.number}"/>
     <property name="toolBuildTimestamp" value="${build.timeStamp}"/>
     <property name="toolBuildRevision" value="${build.revision}"/>
+    <property name="domainProfileStore" ref="domainProfileStore"/>
   </bean>
 
   <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">

@@ -50,7 +50,8 @@ public class Errors {
         PACKAGE_DESCRIPTION_CHANGE_WARNING("packagedescriptionchange.warning"),
         INACCESSIBLE_CONTENT_DIR("inaccessiblepackagecontent.error"),
         ARTIFACT_GRAPH_ERROR("artifactgraph.error"),
-        CONTENT_DIRECTORY_ERROR("contentdirectory.error");
+        CONTENT_DIRECTORY_ERROR("contentdirectory.error"),
+        ADD_CONTENT_ERROR("addcontent.error");
 
 
         private String property;

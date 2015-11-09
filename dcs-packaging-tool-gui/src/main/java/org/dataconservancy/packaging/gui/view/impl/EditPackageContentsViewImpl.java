@@ -65,7 +65,9 @@ import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -126,8 +128,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Set<NodeRelationshipContainer> artifactRelationshipFields;
 
     private InternalProperties internalProperties;
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Preferences preferences;
     private NodePropertyWindowBuilder windowBuilder;
@@ -242,58 +242,54 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         //add 2 here to get rid of horizontal scroll bar
         artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
 
-        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, HBox>, ObservableValue<HBox>>() {
-            public ObservableValue<HBox> call(TreeTableColumn.CellDataFeatures<Node, HBox> p) {
-                // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                Node packageNode = p.getValue().getValue();
+        artifactColumn.setCellValueFactory(p -> {
+            Node packageNode = p.getValue().getValue();
 
-                HBox hbox = new HBox(3);
+            HBox hbox = new HBox(3);
 
-                ImageView exclamImage = new ImageView();
-                exclamImage.getStyleClass().add(EXCLAMATION_IMAGE);
-                exclamImage.setFitHeight(12);
-                exclamImage.setFitWidth(5);
+            ImageView exclamImage = new ImageView();
+            exclamImage.getStyleClass().add(EXCLAMATION_IMAGE);
+            exclamImage.setFitHeight(12);
+            exclamImage.setFitWidth(5);
 
-                Label exclamLabel = new Label();
-                exclamLabel.setGraphic(exclamImage);
+            Label exclamLabel = new Label();
+            exclamLabel.setGraphic(exclamImage);
 
-                Tooltip exclamTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
-                exclamTooltip.setPrefWidth(300);
-                exclamTooltip.setWrapText(true);
-                exclamTooltip.setFont(Font.font(12));
-                Tooltip.install(exclamLabel, exclamTooltip);
+            Tooltip exclamTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
+            exclamTooltip.setPrefWidth(300);
+            exclamTooltip.setWrapText(true);
+            exclamTooltip.setFont(Font.font(12));
+            Tooltip.install(exclamLabel, exclamTooltip);
 
-                if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
-                    hbox.getChildren().add(exclamLabel);
-                }
-
-                Label viewLabel = new Label();
-                viewLabel.setPrefWidth(artifactColumn.getWidth());
-                viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
-
-                String labelText;
-
-                if (packageNode.getFileInfo() != null) {
-                    if (getFullPathCheckBox().selectedProperty().getValue()) {
-                        labelText = packageNode.getFileInfo().getLocation().toString();
-                    } else {
-                        labelText = packageNode.getFileInfo().getName();
-                    }
-                    viewLabel.setText(labelText);
-                }
-
-                Tooltip t = new Tooltip(viewLabel.getText());
-                t.setPrefWidth(300);
-                t.setWrapText(true);
-                viewLabel.setTooltip(t);
-
-                hbox.getChildren().add(viewLabel);
-
-
-
-                return new ReadOnlyObjectWrapper<>(hbox);
+            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
+                hbox.getChildren().add(exclamLabel);
             }
+
+            Label viewLabel = new Label();
+            viewLabel.setPrefWidth(artifactColumn.getWidth());
+            viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
+
+            String labelText;
+
+            if (packageNode.getFileInfo() != null) {
+                if (getFullPathCheckBox().selectedProperty().getValue()) {
+                    labelText = packageNode.getFileInfo().getLocation().toString();
+                } else {
+                    labelText = packageNode.getFileInfo().getName();
+                }
+                viewLabel.setText(labelText);
+            }
+
+            Tooltip t = new Tooltip(viewLabel.getText());
+            t.setPrefWidth(300);
+            t.setWrapText(true);
+            viewLabel.setTooltip(t);
+
+            hbox.getChildren().add(viewLabel);
+
+
+
+            return new ReadOnlyObjectWrapper<>(hbox);
         });
 
         typeColumn.setCellValueFactory(p -> {
@@ -305,38 +301,37 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
-        optionsColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, Label>, ObservableValue<Label>>() {
-            public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<Node, Label> p) {
-                // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                Node packageNode = p.getValue().getValue();
-                Label optionsLabel = new Label();
-                final ContextMenu contextMenu = new ContextMenu();
-                TreeItem<Node> treeItem = p.getValue();
-                ImageView image = new ImageView();
-                image.setFitHeight(20);
-                image.setFitWidth(20);
-                image.getStyleClass().add(ARROWS_IMAGE);
-                optionsLabel.setGraphic(image);
-                //make sure the current artifact type is valid - this status may have changed if its
-                //parent's type has changed
-                if (packageNode.isIgnored()) {
-                    contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
-                } else {
-                    List<NodeTransform> nodeTransforms = profileService.getNodeTransforms(packageNode);
+        optionsColumn.setCellValueFactory(p -> {
+            // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
+            // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+            Node packageNode = p.getValue().getValue();
+            Label optionsLabel = new Label();
+            final ContextMenu contextMenu = new ContextMenu();
+            TreeItem<Node> treeItem = p.getValue();
+            ImageView image = new ImageView();
+            image.setFitHeight(20);
+            image.setFitWidth(20);
+            image.getStyleClass().add(ARROWS_IMAGE);
+            optionsLabel.setGraphic(image);
+            //make sure the current artifact type is valid - this status may have changed if its
+            //parent's type has changed
+            if (packageNode.isIgnored()) {
+                contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
+            } else {
+                List<NodeTransform> nodeTransforms = profileService.getNodeTransforms(packageNode);
 
-                    contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
-                    optionsLabel.setContextMenu(contextMenu);
-                }
-
-                //When the options label is clicked show the context menu.
-                optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
-                    if (e.getButton() == MouseButton.PRIMARY) {
-                        contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
-                    }
-                });
-                return new ReadOnlyObjectWrapper<>(optionsLabel);
+                contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
+                optionsLabel.setContextMenu(contextMenu);
             }
+
+            //When the options label is clicked show the context menu.
+            optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
+                if (e.getButton() == MouseButton.PRIMARY) {
+                    errorMessageLabel.setVisible(false);
+                    contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
+                }
+            });
+            return new ReadOnlyObjectWrapper<>(optionsLabel);
         });
 
 
@@ -445,22 +440,42 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             artifactTree.getSelectionModel().select(treeItem);
         });
 
-        // TODO: Addition of these items to the list should be determined by the service
-        //Create a menu item that will allow the user to pick a file.
-        MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FILE_ITEM_LABEL));
-        itemList.add(addFileItem);
-        addFileItem.setOnAction(event -> {
-            File file = presenter.getController().showOpenFileDialog(new FileChooser());
-            // TODO: do something with this file.
-        });
+        List<NodeType> childNodeTypes = presenter.getPossibleChildTypes(packageNode);
 
-        //Create a menu item that will allow the user to pick a folder.
-        MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FOLDER_ITEM_LABEL));
-        itemList.add(addDirItem);
-        addDirItem.setOnAction(event -> {
-            File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
-            // TODO: do something with this dir.
-        });
+        boolean canHaveFileChild = false;
+        boolean canHaveDirectoryChild = false;
+
+        for (NodeType childNodeType : childNodeTypes) {
+            if (childNodeType.getFileAssociation() == FileAssociation.DIRECTORY) {
+                canHaveDirectoryChild = true;
+            } else {
+                canHaveFileChild = true;
+            }
+
+            if (canHaveDirectoryChild && canHaveFileChild) {
+                break;
+            }
+        }
+
+        if (canHaveFileChild) {
+            //Create a menu item that will allow the user to pick a file.
+            MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FILE_ITEM_LABEL));
+            itemList.add(addFileItem);
+            addFileItem.setOnAction(event -> {
+                File file = presenter.getController().showOpenFileDialog(new FileChooser());
+                presenter.addToTree(packageNode, file.toPath());
+            });
+        }
+
+        if (canHaveDirectoryChild) {
+            //Create a menu item that will allow the user to pick a folder.
+            MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FOLDER_ITEM_LABEL));
+            itemList.add(addDirItem);
+            addDirItem.setOnAction(event -> {
+                File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+                presenter.addToTree(packageNode, file.toPath());
+            });
+        }
 
         //Create a menu item that will allow the user to refresh the tree.
         // TODO: the showing of this item should be determined by a service

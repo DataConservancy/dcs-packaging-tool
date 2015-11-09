@@ -35,12 +35,6 @@
 
 
   <!-- RESOURCE BUNDLES -->
-  <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
-  	<constructor-arg type="java.lang.String">
-  		<value>${ontologyLabels.file}</value>
-  	</constructor-arg>
-  </bean>
-  
   <bean id="helpResource" class="java.util.ResourceBundle" factory-method="getBundle">
   	<constructor-arg type="java.lang.String">
   		<value>bundles/help</value>
@@ -88,10 +82,6 @@
       </map>
     </property>
     <property name="packageDescriptionValidator" ref="packageDescriptionValidator" />
-  </bean>
-
-  <bean id="packageOntologyService" class="org.dataconservancy.packaging.tool.impl.DcsBoPackageOntologyServiceImpl">
-    <property name="creatorPropertiesByString" value="${ontology.creatorProperties}"/>
   </bean>
 
   <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>

@@ -21,8 +21,10 @@ import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
@@ -49,12 +51,6 @@ public interface EditPackageContentsPresenter extends Presenter {
      * @param propertyFormatService The property format service.
      */
     void setPropertyFormatService(PropertyFormatService propertyFormatService);
-
-    /**
-     * Sets the domain profile store that is used to retrieve the selected domain profile.
-     * @param domainProfileStore The domain profile store.
-     */
-    void setDomainProfileStore(DomainProfileObjectStore domainProfileStore);
 
     /**
      * Changes the type of the provided node to the provided type.
@@ -91,4 +87,17 @@ public interface EditPackageContentsPresenter extends Presenter {
      * Saves the artifact that's currently being displayed in the properties window.
      */
     void saveCurrentNode();
+
+    /**
+     * Gets a list of possible child node types for the given node. This is used to determine if a file or folder picker should be present for the add.
+     * @param node The node to get the possible child types for.
+     */
+    List<NodeType> getPossibleChildTypes(Node node);
+
+    /**
+     * Creates a tree from the given path and adds it to the tree at the given node.
+     * @param parent The node that should be the parent of the new code.
+     * @param contentToAdd The path of the content to add to the tree.
+     */
+    void addToTree(Node parent, Path contentToAdd);
 }

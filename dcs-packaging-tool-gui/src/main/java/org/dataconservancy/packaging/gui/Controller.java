@@ -30,9 +30,12 @@ import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -51,6 +54,8 @@ public class Controller {
     private File rootArtifactDir;
     //END TODO
     private PackageState packageState;
+
+    private DomainProfileStore domainProfileStore;
 
     /**
      * Application-scope metadata
@@ -92,6 +97,22 @@ public class Controller {
 
     public void setFactory(Factory factory) {
         this.factory = factory;
+    }
+
+    public void setDomainProfileStore(DomainProfileStore domainProfileStore) {
+        this.domainProfileStore = domainProfileStore;
+    }
+
+    public DomainProfile getPrimaryDomainProfile() {
+        DomainProfile primaryProfile = null;
+        for (DomainProfile profile : domainProfileStore.getPrimaryDomainProfiles()) {
+            if (profile.getIdentifier().equals(packageState.getDomainProfileIdList().get(0))) {
+                primaryProfile = profile;
+                break;
+            }
+        }
+
+        return primaryProfile;
     }
 
     public void startApp() {
@@ -216,6 +237,7 @@ public class Controller {
      * @param chooser the FileChooser
      * @return file chosen or null on cancel
      */
+    //TODO: We should check if these can be removed now in Java 8
     public File showOpenFileDialog(FileChooser chooser) {
         Semaphore lock = getLock(chooser);
         
