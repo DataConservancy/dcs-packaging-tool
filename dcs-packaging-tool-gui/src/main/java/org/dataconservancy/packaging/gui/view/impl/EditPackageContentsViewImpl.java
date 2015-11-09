@@ -68,11 +68,14 @@ import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -268,8 +271,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 exclamTooltip.setFont(Font.font(12));
                 Tooltip.install(exclamLabel, exclamTooltip);
 
-                // TODO: the addition of this line should be determined by PackageService
-                hbox.getChildren().add(exclamLabel);
+                if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
+                    hbox.getChildren().add(exclamLabel);
+                }
 
                 Label viewLabel = new Label();
                 viewLabel.setPrefWidth(artifactColumn.getWidth());
@@ -477,24 +481,26 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //Create a menu item that will allow the user to pick a file.
-        MenuItem remapFileItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
-        itemList.add(remapFileItem);
-        // TODO: the showing of this item should be determined by a service
-        remapFileItem.setOnAction(event -> {
-            File file = presenter.getController().showOpenFileDialog(new FileChooser());
-            // TODO: Do the remap of this file.
+        if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
+            MenuItem remapFileItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
+            itemList.add(remapFileItem);
+            remapFileItem.setOnAction(event -> {
+                File file = null;
+                if (packageNode.getFileInfo().isFile()) {
+                    file = presenter.getController().showOpenFileDialog(new FileChooser());
+                } else {
+                    file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+                }
+                if (file != null) {
+                    //Remap the node to the new file and check all it's descendants to see if they can be remapped also.
+                    remapNode(packageNode, file.toPath());
 
-        });
+                    //Redisplay the tree to update the warnings
+                    presenter.displayPackageTree();
+                }
 
-        //Create a menu item that will allow the user to pick a folder.
-        MenuItem remapDirItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
-        itemList.add(remapDirItem);
-        // TODO: the showing of this item should be determined by a service
-        remapDirItem.setOnAction(event -> {
-            File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
-            // TODO: Do the remap of this dir.
-
-        });
+            });
+        }
 
         //Create a menu item for each available artifact type.
         if (nodeTransforms != null && nodeTransforms.size() > 0) {
@@ -550,6 +556,27 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         itemList.add(createIgnoreMenuItem(treeItem));
 
        return itemList;
+    }
+
+    private void remapNode(Node node, Path newPath) {
+        Path oldPath = Paths.get(node.getFileInfo().getLocation());
+        node.setFileInfo(new FileInfo(newPath));
+
+        if (node.getChildren() != null) {
+            //If this path can't be relativized we won't automatically remap
+            node.getChildren().stream().filter(child -> child.getFileInfo() !=
+                null).forEach(child -> {
+                try {
+                    Path oldRelativePath = Paths.get(child.getFileInfo().getLocation()).relativize(oldPath);
+                    Path newChildPath = newPath.resolve(oldRelativePath);
+                    if (newChildPath.toFile().exists()) {
+                        remapNode(child, newChildPath);
+                    }
+                } catch (IllegalArgumentException e) {
+                    //If this path can't be relativized we won't automatically remap
+                }
+            });
+        }
     }
 
     private MenuItem createIgnoreMenuItem(final TreeItem<Node> treeItem) {
