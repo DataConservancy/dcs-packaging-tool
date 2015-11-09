@@ -165,8 +165,10 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     /**
      * The archive format to use (when {@link #archive} is {@code true})
+     *
+     * Right now this isn't a requirement (support of multiple archive formats) so this support has been commented out.
      */
-    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
+//    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
 
     /**
      * Whether or not to compress the archive (when {@link #archive} is {@code true})
@@ -175,9 +177,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
-     * a particular archive format (currently zip and tar supported) (when {@link #archive} is {@code true})
+     * a particular archive format (when {@link #archive} is {@code true}). Because we are not supporting multiple
+     * archive formats at this time (the requirement is to support ZIP only), this field is set to the
+     * ZipArchiveStreamFactory.
      */
-    private ArchiveStreamFactory arxStreamFactory;
+    private ArchiveStreamFactory arxStreamFactory = new ZipArchiveStreamFactory();
 
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
@@ -383,9 +387,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      *
      * @return a string representing the format of the archive
      */
-    public String getArchiveFormat() {
-        return archiveFormat;
-    }
+//    public String getArchiveFormat() {
+//        return archiveFormat;
+//    }
 
     /**
      * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
@@ -395,9 +399,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      *
      * @param archiveFormat a string representing the format of the archive
      */
-    public void setArchiveFormat(String archiveFormat) {
-        this.archiveFormat = archiveFormat;
-    }
+//    public void setArchiveFormat(String archiveFormat) {
+//        this.archiveFormat = archiveFormat;
+//    }
 
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
@@ -417,23 +421,25 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
-     * a particular archive format (currently zip and tar supported).  The implementation only
-     * consults the factory when the {@link #archive archive flag} is {@code true}.
+     * a particular archive format (currently zip is supported).  The implementation only
+     * consults the factory when the {@link #archive archive flag} is {@code true}.  Package-private for unit test
+     * access.
      *
      * @return the ArchiveStreamFactory
      */
-    public ArchiveStreamFactory getArxStreamFactory() {
+    ArchiveStreamFactory getArxStreamFactory() {
         return arxStreamFactory;
     }
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
-     * a particular archive format (currently zip and tar supported).  The implementation only
-     * consults the factory when the {@link #archive archive flag} is {@code true}.
+     * a particular archive format (currently zip is supported).  The implementation only
+     * consults the factory when the {@link #archive archive flag} is {@code true}.  Package-private for unit test
+     * access.
      *
      * @param arxStreamFactory the ArchiveStreamFactory
      */
-    public void setArxStreamFactory(ArchiveStreamFactory arxStreamFactory) {
+    void setArxStreamFactory(ArchiveStreamFactory arxStreamFactory) {
         this.arxStreamFactory = arxStreamFactory;
     }
 
