@@ -249,10 +249,10 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         return profileLabelList;
     }
 
-    private List<String> getSelectedDomainProfileIdList(){
-        List<String> profileIdList = new ArrayList<>();
+    private List<URI> getSelectedDomainProfileIdList(){
+        List<URI> profileIdList = new ArrayList<>();
         for(String label : getSelectedDomainProfileLabelList()){
-            profileIdList.add(domainProfileIdMap.get(label).toString());
+            profileIdList.add(domainProfileIdMap.get(label));
         }
         return profileIdList;
     }
