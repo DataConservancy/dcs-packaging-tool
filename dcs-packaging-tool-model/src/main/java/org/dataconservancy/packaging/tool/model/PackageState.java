@@ -24,6 +24,7 @@ import org.dataconservancy.packaging.tool.model.ser.SerializationScope;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -49,7 +50,7 @@ public class PackageState {
     /**
      * List of domain profile ids in-use in this package.
      */
-    private List<String> domainProfileIdList;
+    private List<URI> domainProfileIdList;
 
     /**
      * Container of all of the domain objects in this package.
@@ -151,11 +152,11 @@ public class PackageState {
         this.creationToolVersion = creationToolVersion;
     }
 
-    public void setDomainProfileIdList(List<String> domainProfileIdList){
+    public void setDomainProfileIdList(List<URI> domainProfileIdList){
         this.domainProfileIdList = domainProfileIdList;
     }
 
-    public List<String> getDomainProfileIdList() {
+    public List<URI> getDomainProfileIdList() {
         return domainProfileIdList;
     }
 
