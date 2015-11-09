@@ -237,6 +237,13 @@
 
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>
+        <artifactId>dcs-packaging-tool-ser</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.dataconservancy.pkgtool</groupId>
         <artifactId>dcs-packaging-tool-profiles</artifactId>
         <version>${project.version}</version>
       </dependency>
