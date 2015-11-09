@@ -33,10 +33,11 @@ import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.N
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -49,7 +50,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +70,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     private PropertyFormatService propertyFormatService;
     private File packageDescriptionFile;
     private Preferences preferences;
+
+    private DomainProfile primaryProfile;
+    private DomainProfileObjectStore domainProfileStore;
 
     private Set<URI> expandedNodes;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -138,7 +141,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         //Displays the file selector, and then saves the package description to the given file. 
         view.getSaveButton().setOnAction(arg0 -> {
-            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
+            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
 
             //Still check if it's null in case user hit cancel
             if (packageDescriptionFile != null) {
@@ -177,7 +180,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
             //bring up a save file dialog box
-            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
+            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
 
             if (packageDescriptionFile != null) {
 
@@ -441,6 +444,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     @Override
     public void setPropertyFormatService(PropertyFormatService formatService) {
         this.propertyFormatService = formatService;
+    }
+
+    @Override
+    public void setDomainProfileStore(DomainProfileObjectStore profileStore) {
+        this.domainProfileStore = profileStore;
     }
 
     //Recursively sorts all children elements of the tree.

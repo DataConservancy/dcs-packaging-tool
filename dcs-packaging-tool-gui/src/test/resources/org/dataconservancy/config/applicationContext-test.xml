@@ -61,10 +61,6 @@
     <property name="configurationDirectory" value="${configuration.dir}"/>
   </bean>
 
-  <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
-  	<constructor-arg ref="ontologyLabelResource"/>
-  </bean>
-  
   <bean id="help" class="org.dataconservancy.packaging.gui.Help">
   	<constructor-arg ref="helpResource"/>
   </bean>

@@ -57,7 +57,6 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
-import org.dataconservancy.packaging.gui.OntologyLabels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
@@ -111,7 +110,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
     //File chooser for where to save package description. 
-    private FileChooser packageDescriptionFileChooser;
+    private FileChooser packageStateFileChooser;
 
     //Full Path checkbox
     private CheckBox fullPath;
@@ -126,7 +125,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     //Storage for mapping popup fields to properties on the artifacts. 
     private Set<NodeRelationshipContainer> artifactRelationshipFields;
 
-    private OntologyLabels ontologyLabels;
     private InternalProperties internalProperties;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -134,17 +132,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Preferences preferences;
     private NodePropertyWindowBuilder windowBuilder;
 
-    private static final String synthesizedArtifactMarker = " *";
-
     private String availableRelationshipsPath;
     private PackageToolPopup refreshPopup;
     private Button refreshPopupPositiveButton;
     private Button refreshPopupNegativeButton;
 
-    public EditPackageContentsViewImpl(final OntologyLabels ontologyLabels,
-                                       final InternalProperties internalProperties, final String availableRelationshipsPath) {
+    public EditPackageContentsViewImpl(final InternalProperties internalProperties, final String availableRelationshipsPath) {
         super();
-        this.ontologyLabels = ontologyLabels;
         this.internalProperties = internalProperties;
         this.availableRelationshipsPath = availableRelationshipsPath;
 
@@ -184,10 +178,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(errorMessageLabel);
 
         //Creates the file chooser that's used to save the package description to a file.
-        packageDescriptionFileChooser = new FileChooser();
-        packageDescriptionFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_DESCRIPTION_FILE_CHOOSER_KEY));
-        packageDescriptionFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
-        packageDescriptionFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+        packageStateFileChooser = new FileChooser();
+        packageStateFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_DESCRIPTION_FILE_CHOOSER_KEY));
+        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
+        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 
         //Toggles whether the full paths should be displayed in the package artifact tree. 
         fullPath = new CheckBox(TextFactory.getText(LabelKey.SHOW_FULL_PATHS));
@@ -402,27 +396,26 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return artifactTree;
     }
 
-    @Override
-    public FileChooser getPackageDescriptionFileChooser(){
+    public FileChooser getPackageStateFileChooser(){
         File existingDescriptionFile = presenter.getController().getPackageDescriptionFile();
         if(existingDescriptionFile != null){
-            packageDescriptionFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
-            packageDescriptionFileChooser.setInitialFileName(existingDescriptionFile.getName());
+            packageStateFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
+            packageStateFileChooser.setInitialFileName(existingDescriptionFile.getName());
         } else if (presenter.getController().getRootArtifactDir() != null) {
             String fileName = presenter.getController().getRootArtifactDir().getName();
             if (fileName.isEmpty()) {
                 fileName = "description";
             }
-            packageDescriptionFileChooser.setInitialFileName(fileName + ".json");
+            packageStateFileChooser.setInitialFileName(fileName + ".json");
             if (presenter.getController().getContentRoot() != null) {
-                packageDescriptionFileChooser.setInitialDirectory(presenter.getController().getContentRoot());
+                packageStateFileChooser.setInitialDirectory(presenter.getController().getContentRoot());
             } else {
-                packageDescriptionFileChooser.setInitialDirectory(presenter.getController().getRootArtifactDir());
+                packageStateFileChooser.setInitialDirectory(presenter.getController().getRootArtifactDir());
             }
         } else {
-            packageDescriptionFileChooser.setInitialFileName("default.json");
+            packageStateFileChooser.setInitialFileName("default.json");
         }
-        return packageDescriptionFileChooser;
+        return packageStateFileChooser;
     }
 
     @Override
@@ -454,7 +447,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         // TODO: Addition of these items to the list should be determined by the service
         //Create a menu item that will allow the user to pick a file.
-        MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_ITEM_LABEL));
+        MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FILE_ITEM_LABEL));
         itemList.add(addFileItem);
         addFileItem.setOnAction(event -> {
             File file = presenter.getController().showOpenFileDialog(new FileChooser());
@@ -462,7 +455,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //Create a menu item that will allow the user to pick a folder.
-        MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_ITEM_LABEL));
+        MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FOLDER_ITEM_LABEL));
         itemList.add(addDirItem);
         addDirItem.setOnAction(event -> {
             File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
@@ -614,17 +607,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         for (TreeItem<Node> kid: node.getChildren()) {
             setIgnoredDescendants(kid, status);
         }
-    }
-
-    //Creates a string that lists all the invalid properties in single line list.
-    private String formatInvalidProperties(List<String> invalidProperties) {
-        String invalidPropertyString = "";
-
-        for (String property : invalidProperties) {
-            invalidPropertyString += ontologyLabels.get(property) + "\n";
-        }
-
-        return invalidPropertyString;
     }
 
     @Override

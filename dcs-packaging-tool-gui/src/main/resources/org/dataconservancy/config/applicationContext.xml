@@ -67,10 +67,6 @@
     <property name="packageMetadataParametersFile" value = "${packageMetadataParametersFile}" />
   </bean>
 
-  <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
-  	<constructor-arg ref="ontologyLabelResource"/>
-  </bean>
-  
   <bean id="help" class="org.dataconservancy.packaging.gui.Help">
   	<constructor-arg ref="helpResource"/>
   </bean>
@@ -110,12 +106,9 @@
 
   <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
 
-  <bean id="domainProfileObjectStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl">
-    <constructor-arg ref="uriGenerator"/>
-  </bean>
 
   <bean id="profileService" class="org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl">
-    <constructor-arg ref="domainProfileObjectStore"/>
+    <constructor-arg ref="domainProfileStore"/>
     <constructor-arg ref="uriGenerator"/>
   </bean>
 
@@ -185,6 +178,7 @@
     <property name="controller" ref="controller" />
     <property name="profileService" ref="profileService" />
     <property name="ipmService" ref="ipmService"/>
+    <property name="domainProfileStore" ref="domainProfileStore"/>
     <property name="propertyFormatService" ref="propertyFormatService"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>

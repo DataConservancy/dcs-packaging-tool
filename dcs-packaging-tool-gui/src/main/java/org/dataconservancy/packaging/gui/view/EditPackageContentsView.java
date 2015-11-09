@@ -72,7 +72,7 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * Gets the file chooser that's used for saving the pacakge description file. 
      * @return the file chooser
      */
-    FileChooser getPackageDescriptionFileChooser();
+    FileChooser getPackageStateFileChooser();
 
     /**
      * Gets the checkbox used to determine if the full path should be shown or not

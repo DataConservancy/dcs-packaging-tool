@@ -19,6 +19,7 @@ import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -48,6 +49,12 @@ public interface EditPackageContentsPresenter extends Presenter {
      * @param propertyFormatService The property format service.
      */
     void setPropertyFormatService(PropertyFormatService propertyFormatService);
+
+    /**
+     * Sets the domain profile store that is used to retrieve the selected domain profile.
+     * @param domainProfileStore The domain profile store.
+     */
+    void setDomainProfileStore(DomainProfileObjectStore domainProfileStore);
 
     /**
      * Changes the type of the provided node to the provided type.
