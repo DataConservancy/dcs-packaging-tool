@@ -139,6 +139,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     private static final String ERR_INVOKING_METHOD = "Error invoking the method named '%s' on an instance of '%s': %s";
 
+    private static final String ERR_MISSING_MARSHALLINGMAP = "No marshalling map has been specified.  Please call 'setMarshallerMap(...) first.";
+
     /**
      * Placeholders: streamId
      */
@@ -308,6 +310,10 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * @param result   holds the output stream for the serialization result
      */
     void serializeToResult(PackageState state, StreamId streamId, StreamResult result) {
+
+        if (marshallerMap == null) {
+            throw new IllegalStateException(ERR_MISSING_MARSHALLINGMAP);
+        }
 
         PropertyDescriptor pd = propertyDescriptors.get(streamId);
 
