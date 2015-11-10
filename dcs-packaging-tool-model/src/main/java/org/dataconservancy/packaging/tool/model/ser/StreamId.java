@@ -58,5 +58,5 @@ public enum StreamId {
      * Identifier for the stream containing the user specified properties map for the nodes in the package
      */
     USER_SPECIFIED_PROPERTIES
-    
+
 }

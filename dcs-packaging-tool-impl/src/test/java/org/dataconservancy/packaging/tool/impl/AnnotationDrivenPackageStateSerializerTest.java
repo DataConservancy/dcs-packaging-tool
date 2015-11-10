@@ -55,10 +55,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObjects.applicationVersion;
-import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObjects.packageMetadata;
-import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObjects.packageName;
-import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestResources.APPLICATION_VERSION_1;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.applicationVersion;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainObjectsRDF;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainProfileUris;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageMetadata;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.APPLICATION_VERSION_1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
