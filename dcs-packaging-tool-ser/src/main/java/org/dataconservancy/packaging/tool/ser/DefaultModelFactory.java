@@ -78,6 +78,6 @@ public class DefaultModelFactory implements JenaModelFactory {
     public void setPrefixMapping(Map<String, String> prefixMapping) {
         PrefixMapping mapping = PrefixMapping.Factory.create();
         mapping.setNsPrefixes(prefixMapping);
-        setPrefixMapping(prefixMapping);
+        setPrefixMapping(mapping);
     }
 }
