@@ -70,7 +70,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
         HeaderView headerView = new HeaderViewImpl();
         view.setProfileService(profileService);
-
+        view.setIpmService(ipmService);
         view.setHeaderView(headerView);
         view.setHelp(help);
 

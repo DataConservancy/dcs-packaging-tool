@@ -108,20 +108,24 @@ public class IPMServiceImpl implements IPMService {
             node.setIgnored(false);
 
             // Unignore ancestors
-            for (Node n = node; n != null && n.isIgnored(); n = n.getParent()) {
+            for (Node n = node.getParent(); n != null && n.isIgnored(); n = n.getParent()) {
                 n.setIgnored(false);
             }
 
             // Unignore descendants
-            for (Node child : node.getChildren()) {
-                ignoreNode(child, false);
+            if (node.getChildren() != null) {
+                for (Node child : node.getChildren()) {
+                    ignoreNode(child, false);
+                }
             }
         } else {
             node.setIgnored(true);
 
             // Ignore descendants
-            for (Node child : node.getChildren()) {
-                ignoreNode(child, true);
+            if (node.getChildren() != null) {
+                for (Node child : node.getChildren()) {
+                    ignoreNode(child, true);
+                }
             }
         }
     }

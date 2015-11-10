@@ -615,31 +615,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     //Note this code is broken out into a protected method so that it can be executed by the test
     protected void toggleItemIgnore(TreeItem<Node> node, boolean status) {
-        if (status) {
-            setIgnoredDescendants(node, true);
-        } else {
-            setIgnoredAncestors(node, false);
-            setIgnoredDescendants(node, false);
-        }
+        ipmService.ignoreNode(node.getValue(), status);
 
         // Rebuild the entire TreeView and reselect the current PackageArtifact
 
         presenter.rebuildTreeView();
         artifactTree.getSelectionModel().select(presenter.findItem(node.getValue()));
-    }
-
-    private void setIgnoredAncestors(TreeItem<Node> node, boolean status) {
-        do {
-            node.getValue().setIgnored(status);
-        } while ((node = node.getParent()) != null);
-    }
-
-    private void setIgnoredDescendants(TreeItem<Node> node, boolean status) {
-        node.getValue().setIgnored(status);
-
-        for (TreeItem<Node> kid: node.getChildren()) {
-            setIgnoredDescendants(kid, status);
-        }
     }
 
     @Override
