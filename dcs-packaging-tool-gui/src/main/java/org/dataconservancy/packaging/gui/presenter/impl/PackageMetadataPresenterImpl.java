@@ -19,7 +19,6 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DateUtility;
@@ -89,12 +88,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.clearAllFields();
 
             view.getPackageNameField().setText(getController().getPackageState().getPackageName());
-
-            for (String domainProfile : getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE)) {
-                view.addDomainProfileLabel(domainProfile);
-            }
+            view.getDomainProfilesComboBox().setValue(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
             view.getDomainProfilesComboBox().setDisable(true);
-            view.getAddDomainProfileButton().setDisable(true);
 
             for (Node node : view.getAllDynamicFields()) {
                 if (getController().getPackageState().getPackageMetadataValues(node.getId()) != null) {
@@ -123,16 +118,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             domainProfileIdMap.put(domainProfile.getLabel(), domainProfile.getIdentifier());
         }
         view.loadDomainProfileNames(domainProfileLabels);
-        view.getAddDomainProfileButton().setOnAction(event -> {
-            String selectedItem = view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem();
-            if (view.getDomainProfileRemovableLabelVBox().getChildren().size() == 0) {//remove this outer condition when we allow multiple profiles
-                if (selectedItem != null && !selectedItem.isEmpty() &&
-                        !view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem().isEmpty() &&
-                        !(getSelectedDomainProfileLabelList().contains(selectedItem))) {
-                    view.addDomainProfileRemovableLabel(view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem());
-                }
-            }//matches "remove this outer .." above
-        });
 
         if (!view.isFormAlreadyDrawn()) {
             view.setupRequiredFields(packageMetadataService.getRequiredPackageMetadata());
@@ -142,20 +127,19 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         view.getContinueButton().setOnAction(event -> {
             updatePackageState();
-
-            if (validateEditableRequiredFields()) {
-                try(FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))){
-                    packageStateSerializer.serialize(getController().getPackageState(), fis);
-                } catch (IOException e){
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                if (validateRequiredFields()) {
+                    try (FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))) {
+                        packageStateSerializer.serialize(getController().getPackageState(), fis);
+                    } catch (IOException e) {
+                        view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                        view.getErrorLabel().setVisible(true);
+                    }
+                    view.getErrorLabel().setVisible(false);
+                    getController().goToNextPage();
+                } else {
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
                     view.getErrorLabel().setVisible(true);
                 }
-                view.getErrorLabel().setVisible(false);
-                getController().goToNextPage();
-            } else {
-                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
-                view.getErrorLabel().setVisible(true);
-            }
         });
 
         view.getSaveButton().setOnAction(event -> {
@@ -196,14 +180,13 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
 
         // Clear the domain profile list and reset the values on the current state of the form
-        getController().getPackageState().setDomainProfileIdList(getSelectedDomainProfileIdList());
-
-        for (Node removableLabel : view.getDomainProfileRemovableLabelVBox().getChildren()) {
-            if (removableLabel instanceof RemovableLabel) {
-                getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((RemovableLabel) removableLabel).getLabel().getText());
-            } else {
-                getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, ((Label) removableLabel).getText());
-            }
+        getController().getPackageState().setDomainProfileIdList(new ArrayList<URI>());
+        String domainProfileName = view.getDomainProfilesComboBox().getValue();
+        if(domainProfileName != null && !domainProfileName.isEmpty()) {
+            List<URI> domainProfileIdList = new ArrayList<>();
+            domainProfileIdList.add(domainProfileIdMap.get(domainProfileName));
+            getController().getPackageState().setDomainProfileIdList(domainProfileIdList);
+            getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, domainProfileName);
         }
 
         // Now let's go through the dynamic fields and update the package state.
@@ -232,8 +215,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
      *
      * @return true or false based on validation
      */
-    private boolean validateEditableRequiredFields() {
+    private boolean validateRequiredFields() {
 
+        //first check the editable required fields
         for (PackageMetadata reqField : packageMetadataService.getRequiredPackageMetadata()) {
             if (reqField.isEditable() && getController().getPackageState().getPackageMetadataValues(reqField.getName()) == null) {
                 return false;
@@ -243,29 +227,17 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         }
 
-        if (getController().getPackageState().getPackageName() == null || (getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE) == null)) {
+        //now check other required fields
+        if (getController().getPackageState().getPackageName() == null ||
+                getController().getPackageState().getPackageName().isEmpty() ||
+                getController().getPackageState().getDomainProfileIdList() == null ||
+                getController().getPackageState().getDomainProfileIdList().isEmpty() ||
+                !getController().getPackageState().getPackageMetadataList().keySet().contains(GeneralParameterNames.DOMAIN_PROFILE))
+        {
             return false;
         }
 
         return true;
-    }
-
-    private List<String> getSelectedDomainProfileLabelList(){
-        List<String> profileLabelList = new ArrayList<>();
-        for(Node node :view.getDomainProfileRemovableLabelVBox().getChildren()){
-            if(node instanceof RemovableLabel) {
-                profileLabelList.add(((RemovableLabel) node).getLabel().getText());
-            }
-        }
-        return profileLabelList;
-    }
-
-    private List<URI> getSelectedDomainProfileIdList(){
-        List<URI> profileIdList = new ArrayList<>();
-        for(String label : getSelectedDomainProfileLabelList()){
-            profileIdList.add(domainProfileIdMap.get(label));
-        }
-        return profileIdList;
     }
 
     @Override

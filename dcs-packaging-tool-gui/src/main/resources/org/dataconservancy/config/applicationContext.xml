@@ -254,9 +254,11 @@
     <property name="marshallerMap">
       <map>
         <entry key="APPLICATION_VERSION" value-ref="applicationVersionMarshaller"/>
+        <entry key="DOMAIN_PROFILE_LIST" value-ref="domainProfileListMarshaller"/>
         <entry key="PACKAGE_METADATA" value-ref="packageMetadataMarshaller"/>
         <entry key="PACKAGE_NAME" value-ref="packageNameMarshaller"/>
         <entry key="PACKAGE_TREE" value-ref="packageTreeMarshaller"/>
+        <entry key="USER_SPECIFIED_PROPERTIES" value-ref="userSpecifiedPropertiesMarshaller"/>
       </map>
     </property>
     <property name="archive" value="false"/>
@@ -264,6 +266,12 @@
 
   <bean id="applicationVersionMarshaller"  class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
     <property name="streamId" value="APPLICATION_VERSION"/>
+    <property name="marshaller" ref="xStreamMarshaller"/>
+    <property name="unmarshaller" ref="xStreamMarshaller"/>
+  </bean>
+
+  <bean id="domainProfileListMarshaller" class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
+    <property name="streamId" value="DOMAIN_PROFILE_LIST"/>
     <property name="marshaller" ref="xStreamMarshaller"/>
     <property name="unmarshaller" ref="xStreamMarshaller"/>
   </bean>
@@ -284,6 +292,12 @@
     <property name="streamId" value="PACKAGE_TREE"/>
     <property name="marshaller" ref="jenaModelSerializer"/>
     <property name="unmarshaller" ref="jenaModelSerializer"/>
+  </bean>
+
+  <bean id="userSpecifiedPropertiesMarshaller" class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
+    <property name="streamId" value="USER_SPECIFIED_PROPERTIES"/>
+    <property name="marshaller" ref="xStreamMarshaller"/>
+    <property name="unmarshaller" ref="xStreamMarshaller"/>
   </bean>
 
   <bean id="xStreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">

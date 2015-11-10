@@ -50,13 +50,6 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     ComboBox<String> getDomainProfilesComboBox();
 
     /**
-     * A button that adds the selected profile
-     *
-     * @return add profile button
-     */
-    Button getAddDomainProfileButton();
-
-    /**
      * Scrolls the view back to the top of the window.
      */
     void scrollToTop();
@@ -67,20 +60,6 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * @param domainProfileNames The list of domain profile names to provide to the user
      */
     void loadDomainProfileNames(List<String> domainProfileNames);
-
-    /**
-     * Add the selected domain profile as a removable label
-     *
-     * @param domainProfile The name of the domain profile to add
-     */
-    void addDomainProfileRemovableLabel(String domainProfile);
-
-    /**
-     * the VBox that contains removable lables.
-     *
-     * @return the vbox containing removablelabels for domain profiles.
-     */
-    VBox getDomainProfileRemovableLabelVBox();
 
     /**
      * Sets up the required fields in the form.
@@ -129,13 +108,6 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
      * @return the warning popup
      */
     WarningPopup getWarningPopup();
-
-    /**
-     * Similar to {@code} addDomainProfileRemovableLabel, it adds a label for profile but in a way so the user can't
-     * remove it.
-     * @param domainProfile The name of the domain profile to add
-     */
-    void addDomainProfileLabel(String domainProfile);
 
     /**
      * Allows the presenter to know whether the form needs to be drawn or not.

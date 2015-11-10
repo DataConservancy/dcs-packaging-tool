@@ -51,6 +51,7 @@ import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,8 +66,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     //The value of the combobox domain profiles
     private ComboBox<String> domainProfilesComboBox;
-    private Button addDomainProfileButton;
-    private VBox domainProfileRemovableLabelVBox;
 
     private Label errorLabel;
     private ScrollPane contentScrollPane;
@@ -79,6 +78,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private boolean formAlreadyDrawn = false;
     private FileChooser packageMetadataFileChooser;
     private Set<String> failedValidation;
+
+    private boolean allowsMultipleDomainProfiles = true;
 
     public PackageMetadataViewImpl() {
         super();
@@ -138,27 +139,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         topRow.getChildren().add(packageNameEntryFields);
 
         VBox domainProfileVBox = new VBox(4);
-
         Label domainProfileLabel = new Label(TextFactory.getText(LabelKey.SELECT_DOMAIN_PROFILE_LABEL));
         domainProfileVBox.getChildren().add(domainProfileLabel);
-
-        HBox domainProfileAndButton = new HBox(4);
         domainProfilesComboBox = new ComboBox<>();
         domainProfilesComboBox.setPrefWidth(267);
-
-        addDomainProfileButton = new Button(TextFactory.getText(LabelKey.ADD_BUTTON));
-        addDomainProfileButton.setPrefHeight(28);
-        addDomainProfileButton.getStyleClass().add(CLICKABLE);
-
-        domainProfileRemovableLabelVBox = new VBox(4);
-        domainProfileRemovableLabelVBox.getStyleClass().add(VBOX_BORDER);
-        domainProfileRemovableLabelVBox.setId(GeneralParameterNames.DOMAIN_PROFILE);
-
-        domainProfileAndButton.getChildren().add(domainProfilesComboBox);
-        domainProfileAndButton.getChildren().add(addDomainProfileButton);
-
-        domainProfileVBox.getChildren().add(domainProfileAndButton);
-        domainProfileVBox.getChildren().add(domainProfileRemovableLabelVBox);
+        domainProfileVBox.getChildren().add(domainProfilesComboBox);
 
         topRow.getChildren().add(domainProfileVBox);
 
@@ -183,11 +168,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public Button getAddDomainProfileButton() {
-        return addDomainProfileButton;
-    }
-
-    @Override
     public void scrollToTop() {
         contentScrollPane.setVvalue(0);
     }
@@ -203,19 +183,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     @Override
     public void loadDomainProfileNames(List<String> profileNames) {
-        domainProfilesComboBox.getItems().addAll(profileNames);
+        Collections.sort(profileNames);
+        domainProfilesComboBox.getItems().setAll(profileNames);
+        domainProfilesComboBox.setValue(profileNames.get(0));
     }
 
-    @Override
-    public void addDomainProfileRemovableLabel(String domainProfileName) {
-        RemovableLabel removableLabel = new RemovableLabel(domainProfileName, domainProfileRemovableLabelVBox);
-        domainProfileRemovableLabelVBox.getChildren().add(removableLabel);
-    }
-
-    @Override
-    public VBox getDomainProfileRemovableLabelVBox() {
-        return this.domainProfileRemovableLabelVBox;
-    }
 
     @Override
     public void setupRequiredFields(List<PackageMetadata> requiredPackageMetadataList) {
@@ -270,10 +242,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     @Override
     public void clearAllFields() {
         packageNameField.clear();
-        domainProfileRemovableLabelVBox.getChildren().clear();
         domainProfilesComboBox.getItems().clear();
         domainProfilesComboBox.setDisable(false);
-        addDomainProfileButton.setDisable(false);
         for (Node node : allDynamicFields) {
             if (node instanceof TextField) {
                 ((TextField) node).clear();
@@ -323,12 +293,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     @Override
     public WarningPopup getWarningPopup() {
         return warningPopup;
-    }
-
-    @Override
-    public void addDomainProfileLabel(String domainProfile) {
-        Label removableLabel = new Label(domainProfile);
-        domainProfileRemovableLabelVBox.getChildren().add(removableLabel);
     }
 
     @Override
