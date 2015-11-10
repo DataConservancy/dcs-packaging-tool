@@ -118,6 +118,10 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         //Displays the file selector, and then saves the package description to the given file. 
         view.getSaveButton().setOnAction(arg0 -> {
+            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
+                view.getArtifactDetailsWindow().hide();
+            }
+
             packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
 
             //Still check if it's null in case user hit cancel
@@ -144,6 +148,12 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         
         //Validates the package description, saves it, then moves on to the next page.
         view.getContinueButton().setOnAction(arg0 -> {
+
+            //Close property window if it's showing
+            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
+                view.getArtifactDetailsWindow().hide();
+            }
+
             //Perform simple validation to make sure the package description is valid.
             if (!profileService.validateTree(controller.getPackageState().getPackageTree())) {
                 view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
@@ -182,6 +192,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
                 controller.goToNextPage();
             }
+
         });
 
         //Cancels the property popup, which closes the popup with out saving any changes.
@@ -215,6 +226,14 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         });
 
         view.getRefreshPopupNegativeButton().setOnAction(event -> view.getRefreshPopup().hide());
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
+            view.getArtifactDetailsWindow().hide();
+        }
+        super.onBackPressed();
     }
 
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {

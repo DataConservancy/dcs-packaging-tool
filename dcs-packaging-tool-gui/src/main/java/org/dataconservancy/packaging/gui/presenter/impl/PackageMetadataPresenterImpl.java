@@ -32,7 +32,7 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -172,15 +172,15 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     }
 
     @Override
-    public void bindCancelLink() {
-        view.getCancelLink().setOnAction(event -> view.showWarningPopup());
-
+    public void onBackPressed() {
         if (Platform.isFxApplicationThread()) {
             view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
             view.getWarningPopup().setConfirmEventHandler(event -> {
                 view.getWarningPopup().hide();
-                getController().goToPreviousPage();
+                super.onBackPressed();
             });
+
+            view.showWarningPopup();
         }
     }
 
