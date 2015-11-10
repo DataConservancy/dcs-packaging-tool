@@ -51,7 +51,8 @@ public class Errors {
         INACCESSIBLE_CONTENT_DIR("inaccessiblepackagecontent.error"),
         ARTIFACT_GRAPH_ERROR("artifactgraph.error"),
         CONTENT_DIRECTORY_ERROR("contentdirectory.error"),
-        ADD_CONTENT_ERROR("addcontent.error");
+        ADD_CONTENT_ERROR("addcontent.error"),
+        IO_CREATE_ERROR("iocreate.error");
 
 
         private String property;

@@ -32,12 +32,14 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;;
+import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,9 +56,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     private PackageMetadataView view;
     private PackageMetadataService packageMetadataService;
-    private File packageMetadataFile;
     private DomainProfileStore domainProfileStore;
-     Map<String,URI> domainProfileIdMap = new HashMap<>();
+    private Map<String,URI> domainProfileIdMap = new HashMap<>();
+    private PackageStateSerializer packageStateSerializer;
 
     public PackageMetadataPresenterImpl(PackageMetadataView view) {
         super(view);
@@ -123,11 +125,13 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         view.loadDomainProfileNames(domainProfileLabels);
         view.getAddDomainProfileButton().setOnAction(event -> {
             String selectedItem = view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem();
-            if (selectedItem != null &&  !selectedItem.isEmpty() &&
-                    !view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem().isEmpty() &&
-                    !(getSelectedDomainProfileLabelList().contains(selectedItem))) {
-                view.addDomainProfileRemovableLabel(view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem());
-            }
+            if (view.getDomainProfileRemovableLabelVBox().getChildren().size() == 0) {//remove this outer condition when we allow multiple profiles
+                if (selectedItem != null && !selectedItem.isEmpty() &&
+                        !view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem().isEmpty() &&
+                        !(getSelectedDomainProfileLabelList().contains(selectedItem))) {
+                    view.addDomainProfileRemovableLabel(view.getDomainProfilesComboBox().getSelectionModel().getSelectedItem());
+                }
+            }//matches "remove this outer .." above
         });
 
         if (!view.isFormAlreadyDrawn()) {
@@ -140,19 +144,29 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             updatePackageState();
 
             if (validateEditableRequiredFields()) {
+                try(FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))){
+                    packageStateSerializer.serialize(getController().getPackageState(), fis);
+                } catch (IOException e){
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                    view.getErrorLabel().setVisible(true);
+                }
                 view.getErrorLabel().setVisible(false);
                 getController().goToNextPage();
             } else {
                 view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
                 view.getErrorLabel().setVisible(true);
             }
-
         });
 
         view.getSaveButton().setOnAction(event -> {
             updatePackageState();
-            packageMetadataFile = controller.showSaveFileDialog(view.getPackageMetadataFileChooser());
-            // TODO: Store the package metadata in some sort of file here.
+
+            try(FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))){
+                packageStateSerializer.serialize(getController().getPackageState(), fis);
+            } catch (IOException e){
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                view.getErrorLabel().setVisible(true);
+            }
         });
 
     }
@@ -262,6 +276,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     @Override
     public void setDomainProfileStore(DomainProfileStore domainProfileStore) {
         this.domainProfileStore = domainProfileStore;
+    }
+
+    @Override
+    public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer) {
+        this.packageStateSerializer = packageStateSerializer;
     }
 
 }
