@@ -28,7 +28,7 @@ public interface PackageGenerationPresenter extends Presenter {
      * Sets the service that will generate package descriptions to refresh after building a new package
      * @param packageDescriptionBuilder  the  PackageDescriptionBuilder
      */
-    public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder);
+    //public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder);
     
     /**
      * Sets the service that will be used for generating a package from the previously created package description, and the defined package parameters.

@@ -53,6 +53,7 @@ public class Labels {
         GZIP_BUTTON("gzip.button"),
         EXPLODED_BUTTON("exploded.button"),
         SUCCESS_LABEL("success.label"),
+        FINAL_PACKAGE_NAME_LOCATION("finalpackagenamelocation.label"),
         ANOTHER_FORMAT_LABEL("anotherformat.label"),
         RELATIONSHIP_DEFINITION_LABEL("relationshipdefinition.label"),
         SAVE_BUTTON("save.button"),

@@ -25,6 +25,9 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +35,7 @@ import java.util.List;
 /**
  * Base test class for all XStream related classes.
  */
-public class AbstractXstreamTest {
+public abstract class AbstractXstreamTest {
 
     private XmlPullParserFactory xppFactory;
 
@@ -72,6 +75,19 @@ public class AbstractXstreamTest {
             }
         };
 
+        public static List<URI> domainProfileUris = new ArrayList<URI>() {
+            {
+                try {
+                    add(new URI("http://example.org/domain/v1"));
+                    add(new URI("http://example.org/properties/v1"));
+                    add(new URI("http://other.org/properties"));
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+
+            }
+        };
+
         static {
             applicationVersion.setBuildNumber("1");
             applicationVersion.setBuildRevision("abcdefg");
@@ -92,6 +108,9 @@ public class AbstractXstreamTest {
 
         public static ClassPathResource PACKAGE_NAME_1 =
                 new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-name-v1.ser");
+
+        public static ClassPathResource DOMAINPROFILE_URIS_1 =
+                        new ClassPathResource("org/dataconservancy/packaging/tool/ser/domain-profile-uris-v1.ser");
     }
 
 }

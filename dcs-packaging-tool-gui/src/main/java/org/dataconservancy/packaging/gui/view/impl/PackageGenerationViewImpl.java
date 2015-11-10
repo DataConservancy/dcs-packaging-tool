@@ -159,7 +159,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         tarArchiveButton = new RadioButton(TextFactory.getText(LabelKey.TAR_BUTTON));
         tarArchiveButton.setToggleGroup(archiveToggleGroup);
         tarArchiveButton.setUserData("tar");
-        
         tarArchiveButton.setSelected(true);
         archivingOptions.getChildren().add(tarArchiveButton);
         
@@ -225,15 +224,20 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         jsonRadioButton = new RadioButton(TextFactory.getText(LabelKey.JSON_BUTTON));
         jsonRadioButton.setToggleGroup(serializationToggleGroup);
+        jsonRadioButton.setUserData("json");
         jsonRadioButton.setSelected(true);
         serializationOptions.getChildren().add(jsonRadioButton);
 
         xmlRadioButton = new RadioButton(TextFactory.getText(LabelKey.XML_BUTTON));
         xmlRadioButton.setToggleGroup(serializationToggleGroup);
+        xmlRadioButton.setUserData("xml");
+        xmlRadioButton.setSelected(false);
         serializationOptions.getChildren().add(xmlRadioButton);
 
         turtleRadioButton = new RadioButton(TextFactory.getText(LabelKey.TURTLE_BUTTON));
         turtleRadioButton.setToggleGroup(serializationToggleGroup);
+        turtleRadioButton.setUserData("turtle");
+        turtleRadioButton.setSelected(false);
         serializationOptions.getChildren().add(turtleRadioButton);
 
         packagingOptions.getChildren().add(serializationOptions);
@@ -330,35 +334,40 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     public TextField getCurrentOutputDirectoryTextField() {
         return currentOutputDirectoryTextField;
     }
-    
+
     @Override
-    public void showSuccessPopup() {
+    public void showSuccessPopup(String packageName, String location) {
         //Create a simple package tool popup for the generation success message.
         packageGenerationSuccessPopup = new PackageToolPopup();
         packageGenerationSuccessPopup.setTitleText(TextFactory.getText(LabelKey.SUCCESS_LABEL));
         packageGenerationSuccessPopup.setMoveable(false);
-        
+
         VBox popupContent = new VBox();
         popupContent.setMaxWidth(600);
-        
+
         popupContent.setAlignment(Pos.TOP_CENTER);
-        
+
+        Label successfulPackageNameAndLocation =
+                new Label(String.format(TextFactory.getText(LabelKey.FINAL_PACKAGE_NAME_LOCATION), packageName, location));
+        successfulPackageNameAndLocation.setWrapText(true);
+        popupContent.getChildren().add(successfulPackageNameAndLocation);
+
         Label anotherFormatMessage = new Label(TextFactory.getText(LabelKey.ANOTHER_FORMAT_LABEL));
         anotherFormatMessage.setWrapText(true);
-        
+
         popupContent.getChildren().add(anotherFormatMessage);
-        
+
         HBox popupControls = new HBox();
         popupControls.setAlignment(Pos.CENTER);
         popupControls.setSpacing(40);
         popupControls.getChildren().add(noThanksLink);
-        popupControls.getChildren().add(createAnotherPackageButton);  
+        popupControls.getChildren().add(createAnotherPackageButton);
 
         popupContent.getChildren().add(popupControls);
-        
+
         packageGenerationSuccessPopup.setContent(popupContent);
-        
-        
+
+
         Point2D point = continueButton.localToScene(0.0,  0.0);
         double x = point.getX();
         double y = point.getY();

@@ -24,6 +24,7 @@ public class GeneralParameterNames {
 	public static final String PACKAGE_NAME = "Package-Name";
 	public static final String CHECKSUM_ALGORITHMS = "Checksum-Algs";
 	public static final String COMPRESSION_FORMAT = "Compression-Format";
+	public static final String REM_SERIALIZATION_FORMAT = "ReM-Serialization-Format";
 	public static final String ARCHIVING_FORMAT = "Archiving-Format";
     public static final String EXTERNAL_PROJECT_ID = "External-Project-Id";
 	public static final String DOMAIN_PROFILE = "Domain-Profile";
