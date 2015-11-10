@@ -20,6 +20,8 @@ package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
@@ -32,11 +34,13 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.oxm.Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.beans.PropertyDescriptor;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -158,6 +162,22 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     private static final String ERR_MARSHALLING_STREAM = "Error marshalling streamId '%s': %s";
 
+
+    /**
+     * Placeholders: streamId, error message
+     */
+    private static final String ERR_UNMARSHALLING_ARCHIVE = "Error unmarshalling package state stream from archive: %s";
+
+    /**
+     * Placeholders: streamId, error message
+     */
+    private static final String ERR_UNMARSHALLING_STREAMID_ARCHIVE = "Error unmarshalling streamId '%s' from archive: %s";
+
+    /**
+     * Placeholders: streamId, error message
+     */
+    private static final String ERR_UNMARSHALLING_STREAM = "Error unmarshalling streamId '%s': %s";
+
     /**
      * Whether or not we are serializing streams into an archive (zip or tar)
      */
@@ -197,6 +217,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
+
     }
 
     /**
@@ -355,8 +376,74 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     }
 
     @Override
-    public void deserialize(PackageState state, InputStream in, StreamId streamId) {
-        // TODO
+    public void deserialize(PackageState state, StreamId streamId, InputStream in) {
+        if (isArchiveStream(in)) {
+            in = new ZipArchiveInputStream(in);
+            deserialize(state, streamId, (ZipArchiveInputStream) in);
+            return;
+        }
+
+        if (streamId == null) {
+            throw new UnsupportedOperationException("Cannot deserialize a PackageState object from a non-archive " +
+                    "(i.e. not a zip file) input stream.");
+        }
+
+        try {
+            Object result = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+            if (result != null) {
+                propertyDescriptors.get(streamId).getWriteMethod().invoke(state, result);
+            } else {
+                throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, streamId,
+                        "Inexplicable 'null' result from unmarshalling!"));
+            }
+        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, streamId, e.getMessage()), e);
+        }
+    }
+
+    void deserialize(PackageState state, StreamId streamId, ZipArchiveInputStream in) {
+        ArchiveEntry entry = null;
+        Object deserializedStream = null;
+
+        // deserialize the specified stream identifier (or all stream identifiers if streamId is null) from the
+        // inputStream to the package state
+
+        try {
+            while ((entry = (in.getNextEntry())) != null) {
+                if (streamId == null || streamId.name().equals(entry.getName())) {
+                    deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+                    propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
+                }
+            }
+        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+            if (streamId == null) {
+                throw new RuntimeException(String.format(ERR_UNMARSHALLING_ARCHIVE, e.getMessage()), e);
+            } else {
+                throw new RuntimeException(
+                        String.format(ERR_UNMARSHALLING_STREAMID_ARCHIVE, streamId, e.getMessage()), e);
+            }
+        }
+    }
+
+    boolean isArchiveStream(InputStream in) {
+        if (in == null) {
+            throw new IllegalArgumentException("Stream must not be null.");
+        }
+
+        if (!in.markSupported()) {
+            throw new IllegalArgumentException("Mark is not supported.");
+        }
+
+        final byte[] signature = new byte[12];
+        in.mark(signature.length);
+        int signatureLength = 0;
+        try {
+            signatureLength = IOUtils.readFully(in, signature);
+            in.reset();
+        } catch (IOException e) {
+            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, e.getMessage()), e);
+        }
+        return ZipArchiveInputStream.matches(signature, signatureLength);
     }
 
     /**

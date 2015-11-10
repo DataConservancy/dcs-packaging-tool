@@ -19,8 +19,10 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.attribute.FileTime;
 

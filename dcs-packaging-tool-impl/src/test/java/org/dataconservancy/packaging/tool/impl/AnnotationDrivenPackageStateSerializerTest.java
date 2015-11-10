@@ -45,6 +45,7 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -61,6 +62,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObjects.applicationVersion;
 import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObjects.packageMetadata;
 import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObjects.packageName;
+import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestResources.APPLICATION_VERSION_1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -236,7 +238,7 @@ public class AnnotationDrivenPackageStateSerializerTest {
     public void testDeserializeSimple() throws Exception {
         state = new PackageState();
         when(mockedMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller().unmarshal(any(Source.class))).thenReturn(applicationVersion);
-        underTest.deserialize(state, StreamId.APPLICATION_VERSION, AbstractXstreamTest.TestResources.APPLICATION_VERSION_1.getInputStream());
+        underTest.deserialize(state, StreamId.APPLICATION_VERSION, new BufferedInputStream(APPLICATION_VERSION_1.getInputStream()));
         assertNotNull(state.getCreationToolVersion());
         assertEquals(applicationVersion, state.getCreationToolVersion());
         verify(mockedMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller()).unmarshal(any(Source.class));
@@ -249,7 +251,7 @@ public class AnnotationDrivenPackageStateSerializerTest {
         ZipArchiveOutputStream zipOut = new ZipArchiveOutputStream(baos);
         ZipArchiveEntry zipEntry = new ZipArchiveEntry(StreamId.APPLICATION_VERSION.name());
         zipOut.putArchiveEntry(zipEntry);
-        IOUtils.copy(AbstractXstreamTest.TestResources.APPLICATION_VERSION_1.getInputStream(), zipOut);
+        IOUtils.copy(APPLICATION_VERSION_1.getInputStream(), zipOut);
         zipOut.closeArchiveEntry();
         zipOut.close();
 
