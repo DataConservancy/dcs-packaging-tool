@@ -1,0 +1,11 @@
+<serialization version="1" converterClass="org.dataconservancy.packaging.tool.ser.UserPropertyConverter" streamId="USER_SPECIFIED_PROPERTIES">
+  <userProperty>
+    <node id="node:1">
+      <Property predicate="pred:1" valueType="STRING">foo</Property>
+      <Property predicate="pred:2" valueType="URI">value:foo</Property>
+    </node>
+    <node id="node:2">
+      <Property predicate="pred:1" valueType="STRING">bar</Property>
+    </node>
+  </userProperty>
+</serialization>

@@ -19,6 +19,9 @@
 package org.dataconservancy.packaging.tool.ser;
 
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.junit.Before;
 import org.springframework.core.io.ClassPathResource;
 import org.xmlpull.v1.XmlPullParser;
@@ -29,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -88,6 +92,33 @@ public abstract class AbstractXstreamTest {
             }
         };
 
+        public static LinkedHashMap<URI, List<Property>> propertiesMap = new LinkedHashMap<URI, List<Property>>() {
+            {
+                try {
+                    PropertyType typeOne = new PropertyType();
+                    typeOne.setDomainPredicate(new URI("pred:1"));
+                    typeOne.setPropertyValueType(PropertyValueType.STRING);
+
+                    PropertyType typeTwo = new PropertyType();
+                    typeTwo.setDomainPredicate(new URI("pred:2"));
+                    typeTwo.setPropertyValueType(PropertyValueType.URI);
+
+                    Property propertyOne = new Property(typeOne);
+                    propertyOne.setStringValue("foo");
+
+                    Property propertyTwo = new Property(typeTwo);
+                    propertyTwo.setUriValue(new URI("value:foo"));
+
+                    Property propertyThree = new Property(typeOne);
+                    propertyThree.setStringValue("bar");
+
+                    put(new URI("node:1"), Arrays.asList(propertyOne, propertyTwo));
+                    put(new URI("node:2"), Arrays.asList(propertyThree));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
         static {
             applicationVersion.setBuildNumber("1");
             applicationVersion.setBuildRevision("abcdefg");
@@ -110,7 +141,10 @@ public abstract class AbstractXstreamTest {
                 new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-name-v1.ser");
 
         public static ClassPathResource DOMAINPROFILE_URIS_1 =
-                        new ClassPathResource("org/dataconservancy/packaging/tool/ser/domain-profile-uris-v1.ser");
+                                new ClassPathResource("org/dataconservancy/packaging/tool/ser/domain-profile-uris-v1.ser");
+
+        public static ClassPathResource USER_PROPERTIES_1 =
+                new ClassPathResource("org/dataconservancy/packging/tool/ser/user-property-v1.ser");
     }
 
 }

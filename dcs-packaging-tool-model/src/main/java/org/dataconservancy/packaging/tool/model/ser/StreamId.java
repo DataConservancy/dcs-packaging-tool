@@ -47,6 +47,10 @@ public enum StreamId {
     /**
      * Identifier for the stream containing the URIs of Domain Profiles in use for the package
      */
-    DOMAIN_PROFILE_LIST
+    DOMAIN_PROFILE_LIST,
 
+    /**
+     * Identifier for the stream containing the user specified properties map for the nodes in the package
+     */
+    USER_SPECIFIED_PROPERTIES
 }

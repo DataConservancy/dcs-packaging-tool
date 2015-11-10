@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
@@ -55,6 +57,12 @@ public class PackageState {
      */
     @Serialize(streamId = StreamId.DOMAIN_PROFILE_LIST)
     private List<URI> domainProfileIdList;
+
+    /**
+     * A map of all of the user specified properties that are set outside of the profiles, keyed by the ID of the node.
+     */
+    @Serialize(streamId = StreamId.USER_SPECIFIED_PROPERTIES, scope = {SerializationScope.WIP})
+    private Map<URI, List<Property>> userSpecifiedProperties;
 
     /**
      * Container of all of the domain objects in this package.
@@ -189,6 +197,15 @@ public class PackageState {
         this.outputDirectory = outputDirectory;
     }
 
+    public Map<URI, List<Property>> getUserSpecifiedProperties() {
+        return userSpecifiedProperties;
+    }
+
+    public void setUserSpecifiedProperties(
+        Map<URI, List<Property>> userSpecifiedProperties) {
+        this.userSpecifiedProperties = userSpecifiedProperties;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -222,7 +239,11 @@ public class PackageState {
             that.packageMetadataList != null) {
             return false;
         }
-        
+        if (userSpecifiedProperties !=
+            null ? !userSpecifiedProperties.equals(that.userSpecifiedProperties) :
+            that.userSpecifiedProperties != null) {
+            return false;
+        }
         /* This is not the notion of equality we want here, but there's nothing we can reasonably do about it */
         if (domainObjectRDF !=
                 null ? !(domainObjectRDF == that.domainObjectRDF) :
@@ -250,6 +271,8 @@ public class PackageState {
             (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
         result = 31 * result +
                 (domainObjectRDF != null ? domainObjectRDF.hashCode() : 0);
+        result = 31 * result +
+            (userSpecifiedProperties != null ? userSpecifiedProperties.hashCode() : 0);
         return result;
     }
 }
