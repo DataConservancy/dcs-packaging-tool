@@ -126,7 +126,8 @@ public class Labels {
         DETECTED_CHANGES_LABEL("detectedchanges.label"),
         FILE_MISSING_TIP("backingfilenotfound.tip"),
         REFRESH_STATUS_LABEL("refreshstatus.label"),
-        REFRESH_LOCATION_LABEL("refreshlocation.label");
+        REFRESH_LOCATION_LABEL("refreshlocation.label"),
+        NO_BACKING_FILE_LABEL("nobackingfile.label");
 
         private String property;
 

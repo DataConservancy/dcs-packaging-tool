@@ -62,6 +62,7 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -283,6 +284,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     labelText = packageNode.getFileInfo().getName();
                 }
                 viewLabel.setText(labelText);
+            } else {
+                viewLabel.setText(TextFactory.getText(LabelKey.NO_BACKING_FILE_LABEL));
             }
 
             Tooltip t = new Tooltip(viewLabel.getText());
