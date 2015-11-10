@@ -29,7 +29,7 @@ public class PackageStateTest {
         EqualsVerifier
                 .forClass(PackageState.class).allFieldsShouldBeUsed()
                 .withPrefabValues(Node.class, new Node(new URI("uri:foo")), new Node(new URI("uri:bar")))
-                .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
+                .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS, Warning.REFERENCE_EQUALITY)
                 .verify();
     }
 }
