@@ -25,7 +25,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -83,7 +82,6 @@ import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -341,8 +339,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             return new ReadOnlyObjectWrapper<>(optionsLabel);
         });
 
-
-        artifactTree.getColumns().addAll(artifactColumn, typeColumn, optionsColumn);
+        artifactTree.getColumns().add(artifactColumn);
+        artifactTree.getColumns().add(typeColumn);
+        artifactTree.getColumns().add(optionsColumn);
 
         //set up row factory to allow for a little alternate row styling for ignored package artifacts
         artifactTree.setRowFactory(new Callback<TreeTableView<Node>, TreeTableRow<Node>>() {
@@ -708,9 +707,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return popupNode;
     }
 
-    public void setPopupNode(Node artifact) {
-        popupNode = artifact;
-    }
     /**
      * {@inheritDoc}
      */
@@ -804,20 +800,19 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         Label refreshSummary = new Label(TextFactory.format(Messages.MessageKey.REFRESH_STATUS_MESSAGE, addCount, deleteCount, updateCount));
         refreshSummary.setWrapText(true);
 
-        TableView resultTable = new TableView();
+        TableView<ComparisonResult> resultTable = new TableView<>();
         resultTable.setEditable(false);
 
-        TableColumn statusCol = new TableColumn(TextFactory.getText(LabelKey.REFRESH_STATUS_LABEL));
-        statusCol.setCellValueFactory(
-                        new PropertyValueFactory<ComparisonResult, String>("comparison"));
+        TableColumn<ComparisonResult, String> statusCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_STATUS_LABEL));
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("comparison"));
         statusCol.setPrefWidth(75);
 
-        TableColumn locationCol = new TableColumn(TextFactory.getText(LabelKey.REFRESH_LOCATION_LABEL));
-        locationCol.setCellValueFactory(
-                                new PropertyValueFactory<ComparisonResult, String>("location"));
+        TableColumn<ComparisonResult, String> locationCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_LOCATION_LABEL));
+        locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
 
         resultTable.setItems(resultTableData);
-        resultTable.getColumns().addAll(statusCol, locationCol);
+        resultTable.getColumns().add(statusCol);
+        resultTable.getColumns().add(locationCol);
 
         changesVBox.getChildren().add(refreshSummary);
         changesVBox.getChildren().add(resultTable);
