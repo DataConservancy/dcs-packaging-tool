@@ -16,11 +16,8 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
@@ -33,10 +30,14 @@ import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.N
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
-import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -48,11 +49,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -91,40 +95,18 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     public javafx.scene.Node display() {
         String disciplinePath = controller.getFactory().getConfiguration().getDisciplineMap();
         view.setupWindowBuilder(disciplinePath);
-        final PackageArtifactTreeServiceWorker worker =
-                new PackageArtifactTreeServiceWorker();
 
         view.getErrorMessageLabel().setVisible(false);
-        
-        worker.setOnFailed(workerStateEvent -> {
-            Throwable e = workerStateEvent.getSource().getException();
 
-            view.getErrorMessageLabel().setText(
-                TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
-            view.getErrorMessageLabel().setVisible(true);
-            log.error("Error processing package description", e);
+        displayPackageTree();
 
+        if (controller.getCrossPageProgressIndicatorPopUp() != null) {
             controller.getCrossPageProgressIndicatorPopUp().hide();
-            controller.showHome(false);
-            worker.reset();
-        });
-        
-        worker.setOnSucceeded(workerStateEvent -> {
-            displayPackageTree();
-
-            if (controller.getCrossPageProgressIndicatorPopUp() != null) {
-                controller.getCrossPageProgressIndicatorPopUp().hide();
-            }
-
-            //Setup help content and then rebind the base class to this view.
-            view.setupHelp();
-            setView(view);
-            worker.reset();
-        });
-
-        if (Platform.isFxApplicationThread()) {
-            worker.start();
         }
+
+        //Setup help content and then rebind the base class to this view.
+        view.setupHelp();
+        setView(view);
 
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         preferences.addPreferenceChangeListener(this);
@@ -138,7 +120,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         //Displays the file selector, and then saves the package description to the given file. 
         view.getSaveButton().setOnAction(arg0 -> {
-            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
+            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
 
             //Still check if it's null in case user hit cancel
             if (packageDescriptionFile != null) {
@@ -177,7 +159,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
             //bring up a save file dialog box
-            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageDescriptionFileChooser());
+            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
 
             if (packageDescriptionFile != null) {
 
@@ -227,14 +209,14 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
 
         view.getRefreshPopupPositiveButton().setOnAction(event -> {
-            // TODO: Do something useful
+            ipmService.mergeTree(controller.getPackageState().getPackageTree(), view.getRefreshResult());
+            profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), controller.getPackageState().getPackageTree());
+
+            displayPackageTree();
             view.getRefreshPopup().hide();
         });
 
-        view.getRefreshPopupNegativeButton().setOnAction(event -> {
-            // TODO: Do something useful
-            view.getRefreshPopup().hide();
-        });
+        view.getRefreshPopupNegativeButton().setOnAction(event -> view.getRefreshPopup().hide());
     }
 
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
@@ -396,9 +378,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 if (inheritablePropertyValues != null) {
                     for (Property inheritablePropertyValue : inheritablePropertyValues) {
                         for (Node child : node.getChildren()) {
-                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> {
-                                profileService.addProperty(child, inheritablePropertyValue);
-                            });
+                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> profileService.addProperty(child, inheritablePropertyValue));
 
                             if (child.getChildren() != null) {
                                 child.getChildren().forEach(this::applyMetadataInheritance);
@@ -494,27 +474,67 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
     }
 
-    /**
-     * A {@link javafx.concurrent.Service} which executes the {@link javafx.concurrent.Task} of obtaining a package tree
-     * from PackageOntologyService given a
-     * {@link org.dataconservancy.packaging.tool.model.PackageDescription}.
-     */
-    private class PackageArtifactTreeServiceWorker extends Service<Void> {
-        public PackageArtifactTreeServiceWorker() {
+    @Override
+    public List<NodeType> getPossibleChildTypes(Node node) {
+        List<NodeType> childNodes = new ArrayList<>();
+        for (NodeType nodeType : controller.getPrimaryDomainProfile().getNodeTypes()) {
+            if (nodeType.getParentConstraints() != null) {
+                for (NodeConstraint parentConstraint : nodeType.getParentConstraints()) {
+                    if (parentConstraint.matchesAny() || (parentConstraint.getNodeType() != null && parentConstraint.getNodeType().equals(node.getNodeType()))) {
+                        childNodes.add(nodeType);
+                        break;
+                    }
+                }
+            }
         }
 
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    // Thread cannot modify UI so call displayPackageTree on success.
-                    return null;
-                }
-            };
+        return childNodes;
+    }
+
+    @Override
+    public void addToTree(Node parent, Path contentToAdd) {
+        try {
+            Node node = ipmService.createTreeFromFileSystem(contentToAdd);
+            parent.addChild(node);
+            profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), parent);
+
+            //Refresh the tree display
+            displayPackageTree();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            view.getErrorMessageLabel().setText(
+                TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) +
+                    e.getMessage());
+            view.getErrorMessageLabel().setVisible(true);
         }
     }
 
+    @Override
+    public Map<Node, NodeComparison> refreshTreeContent(Node node) {
+        Map<Node, NodeComparison> resultMap = new HashMap<>();
+        try {
+            Node newTree = buildComparisonTree(node);
+            resultMap = ipmService.compareTree(node, newTree);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return resultMap;
+    }
+
+    private Node buildComparisonTree(Node node) throws IOException {
+        Node newTree = ipmService.createTreeFromFileSystem(Paths.get(node.getFileInfo().getLocation()));
+        for (Node child : node.getChildren()) {
+            if (child.getFileInfo() != null && Paths.get(child.getFileInfo().getLocation()).toFile().exists()) {
+                if (!Paths.get(child.getFileInfo().getLocation()).startsWith(Paths.get(node.getFileInfo().getLocation()))) {
+                    newTree.addChild(buildComparisonTree(child));
+                }
+            }
+        }
+
+        return newTree;
+    }
 
     public void displayPackageTree() {
         if (controller.getPackageState() != null && controller.getPackageState().getPackageTree() != null) {

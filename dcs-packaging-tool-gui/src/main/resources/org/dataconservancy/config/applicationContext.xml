@@ -38,12 +38,6 @@
 
   <!-- RESOURCE BUNDLES -->
 
-  <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
-  	<constructor-arg type="java.lang.String">
-  		<value>${ontologyLabels.file}</value>
-  	</constructor-arg>
-  </bean>
-  
   <bean id="helpResource" class="java.util.ResourceBundle" factory-method="getBundle">
   	<constructor-arg type="java.lang.String">
   		<value>bundles/help</value>
@@ -67,10 +61,6 @@
     <property name="packageMetadataParametersFile" value = "${packageMetadataParametersFile}" />
   </bean>
 
-  <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
-  	<constructor-arg ref="ontologyLabelResource"/>
-  </bean>
-  
   <bean id="help" class="org.dataconservancy.packaging.gui.Help">
   	<constructor-arg ref="helpResource"/>
   </bean>
@@ -147,7 +137,6 @@
   </bean>
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
-    <constructor-arg ref="ontologyLabels"/>
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
@@ -241,6 +230,7 @@
     <property name="toolBuildNumber" value="${build.number}"/>
     <property name="toolBuildTimestamp" value="${build.timeStamp}"/>
     <property name="toolBuildRevision" value="${build.revision}"/>
+    <property name="domainProfileStore" ref="domainProfileStore"/>
   </bean>
 
   <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">

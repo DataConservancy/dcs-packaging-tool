@@ -20,6 +20,8 @@ package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
@@ -32,11 +34,13 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.oxm.Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.beans.PropertyDescriptor;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.attribute.FileTime;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -102,26 +106,26 @@ import java.util.zip.CRC32;
  * <strong>Archive-related configuration:</strong>
  * </p>
  * <dl>
- *     <dt>archive</dt>
- *     <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
- *         When this flag is false, other archive-related properties are not consulted.</dd>
- *     <dt>archiveFormat</dt>
- *     <dd>A string indicating the format the archive should take.  Supported value are:
- *         {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
- *         {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
- *     <dt>compress</dt>
- *     <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
- *     <dt>arxStreamFactory</dt>
- *     <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
+ * <dt>archive</dt>
+ * <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
+ * When this flag is false, other archive-related properties are not consulted.</dd>
+ * <dt>archiveFormat</dt>
+ * <dd>A string indicating the format the archive should take.  Supported value are:
+ * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
+ * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
+ * <dt>compress</dt>
+ * <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
+ * <dt>arxStreamFactory</dt>
+ * <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
  * </dl>
  * <p>
  * <strong>Marshalling-related configuration:</strong>
  * </p>
  * <dl>
- *     <dt>marshallerMap</dt>
- *     <dd>Maps the (un)marshallers to the streams that they (de)serialize.  Typically this will be
- *         dependency injected.  In order for this implementation to function properly, each {@link StreamId}
- *         should be represented in this {@code Map} with associated {@link StreamMarshaller}s</dd>
+ * <dt>marshallerMap</dt>
+ * <dd>Maps the (un)marshallers to the streams that they (de)serialize.  Typically this will be
+ * dependency injected.  In order for this implementation to function properly, each {@link StreamId}
+ * should be represented in this {@code Map} with associated {@link StreamMarshaller}s</dd>
  * </dl>
  */
 public class AnnotationDrivenPackageStateSerializer implements PackageStateSerializer {
@@ -158,6 +162,22 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     private static final String ERR_MARSHALLING_STREAM = "Error marshalling streamId '%s': %s";
 
+
+    /**
+     * Placeholders: streamId, error message
+     */
+    private static final String ERR_UNMARSHALLING_ARCHIVE = "Error unmarshalling package state stream from archive: %s";
+
+    /**
+     * Placeholders: streamId, error message
+     */
+    private static final String ERR_UNMARSHALLING_STREAMID_ARCHIVE = "Error unmarshalling streamId '%s' from archive: %s";
+
+    /**
+     * Placeholders: streamId, error message
+     */
+    private static final String ERR_UNMARSHALLING_STREAM = "Error unmarshalling streamId '%s': %s";
+
     /**
      * Whether or not we are serializing streams into an archive (zip or tar)
      */
@@ -165,8 +185,10 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     /**
      * The archive format to use (when {@link #archive} is {@code true})
+     *
+     * Right now this isn't a requirement (support of multiple archive formats) so this support has been commented out.
      */
-    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
+//    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
 
     /**
      * Whether or not to compress the archive (when {@link #archive} is {@code true})
@@ -175,9 +197,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
-     * a particular archive format (currently zip and tar supported) (when {@link #archive} is {@code true})
+     * a particular archive format (when {@link #archive} is {@code true}). Because we are not supporting multiple
+     * archive formats at this time (the requirement is to support ZIP only), this field is set to the
+     * ZipArchiveStreamFactory.
      */
-    private ArchiveStreamFactory arxStreamFactory;
+    private ArchiveStreamFactory arxStreamFactory = new ZipArchiveStreamFactory();
 
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
@@ -193,6 +217,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
+
     }
 
     /**
@@ -351,8 +376,74 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     }
 
     @Override
-    public void deserialize(PackageState state, InputStream in, StreamId streamId) {
-        // TODO
+    public void deserialize(PackageState state, StreamId streamId, InputStream in) {
+        if (isArchiveStream(in)) {
+            in = new ZipArchiveInputStream(in);
+            deserialize(state, streamId, (ZipArchiveInputStream) in);
+            return;
+        }
+
+        if (streamId == null) {
+            throw new UnsupportedOperationException("Cannot deserialize a PackageState object from a non-archive " +
+                    "(i.e. not a zip file) input stream.");
+        }
+
+        try {
+            Object result = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+            if (result != null) {
+                propertyDescriptors.get(streamId).getWriteMethod().invoke(state, result);
+            } else {
+                throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, streamId,
+                        "Inexplicable 'null' result from unmarshalling!"));
+            }
+        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, streamId, e.getMessage()), e);
+        }
+    }
+
+    void deserialize(PackageState state, StreamId streamId, ZipArchiveInputStream in) {
+        ArchiveEntry entry = null;
+        Object deserializedStream = null;
+
+        // deserialize the specified stream identifier (or all stream identifiers if streamId is null) from the
+        // inputStream to the package state
+
+        try {
+            while ((entry = (in.getNextEntry())) != null) {
+                if (streamId == null || streamId.name().equals(entry.getName())) {
+                    deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+                    propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
+                }
+            }
+        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+            if (streamId == null) {
+                throw new RuntimeException(String.format(ERR_UNMARSHALLING_ARCHIVE, e.getMessage()), e);
+            } else {
+                throw new RuntimeException(
+                        String.format(ERR_UNMARSHALLING_STREAMID_ARCHIVE, streamId, e.getMessage()), e);
+            }
+        }
+    }
+
+    boolean isArchiveStream(InputStream in) {
+        if (in == null) {
+            throw new IllegalArgumentException("Stream must not be null.");
+        }
+
+        if (!in.markSupported()) {
+            throw new IllegalArgumentException("Mark is not supported.");
+        }
+
+        final byte[] signature = new byte[12];
+        in.mark(signature.length);
+        int signatureLength = 0;
+        try {
+            signatureLength = IOUtils.readFully(in, signature);
+            in.reset();
+        } catch (IOException e) {
+            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, e.getMessage()), e);
+        }
+        return ZipArchiveInputStream.matches(signature, signatureLength);
     }
 
     /**
@@ -383,9 +474,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      *
      * @return a string representing the format of the archive
      */
-    public String getArchiveFormat() {
-        return archiveFormat;
-    }
+//    public String getArchiveFormat() {
+//        return archiveFormat;
+//    }
 
     /**
      * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
@@ -395,9 +486,9 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      *
      * @param archiveFormat a string representing the format of the archive
      */
-    public void setArchiveFormat(String archiveFormat) {
-        this.archiveFormat = archiveFormat;
-    }
+//    public void setArchiveFormat(String archiveFormat) {
+//        this.archiveFormat = archiveFormat;
+//    }
 
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
@@ -417,23 +508,25 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
-     * a particular archive format (currently zip and tar supported).  The implementation only
-     * consults the factory when the {@link #archive archive flag} is {@code true}.
+     * a particular archive format (currently zip is supported).  The implementation only
+     * consults the factory when the {@link #archive archive flag} is {@code true}.  Package-private for unit test
+     * access.
      *
      * @return the ArchiveStreamFactory
      */
-    public ArchiveStreamFactory getArxStreamFactory() {
+    ArchiveStreamFactory getArxStreamFactory() {
         return arxStreamFactory;
     }
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
-     * a particular archive format (currently zip and tar supported).  The implementation only
-     * consults the factory when the {@link #archive archive flag} is {@code true}.
+     * a particular archive format (currently zip is supported).  The implementation only
+     * consults the factory when the {@link #archive archive flag} is {@code true}.  Package-private for unit test
+     * access.
      *
      * @param arxStreamFactory the ArchiveStreamFactory
      */
-    public void setArxStreamFactory(ArchiveStreamFactory arxStreamFactory) {
+    void setArxStreamFactory(ArchiveStreamFactory arxStreamFactory) {
         this.arxStreamFactory = arxStreamFactory;
     }
 

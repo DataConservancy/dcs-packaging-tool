@@ -77,6 +77,13 @@
 
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-ser</artifactId>
+      <scope>test</scope>
+      <classifier>tests</classifier>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-api</artifactId>
     </dependency>
 

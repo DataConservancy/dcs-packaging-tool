@@ -33,7 +33,8 @@ public class Messages {
         WARNING_PACKAGE_DESCRIPTION_MODIFICATION("packagedescriptionmodification.warning"),
         URL_VALIDATION_FAILURE("urlvalidation.failure"),
         PHONE_VALIDATION_FAILURE("phonevalidation.failure"),
-        EMAIL_VALIDATION_FAILURE("emailvalidation.failure");
+        EMAIL_VALIDATION_FAILURE("emailvalidation.failure"),
+        REFRESH_STATUS_MESSAGE("refreshstatus.message");
 
         String property;
 

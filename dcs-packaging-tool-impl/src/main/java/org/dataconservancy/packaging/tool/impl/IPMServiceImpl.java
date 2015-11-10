@@ -60,37 +60,40 @@ public class IPMServiceImpl implements IPMService {
                 "Error determining canonical path of " + path.toFile(), e);
         }
 
-        Node node = new Node(uriGenerator.generateNodeURI());
+        Node node = null;
+        //Just as a fail safe ensure the file exists before adding.
+        if (path.toRealPath().toFile().exists()) {
+            node = new Node(uriGenerator.generateNodeURI());
 
-        FileInfo info = new FileInfo(path);
-        node.setFileInfo(info);
+            FileInfo info = new FileInfo(path);
+            node.setFileInfo(info);
 
-        //If it's not the root set the parent child information.
-        if (parent != null) {
-            parent.addChild(node);
+            //If it's not the root set the parent child information.
+            if (parent != null) {
+                parent.addChild(node);
 
-            //If the parent of this new node was previously ignored, ignore this node as well.
-            if (parent.isIgnored()) {
+                //If the parent of this new node was previously ignored, ignore this node as well.
+                if (parent.isIgnored()) {
+                    node.setIgnored(true);
+                }
+
+                node.setParent(parent);
+            }
+
+            //If the file is hidden or starts with a "." set it to ignored.
+            //The "." semantics are carried over from the old rules based approach.
+            if (Files.isHidden(path) || path.getFileName().toString().startsWith(".")) {
                 node.setIgnored(true);
             }
 
-            node.setParent(parent);
-        }
+            //If the path represents a directory loop through all children and add them to the tree.
+            if (Files.isDirectory(path)) {
+                DirectoryStream<Path> stream = Files.newDirectoryStream(path);
+                for (Path childPath : stream) {
+                    createTree(node, childPath);
+                }
 
-        //If the file is hidden or starts with a "." set it to ignored.
-        //The "." semantics are carried over from the old rules based approach.
-        if (Files.isHidden(path) ||
-            path.getFileName().toString().startsWith(".")) {
-            node.setIgnored(true);
-        }
-
-        //If the path represents a directory loop through all children and add them to the tree.
-        if (Files.isDirectory(path)) {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(path);
-            for (Path childPath : stream) {
-                createTree(node, childPath);
             }
-
         }
         return node;
     }

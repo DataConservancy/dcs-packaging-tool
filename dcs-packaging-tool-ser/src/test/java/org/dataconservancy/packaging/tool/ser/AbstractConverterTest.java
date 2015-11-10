@@ -31,29 +31,7 @@ import static org.mockito.Mockito.mock;
  * Provides access to common methods used for all XStream converter tests.  Subclasses may override any of these
  * methods.
  */
-public abstract class AbstractConverterTest {
-
-    private XmlPullParserFactory xppFactory;
-
-    /**
-     * Currently instantiates an XmlPullParserFactory.
-     *
-     * @throws Exception
-     */
-    @Before
-    public void setUp() throws Exception {
-        xppFactory = XmlPullParserFactory.newInstance();
-    }
-
-    /**
-     * Obtain a new instance of an XmlPullParser, used when deserializing object instances.
-     *
-     * @return a new instance of XmlPullParser
-     * @throws XmlPullParserException
-     */
-    public XmlPullParser getPullParser() throws XmlPullParserException {
-        return xppFactory.newPullParser();
-    }
+public abstract class AbstractConverterTest extends AbstractXstreamTest {
 
     /**
      * Returns a configured {@link UnmarshallingContext}.  Currently this implementation returns a mock.  Subclasses

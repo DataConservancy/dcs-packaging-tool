@@ -13,7 +13,27 @@
     <artifactId>dcs-packaging-tool</artifactId>
     <version>0.10.1-SNAPSHOT</version>
   </parent>
-    
+
+  <!-- Build  ===================================================== --> 
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- create a test jar containing serializations used for
+             testing -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <!-- Dependency Management ====================================== -->
   
   <dependencyManagement>

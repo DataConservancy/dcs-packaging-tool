@@ -37,9 +37,6 @@ public abstract class BaseGuiTest {
 
     @Autowired
     protected Configuration configuration;
-    
-    @Autowired
-    protected OntologyLabels propertyLabels;
 
     @Autowired
     protected InternalProperties internalProperties;

@@ -140,7 +140,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         controller.setPackageState(state);
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
-        view = new EditPackageContentsViewImpl(propertyLabels, internalProperties, "classpath:/defaultRelationships");
+        view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
         view.setProfileService(profileService);
         view.setIpmService(ipmService);
 

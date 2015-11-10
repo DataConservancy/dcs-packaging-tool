@@ -98,7 +98,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             HeaderView header = new HeaderViewImpl();
 
             // Setup next page
-            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(propertyLabels, internalProperties, "classpath:/defaultRelationships");
+            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
             editPackageContentsView.setHeaderView(header);
             packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
             factory.setEditPackageContentsPresenter(packageDescriptionPresenter);
