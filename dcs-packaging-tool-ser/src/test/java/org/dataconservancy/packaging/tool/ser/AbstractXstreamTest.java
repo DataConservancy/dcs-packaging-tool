@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Base test class for all XStream related classes.
  */
-public class AbstractXstreamTest {
+public abstract class AbstractXstreamTest {
 
     private XmlPullParserFactory xppFactory;
 
