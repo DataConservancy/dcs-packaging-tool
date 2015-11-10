@@ -52,6 +52,7 @@ public class PackageState {
     /**
      * List of domain profile ids in-use in this package.
      */
+    @Serialize(streamId = StreamId.DOMAIN_PROFILE_LIST)
     private List<URI> domainProfileIdList;
 
     /**
