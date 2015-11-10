@@ -131,7 +131,14 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setUnmarshaller(new XStreamMarshaller());
                 }
             });
-            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+//            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+//                {
+//                    setStreamId(StreamId.PACKAGE_TREE);
+//                    setMarshaller(new JenaModelSerializer(new DefaultModelFactory()));
+//                    setUnmarshaller(new JenaModelSerializer(new DefaultModelFactory()));
+//                }
+//            });
+            put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.PACKAGE_TREE);
                     setMarshaller(new JenaModelSerializer(new DefaultModelFactory()));
@@ -168,7 +175,14 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setUnmarshaller(mock(Unmarshaller.class));
                 }
             });
-            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+//            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+//                {
+//                    setStreamId(StreamId.PACKAGE_TREE);
+//                    setUnmarshaller(mock(Unmarshaller.class));
+//                    setMarshaller(mock(Marshaller.class));
+//                }
+//            });
+            put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.PACKAGE_TREE);
                     setUnmarshaller(mock(Unmarshaller.class));
