@@ -29,10 +29,10 @@ public interface Ontologies {
             "http://www.dataconservancy.org/ptg-prof/";
 
     public static final String NS_DCS_PKGTOOL_PROFILE_BOM =
-            "http//dataconservancy.org/ptg-profiles/dcs-bo-1.0#";
+            "http://dataconservancy.org/ptg-profiles/dcs-bo-1.0#";
     
     public static final String NS_DCS_PKGTOOL_PROFILE_PCDM =
-            "http//dataconservancy.org/ptg-profiles/PCDM-1.0#";
+            "http://dataconservancy.org/ptg-profiles/PCDM-1.0#";
 
     public static final String NS_DCS_TYPES =
             "http://dataconservancy.org/ns/types/";
@@ -46,7 +46,7 @@ public interface Ontologies {
     public static final String NS_RDFS =
             "http://www.w3.org/2000/01/rdf-schema#";
 
-    public static final String NS_XSD = "ttp://www.w3.org/2001/XMLSchema#";
+    public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema#";
 
     /**
      * Central map of prefixes, consistent with all ontologies used herein.
