@@ -15,21 +15,23 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
-import org.dataconservancy.packaging.tool.model.ipm.Node;
+
 import org.dataconservancy.packaging.tool.model.ser.SerializationScope;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.jena.rdf.model.Model;
 
 
 /**
@@ -55,9 +57,7 @@ public class PackageState {
     /**
      * Container of all of the domain objects in this package.
      */
-    // TODO: Figure out approach to serializing domain objects
-//    @Serialize(streamId = "package-domain-objects", scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
-//    private DomainProfileObjectStore domainProfileObjectStore;
+     private Model domainObjectRDF;
 
     /**
      * A map of metadata fields relevant to this package, keyed by the name of the metadata field to their associated
@@ -159,6 +159,15 @@ public class PackageState {
     public List<URI> getDomainProfileIdList() {
         return domainProfileIdList;
     }
+    
+    public Model getDomainObjectRDF() {
+        return domainObjectRDF;
+    }
+
+    
+    public void setDomainObjectRDF(Model domainObjectRDF) {
+        this.domainObjectRDF = domainObjectRDF;
+    }
 
     /**
      * Determines whether this package state currently has any metadata or not, mainly used for opening existing packages.
@@ -211,6 +220,13 @@ public class PackageState {
             that.packageMetadataList != null) {
             return false;
         }
+        
+        /* This is not the notion of equality we want here, but there's nothing we can reasonably do about it */
+        if (domainObjectRDF !=
+                null ? !(domainObjectRDF == that.domainObjectRDF) :
+                that.domainObjectRDF != null) {
+                return false;
+            }
         return !(creationToolVersion !=
                      null ? !creationToolVersion.equals(that.creationToolVersion) :
                      that.creationToolVersion != null);
@@ -230,6 +246,8 @@ public class PackageState {
             (outputDirectory != null ? outputDirectory.hashCode() : 0);
         result = 31 * result +
             (creationToolVersion != null ? creationToolVersion.hashCode() : 0);
+        result = 31 * result +
+                (domainObjectRDF != null ? domainObjectRDF.hashCode() : 0);
         return result;
     }
 }
