@@ -373,6 +373,7 @@ public class DcsBOProfile
         hasDiscipline.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasDiscipline"));
         hasDiscipline.setPropertyValueType(PropertyValueType.STRING);
+        hasDiscipline.setPropertyValueHint(PropertyValueHint.DCS_DISCIPLINE);
 
         hasContentModel.setLabel("Content Model");
         hasContentModel
