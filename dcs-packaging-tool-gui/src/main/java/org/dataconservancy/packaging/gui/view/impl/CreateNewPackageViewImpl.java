@@ -133,7 +133,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
 
         progressIndicatorPopUp.setTitleText(TextFactory.getText(LabelKey.PROGRESS_INDICATOR));
         progressIndicatorPopUp.setMoveable(true);
-        progressIndicatorPopUp.setMessage(TextFactory.getText(LabelKey.BUILDING_PACKAGE_DESCRIPTION));
+        progressIndicatorPopUp.setMessage(TextFactory.getText(LabelKey.BUILDING_PACKAGE_TREE));
 
         //Quickly display the popup so we can measure the content
         //Check for scene == null in the case of unit tests, or massive disaster..

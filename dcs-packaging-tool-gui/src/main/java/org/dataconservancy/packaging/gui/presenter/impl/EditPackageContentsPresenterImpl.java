@@ -31,9 +31,7 @@ import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
-import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.PackageRelationship;
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -131,7 +129,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     stream = new FileOutputStream(packageDescriptionFile);
                 } catch (IOException e) {
                     log.error(e.getMessage());
-                    view.getErrorMessageLabel().setText(TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) + e.getMessage());
+                    view.getErrorMessageLabel().setText(TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) + e.getMessage());
                     view.getErrorMessageLabel().setVisible(true);
                 }
 
@@ -154,7 +152,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                         view.getWarningPopup().hide();
                     }
                 });
-                view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_VALIDATION_ERROR), "Tree was not valid", false, false);
+                view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), "Tree was not valid", false, false);
                 return;
             }
 
@@ -169,7 +167,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 } catch (IOException e) {
                     log.error(e.getMessage());
                     view.getErrorMessageLabel().setText(
-                        TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_SAVE_ERROR) +
+                        TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) +
                             e.getMessage());
                     view.getErrorMessageLabel().setVisible(true);
                 }

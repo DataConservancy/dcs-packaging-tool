@@ -117,7 +117,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 } else if (controller.getPackageDescription() != null) {
                     controller.goToNextPage();
                 } else {
-                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
+                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
                     view.getErrorMessage().setVisible(true);
                 }
             } catch (Exception e) {

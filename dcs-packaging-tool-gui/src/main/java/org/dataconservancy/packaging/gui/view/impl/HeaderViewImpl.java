@@ -66,7 +66,7 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                     locationBar.getChildren().add(pageLabel);
                     pageLabel.getStyleClass().add(PAGE_ONE_SELECTED);
                     break;
-                 case DEFINE_RELATIONSHIPS:
+                 case EDIT_PACKAGE_CONTENTS:
                     pageLabel.getStyleClass().add(PAGE_TWO_UNSELECTED);
                     locationBar.getChildren().add(pageLabel);
                     break;
@@ -132,7 +132,7 @@ public class HeaderViewImpl extends VBox implements HeaderView, CssConstants {
                 locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_UNSELECTED);
                 locationBar.getChildren().get(0).getStyleClass().add(PAGE_ONE_SELECTED);
                 break;
-            case DEFINE_RELATIONSHIPS:
+            case EDIT_PACKAGE_CONTENTS:
                 locationBar.setVisible(true);
                 //Remove the old selection
                 locationBar.getChildren().get(0).getStyleClass().removeAll(PAGE_ONE_SELECTED);

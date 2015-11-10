@@ -292,10 +292,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             packageDescription = packageDescriptionBuilder.deserialize(fis);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage());
-            return TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_BUILD_ERROR) + " " + e.getMessage();
+            return TextFactory.getText(ErrorKey.PACKAGE_TREE_BUILD_ERROR) + " " + e.getMessage();
         } catch (NullPointerException e) {
             log.error(e.getMessage());
-            return TextFactory.getText(ErrorKey.PACKAGE_DESCRIPTION_BUILD_ERROR) + " " + e.getMessage();
+            return TextFactory.getText(ErrorKey.PACKAGE_TREE_BUILD_ERROR) + " " + e.getMessage();
         }
 
         Package createdPackage;

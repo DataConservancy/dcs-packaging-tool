@@ -188,7 +188,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         //Creates the file chooser that's used to save the package description to a file.
         packageStateFileChooser = new FileChooser();
-        packageStateFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_DESCRIPTION_FILE_CHOOSER_KEY));
+        packageStateFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_STATE_FILE_CHOOSER_KEY));
         packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
         packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 

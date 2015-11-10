@@ -31,7 +31,6 @@ import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
-import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
@@ -150,13 +149,13 @@ public class Controller {
     private void initiatePagesStacks() {
         createNewPackagePagesStack.clear();
         createNewPackagePagesStack.add(Page.GENERATE_PACKAGE);
-        createNewPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        createNewPackagePagesStack.add(Page.EDIT_PACKAGE_CONTENTS);
         createNewPackagePagesStack.add(Page.CREATE_NEW_PACKAGE);
         createNewPackagePagesStack.add(Page.PACKAGE_METADATA);
 
         openExistingPackagePagesStack.clear();
         openExistingPackagePagesStack.add(Page.GENERATE_PACKAGE);
-        openExistingPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        openExistingPackagePagesStack.add(Page.EDIT_PACKAGE_CONTENTS);
         openExistingPackagePagesStack.add(Page.EXISTING_PACKAGE_METADATA);
         openExistingPackagePagesStack.add(Page.OPEN_EXISTING_PACKAGE);
     }
@@ -346,7 +345,7 @@ public class Controller {
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
                 break;
-            case DEFINE_RELATIONSHIPS:
+            case EDIT_PACKAGE_CONTENTS:
                 showEditPackageContents();
                 break;
             case GENERATE_PACKAGE:
