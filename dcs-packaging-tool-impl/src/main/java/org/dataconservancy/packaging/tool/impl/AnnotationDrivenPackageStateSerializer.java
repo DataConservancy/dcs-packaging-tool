@@ -352,6 +352,10 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
         try {
             toSerialize = pd.getReadMethod().invoke(state);
+            if (toSerialize == null) {
+                // The field on the package state had a null value, which is OK.  We have nothing to serialize.
+                return;
+            }
         } catch (Exception e) {
             String err = String.format(ERR_INVOKING_METHOD,
                     pd.getReadMethod(), state.getClass().getName(), e.getMessage());

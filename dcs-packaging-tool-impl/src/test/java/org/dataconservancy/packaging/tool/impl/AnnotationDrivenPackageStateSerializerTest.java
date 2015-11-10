@@ -45,6 +45,7 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,6 +66,7 @@ import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestObj
 import static org.dataconservancy.packaging.tool.ser.AbstractXstreamTest.TestResources.APPLICATION_VERSION_1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -263,6 +265,25 @@ public class AnnotationDrivenPackageStateSerializerTest {
         assertNotNull(state.getCreationToolVersion());
         assertEquals(applicationVersion, state.getCreationToolVersion());
         verify(mockedMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller()).unmarshal(any(Source.class));
+    }
+
+    @Test
+    public void testSerializeStreamWithNullFieldInPackageState() throws Exception {
+        state = new PackageState();
+        StreamResult result = new StreamResult(new NullOutputStream());  // we're using mocks, so nothing will be
+                                                                         // written to the output stream
+        assertNull(state.getCreationToolVersion());
+
+        underTest.serializeToResult(state, StreamId.APPLICATION_VERSION, result);
+
+        // Nothing was serialized, the application version field for the state was null.
+        verifyZeroInteractions(mockedMarshallerMap.get(StreamId.APPLICATION_VERSION).getMarshaller());
+
+        // Set a non-null value, and try again
+        state.setCreationToolVersion(applicationVersion);
+        underTest.serializeToResult(state, StreamId.APPLICATION_VERSION, result);
+
+        verify(mockedMarshallerMap.get(StreamId.APPLICATION_VERSION).getMarshaller()).marshal(applicationVersion, result);
     }
 
     @Test

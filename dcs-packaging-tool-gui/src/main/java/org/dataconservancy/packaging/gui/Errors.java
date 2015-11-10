@@ -25,7 +25,7 @@ public class Errors {
 
     public enum ErrorKey {
 
-        PACKAGE_GENERATION_CREATION_ERROR("packagegeneration.packagecreation.error"), 
+        PACKAGE_GENERATION_CREATION_ERROR("packagegeneration.packagecreation.error"),
         PACKAGE_GENERATION_SAVE("packagegeneration.save.error"),
         MISSING_REQUIRED_FIELDS("packagenamemissing.error"),
         BASE_DIRECTORY_NOT_SELECTED("basedirectorynotselected.error"),
@@ -41,7 +41,8 @@ public class Errors {
         PROPERTY_LOSS_WARNING("propertyloss.warning"),
         PACKAGE_TREE_BUILD_ERROR("packagetreebuild.error"),
         INACCESSIBLE_CONTENT_DIR("inaccessiblepackagecontent.error"),
-        ADD_CONTENT_ERROR("addcontent.error");
+        ADD_CONTENT_ERROR("addcontent.error"),
+        IO_CREATE_ERROR("iocreate.error");
 
 
         private String property;
