@@ -50,7 +50,13 @@ public enum StreamId {
     DOMAIN_PROFILE_LIST,
 
     /**
+     * Identifier for the stream containing the serialization of domain objects in the package
+     */
+    DOMAIN_OBJECTS,
+
+    /**
      * Identifier for the stream containing the user specified properties map for the nodes in the package
      */
     USER_SPECIFIED_PROPERTIES
+    
 }

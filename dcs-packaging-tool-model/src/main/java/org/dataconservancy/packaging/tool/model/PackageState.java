@@ -67,7 +67,8 @@ public class PackageState {
     /**
      * Container of all of the domain objects in this package.
      */
-     private Model domainObjectRDF;
+    @Serialize(streamId = StreamId.DOMAIN_OBJECTS, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
+    private Model domainObjectRDF;
 
     /**
      * A map of metadata fields relevant to this package, keyed by the name of the metadata field to their associated

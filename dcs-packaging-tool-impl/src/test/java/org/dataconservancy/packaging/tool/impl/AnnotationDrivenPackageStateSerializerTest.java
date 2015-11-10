@@ -38,7 +38,6 @@ import org.dataconservancy.packaging.tool.ser.PackageNameConverter;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.xstream.XStreamMarshaller;
@@ -51,12 +50,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -140,12 +135,18 @@ public class AnnotationDrivenPackageStateSerializerTest {
 //            });
             put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
-                    setStreamId(StreamId.PACKAGE_TREE);
+                    setStreamId(StreamId.DOMAIN_PROFILE_LIST);
+                    setMarshaller(new XStreamMarshaller());
+                    setUnmarshaller(new XStreamMarshaller());
+                }
+            });
+            put(StreamId.DOMAIN_OBJECTS, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.DOMAIN_OBJECTS);
                     setMarshaller(new JenaModelSerializer(new DefaultModelFactory()));
                     setUnmarshaller(new JenaModelSerializer(new DefaultModelFactory()));
                 }
             });
-
         }
     };
 
@@ -184,12 +185,18 @@ public class AnnotationDrivenPackageStateSerializerTest {
 //            });
             put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
-                    setStreamId(StreamId.PACKAGE_TREE);
+                    setStreamId(StreamId.DOMAIN_PROFILE_LIST);
                     setUnmarshaller(mock(Unmarshaller.class));
                     setMarshaller(mock(Marshaller.class));
                 }
             });
-
+            put(StreamId.DOMAIN_OBJECTS, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.DOMAIN_OBJECTS);
+                    setUnmarshaller(mock(Unmarshaller.class));
+                    setMarshaller(mock(Marshaller.class));
+                }
+            });
         }
     };
 
@@ -215,6 +222,8 @@ public class AnnotationDrivenPackageStateSerializerTest {
         state.setCreationToolVersion(applicationVersion);
         state.setPackageName(packageName);
         state.setPackageMetadataList(packageMetadata);
+        state.setDomainProfileIdList(domainProfileUris);
+        state.setDomainObjectRDF(domainObjectsRDF);
 
         /*
          * Configure the live stream marshalling map with XStream converters
@@ -332,13 +341,25 @@ public class AnnotationDrivenPackageStateSerializerTest {
                         verifiedStreamCount.incrementAndGet();
                         break;
 
+                    case DOMAIN_PROFILE_LIST:
+                        verify(streamMarshaller.getMarshaller())
+                                .marshal(eq(domainProfileUris), isNotNull(Result.class));
+                        verifiedStreamCount.incrementAndGet();
+                        break;
+
+                    case DOMAIN_OBJECTS:
+                        verify(streamMarshaller.getMarshaller())
+                                .marshal(eq(domainObjectsRDF), isNotNull(Result.class));
+                        verifiedStreamCount.incrementAndGet();
+                        break;
+
                 }
             } catch (IOException e) {
                 fail("Encountered IOE: " + e.getMessage());
             }
         });
 
-        assertEquals(3, verifiedStreamCount.intValue());
+        assertEquals(mockedMarshallerMap.size(), verifiedStreamCount.intValue());
 
     }
 
