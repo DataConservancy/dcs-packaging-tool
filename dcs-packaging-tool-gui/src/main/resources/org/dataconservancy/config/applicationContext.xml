@@ -72,7 +72,6 @@
 
   <!-- SERVICES AND BUILDERS -->
   <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
-  <bean id="packageDescriptionBuilder" class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
   <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
   <bean id="packageMetadataService" class="org.dataconservancy.packaging.gui.services.PackageMetadataService">
     <constructor-arg ref="configuration"/>
@@ -198,7 +197,6 @@
     <property name="controller" ref="controller"/>
     <property name="packageGenerationParametersBuilder" ref="propertiesConfigurationParametersBuilder"/>
     <property name="packageGenerationService" ref="packageGenerationService"/>
-    <property name="packageDescriptionBuilder" ref="packageDescriptionBuilder"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 

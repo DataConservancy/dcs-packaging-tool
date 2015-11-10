@@ -30,7 +30,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -43,7 +42,6 @@ import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.BoremParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
@@ -59,22 +57,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Implementation for the screen that will handle generating the actual package. Controls the user selecting packaging options,
- * selecting a basic directory and then generating a package. Will present the user with an option to see if they wish to generate another package,
- * with different options or return to the main screen.
+ * Implementation for the screen that will handle generating the actual package.
+ * Controls the user selecting packaging options, selecting a basic directory and then generating a package.
+ * Will present the user with an option to see if they wish to generate another package, with different options or
+ * return to the main screen.
  */
 public class PackageGenerationPresenterImpl extends BasePresenterImpl implements PackageGenerationPresenter {
     private PackageGenerationView view;
     private PackageGenerationService packageGenerationService;
     private PackageGenerationParametersBuilder packageGenerationParamsBuilder;
-    private PackageDescriptionBuilder packageDescriptionBuilder;
+
     private PackageGenerationParameters generationParams = null;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     private GeneratePackageService backgroundService;
+    private File packageLocation;
+    private String packageFileName;
+
+
 
     public PackageGenerationPresenterImpl(PackageGenerationView view) {
         super(view);
@@ -95,11 +97,15 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         view.getCurrentOutputDirectoryTextField().setText("");
         generationParams = null;
         loadPackageGenerationParams();
-        view.loadAvailableProjects(controller.getAvailableProjects());
+
         //Setup help content and then rebind the base class to this view.
         view.setupHelp();
         setView(view);
         super.bindBaseElements();
+
+        if (packageLocation == null) {
+            view.getContinueButton().setDisable(true);
+        }
 
         return view.asNode();
     }
@@ -112,7 +118,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         backgroundService.setOnSucceeded(t -> {
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().hide();
-                view.showSuccessPopup();
+                view.showSuccessPopup(packageFileName, packageLocation.getAbsolutePath());
                 view.scrollToTop();
             }
             backgroundService.reset();
@@ -152,17 +158,17 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         view.getSelectOutputDirectoryButton().setOnAction(arg0 -> {
             File file = controller.showOpenDirectoryDialog(view.getOutputDirectoryChooser());
             if (file != null) {
-                controller.getPackageState().setOutputDirectory(file);
-                view.getOutputDirectoryChooser().setInitialDirectory(controller.getPackageState().getOutputDirectory());
+                view.getOutputDirectoryChooser().setInitialDirectory(file.getAbsoluteFile());
                 //Set the package location parameter based on the new output directory.
-                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getPackageState().getOutputDirectory().getAbsolutePath());
-
-                setOutputDirectory(true);
+                packageLocation = file;
+                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, file.getAbsolutePath());
+                view.getContinueButton().setDisable(false);
             }
+            view.getCurrentOutputDirectoryTextField().setText(file.getAbsolutePath());
         });
 
         //Handles the user pressing the no thanks link on the create another package popup. This will take the user
-        //back to the home screen. 
+        //back to the home screen.
         view.getNoThanksLink().setOnAction(arg0 -> {
             if (view.getSuccessPopup() != null && view.getSuccessPopup().isShowing()) {
                 view.getSuccessPopup().hide();
@@ -170,7 +176,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             controller.showHome(true);
         });
 
-        //Handles the user pressing the create another package button on the create another package popup. This will 
+        //Handles the user pressing the create another package button on the create another package popup. This will
         //dismiss the popup and keep the user on the screen.
         view.getCreateNewPackageButton().setOnAction(arg0 -> {
             if (view.getSuccessPopup() != null && view.getSuccessPopup().isShowing()) {
@@ -195,7 +201,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         //This listener changes what is shown in the output directory box when the archiving format is changed.
         view.getArchiveToggleGroup().selectedToggleProperty().addListener((ov, toggle, archiveToggle) -> {
             if (archiveToggle != null) {
-                setOutputDirectory(true);
 
                 //Set the parameter for the archive format.
                 String archiveExtension = (String) archiveToggle.getUserData();
@@ -218,7 +223,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         //This listener changes what is shown in the output directory box when the compression format is changed.
         view.getCompressionToggleGroup().selectedToggleProperty().addListener((ov, toggle, compressionToggle) -> {
             if (compressionToggle != null) {
-                setOutputDirectory(true);
 
                 //Set the parameter for compression format.
                 String compressionExtension = (String) compressionToggle.getUserData();
@@ -226,6 +230,21 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
                 if (!compressionExtension.isEmpty()) {
                     generationParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, compressionExtension);
+                }
+            }
+        });
+
+        //This listener changes package generation parameters list depending on user's selection for ReM Serialization
+        //Format
+        view.getSerializationToggleGroup().selectedToggleProperty().addListener((ov, toggle, remSerializationToggle) -> {
+            if (remSerializationToggle != null) {
+
+                //Set the parameter for compression format.
+                String serializationFormat = (String) remSerializationToggle.getUserData();
+                generationParams.removeParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT);
+
+                if (!serializationFormat.isEmpty()) {
+                    generationParams.addParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, serializationFormat);
                 }
             }
         });
@@ -263,46 +282,37 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             ((ProgressDialogPopup) view.getProgressPopup()).setCancelEventHandler(event -> backgroundService.cancel());
         }
 
-        /*Handles when the continue button is pressed in the footer. 
-        * In this case it creates package params based on the options selected, it then tries to generate a package and save it to the output directory.
-        * If successful a popup is shown asking the user if they want to create another package, otherwise an error message is displayed informing the user what went wrong
+        /*Handles when the continue button is pressed in the footer.
+        * In this case it creates package params based on the options selected, it then tries to generate a package and
+        * save it to the output directory. If successful a popup is shown asking the user if they want to create another
+        * package, otherwise an error message is displayed informing the user what went wrong
         * and error is logged.
         */
         view.getContinueButton().setOnAction(arg0 -> {
-            /* Commenting this out for now as DC-2116 suggests it's out of scope.
             view.getStatusLabel().setVisible(false);
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().show();
             }
             backgroundService.setOverwriteFile(false);
             backgroundService.execute();
-            */
+
         });
 
     }
 
     /*
-     * Generates and saves the package to a file if an error occurs the error message is returned so it can be properly handled.
+    TODO: update this code to use updated Package Generation service
+     * Generates and saves the package to a file if an error occurs the error message is returned so it can be properly
+     * handled.
      */
-    private String generateAndSavePackage() {
-        //PackageDescription packageDescription = controller.getPackageDescription();
-        PackageDescription packageDescription;
-        try {
-            FileInputStream fis = new FileInputStream(controller.getPackageDescriptionFile());
-            packageDescription = packageDescriptionBuilder.deserialize(fis);
-        } catch (FileNotFoundException e) {
-            log.error(e.getMessage());
-            return TextFactory.getText(ErrorKey.PACKAGE_TREE_BUILD_ERROR) + " " + e.getMessage();
-        } catch (NullPointerException e) {
-            log.error(e.getMessage());
-            return TextFactory.getText(ErrorKey.PACKAGE_TREE_BUILD_ERROR) + " " + e.getMessage();
-        }
 
-        Package createdPackage;
+    private String generateAndSavePackage(File packageFile) {
+        Package createdPackage = null;
         //If we have all the objects we need attempt to create a package with the package generation service, and check that we haven't been canceled
-        if (generationParams != null && packageDescription != null && !Thread.currentThread().isInterrupted()) {
+        if (generationParams != null && controller.getPackageState() != null && !Thread.currentThread().isInterrupted()) {
             try {
-                createdPackage = packageGenerationService.generatePackage(packageDescription, generationParams);
+                //TODO: update call to PackageGenerationService
+                //createdPackage = packageGenerationService.generatePackage(controller.getPackageState(), generationParams);
             } catch (PackageToolException e) {
                 log.error(e.getMessage());
                 return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
@@ -319,9 +329,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         if (!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded") && !Thread.currentThread().isInterrupted()) {
             //If we've successfully generated a package, save the package to the provided output directory,
             //unless we wanted the package exploded, in which case there is no package file produced
-            if (createdPackage != null) {
-                File packageFile = getPackageFile();
-
+           /* if (createdPackage != null) {
                 try {
                     if (createdPackage.isAvailable()) {
                         FileOutputStream fos = new FileOutputStream(packageFile);
@@ -337,9 +345,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 }
 
             } else {
-                log.error(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " created package was null");
+                log.error(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " Created package was null.");
                 return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
-            }
+            }*/
         }
 
         return "";
@@ -376,42 +384,13 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         //As an absolute fall back if the parameters can't be loaded from anywhere set them in the code.
         if (generationParams == null) {
-            loadDefaultParams();
+            loadDefaultPackageGenerationParams();
         }
 
         setViewToDefaults();
     }
 
-    private void updateParamsFromPackageMetadataList() {
-        updateParams(GeneralParameterNames.PACKAGE_NAME, Arrays.asList(getController().getPackageState().getPackageName()));
-        updateParams(GeneralParameterNames.DOMAIN_PROFILE, getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE));
-        updateParams(BagItParameterNames.CONTACT_NAME, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_NAME));
-        updateParams(BagItParameterNames.CONTACT_PHONE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_PHONE));
-        updateParams(BagItParameterNames.CONTACT_EMAIL, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.CONTACT_EMAIL));
-        updateParams(BagItParameterNames.EXTERNAL_IDENTIFIER, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.EXTERNAL_IDENTIFIER));
-        updateParams(BagItParameterNames.EXTERNAL_DESCRIPTION, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.EXTERNAL_DESCRIPTION));
-        updateParams(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.INTERNAL_SENDER_IDENTIFIER));
-        updateParams(BagItParameterNames.INTERNAL_SENDER_DESCRIPTION, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.INTERNAL_SENDER_DESCRIPTION));
-        updateParams(BagItParameterNames.SOURCE_ORG, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.SOURCE_ORG));
-        updateParams(BagItParameterNames.ORG_ADDRESS, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.ORG_ADDRESS));
-        updateParams(BagItParameterNames.BAG_GROUP_ID, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAG_GROUP_ID));
-        updateParams(BagItParameterNames.BAGGING_DATE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAGGING_DATE));
-        updateParams(BagItParameterNames.BAG_SIZE, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.BAG_SIZE));
-        updateParams(BagItParameterNames.PAYLOAD_OXUM, getController().getPackageState().getPackageMetadataValues(BagItParameterNames.PAYLOAD_OXUM));
-    }
-
-    private void updateParams(String key, List<String> values) {
-        generationParams.removeParam(key);
-
-        if (values != null && !values.isEmpty()) {
-            generationParams.addParam(key, values);
-        }
-    }
-
-    /**
-     * If any required parameters are missing from the file fill them in with default values.
-     */
-    private void fillInMissingParams() {
+    private void fillInMissingPackageGenerationParams() {
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID).isEmpty()) {
             generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
@@ -419,7 +398,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_NAME) == null ||
                 generationParams.getParam(GeneralParameterNames.PACKAGE_NAME).isEmpty()) {
-            generationParams.addParam(GeneralParameterNames.PACKAGE_NAME, getPackageName());
+            generationParams.addParam(GeneralParameterNames.PACKAGE_NAME, controller.getPackageState().getPackageName());
         }
 
         if (generationParams.getParam(GeneralParameterNames.CHECKSUM_ALGORITHMS) == null ||
@@ -440,59 +419,17 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
             generationParams.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksumAlgs);
         }
-
-        if (generationParams.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION) == null ||
-                generationParams.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION).isEmpty()) {
-            if (controller.getContentRoot() != null) {
-                generationParams.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, controller.getContentRoot().getPath());
-            }
-        }
-
-        if (generationParams.getParam(BagItParameterNames.PKG_BAG_DIR) == null ||
-                generationParams.getParam(BagItParameterNames.PKG_BAG_DIR).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.PKG_BAG_DIR, getPackageName());
-        }
-
-        if (generationParams.getParam(BagItParameterNames.BAGIT_PROFILE_ID) == null ||
-                generationParams.getParam(BagItParameterNames.BAGIT_PROFILE_ID).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.BAGIT_PROFILE_ID, "http://dataconservancy.org/formats/data-conservancy-pkg-0.9");
-        }
-
-        if (generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) == null ||
-                generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION).isEmpty()) {
-            if (controller.getPackageState().getOutputDirectory() != null) {
-                generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, controller.getPackageState().getOutputDirectory().getAbsolutePath());
-            }
-        }
-
-        if (generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER) == null ||
-                generationParams.getParam(BagItParameterNames.EXTERNAL_IDENTIFIER).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.EXTERNAL_IDENTIFIER, "none");
-        }
-
-        if (generationParams.getParam(BagItParameterNames.BAG_COUNT) == null ||
-                generationParams.getParam(BagItParameterNames.BAG_COUNT).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.BAG_COUNT, "1 of 1");
-        }
-
-        if (generationParams.getParam(BagItParameterNames.BAG_GROUP_ID) == null ||
-                generationParams.getParam(BagItParameterNames.BAG_GROUP_ID).isEmpty()) {
-            generationParams.addParam(BagItParameterNames.BAG_GROUP_ID, "none");
-        }
     }
 
     /**
      * This method is a last resort to load default parameters in code, if none of the file options could be loaded.
      */
-    private void loadDefaultParams() {
+    private void loadDefaultPackageGenerationParams() {
 
         generationParams = new PackageGenerationParameters();
         generationParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
 
         generationParams.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, "md5");
-        if (controller.getContentRoot() != null) {
-            generationParams.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, controller.getContentRoot().getPath());
-        }
 
         if (view.getArchiveToggleGroup().getSelectedToggle() != null) {
             String archiveExtension = (String) view.getArchiveToggleGroup().getSelectedToggle().getUserData();
@@ -508,14 +445,23 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
         }
 
-        generationParams.addParam(BagItParameterNames.BAGIT_PROFILE_ID, "http://dataconservancy.org/formats/data-conservancy-pkg-0.9");
+        if (view.getSerializationToggleGroup().getSelectedToggle() != null) {
+            String oreReMSerializationFormat = (String) view.getSerializationToggleGroup().getSelectedToggle().getUserData();
+            if (!oreReMSerializationFormat.isEmpty()) {
+                generationParams.addParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, oreReMSerializationFormat);
+            }
+        }
+
+        generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION,
+                new File(controller.getPackageState().getPackageTree().getFileInfo().getLocation()).getParent());
     }
 
     private void setViewToDefaults() {
         if (generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT) != null
                 && !generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT).isEmpty()) {
             for (Toggle compressionToggle : view.getCompressionToggleGroup().getToggles()) {
-                if (compressionToggle.getUserData().equals(generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT).get(0))) {
+                if (compressionToggle.getUserData()
+                        .equals(generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT).get(0))) {
                     compressionToggle.setSelected(true);
                     break;
                 }
@@ -525,8 +471,20 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         if (generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT) != null
                 && !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).isEmpty()) {
             for (Toggle archivingToggle : view.getArchiveToggleGroup().getToggles()) {
-                if (archivingToggle.getUserData().equals(generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).get(0))) {
+                if (archivingToggle.getUserData()
+                        .equals(generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).get(0))) {
                     archivingToggle.setSelected(true);
+                    break;
+                }
+            }
+        }
+
+        if (generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT) != null
+                && !generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).isEmpty()) {
+            for (Toggle serializationToggle : view.getSerializationToggleGroup().getToggles()) {
+                if (serializationToggle.getUserData()
+                        .equals(generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).get(0))) {
+                    serializationToggle.setSelected(true);
                     break;
                 }
             }
@@ -541,7 +499,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     view.getSHA1CheckBox().setSelected(true);
                 }
             }
-
         }
 
         if (generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) != null
@@ -549,115 +506,45 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             String filePath = generationParams.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
             if (filePath != null && !filePath.isEmpty()) {
                 File outputDirectory = new File(filePath);
-                if (!outputDirectory.exists()) {
-                    if (!outputDirectory.mkdirs()) {
-                        // If the directory could not be created, reset outputDirectory, and display a warning
-                        controller.getPackageState().setOutputDirectory(null);
-                        view.getStatusLabel().setText(TextFactory.getText(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR));
+                if (!outputDirectory.exists() &&!outputDirectory.mkdirs()) {
+                        view.getStatusLabel().setText(TextFactory.getText(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR) +
+                        "Failed to create directory " + filePath);
                         view.getStatusLabel().setTextFill(Color.RED);
                         view.getStatusLabel().setVisible(true);
-                    } else {
-                        controller.getPackageState().setOutputDirectory(outputDirectory);
-                    }
+                } else {
+                    packageLocation = outputDirectory;
                 }
             }
+        } else {
+            packageLocation =
+                    new File(controller.getPackageState().getPackageTree().getFileInfo().getLocation()).getParentFile();
         }
-
-        setOutputDirectory(false);
-    }
-
-    private String getPackageName() {
-        return getController().getPackageState().getPackageName();
+        view.getCurrentOutputDirectoryTextField().setText(packageLocation.getAbsolutePath());
     }
 
     private File getPackageFile() {
-        String packageName = "pkg";
-
-        if (generationParams.getParam(GeneralParameterNames.PACKAGE_NAME) != null &&
-                !generationParams.getParam(GeneralParameterNames.PACKAGE_NAME).isEmpty()) {
-            packageName = generationParams.getParam(GeneralParameterNames.PACKAGE_NAME, 0);
-        }
+        packageFileName = controller.getPackageState().getPackageName();
 
         if (generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT) != null &&
-                !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).isEmpty()) {
-            packageName += "." + generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0);
+                !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).isEmpty() &&
+                !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).equals("exploded")) {
+            packageFileName += "." + generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0);
         }
 
         if (generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT) != null &&
                 !generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT).isEmpty()) {
-            packageName += "." + generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT, 0);
+            packageFileName += "." + generationParams.getParam(GeneralParameterNames.COMPRESSION_FORMAT, 0);
         }
 
         File packageFile;
         if (controller.getPackageState().getOutputDirectory() != null) {
-            packageFile = new File(controller.getPackageState().getOutputDirectory(), packageName);
+            packageFile = new File(controller.getPackageState().getOutputDirectory(), packageFileName);
         } else {
-            packageFile = new File("./", packageName);
+            packageFile = new File("./", packageFileName);
         }
 
         return packageFile;
     }
-
-    /**
-     * Sets the output name of the file that will be saved based on the path of the output directory the package name,
-     * and the archive format, and the compression format.
-     */
-    private void setOutputDirectory(boolean overrideStatus) {
-        String currentOutput = "";
-        String errorText = "";
-        boolean hasPackageName = (getPackageName() != null && !getPackageName().isEmpty());
-
-        if (!hasPackageName || controller.getPackageState().getOutputDirectory() == null) {
-            if (hasPackageName) {
-                errorText = TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_MISSING);
-            } else if (controller.getPackageState().getOutputDirectory() != null) {
-                errorText = TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS);
-            } else {
-                errorText = TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING);
-            }
-        }
-
-        if (StringUtils.containsAny(getPackageName(), controller.getPackageFilenameIllegalCharacters())) {
-            errorText = TextFactory.getText(ErrorKey.PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS)
-                    + "   " + controller.getPackageFilenameIllegalCharacters();
-        }
-
-        if (errorText.isEmpty()) {
-            currentOutput = controller.getPackageState().getOutputDirectory().getAbsolutePath() + File.separator + getPackageName();
-
-            if (view.getArchiveToggleGroup().getSelectedToggle() != null && !view.getArchiveToggleGroup().getSelectedToggle().getUserData().equals("exploded")) {
-                currentOutput += "." + view.getArchiveToggleGroup().getSelectedToggle().getUserData();
-            }
-
-            if (view.getCompressionToggleGroup().getSelectedToggle() != null) {
-                String compressionExtension = (String) view.getCompressionToggleGroup().getSelectedToggle().getUserData();
-                if (!compressionExtension.isEmpty()) {
-                    currentOutput += "." + compressionExtension;
-                }
-            }
-
-            view.getStatusLabel().setVisible(false);
-            view.getContinueButton().setDisable(false);
-        } else {
-            if (overrideStatus || !view.getStatusLabel().isVisible()) {
-                view.getStatusLabel().setText(errorText);
-                view.getStatusLabel().setTextFill(Color.RED);
-                view.getStatusLabel().setVisible(true);
-            }
-            view.getContinueButton().setDisable(true);
-        }
-
-        // Warning for long filenames, won't prevent you from continuing but may cause an error when you actually save
-        // Mostly affects Windows machines
-        if (currentOutput.length() > 259) {
-            view.getStatusLabel().setText(TextFactory.format(Messages.MessageKey.WARNING_FILENAME_LENGTH, currentOutput.length()));
-            view.getStatusLabel().setTextFill(Color.RED);
-            view.getStatusLabel().setVisible(true);
-        }
-
-        view.getCurrentOutputDirectoryTextField().setText(currentOutput);
-    }
-
 
     /**
      * we use this method to get the compression toggle corresponding to None - have to set this
@@ -686,10 +573,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         this.packageGenerationParamsBuilder = packageParamsBuilder;
     }
 
-    @Override
-    public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder) {
-        this.packageDescriptionBuilder = packageDescriptionBuilder;
-    }
 
     //Method should only be used for testing, will run all code on the same thread to simplify the test.
     protected void setTestBackgroundService() {
@@ -774,19 +657,16 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                     protected Void call() throws Exception {
 
                         //If any parameters weren't set in the user provided files we'll supply defaults
-                        fillInMissingParams();
-
-                        //Update params based on what's on the form
-                        updateParamsFromPackageMetadataList();
+                        fillInMissingPackageGenerationParams();
 
                         File packageFile = getPackageFile();
 
-                        if (controller.getPackageState().getOutputDirectory() == null) {
+                        if (packageLocation == null) {
                             updateMessage(TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_MISSING));
                             cancel();
                         } else {
                             if (!packageFile.exists() || overwriteFile) {
-                                String errorMessage = generateAndSavePackage();
+                                String errorMessage = generateAndSavePackage(packageFile);
                                 if (!errorMessage.isEmpty()) {
                                     updateMessage(errorMessage);
                                     cancel();
@@ -821,21 +701,18 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             AsyncWorker worker = new AsyncWorker();
 
             //If any parameters weren't set in the user provided files we'll supply defaults
-            fillInMissingParams();
-
-            //Update params based on what's on the form
-            updateParamsFromPackageMetadataList();
+            fillInMissingPackageGenerationParams();
 
             File packageFile = getPackageFile();
 
-            if (controller.getPackageState().getOutputDirectory() == null) {
+            if (packageLocation == null) {
 
                 worker.setMessage(TextFactory.getText(ErrorKey.OUTPUT_DIRECTORY_MISSING));
                 worker.setState(Worker.State.CANCELLED);
                 cancelledHandler.handle(new WorkerStateEvent(worker, WorkerStateEvent.WORKER_STATE_CANCELLED));
             } else {
                 if (!packageFile.exists() || overwriteFile) {
-                    String errorMessage = generateAndSavePackage();
+                    String errorMessage = generateAndSavePackage(packageFile);
                     if (!errorMessage.isEmpty()) {
                         worker.setMessage(errorMessage);
                         worker.setState(Worker.State.CANCELLED);

@@ -231,7 +231,7 @@ public class Controller {
     }
 
     /**
-     * Pops up a dialog that waits for the user to choose a file.
+     * Pops up a dialog that waits for the user to choose a file.ReM-Serialization-Format
      *
      * @param chooser the FileChooser
      * @return file chosen or null on cancel

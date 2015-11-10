@@ -1,5 +1,10 @@
 Package-Format-Id = BOREM
 BagIt-Profile-Identifier = http://dataconservancy.org/formats/data-conservancy-pkg-0.9
+#Options for Checksum algorimth are: md5, sha1
 Checksum-Algs = md5
+#Options for Archiving-format are: tar, zip, none
 Archiving-Format = tar
+#Options for Compression-format are: gz, none
 Compression-Format = gz
+#Options for ReM-Serialization-Format are: json, turtle, xml
+ReM-Serialization-Format = json
