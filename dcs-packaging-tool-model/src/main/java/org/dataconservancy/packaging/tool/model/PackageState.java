@@ -46,7 +46,8 @@ public class PackageState {
     /**
      * Package's tree structure
      */
-    @Serialize(streamId = StreamId.PACKAGE_TREE, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
+// TODO: This must be changed to a Jena Model before serialization can take place
+//    @Serialize(streamId = StreamId.PACKAGE_TREE, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
     private Node packageTree;
 
     /**
