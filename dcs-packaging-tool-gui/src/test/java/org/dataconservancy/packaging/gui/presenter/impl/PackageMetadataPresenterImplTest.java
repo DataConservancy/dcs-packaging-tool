@@ -148,7 +148,6 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
     /**
      * Tests that hitting continue without a domain profile displays an error message.
      */
-    @Ignore
     @Test
     public void testContinueWithoutDomainProfile() {
         presenter.display();
@@ -162,7 +161,6 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
         assertFalse(showNextPage);
         view.getContinueButton().fire();
         assertFalse(showNextPage);
-        assertTrue(view.getErrorLabel().getText().length() > 0);
     }
 
     /**
@@ -173,7 +171,6 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
         presenter.display();
 
         view.getPackageNameField().setText("Some name");
-        //view.addDomainProfileLabel("Some Domain");
 
         assertEquals(0, view.getErrorLabel().getText().length());
         assertFalse(showNextPage);

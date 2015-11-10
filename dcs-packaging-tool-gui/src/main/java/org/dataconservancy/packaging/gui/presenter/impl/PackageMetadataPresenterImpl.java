@@ -127,7 +127,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         view.getContinueButton().setOnAction(event -> {
             updatePackageState();
-                if (validateRequiredFields()) {
+            if (validateRequiredFields()) {
+                if (Platform.isFxApplicationThread()) {
                     try (FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))) {
                         packageStateSerializer.serialize(getController().getPackageState(), fis);
                     } catch (IOException e) {
@@ -136,10 +137,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                     }
                     view.getErrorLabel().setVisible(false);
                     getController().goToNextPage();
-                } else {
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
-                    view.getErrorLabel().setVisible(true);
                 }
+            } else {
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
+                view.getErrorLabel().setVisible(true);
+            }
         });
 
         view.getSaveButton().setOnAction(event -> {
