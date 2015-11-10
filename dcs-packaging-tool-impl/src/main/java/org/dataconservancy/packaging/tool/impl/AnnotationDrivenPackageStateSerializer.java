@@ -102,26 +102,26 @@ import java.util.zip.CRC32;
  * <strong>Archive-related configuration:</strong>
  * </p>
  * <dl>
- *     <dt>archive</dt>
- *     <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
- *         When this flag is false, other archive-related properties are not consulted.</dd>
- *     <dt>archiveFormat</dt>
- *     <dd>A string indicating the format the archive should take.  Supported value are:
- *         {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
- *         {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
- *     <dt>compress</dt>
- *     <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
- *     <dt>arxStreamFactory</dt>
- *     <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
+ * <dt>archive</dt>
+ * <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
+ * When this flag is false, other archive-related properties are not consulted.</dd>
+ * <dt>archiveFormat</dt>
+ * <dd>A string indicating the format the archive should take.  Supported value are:
+ * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
+ * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
+ * <dt>compress</dt>
+ * <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
+ * <dt>arxStreamFactory</dt>
+ * <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
  * </dl>
  * <p>
  * <strong>Marshalling-related configuration:</strong>
  * </p>
  * <dl>
- *     <dt>marshallerMap</dt>
- *     <dd>Maps the (un)marshallers to the streams that they (de)serialize.  Typically this will be
- *         dependency injected.  In order for this implementation to function properly, each {@link StreamId}
- *         should be represented in this {@code Map} with associated {@link StreamMarshaller}s</dd>
+ * <dt>marshallerMap</dt>
+ * <dd>Maps the (un)marshallers to the streams that they (de)serialize.  Typically this will be
+ * dependency injected.  In order for this implementation to function properly, each {@link StreamId}
+ * should be represented in this {@code Map} with associated {@link StreamMarshaller}s</dd>
  * </dl>
  */
 public class AnnotationDrivenPackageStateSerializer implements PackageStateSerializer {
