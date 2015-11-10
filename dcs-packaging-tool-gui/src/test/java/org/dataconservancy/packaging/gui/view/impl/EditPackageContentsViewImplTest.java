@@ -67,10 +67,10 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         dataItem = collection.getChildren().get(0);
         dataFile = dataItem.getChildren().get(0);
 
-        view = new EditPackageContentsViewImpl(propertyLabels, internalProperties, "classpath:/defaultRelationships");
+        view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
         HeaderView headerView = new HeaderViewImpl();
         view.setProfileService(profileService);
-
+        view.setIpmService(ipmService);
         view.setHeaderView(headerView);
         view.setHelp(help);
 

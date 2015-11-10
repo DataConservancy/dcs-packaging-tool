@@ -38,12 +38,6 @@
 
   <!-- RESOURCE BUNDLES -->
 
-  <bean id="ontologyLabelResource" class="java.util.ResourceBundle" factory-method="getBundle">
-  	<constructor-arg type="java.lang.String">
-  		<value>${ontologyLabels.file}</value>
-  	</constructor-arg>
-  </bean>
-  
   <bean id="helpResource" class="java.util.ResourceBundle" factory-method="getBundle">
   	<constructor-arg type="java.lang.String">
   		<value>bundles/help</value>
@@ -67,10 +61,6 @@
     <property name="packageMetadataParametersFile" value = "${packageMetadataParametersFile}" />
   </bean>
 
-  <bean id="ontologyLabels" class="org.dataconservancy.packaging.gui.OntologyLabels">
-  	<constructor-arg ref="ontologyLabelResource"/>
-  </bean>
-  
   <bean id="help" class="org.dataconservancy.packaging.gui.Help">
   	<constructor-arg ref="helpResource"/>
   </bean>
@@ -125,6 +115,21 @@
     <constructor-arg ref="uriGenerator"/>
   </bean>
 
+  <bean id="packageMetadataPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageMetadataPresenterImpl">
+    <constructor-arg ref="packageMetadataView"/>
+    <property name="controller" ref="controller"/>
+    <property name="packageMetadataService" ref="packageMetadataService"/>
+    <property name="internalProperties" ref="internalProperties"/>
+    <property name="domainProfileStore" ref="domainProfileStore"/>
+    <property name="packageStateSerializer" ref="packageStateSerializer"/>
+  </bean>
+
+  <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
+    <constructor-arg ref="openExistingPackageView"/>
+    <property name="controller" ref="controller" />
+    <property name="internalProperties" ref="internalProperties"/>
+  </bean>
+
   <!-- VIEWS -->
   <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
     <property name="headerView" ref="headerView"/>
@@ -147,7 +152,6 @@
   </bean>
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
-    <constructor-arg ref="ontologyLabels"/>
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
@@ -198,20 +202,6 @@
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
 
-  <bean id="packageMetadataPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageMetadataPresenterImpl">
-    <constructor-arg ref="packageMetadataView"/>
-    <property name="controller" ref="controller"/>
-    <property name="packageMetadataService" ref="packageMetadataService"/>
-    <property name="internalProperties" ref="internalProperties"/>
-    <property name="domainProfileStore" ref="domainProfileStore"/>
-  </bean>
-
-  <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
-    <constructor-arg ref="openExistingPackageView"/>
-    <property name="controller" ref="controller" />
-    <property name="internalProperties" ref="internalProperties"/>
-  </bean>
-
   <!-- FACTORY -->
   <bean id="factory" class="org.dataconservancy.packaging.gui.Factory">
     <property name="configuration" ref="configuration" />
@@ -241,22 +231,83 @@
     <property name="toolBuildNumber" value="${build.number}"/>
     <property name="toolBuildTimestamp" value="${build.timeStamp}"/>
     <property name="toolBuildRevision" value="${build.revision}"/>
+    <property name="domainProfileStore" ref="domainProfileStore"/>
   </bean>
+
 
   <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
     <property name="primaryDomainProfiles">
-        <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
-          <ref bean="dcsBoProfile"/>
-          <ref bean="pcdmProfile"/>
-        </list>
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
+        <ref bean="dcsBoProfile"/>
+        <ref bean="pcdmProfile"/>
+      </list>
     </property>
     <property name="secondaryDomainProfiles">
-        <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
     </property>
   </bean>
 
   <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>
 
   <bean id="pcdmProfile" class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile"/>
+
+  <!-- (DE)SERIALIZATION -->
+  <bean id="packageStateSerializer" class="org.dataconservancy.packaging.tool.impl.AnnotationDrivenPackageStateSerializer">
+    <property name="marshallerMap">
+      <map>
+        <entry key="APPLICATION_VERSION" value-ref="applicationVersionMarshaller"/>
+        <entry key="PACKAGE_METADATA" value-ref="packageMetadataMarshaller"/>
+        <entry key="PACKAGE_NAME" value-ref="packageNameMarshaller"/>
+        <entry key="PACKAGE_TREE" value-ref="packageTreeMarshaller"/>
+      </map>
+    </property>
+    <property name="archive" value="false"/>
+  </bean>
+
+  <bean id="applicationVersionMarshaller"  class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
+    <property name="streamId" value="APPLICATION_VERSION"/>
+    <property name="marshaller" ref="xStreamMarshaller"/>
+    <property name="unmarshaller" ref="xStreamMarshaller"/>
+  </bean>
+
+  <bean id="packageMetadataMarshaller"  class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
+    <property name="streamId" value="PACKAGE_METADATA"/>
+    <property name="marshaller" ref="xStreamMarshaller"/>
+    <property name="unmarshaller" ref="xStreamMarshaller"/>
+  </bean>
+
+  <bean id="packageNameMarshaller"  class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
+    <property name="streamId" value="PACKAGE_NAME"/>
+    <property name="marshaller" ref="xStreamMarshaller"/>
+    <property name="unmarshaller" ref="xStreamMarshaller"/>
+  </bean>
+
+  <bean id="packageTreeMarshaller" class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
+    <property name="streamId" value="PACKAGE_TREE"/>
+    <property name="marshaller" ref="jenaModelSerializer"/>
+    <property name="unmarshaller" ref="jenaModelSerializer"/>
+  </bean>
+
+  <bean id="xStreamMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller">
+    <property name="converters">
+      <list>
+       <ref bean="applicationVersionConverter"/>
+       <ref bean="packageMetadataConverter"/>
+       <ref bean="packageNameConverter"/>
+     </list>
+    </property>
+  </bean>
+
+  <bean id="applicationVersionConverter" class="org.dataconservancy.packaging.tool.ser.ApplicationVersionConverter"/>
+
+  <bean id="packageMetadataConverter" class="org.dataconservancy.packaging.tool.ser.PackageMetadataConverter"/>
+
+  <bean id="packageNameConverter" class="org.dataconservancy.packaging.tool.ser.PackageNameConverter"/>
+
+  <bean id="jenaModelFactory" class="org.dataconservancy.packaging.tool.ser.DefaultModelFactory"/>
+
+  <bean id="jenaModelSerializer" class="org.dataconservancy.packaging.tool.ser.JenaModelSerializer">
+    <constructor-arg ref="jenaModelFactory"/>
+  </bean>
 
 </beans>

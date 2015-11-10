@@ -32,7 +32,6 @@ import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
@@ -98,7 +97,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             HeaderView header = new HeaderViewImpl();
 
             // Setup next page
-            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(propertyLabels, internalProperties, "classpath:/defaultRelationships");
+            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
             editPackageContentsView.setHeaderView(header);
             packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
             factory.setEditPackageContentsPresenter(packageDescriptionPresenter);
@@ -150,7 +149,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);
             controller.getCreateNewPackagePagesStack().clear();
-            controller.getCreateNewPackagePagesStack().push(Page.DEFINE_RELATIONSHIPS);
+            controller.getCreateNewPackagePagesStack().push(Page.EDIT_PACKAGE_CONTENTS);
             editPackageContentsView.setHeaderView(header);
 
             initialized = true;

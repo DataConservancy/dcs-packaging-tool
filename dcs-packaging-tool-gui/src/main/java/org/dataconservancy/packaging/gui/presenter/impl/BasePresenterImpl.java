@@ -40,7 +40,7 @@ public abstract class BasePresenterImpl implements Presenter {
         
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
 
-        bindCancelLink();
+        view.getCancelLink().setOnAction(event -> onBackPressed());
     }
 
     @Override
@@ -62,7 +62,7 @@ public abstract class BasePresenterImpl implements Presenter {
         this.view = view;
     }
 
-    public void bindCancelLink() {
-        view.getCancelLink().setOnAction(event -> getController().goToPreviousPage());
+    public void onBackPressed() {
+        getController().goToPreviousPage();
     }
 }

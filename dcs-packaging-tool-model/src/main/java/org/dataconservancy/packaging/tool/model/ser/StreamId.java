@@ -42,6 +42,11 @@ public enum StreamId {
      * Identifier for the stream containing developer version information (version number, build number, etc.) for the
      * Package Tool GUI
      */
-    APPLICATION_VERSION
+    APPLICATION_VERSION,
+
+    /**
+     * Identifier for the stream containing the URIs of Domain Profiles in use for the package
+     */
+    DOMAIN_PROFILE_LIST
 
 }

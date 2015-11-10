@@ -59,7 +59,7 @@ public class PackageMetadataServiceTest {
         Assert.assertEquals("Package-Metadata-Required", pm.getName());
         Assert.assertEquals(PackageMetadata.Requiredness.REQUIRED, pm.getRequiredness());
         Assert.assertFalse(pm.isRepeatable());
-        Assert.assertFalse(pm.isEditable());
+        Assert.assertTrue(pm.isEditable());
         Assert.assertEquals("This is the help text for Package-Metadata-1",pm.getHelpText());
         Assert.assertEquals(null, pm.getValidationType());
     }

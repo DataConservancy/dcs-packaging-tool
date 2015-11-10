@@ -182,23 +182,4 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
     }
 
-    /**
-     * Test that continue works correctly when all required fields are set.
-     */
-    @Test
-    public void testContinue() throws InterruptedException {
-        presenter.display();
-        view.getPackageNameField().setText("Some Name");
-        view.addDomainProfileLabel("Some Domain");
-        for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> {
-                ((TextField) node).setText("Some Text");
-            });
-        }
-
-        assertFalse(showNextPage);
-        view.getContinueButton().fire();
-        assertTrue(showNextPage);
-    }
-
 }

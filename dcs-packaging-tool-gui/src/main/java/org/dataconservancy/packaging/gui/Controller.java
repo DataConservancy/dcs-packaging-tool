@@ -30,9 +30,11 @@ import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -51,6 +53,8 @@ public class Controller {
     private File rootArtifactDir;
     //END TODO
     private PackageState packageState;
+
+    private DomainProfileStore domainProfileStore;
 
     /**
      * Application-scope metadata
@@ -94,6 +98,22 @@ public class Controller {
         this.factory = factory;
     }
 
+    public void setDomainProfileStore(DomainProfileStore domainProfileStore) {
+        this.domainProfileStore = domainProfileStore;
+    }
+
+    public DomainProfile getPrimaryDomainProfile() {
+        DomainProfile primaryProfile = null;
+        for (DomainProfile profile : domainProfileStore.getPrimaryDomainProfiles()) {
+            if (profile.getIdentifier().equals(packageState.getDomainProfileIdList().get(0))) {
+                primaryProfile = profile;
+                break;
+            }
+        }
+
+        return primaryProfile;
+    }
+
     public void startApp() {
         defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
         packageFilenameIllegalCharacters = factory.getConfiguration().getPackageFilenameIllegalCharacters();
@@ -129,13 +149,13 @@ public class Controller {
     private void initiatePagesStacks() {
         createNewPackagePagesStack.clear();
         createNewPackagePagesStack.add(Page.GENERATE_PACKAGE);
-        createNewPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        createNewPackagePagesStack.add(Page.EDIT_PACKAGE_CONTENTS);
         createNewPackagePagesStack.add(Page.CREATE_NEW_PACKAGE);
         createNewPackagePagesStack.add(Page.PACKAGE_METADATA);
 
         openExistingPackagePagesStack.clear();
         openExistingPackagePagesStack.add(Page.GENERATE_PACKAGE);
-        openExistingPackagePagesStack.add(Page.DEFINE_RELATIONSHIPS);
+        openExistingPackagePagesStack.add(Page.EDIT_PACKAGE_CONTENTS);
         openExistingPackagePagesStack.add(Page.EXISTING_PACKAGE_METADATA);
         openExistingPackagePagesStack.add(Page.OPEN_EXISTING_PACKAGE);
     }
@@ -216,6 +236,7 @@ public class Controller {
      * @param chooser the FileChooser
      * @return file chosen or null on cancel
      */
+    //TODO: We should check if these can be removed now in Java 8
     public File showOpenFileDialog(FileChooser chooser) {
         Semaphore lock = getLock(chooser);
         
@@ -324,7 +345,7 @@ public class Controller {
             case CREATE_NEW_PACKAGE:
                 showCreatePackageDescription();
                 break;
-            case DEFINE_RELATIONSHIPS:
+            case EDIT_PACKAGE_CONTENTS:
                 showEditPackageContents();
                 break;
             case GENERATE_PACKAGE:

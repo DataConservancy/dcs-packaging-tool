@@ -16,25 +16,29 @@
  *
  */
 
-package org.dataconservancy.packaging.tool.impl;
+package org.dataconservancy.packaging.tool.ser;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveOutputStream;
-
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.attribute.FileTime;
 
 /**
  *
  */
-public interface ArchiveStreamFactory {
+public class DomainProfileUriListConverterTest extends AbstractRoundTripConverterTest {
 
-    ArchiveOutputStream newArchiveOutputStream(OutputStream out);
+    @Override
+    public InputStream getSerializationInputStream() throws IOException {
+        return TestResources.DOMAINPROFILE_URIS_1.getInputStream();
+    }
 
-    ArchiveEntry newArchiveEntry(String name, long sizeBytes, FileTime created, FileTime lastModified,
-                                 int unixPermissions, long crc);
+    @Override
+    public Object getSerializationObject() {
+        return TestObjects.domainProfileUris;
+    }
 
+    @Override
+    public AbstractPackageToolConverter getUnderTest() {
+        return new DomainProfileUriListConverter();
+    }
 
 }

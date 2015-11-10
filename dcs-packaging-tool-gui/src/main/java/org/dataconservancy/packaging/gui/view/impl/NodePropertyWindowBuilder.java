@@ -37,7 +37,6 @@ import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
-import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
@@ -140,7 +139,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         //Create the relationship tab that displays all relationships the artifact has.
         Tab relationshipTab = new Tab();
         relationshipTab.setClosable(false);
-        relationshipTab.setText(TextFactory.getText(Labels.LabelKey.PACKAGE_ARTIFACT_RELATIONSHIPS));
+        relationshipTab.setText(TextFactory.getText(Labels.LabelKey.RELATIONSHIPS_LABEL));
         ScrollPane relationshipPane = new ScrollPane();
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -226,7 +225,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         final VBox inheritanceBox = new VBox(12);
         if (node.getNodeType().getInheritableProperties() != null) {
-            inheritanceBox.getChildren().add(new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_ARTIFACT_INHERITANCE)));
+            inheritanceBox.getChildren().add(new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_LABEL)));
 
             inheritanceBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
 

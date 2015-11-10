@@ -30,7 +30,6 @@ import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
-import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +117,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 } else if (controller.getPackageDescription() != null) {
                     controller.goToNextPage();
                 } else {
-                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED));
+                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
                     view.getErrorMessage().setVisible(true);
                 }
             } catch (Exception e) {
@@ -208,8 +207,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 @Override
                 protected Node call() throws Exception {
                     Node root = ipmService.createTreeFromFileSystem(root_artifact_dir.toPath());
-                    //TODO Replace hardcoded profile with the one from package state when it's finished
-                    profileService.assignNodeTypes(new DcsBOProfile(), root);
+                    profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), root);
 
                     return root;
                 }

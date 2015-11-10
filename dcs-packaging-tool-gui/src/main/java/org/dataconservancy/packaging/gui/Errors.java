@@ -25,32 +25,24 @@ public class Errors {
 
     public enum ErrorKey {
 
-        PACKAGE_GENERATION_CREATION_ERROR("packagegeneration.packagecreation.error"), 
-        PACKAGE_PARAMS_CREATION_ERROR("packageparamscreation.error"), 
+        PACKAGE_GENERATION_CREATION_ERROR("packagegeneration.packagecreation.error"),
         PACKAGE_GENERATION_SAVE("packagegeneration.save.error"),
         MISSING_REQUIRED_FIELDS("packagenamemissing.error"),
-        EMAIL_MISSING("emailmissing.error"),
-        BASE_DIRECTORY_OR_DESCRIPTION_NOT_SELECTED("basedirectoryordescriptionnotselected.error"),
+        BASE_DIRECTORY_NOT_SELECTED("basedirectorynotselected.error"),
         OUTPUT_DIRECTORY_MISSING("outputdirectorymissing.error"),
         OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING("outputdirectoryandpackagenamemissing.error"),
-        PACKAGE_DESCRIPTION_VALIDATION_ERROR("packagedescriptionvalidation.error"),
-        ARTIFACT_TYPE_ERROR("artifacttype.error"),
-        PACKAGE_DESCRIPTION_SAVE_ERROR("packagedescriptionsave.error"),
+        PACKAGE_TREE_VALIDATION_ERROR("packagetreevalidation.error"),
+        PACKAGE_STATE_SAVE_ERROR("packagestatesave.error"),
         HIERARCHICAL_RELATIONSHIP_ERROR("hierarchicalrelationship.error"),
         INVALID_RELATIONSHIP_ERROR("invalidrelationship.error"),
-        INVALID_REFERENCE_ERROR("invalidreference.error"),
         PARAM_LOADING_ERROR("paramsloading.error"),
-        METADATA_INHERITANCE_ERROR("metadatainheritance.error"),
         PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS("packageFilenameIllegalCharacters.error"),
         OUTPUT_DIR_NOT_CREATED_ERROR("outputDirNotCreated.error"),
         PROPERTY_LOSS_WARNING("propertyloss.warning"),
-        ARTIFACT_LOSS_WARNING("artifactloss.warning"),
-        ARTIFACT_LOSS_WARNING_MESSAGE("artifactlossmessage.warning"),
-        PACKAGE_DESCRIPTION_BUILD_ERROR("packagedescriptionbuild.error"),
-        PACKAGE_DESCRIPTION_CHANGE_WARNING("packagedescriptionchange.warning"),
+        PACKAGE_TREE_BUILD_ERROR("packagetreebuild.error"),
         INACCESSIBLE_CONTENT_DIR("inaccessiblepackagecontent.error"),
-        ARTIFACT_GRAPH_ERROR("artifactgraph.error"),
-        CONTENT_DIRECTORY_ERROR("contentdirectory.error");
+        ADD_CONTENT_ERROR("addcontent.error"),
+        IO_CREATE_ERROR("iocreate.error");
 
 
         private String property;

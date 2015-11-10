@@ -20,9 +20,11 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -35,11 +37,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
@@ -54,10 +59,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
-import org.dataconservancy.packaging.gui.OntologyLabels;
+import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
@@ -66,12 +72,14 @@ import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.api.support.NodeComparison;
+import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -83,6 +91,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the view that displays the package description tree, and the controls for applying inherited metadata.
@@ -96,6 +105,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Node popupNode;
     private DomainProfileService profileService;
     private IPMService ipmService;
+    private Map<Node, NodeComparison> refreshResult;
 
     //Warning popup and controls
     public PackageToolPopup warningPopup;
@@ -111,7 +121,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
     //File chooser for where to save package description. 
-    private FileChooser packageDescriptionFileChooser;
+    private FileChooser packageStateFileChooser;
 
     //Full Path checkbox
     private CheckBox fullPath;
@@ -126,25 +136,18 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     //Storage for mapping popup fields to properties on the artifacts. 
     private Set<NodeRelationshipContainer> artifactRelationshipFields;
 
-    private OntologyLabels ontologyLabels;
     private InternalProperties internalProperties;
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Preferences preferences;
     private NodePropertyWindowBuilder windowBuilder;
-
-    private static final String synthesizedArtifactMarker = " *";
 
     private String availableRelationshipsPath;
     private PackageToolPopup refreshPopup;
     private Button refreshPopupPositiveButton;
     private Button refreshPopupNegativeButton;
 
-    public EditPackageContentsViewImpl(final OntologyLabels ontologyLabels,
-                                       final InternalProperties internalProperties, final String availableRelationshipsPath) {
+    public EditPackageContentsViewImpl(final InternalProperties internalProperties, final String availableRelationshipsPath) {
         super();
-        this.ontologyLabels = ontologyLabels;
         this.internalProperties = internalProperties;
         this.availableRelationshipsPath = availableRelationshipsPath;
 
@@ -184,10 +187,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(errorMessageLabel);
 
         //Creates the file chooser that's used to save the package description to a file.
-        packageDescriptionFileChooser = new FileChooser();
-        packageDescriptionFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_DESCRIPTION_FILE_CHOOSER_KEY));
-        packageDescriptionFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
-        packageDescriptionFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+        packageStateFileChooser = new FileChooser();
+        packageStateFileChooser.setTitle(TextFactory.getText(LabelKey.PACKAGE_STATE_FILE_CHOOSER_KEY));
+        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
+        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 
         //Toggles whether the full paths should be displayed in the package artifact tree. 
         fullPath = new CheckBox(TextFactory.getText(LabelKey.SHOW_FULL_PATHS));
@@ -217,10 +220,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(fullPath);
         content.getChildren().add(showIgnored);
 
-        Label syntheticArtifactLabel = new Label(TextFactory.getText(LabelKey.SYNTHESIZED_ARTIFACT_NOTATION));
-
-        content.getChildren().add(syntheticArtifactLabel);
-
         //The main element of the view a tree of all the package artifacts.
         artifactTree = new TreeTableView<>();
 
@@ -248,58 +247,54 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         //add 2 here to get rid of horizontal scroll bar
         artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
 
-        artifactColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, HBox>, ObservableValue<HBox>>() {
-            public ObservableValue<HBox> call(TreeTableColumn.CellDataFeatures<Node, HBox> p) {
-                // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                Node packageNode = p.getValue().getValue();
+        artifactColumn.setCellValueFactory(p -> {
+            Node packageNode = p.getValue().getValue();
 
-                HBox hbox = new HBox(3);
+            HBox hbox = new HBox(3);
 
-                ImageView exclamImage = new ImageView();
-                exclamImage.getStyleClass().add(EXCLAMATION_IMAGE);
-                exclamImage.setFitHeight(12);
-                exclamImage.setFitWidth(5);
+            ImageView exclamImage = new ImageView();
+            exclamImage.getStyleClass().add(EXCLAMATION_IMAGE);
+            exclamImage.setFitHeight(12);
+            exclamImage.setFitWidth(5);
 
-                Label exclamLabel = new Label();
-                exclamLabel.setGraphic(exclamImage);
+            Label exclamLabel = new Label();
+            exclamLabel.setGraphic(exclamImage);
 
-                Tooltip exclamTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
-                exclamTooltip.setPrefWidth(300);
-                exclamTooltip.setWrapText(true);
-                exclamTooltip.setFont(Font.font(12));
-                Tooltip.install(exclamLabel, exclamTooltip);
+            Tooltip exclamTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
+            exclamTooltip.setPrefWidth(300);
+            exclamTooltip.setWrapText(true);
+            exclamTooltip.setFont(Font.font(12));
+            Tooltip.install(exclamLabel, exclamTooltip);
 
-                if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
-                    hbox.getChildren().add(exclamLabel);
-                }
-
-                Label viewLabel = new Label();
-                viewLabel.setPrefWidth(artifactColumn.getWidth());
-                viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
-
-                String labelText;
-
-                if (packageNode.getFileInfo() != null) {
-                    if (getFullPathCheckBox().selectedProperty().getValue()) {
-                        labelText = packageNode.getFileInfo().getLocation().toString();
-                    } else {
-                        labelText = packageNode.getFileInfo().getName();
-                    }
-                    viewLabel.setText(labelText);
-                }
-
-                Tooltip t = new Tooltip(viewLabel.getText());
-                t.setPrefWidth(300);
-                t.setWrapText(true);
-                viewLabel.setTooltip(t);
-
-                hbox.getChildren().add(viewLabel);
-
-
-
-                return new ReadOnlyObjectWrapper<>(hbox);
+            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
+                hbox.getChildren().add(exclamLabel);
             }
+
+            Label viewLabel = new Label();
+            viewLabel.setPrefWidth(artifactColumn.getWidth());
+            viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
+
+            String labelText;
+
+            if (packageNode.getFileInfo() != null) {
+                if (getFullPathCheckBox().selectedProperty().getValue()) {
+                    labelText = packageNode.getFileInfo().getLocation().toString();
+                } else {
+                    labelText = packageNode.getFileInfo().getName();
+                }
+                viewLabel.setText(labelText);
+            }
+
+            Tooltip t = new Tooltip(viewLabel.getText());
+            t.setPrefWidth(300);
+            t.setWrapText(true);
+            viewLabel.setTooltip(t);
+
+            hbox.getChildren().add(viewLabel);
+
+
+
+            return new ReadOnlyObjectWrapper<>(hbox);
         });
 
         typeColumn.setCellValueFactory(p -> {
@@ -311,42 +306,42 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
-        optionsColumn.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Node, Label>, ObservableValue<Label>>() {
-            public ObservableValue<Label> call(TreeTableColumn.CellDataFeatures<Node, Label> p) {
-                // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-                // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-                Node packageNode = p.getValue().getValue();
-                Label optionsLabel = new Label();
-                final ContextMenu contextMenu = new ContextMenu();
-                TreeItem<Node> treeItem = p.getValue();
-                ImageView image = new ImageView();
-                image.setFitHeight(20);
-                image.setFitWidth(20);
-                image.getStyleClass().add(ARROWS_IMAGE);
-                optionsLabel.setGraphic(image);
-                //make sure the current artifact type is valid - this status may have changed if its
-                //parent's type has changed
-                if (packageNode.isIgnored()) {
-                    contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
-                } else {
-                    List<NodeTransform> nodeTransforms = profileService.getNodeTransforms(packageNode);
+        optionsColumn.setCellValueFactory(p -> {
+            // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
+            // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+            Node packageNode = p.getValue().getValue();
+            Label optionsLabel = new Label();
+            final ContextMenu contextMenu = new ContextMenu();
+            TreeItem<Node> treeItem = p.getValue();
+            ImageView image = new ImageView();
+            image.setFitHeight(20);
+            image.setFitWidth(20);
+            image.getStyleClass().add(ARROWS_IMAGE);
+            optionsLabel.setGraphic(image);
+            //make sure the current artifact type is valid - this status may have changed if its
+            //parent's type has changed
+            if (packageNode.isIgnored()) {
+                contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
+            } else {
+                List<NodeTransform> nodeTransforms = profileService.getNodeTransforms(packageNode);
 
-                    contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
-                    optionsLabel.setContextMenu(contextMenu);
-                }
-
-                //When the options label is clicked show the context menu.
-                optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
-                    if (e.getButton() == MouseButton.PRIMARY) {
-                        contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
-                    }
-                });
-                return new ReadOnlyObjectWrapper<>(optionsLabel);
+                contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
+                optionsLabel.setContextMenu(contextMenu);
             }
+
+            //When the options label is clicked show the context menu.
+            optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
+                if (e.getButton() == MouseButton.PRIMARY) {
+                    errorMessageLabel.setVisible(false);
+                    contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
+                }
+            });
+            return new ReadOnlyObjectWrapper<>(optionsLabel);
         });
 
-
-        artifactTree.getColumns().addAll(artifactColumn, typeColumn, optionsColumn);
+        artifactTree.getColumns().add(artifactColumn);
+        artifactTree.getColumns().add(typeColumn);
+        artifactTree.getColumns().add(optionsColumn);
 
         //set up row factory to allow for a little alternate row styling for ignored package artifacts
         artifactTree.setRowFactory(new Callback<TreeTableView<Node>, TreeTableRow<Node>>() {
@@ -402,27 +397,26 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return artifactTree;
     }
 
-    @Override
-    public FileChooser getPackageDescriptionFileChooser(){
+    public FileChooser getPackageStateFileChooser(){
         File existingDescriptionFile = presenter.getController().getPackageDescriptionFile();
         if(existingDescriptionFile != null){
-            packageDescriptionFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
-            packageDescriptionFileChooser.setInitialFileName(existingDescriptionFile.getName());
+            packageStateFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
+            packageStateFileChooser.setInitialFileName(existingDescriptionFile.getName());
         } else if (presenter.getController().getRootArtifactDir() != null) {
             String fileName = presenter.getController().getRootArtifactDir().getName();
             if (fileName.isEmpty()) {
                 fileName = "description";
             }
-            packageDescriptionFileChooser.setInitialFileName(fileName + ".json");
+            packageStateFileChooser.setInitialFileName(fileName + ".json");
             if (presenter.getController().getContentRoot() != null) {
-                packageDescriptionFileChooser.setInitialDirectory(presenter.getController().getContentRoot());
+                packageStateFileChooser.setInitialDirectory(presenter.getController().getContentRoot());
             } else {
-                packageDescriptionFileChooser.setInitialDirectory(presenter.getController().getRootArtifactDir());
+                packageStateFileChooser.setInitialDirectory(presenter.getController().getRootArtifactDir());
             }
         } else {
-            packageDescriptionFileChooser.setInitialFileName("default.json");
+            packageStateFileChooser.setInitialFileName("default.json");
         }
-        return packageDescriptionFileChooser;
+        return packageStateFileChooser;
     }
 
     @Override
@@ -452,34 +446,54 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             artifactTree.getSelectionModel().select(treeItem);
         });
 
-        // TODO: Addition of these items to the list should be determined by the service
-        //Create a menu item that will allow the user to pick a file.
-        MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_ITEM_LABEL));
-        itemList.add(addFileItem);
-        addFileItem.setOnAction(event -> {
-            File file = presenter.getController().showOpenFileDialog(new FileChooser());
-            // TODO: do something with this file.
-        });
+        List<NodeType> childNodeTypes = presenter.getPossibleChildTypes(packageNode);
 
-        //Create a menu item that will allow the user to pick a folder.
-        MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_ITEM_LABEL));
-        itemList.add(addDirItem);
-        addDirItem.setOnAction(event -> {
-            File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
-            // TODO: do something with this dir.
-        });
+        boolean canHaveFileChild = false;
+        boolean canHaveDirectoryChild = false;
 
-        //Create a menu item that will allow the user to refresh the tree.
-        // TODO: the showing of this item should be determined by a service
-        MenuItem refreshItem = new MenuItem(TextFactory.getText(LabelKey.REFRESH_ITEM_LABEL));
-        itemList.add(refreshItem);
-        refreshItem.setOnAction(event -> {
-            // TODO: Do the refresh and pass in a RefreshResults object of some sort
-            // For now, the refresh is faked out exactly like the mock up.
-            showRefreshResultsPopup();
-        });
+        for (NodeType childNodeType : childNodeTypes) {
+            if (childNodeType.getFileAssociation() == FileAssociation.DIRECTORY) {
+                canHaveDirectoryChild = true;
+            } else {
+                canHaveFileChild = true;
+            }
 
-        //Create a menu item that will allow the user to pick a file.
+            if (canHaveDirectoryChild && canHaveFileChild) {
+                break;
+            }
+        }
+
+        if (canHaveFileChild) {
+            //Create a menu item that will allow the user to pick a file.
+            MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FILE_ITEM_LABEL));
+            itemList.add(addFileItem);
+            addFileItem.setOnAction(event -> {
+                File file = presenter.getController().showOpenFileDialog(new FileChooser());
+                presenter.addToTree(packageNode, file.toPath());
+            });
+        }
+
+        if (canHaveDirectoryChild) {
+            //Create a menu item that will allow the user to pick a folder.
+            MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FOLDER_ITEM_LABEL));
+            itemList.add(addDirItem);
+            addDirItem.setOnAction(event -> {
+                File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+                presenter.addToTree(packageNode, file.toPath());
+            });
+        }
+
+        //If backing file
+        if (packageNode.getFileInfo() != null && ipmService.checkFileInfoIsAccessible(packageNode)) {
+            MenuItem refreshItem = new MenuItem(TextFactory.getText(LabelKey.REFRESH_ITEM_LABEL));
+            itemList.add(refreshItem);
+            refreshItem.setOnAction(event -> {
+                refreshResult = presenter.refreshTreeContent(packageNode);
+                showRefreshResultsPopup();
+            });
+        }
+
+        //If the backing file system entity is not available give the option to remap
         if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
             MenuItem remapFileItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
             itemList.add(remapFileItem);
@@ -508,42 +522,42 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             itemList.add(separator);
 
             for (final NodeTransform transform : nodeTransforms) {
-                //final List<String> invalidProperties = presenter.findInvalidProperties(packageNode, type);
+                final List<PropertyType> invalidProperties = new ArrayList<>();
+
+                List<PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
+                invalidProperties.addAll(packageNode.getNodeType().getPropertyConstraints().stream().filter(newTypeConstraint -> !newTypeProperties.contains(newTypeConstraint.getPropertyType())).map(PropertyConstraint::getPropertyType).collect(Collectors.toList()));
 
                 MenuItem item = new MenuItem(transform.getLabel());
-
                 itemList.add(item);
 
-                /*
-                 TODO: Do we still want to warn users about potential property loss, that seems unsustainable.
-                if (!invalidProperties.isEmpty() && !type.equals(packageNode.getType())) {
+                if (!invalidProperties.isEmpty()) {
                     ImageView invalidImage = new ImageView("/images/orange_exclamation.png");
                     invalidImage.setFitWidth(8);
                     invalidImage.setFitHeight(24);
                     item.setGraphic(invalidImage);
                 }
-                */
+
                 item.setOnAction(actionEvent -> {
                     boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
-                    /*TODO: Determine what we want to do about possible property loss
-                        if (!invalidProperties.isEmpty() && !hideWarningPopup && !type.equals(packageNode.getType())) {
 
-                        showWarningPopup(errors.get(ErrorKey.PROPERTY_LOSS_WARNING), messages.formatInvalidPropertyWarning(type, formatInvalidProperties(invalidProperties)), true, true);
+                    if (!invalidProperties.isEmpty() && !hideWarningPopup) {
+
+                        showWarningPopup(TextFactory.getText(Errors.ErrorKey.PROPERTY_LOSS_WARNING), TextFactory.format(Messages.MessageKey.WARNING_INVALID_PROPERTY, transform.getResultNodeType().getLabel(), formatInvalidProperties(invalidProperties)), true, true);
                         getWarningPopupNegativeButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValueAsString());
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
                         });
 
                         getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            presenter.changeType(packageNode, type);
-                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValueAsString());
+                            presenter.changeType(packageNode, transform);
+                            preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
                         });
                     } else {
-                        presenter.changeType(packageNode, type);
-                    } */
-                    presenter.changeType(packageNode, transform);
+                        presenter.changeType(packageNode, transform);
+                    }
+
                 });
             }
         }
@@ -555,6 +569,17 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         itemList.add(createIgnoreMenuItem(treeItem));
 
        return itemList;
+    }
+
+    //Creates a string that lists all the invalid properties in single line list.
+    private String formatInvalidProperties(List<PropertyType> invalidProperties) {
+        String invalidPropertyString = "";
+
+        for (PropertyType property : invalidProperties) {
+            invalidPropertyString += property.getLabel() + "\n";
+        }
+
+        return invalidPropertyString;
     }
 
     private void remapNode(Node node, Path newPath) {
@@ -589,42 +614,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     //Note this code is broken out into a protected method so that it can be executed by the test
     protected void toggleItemIgnore(TreeItem<Node> node, boolean status) {
-        if (status) {
-            setIgnoredDescendants(node, true);
-        } else {
-            setIgnoredAncestors(node, false);
-            setIgnoredDescendants(node, false);
-        }
+        ipmService.ignoreNode(node.getValue(), status);
 
         // Rebuild the entire TreeView and reselect the current PackageArtifact
 
         presenter.rebuildTreeView();
         artifactTree.getSelectionModel().select(presenter.findItem(node.getValue()));
-    }
-
-    private void setIgnoredAncestors(TreeItem<Node> node, boolean status) {
-        do {
-            node.getValue().setIgnored(status);
-        } while ((node = node.getParent()) != null);
-    }
-
-    private void setIgnoredDescendants(TreeItem<Node> node, boolean status) {
-        node.getValue().setIgnored(status);
-
-        for (TreeItem<Node> kid: node.getChildren()) {
-            setIgnoredDescendants(kid, status);
-        }
-    }
-
-    //Creates a string that lists all the invalid properties in single line list.
-    private String formatInvalidProperties(List<String> invalidProperties) {
-        String invalidPropertyString = "";
-
-        for (String property : invalidProperties) {
-            invalidPropertyString += ontologyLabels.get(property) + "\n";
-        }
-
-        return invalidPropertyString;
     }
 
     @Override
@@ -712,9 +707,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return popupNode;
     }
 
-    public void setPopupNode(Node artifact) {
-        popupNode = artifact;
-    }
     /**
      * {@inheritDoc}
      */
@@ -781,20 +773,49 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         refreshPopup.setTitleText(TextFactory.getText(LabelKey.DETECTED_CHANGES_LABEL));
 
-        VBox content = new VBox(48);
-        content.setPrefWidth(300);
+        VBox content = new VBox(16);
+        content.setPrefWidth(500);
+
+        int addCount = 0;
+        int deleteCount = 0;
+        int updateCount = 0;
+
+        ObservableList<ComparisonResult> resultTableData = FXCollections.observableArrayList();
+        for (Node node : refreshResult.keySet()) {
+            resultTableData.add(new ComparisonResult(refreshResult.get(node), node));
+            switch (refreshResult.get(node).getStatus()) {
+                case ADDED:
+                    addCount++;
+                    break;
+                case DELETED:
+                    deleteCount++;
+                    break;
+                case UPDATED:
+                    updateCount++;
+                    break;
+            }
+        }
 
         VBox changesVBox = new VBox(4);
-        Label changesLabel = new Label("1 new file found");
-        changesLabel.setWrapText(true);
+        Label refreshSummary = new Label(TextFactory.format(Messages.MessageKey.REFRESH_STATUS_MESSAGE, addCount, deleteCount, updateCount));
+        refreshSummary.setWrapText(true);
 
-        Label changesLabel2 = new Label("/dir/file");
-        changesLabel2.setFont(Font.font(12));
-        changesLabel2.setPadding(new Insets(0, 0, 0, 10));
-        changesLabel2.setWrapText(true);
+        TableView<ComparisonResult> resultTable = new TableView<>();
+        resultTable.setEditable(false);
 
-        changesVBox.getChildren().add(changesLabel);
-        changesVBox.getChildren().add(changesLabel2);
+        TableColumn<ComparisonResult, String> statusCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_STATUS_LABEL));
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("comparison"));
+        statusCol.setPrefWidth(75);
+
+        TableColumn<ComparisonResult, String> locationCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_LOCATION_LABEL));
+        locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
+
+        resultTable.setItems(resultTableData);
+        resultTable.getColumns().add(statusCol);
+        resultTable.getColumns().add(locationCol);
+
+        changesVBox.getChildren().add(refreshSummary);
+        changesVBox.getChildren().add(resultTable);
 
         content.getChildren().add(changesVBox);
 
@@ -818,6 +839,29 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - content.getHeight()/2.0;
         refreshPopup.setOwner(getScene().getWindow());
         refreshPopup.show(x, y);
+    }
+
+    public static class ComparisonResult {
+        private SimpleStringProperty comparison;
+        private SimpleStringProperty location;
+
+        public ComparisonResult(NodeComparison comparison, Node node) {
+            this.comparison = new SimpleStringProperty(comparison.getStatus().toString());
+            this.location = new SimpleStringProperty(node.getFileInfo().getLocation().toString());
+        }
+
+        public String getComparison() {
+            return comparison.get();
+        }
+
+        public String getLocation() {
+            return location.get();
+        }
+    }
+
+    @Override
+    public Map<Node, NodeComparison> getRefreshResult() {
+        return refreshResult;
     }
 
     @Override

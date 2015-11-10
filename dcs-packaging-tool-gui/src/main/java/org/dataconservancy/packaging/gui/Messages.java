@@ -23,17 +23,13 @@ import java.util.ResourceBundle;
  */
 public class Messages {
     public enum MessageKey {
-        PACKAGE_DESCRIPTION_BUILDER_SUCCESS("packagedescriptionbuilder.success"),
-        PACKAGE_DESCRIPTION_BUILDER_FAILURE("packagedescriptionbuilder.failure"),
-        PACKAGE_DESCRIPTION_BUILDER_ERROR("packagedescriptionbuilder.error"),
-        PACKAGE_GENERATION_SUCCESS("packagegeneration.success"),
         ERROR_CREATING_NEW_PACKAGE("createnewpackage.error"),
         WARNING_FILENAME_LENGTH("filenamelength.warning"),
         WARNING_INVALID_PROPERTY("invalidproperty.warning"),
-        WARNING_PACKAGE_DESCRIPTION_MODIFICATION("packagedescriptionmodification.warning"),
         URL_VALIDATION_FAILURE("urlvalidation.failure"),
         PHONE_VALIDATION_FAILURE("phonevalidation.failure"),
-        EMAIL_VALIDATION_FAILURE("emailvalidation.failure");
+        EMAIL_VALIDATION_FAILURE("emailvalidation.failure"),
+        REFRESH_STATUS_MESSAGE("refreshstatus.message");
 
         String property;
 
