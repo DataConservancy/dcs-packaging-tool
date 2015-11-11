@@ -222,7 +222,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
-
+        deserialize(state, null, in);
     }
 
     /**
