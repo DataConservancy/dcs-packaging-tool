@@ -341,7 +341,6 @@ public class DcsBOProfile
         hasCreateDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasCreateDate"));
         hasCreateDate.setPropertyValueType(PropertyValueType.DATE_TIME);
-        hasCreateDate.setPropertyValueHint(PropertyValueHint.DATE_TIME);
 
         hasModifiedDate.setLabel("Modified Date");
         hasModifiedDate
@@ -349,7 +348,6 @@ public class DcsBOProfile
         hasModifiedDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasModifiedDate"));
         hasModifiedDate.setPropertyValueType(PropertyValueType.DATE_TIME);
-        hasModifiedDate.setPropertyValueHint(PropertyValueHint.DATE_TIME);
 
         hasDepositDate.setLabel("Deposit Date");
         hasDepositDate
@@ -357,7 +355,6 @@ public class DcsBOProfile
         hasDepositDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasDepositDate"));
         hasDepositDate.setPropertyValueType(PropertyValueType.DATE_TIME);
-        hasDepositDate.setPropertyValueHint(PropertyValueHint.DATE_TIME);
 
         hasPublicationDate.setLabel("Publication Date");
         hasPublicationDate
@@ -365,7 +362,6 @@ public class DcsBOProfile
         hasPublicationDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasPublicationDate"));
         hasPublicationDate.setPropertyValueType(PropertyValueType.DATE_TIME);
-        hasPublicationDate.setPropertyValueHint(PropertyValueHint.DATE_TIME);
 
         hasDiscipline.setLabel("Discipline");
         hasDiscipline
@@ -450,7 +446,6 @@ public class DcsBOProfile
         hasStartDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasStartDate"));
         hasStartDate.setPropertyValueType(PropertyValueType.DATE_TIME);
-        hasStartDate.setPropertyValueHint(PropertyValueHint.DATE_TIME);
 
         hasEndDate.setLabel("End Date");
         hasEndDate
@@ -458,7 +453,6 @@ public class DcsBOProfile
         hasEndDate.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasEndDate"));
         hasEndDate.setPropertyValueType(PropertyValueType.DATE_TIME);
-        hasEndDate.setPropertyValueHint(PropertyValueHint.DATE_TIME);
 
         hasFundingEntity.setLabel("Funding Entity");
         hasFundingEntity
