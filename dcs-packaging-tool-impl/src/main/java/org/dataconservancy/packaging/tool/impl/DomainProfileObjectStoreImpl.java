@@ -78,15 +78,29 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
     }
 
     @Override
-    public void removeObject(URI object) {
-        Resource res = as_resource(object);
+    public void deleteObject(Node node) {
+        if (node.getDomainObject() == null) {
+            return;
+        }
+        
+        // Remove relations to parent in domain
+        
+        Node parent = node.getParent();
+        
+        if (parent != null) {
+            clear_relations(node.getDomainObject(), parent.getDomainObject());
+        }
 
-        // Remove statements defining object
-
+        // Remove properties of the domain object
+        
+        Resource res = as_resource(node.getDomainObject());
         res.listProperties().toList().forEach(s -> remove_property(res, s.getPredicate(), s.getObject()));
+        
+        // Remove relations to children in domain
 
-        // Remove all statements about this object
-        model.removeAll(null, null, res);
+        if (node.hasChildren()) {
+            node.getChildren().forEach(child -> clear_relations(node.getDomainObject(), child.getDomainObject()));
+        }
     }
 
     @Override

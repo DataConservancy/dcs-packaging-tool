@@ -53,8 +53,9 @@ public class DomainProfileObjectStoreImplTest {
         test_update_object(ipmfactory.createTwoDirectoryTree());
         test_update_object(ipmfactory.createSimpleTree());
         test_update_object(ipmfactory.createSimpleTree2());
+        test_update_object(ipmfactory.createSimpleTree3());
     }
-
+    
     /**
      * Check updating existing objects with new types.
      */
@@ -92,6 +93,47 @@ public class DomainProfileObjectStoreImplTest {
         
         // Does not have old domain types
         profile.getCowNodeType().getDomainTypes().forEach(u -> assertFalse(store.hasRelationship(cow.getDomainObject(), URI.create(RDF.type.getURI()), u)));
+    }
+    
+    // Check that deleting all the objects of a tree removes all statements in the model. 
+    @Test
+    public void testDeleteObject() {
+        Node root = ipmfactory.createSimpleTree();        
+        root.walk(store::updateObject);
+        
+        assertTrue(model.size() > 0);
+        
+        root.walk(store::deleteObject);
+        
+        assertEquals(0, model.size());
+    }
+    
+    @Test
+    public void testMoveObject() {
+        Node root = ipmfactory.createSimpleTree();
+        root.walk(store::updateObject);
+        
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+
+        // Move media from cow to barn
+        
+        store.moveObject(media, null, barn);
+        
+        assertEquals(media.getNodeType().getIdentifier(), profile.getMediaNodeType().getIdentifier());
+        assertEquals(barn.getIdentifier(), media.getParent().getIdentifier());
+        assertTrue(barn.getChildren().contains(media));
+        assertFalse(cow.getChildren().contains(media));
+        
+        // Move cow to root and turn it into a farm
+        
+        store.moveObject(cow, profile.getFarmNodeType(), root);
+        
+        assertEquals(cow.getNodeType().getIdentifier(), profile.getFarmNodeType().getIdentifier());
+        assertEquals(root.getIdentifier(), cow.getParent().getIdentifier());
+        assertTrue(root.getChildren().contains(cow));
+        assertFalse(barn.getChildren().contains(cow));
     }
     
     @Test

@@ -36,11 +36,14 @@ public interface DomainProfileObjectStore {
     void updateObject(Node node);
 
     /**
-     * @param object
-     *            Remove all statements defining the object and about the
-     *            object.
+     * Delete the domain object of a node. Any relations between that domain
+     * object and the domain objects of its parent or child nodes are removed.
+     * The state of the node itself is not modified.
+     * 
+     * @param node
+     *            The node whose domain object should be deleted.
      */
-    void removeObject(URI object);
+    void deleteObject(Node node);
 
     /**
      * Move one node to another, optionally changing the type of the node, and
