@@ -67,7 +67,6 @@
   </bean>
 
   <!-- SERVICES AND BUILDERS -->
-  <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
   <bean id="packageDescriptionBuilder" class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
   <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
 
@@ -81,7 +80,6 @@
         <entry key="TEST" value-ref="testPackageGenerator" />
       </map>
     </property>
-    <property name="packageDescriptionValidator" ref="packageDescriptionValidator" />
   </bean>
 
   <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>

@@ -18,13 +18,15 @@ package org.dataconservancy.packaging.tool.impl;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerator;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
+import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
-import org.dataconservancy.packaging.tool.impl.generator.OrePackageModelBuilder;
 import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory;
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory;
-import org.dataconservancy.packaging.tool.model.*;
-
-import java.net.URI;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
+import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
 
 /**
  * <p>Bagit + ORE ReM package generator.</p>
@@ -65,7 +67,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
      * will be null.
      */
     @Override
-	public Package generatePackage(PackageDescription desc, PackageGenerationParameters params) {
+	public Package generatePackage(PackageState desc, PackageGenerationParameters params) {
         //check for format
         String formatId = params.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID, 0);
 
@@ -80,7 +82,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
 
         try {
             BagItPackageAssembler assembler = (BagItPackageAssembler)PackageAssemblerFactory.newAssembler(params);
-            OrePackageModelBuilder builder = (OrePackageModelBuilder)PackageModelBuilderFactory.newBuilder(desc, params);
+            PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(desc, params);
 
             if (assembler == null) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_OBJECT_INSTANTIATION_EXP, "Could not create " +
@@ -93,10 +95,6 @@ public class BOREMPackageGenerator implements PackageGenerator {
             }
 
             builder.buildModel(desc, assembler);
-
-            URI packageRemURI = builder.getPackageRemURI();
-
-            assembler.addParameter(BoremParameterNames.PKG_ORE_REM, packageRemURI.toString());
 
 
             //To support the cancelling of package creation we check here to see if the thread has been interrupted.

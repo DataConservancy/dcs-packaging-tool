@@ -15,13 +15,13 @@
  */
 package org.dataconservancy.packaging.tool.api;
 
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageState;
 
 /**
  * This is the format-specific package generator.
  * <p>
- * Given a {@link PackageDescription} describing package contents, the role of
+ * Given a {@link PackageState} describing package contents, the role of
  * the PackageGenerator is to produce an appropriate serialized package in some
  * format.
  * </p>
@@ -30,16 +30,16 @@ public interface PackageGenerator {
 
 	/**
 	 * Generate a package based upon the content specified in the
-	 * PackageDescription.
+	 * PackageState.
 	 * 
 	 * @param desc
-	 *            PackageDescription containing the content.
+	 *            PackageState containing the content.
 	 * @param params
 	 *            User-selected Package Generation preferences, may also contain
 	 *            ref to format-specific preferences/configuration.
 	 * @throws RuntimeException
 	 *             if there is a problem generating the package.
 	 */
-	public Package generatePackage(PackageDescription desc,
+	public Package generatePackage(PackageState desc,
 			PackageGenerationParameters params);
 }

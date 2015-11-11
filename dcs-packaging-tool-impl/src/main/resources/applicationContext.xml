@@ -36,12 +36,11 @@
     </property>
     <property name="arguments">
       <map key-type="java.lang.String" value-type="java.lang.Class">
-        <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value="org.dataconservancy.packaging.tool.impl.generator.OrePackageModelBuilder"/>
+        <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value="org.dataconservancy.packaging.tool.impl.generator.BagOreRemPackageModelBuilder"/>
       </map>
     </property>
   </bean>
 
-  <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
   <bean id="boremPackageGenerator" class="org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator" />
   <bean id="testPackageGenerator" class="org.dataconservancy.packaging.tool.impl.TestPackageGenerator" />
   <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
@@ -51,7 +50,6 @@
         <entry key="TEST" value-ref="testPackageGenerator" />
       </map>
     </property>
-    <property name="packageDescriptionValidator" ref="packageDescriptionValidator" />
   </bean>
 
 </beans>

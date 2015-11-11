@@ -29,7 +29,7 @@ import java.net.URI;
  * The package assembler allows for the creation of named resources within a
  * logical package, and the ultimate assembly of these resources into a final,
  * physical packaged form.
- * <p>
+ * </p>
  */
 public interface PackageAssembler {
 
@@ -60,6 +60,7 @@ public interface PackageAssembler {
      *        the package.
      * @param type
      *        Resource type (e.g. data, metadata, etc).
+     * @return URI of reserved resource
      */
     URI reserveResource(String path, PackageResourceType type);
 
@@ -101,6 +102,7 @@ public interface PackageAssembler {
      *        Resource type (e.g. data, metadata, etc).
      * @param content
      *        InputStream containing the content of the resource.
+     * @return URI of created resource
      */
     URI createResource(String path,
                        PackageResourceType type,
@@ -123,6 +125,7 @@ public interface PackageAssembler {
      * that this method may imply some sort of finalization or cleanup of
      * resources used in building the package.
      * </p>
+     * @return a Package
      */
     public org.dataconservancy.packaging.tool.api.Package assemblePackage();
 

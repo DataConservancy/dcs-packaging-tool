@@ -17,8 +17,8 @@ package org.dataconservancy.packaging.tool.impl;
 
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerator;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageState;
 
 /**
  * Test package generator
@@ -33,7 +33,7 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 public class TestPackageGenerator implements PackageGenerator {
 
 	@Override
-	public Package generatePackage(PackageDescription desc,
+	public Package generatePackage(PackageState desc,
 			PackageGenerationParameters prefs) {
 		throw new UnsupportedOperationException(
 				"Test package generator not implemented");

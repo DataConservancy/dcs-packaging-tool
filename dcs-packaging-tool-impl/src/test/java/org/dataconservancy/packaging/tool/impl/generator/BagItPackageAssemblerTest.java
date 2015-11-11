@@ -15,7 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -52,7 +52,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
