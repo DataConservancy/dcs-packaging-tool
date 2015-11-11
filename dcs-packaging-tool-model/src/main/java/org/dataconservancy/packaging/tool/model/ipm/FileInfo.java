@@ -58,7 +58,13 @@ public class FileInfo {
 
                 List<DetectedFormat> fileFormats = ContentDetectionService.getInstance().detectFormats(path.toFile());
                 for (DetectedFormat format : fileFormats) {
-                    formats.add(createFormatURIString(format));
+                    if (format.getId() != null && !format.getId().isEmpty()) {
+                        formats.add(createFormatURIString(format));
+                    }
+
+                    if (format.getMimeType() != null && !format.getMimeType().isEmpty()) {
+                        formats.add(format.getMimeType());
+                    }
                 }
             }
         } catch (IOException e) {
@@ -311,8 +317,6 @@ public class FileInfo {
         String formatString = "";
         if (format.getId() != null && !format.getId().isEmpty()) {
             formatString = "info:pronom/" + format.getId();
-        } else if (format.getMimeType() != null && !format.getMimeType().isEmpty()) {
-            formatString = format.getMimeType();
         }
 
         return formatString;
