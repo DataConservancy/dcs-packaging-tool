@@ -26,6 +26,7 @@ import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
@@ -398,7 +399,50 @@ public class AnnotationDrivenPackageStateSerializerTest {
         });
 
         assertEquals(mockedMarshallerMap.size(), verifiedStreamCount.intValue());
+    }
 
+    @Test
+    public void testUnmarshalEntireState() throws Exception {
+        // First, create a state file to unmarshal
+        // 1. It must be a zip archive; unmarshalling a non-archive package state file isn't supported
+        // 2. We use the liveMarshallerMap; no mocks.
+        // 3. We use a live ArchiveStreamFactory
+        underTest.setArchive(true);
+        underTest.setMarshallerMap(liveMarshallerMap);
+        underTest.setArxStreamFactory(new ZipArchiveStreamFactory());
+        File tmp = File.createTempFile(this.getClass().getName() + "_UnmarshalEntireState", ".zip");
+        OutputStream out = new FileOutputStream(tmp);
+        underTest.serialize(state, out);
+        assertTrue(tmp.exists() && tmp.length() > 1);
+
+        // Verify that we wrote out a zip file.
+        final byte[] signature = new byte[12];
+        InputStream in = new BufferedInputStream(new FileInputStream(tmp));
+        in.mark(signature.length);
+        int bytesRead = org.apache.commons.compress.utils.IOUtils.readFully(in, signature);
+        assertTrue(ZipArchiveInputStream.matches(signature, bytesRead));
+        in.reset();
+
+        // Create a new instance of PackageState, and deserialize the zip archive created above, which contains the
+        // test objects from the {@link #state prepared instance} of PackageState
+        PackageState state = new PackageState();  // a new instance of PackageState with no internal state
+        underTest.deserialize(state, in);
+
+        Map<StreamId, PropertyDescriptor> pds = AnnotationDrivenPackageStateSerializer.getStreamDescriptors();
+        assertTrue(pds.size() > 0);
+        pds.keySet().stream().forEach(streamId -> {
+            try {
+                assertNotNull("Expected non-null value for PackageState field '" + pds.get(streamId).getName() + "', " +
+                                "StreamId '" + streamId + "'",
+                        pds.get(streamId).getReadMethod().invoke(state));
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                fail(e.getMessage());
+            }
+        });
+
+        IOUtils.closeQuietly(in);
+        IOUtils.closeQuietly(out);
+        FileUtils.deleteQuietly(tmp);
     }
 
     @Test
