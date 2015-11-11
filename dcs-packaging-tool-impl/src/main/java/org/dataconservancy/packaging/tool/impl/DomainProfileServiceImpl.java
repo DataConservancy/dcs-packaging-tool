@@ -152,7 +152,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
         if (tr.getInsertParentNodeType() != null) {
             Node new_parent = new Node(urigen.generateNodeURI());
-            
+
             objstore.moveObject(new_parent, tr.getInsertParentNodeType(), node.getParent());
             objstore.moveObject(node, tr.getResultNodeType(), new_parent);
         }
@@ -165,7 +165,8 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             }
 
             // Move children to parent, avoiding concurrent modification of
-            // children list also performs any child transformations on the moved children
+            // children list also performs any child transformations on the
+            // moved children
             if (node.hasChildren()) {
                 for (Node child : new ArrayList<>(node.getChildren())) {
                     objstore.moveObject(child, null, parent);
@@ -177,8 +178,11 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         if (tr.removeEmptyResult() && node.isLeaf() && !node.isRoot()) {
-            node.getParent().removeChild(node);
-            objstore.removeObject(node.getDomainObject());
+            if (!node.isRoot()) {
+                node.getParent().removeChild(node);
+            }
+
+            objstore.deleteObject(node);
         } else if (tr.getResultNodeType() != null
                 && !tr.getResultNodeType().getIdentifier().equals(node.getNodeType().getIdentifier())) {
             // Do result node transform if not removed and not already done
@@ -186,16 +190,17 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             node.setNodeType(tr.getResultNodeType());
             objstore.updateObject(node);
         }
-        
+
         if (tr.getResultChildTransforms() != null && node.hasChildren()) {
             // For each child, do only first transform which matches
-            for (Node child: node.getChildren()) {
+            for (Node child : node.getChildren()) {
                 transformChildren(child, tr.getResultChildTransforms());
             }
         }
     }
 
-    //Runs the child transforms on the passed in child node. Applies the first applicable transform in the list.
+    // Runs the child transforms on the passed in child node. Applies the first
+    // applicable transform in the list.
     private void transformChildren(Node child, List<NodeTransform> childTransforms) {
         for (NodeTransform child_tr : childTransforms) {
             if (can_transform(child, child_tr)) {
@@ -235,35 +240,45 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         Node parent = node.getParent();
         List<NodeConstraint> child_constraints = tr.getSourceChildConstraints();
 
+        // Check against node without ignored children
+
+        List<Node> kids = null;
+
+        if (node.hasChildren()) {
+            kids = new ArrayList<>(node.getChildren());
+            kids.removeIf(Node::isIgnored);
+        }
+
+        boolean is_leaf = kids == null || kids.isEmpty();
+
         if (child_constraints != null && !tr.getSourceChildConstraints().isEmpty()) {
-            if (node.isLeaf()) {
+            if (is_leaf) {
                 // Leaf node must have a matches none child constraint
-                
+
                 boolean matches_none = false;
-                
-                for (NodeConstraint nc: child_constraints) {
+
+                for (NodeConstraint nc : child_constraints) {
                     if (nc.matchesNone()) {
                         matches_none = true;
                     }
                 }
-                
+
                 if (!matches_none) {
                     return false;
                 }
             } else {
                 // Each child must meet at least one child constraint
-                
-                for (Node child : node.getChildren()) {
+
+                for (Node child : kids) {
                     boolean meets_constraint = false;
-                    
-                    for (NodeConstraint nc: child_constraints) {
-                        if (meets_type_constraint(child, nc)
-                                && meets_parent_relation_constraint(child, node, nc)) {
+
+                    for (NodeConstraint nc : child_constraints) {
+                        if (meets_type_constraint(child, nc) && meets_parent_relation_constraint(child, node, nc)) {
                             meets_constraint = true;
                             break;
                         }
                     }
-                    
+
                     if (!meets_constraint) {
                         return false;
                     }
@@ -285,6 +300,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public boolean validateTree(Node node) {
+        if (node.isIgnored()) {
+            return false;
+        }
+
         if (!is_valid(node)) {
             return false;
         }
@@ -294,7 +313,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         for (Node child : node.getChildren()) {
-            if (!validateTree(child)) {
+            if (!child.isIgnored() && !validateTree(child)) {
                 return false;
             }
         }
@@ -408,7 +427,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (type == null) {
             return false;
         }
-        
+
         if (node.getDomainObject() == null) {
             return false;
         }
@@ -422,7 +441,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         if (constraints == null || constraints.isEmpty()) {
             return true;
         }
-        
+
         // Parent must meet one constraint
 
         Node parent = node.getParent();
@@ -485,10 +504,19 @@ public class DomainProfileServiceImpl implements DomainProfileService {
 
     @Override
     public boolean assignNodeTypes(DomainProfile profile, Node node) {
+        if (node.isIgnored()) {
+            throw new IllegalArgumentException("Cannot assign types to ignored node.: " + node.getIdentifier());
+        }
+        
         boolean success = assign_node_types(profile, node);
 
         if (success) {
-            node.walk(objstore::updateObject);
+            // Do not create domain objects for ignored nodes.
+            node.walk(n -> { 
+                if (!n.isIgnored()) {
+                    objstore.updateObject(n);
+                }
+            });
         }
 
         return success;
@@ -510,7 +538,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             node.setNodeType(nt);
 
             for (Node child : node.getChildren()) {
-                if (!assign_node_types(profile, child)) {
+                if (!child.isIgnored() && !assign_node_types(profile, child)) {
                     continue next;
                 }
             }
@@ -519,5 +547,12 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         return false;
+    }
+
+    @Override
+    public void removeDomainObject(Node node) {
+        if (node.getDomainObject() != null) {
+            objstore.deleteObject(node);
+        }
     }
 }

@@ -56,8 +56,11 @@ public interface DomainProfileService {
 
     /**
      * Gets all properties on the node of the given property type.
-     * @param node The node whose properties should be returned.
-     * @param type The type of node to get the properties for.
+     * 
+     * @param node
+     *            The node whose properties should be returned.
+     * @param type
+     *            The type of node to get the properties for.
      * @return All properties of the given type on the node.
      */
     List<Property> getProperties(Node node, PropertyType type);
@@ -74,6 +77,16 @@ public interface DomainProfileService {
      * @return valid or invalid
      */
     boolean validateProperties(Node node, NodeType type);
+
+    /**
+     * Remove domain object associated with node. The node itself is not
+     * modified. Removing the domain object of a node which is not ignored
+     * will make the tree invalid.
+     * 
+     * @param node
+     *            The node whose domain object should be removed.
+     */
+    void removeDomainObject(Node node);
 
     /**
      * Transform a node. The tree must be valid before a transform and will be
@@ -95,7 +108,9 @@ public interface DomainProfileService {
 
     /**
      * Check if a tree satisfies all its node constraints. Such a tree must also
-     * have domain objects with the correct relations.
+     * have domain objects with the correct relations. A tree is invalid if the
+     * root is an ignored node. Otherwise ignored nodes are not considered when
+     * checking validity.
      * 
      * @param root
      *            The root node of the tree to validate.
@@ -106,7 +121,8 @@ public interface DomainProfileService {
     /**
      * Attempt to assign node types to a tree such that it is valid with respect
      * to node types. Only the node and its descendants will have types
-     * assigned.
+     * assigned. Ignored nodes do not have types assigned and are treated as if
+     * they do not exist.
      * 
      * The parent of the node must either not exist or be part of a valid tree.
      * 

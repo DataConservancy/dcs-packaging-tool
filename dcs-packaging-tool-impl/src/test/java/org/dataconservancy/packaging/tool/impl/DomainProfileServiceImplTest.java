@@ -123,6 +123,34 @@ public class DomainProfileServiceImplTest {
 
         assertTrue(service.validateTree(root));
     }
+    
+    /**
+     * A tree consisting of three directories and a file.
+     * The third directory and file are ignored.
+     */
+    @Test
+    public void testAssignSimpleWithIgnoredNodes() {
+        Node root = ipmfact.createSimpleTree();
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+        
+        cow.setIgnored(true);
+        media.setIgnored(true);
+
+        root.walk(Node::clearNodeTypes);
+
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertTrue(success);
+
+        assertTrue(service.validateTree(root));
+        
+        assertNull(cow.getNodeType());
+        assertNull(cow.getDomainObject());
+        assertNull(media.getNodeType());
+        assertNull(media.getDomainObject());
+    }
 
     /**
      * A tree consisting of two directories and two files.
@@ -288,6 +316,30 @@ public class DomainProfileServiceImplTest {
         root.setNodeType(null);
 
         assertFalse(service.validateTree(root));
+    }
+    
+    @Test
+    public void testValidateTreeWithIgnoredNodes() {
+        Node root = ipmfact.createSimpleTree();
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+        
+        root.walk(store::updateObject);
+
+        // Root of tree cannot be ignored
+        assertTrue(service.validateTree(root));
+        root.setIgnored(true);
+        assertFalse(service.validateTree(root));
+        
+        // Any other nodes may be ignored
+        root.setIgnored(false);
+        cow.setIgnored(true);
+        barn.setIgnored(true);;
+        cow.setIgnored(true);
+        media.setIgnored(true);
+        
+        assertTrue(service.validateTree(root));
     }
 
     // Tree must have domain objects to be valid
@@ -485,5 +537,32 @@ public class DomainProfileServiceImplTest {
         assertEquals(trough.getIdentifier(), feed.getParent().getIdentifier());
         
         assertTrue(service.validateTree(farm));
+    }
+    
+    /**
+     * Test the ability to delete domain objects of nodes.
+     */
+    @Test
+    public void testDeleteDomainObjects() {
+        Node root = ipmfact.createSimpleTree3();
+        
+        root.walk(store::updateObject);
+        
+        // Add a complex property to root node
+        Property person = new Property(profile.getFarmerPropertyType());
+        Property name = new Property(profile.getNamePropertyType());
+        name.setStringValue("Farmer Jim");
+        person.setComplexValue(Arrays.asList(name));
+
+        service.addProperty(root, person);
+        
+        assertTrue(model.size() > 0);
+        
+        assertTrue(service.validateTree(root));
+        
+        root.walk(store::deleteObject);
+        
+        assertEquals(0, model.size());
+        assertFalse(service.validateTree(root));
     }
 }
