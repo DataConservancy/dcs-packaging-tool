@@ -69,29 +69,30 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
 
         view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
         HeaderView headerView = new HeaderViewImpl();
-        view.setProfileService(profileService);
         view.setIpmService(ipmService);
         view.setHeaderView(headerView);
         view.setHelp(help);
 
-        PackageState state = new PackageState();
-        state.setPackageTree(project);
-
         Controller controller = new Controller() {
-            @Override
-            public PackageState getPackageState() {
-                return state;
-            }
             @Override
             public File showSaveFileDialog(FileChooser chooser) {
                 return null;
+            }
+
+            @Override
+            public DomainProfileService getDomainProfileService() {
+                return profileService;
+            }
+
+            @Override
+            public Node getPackageTree() {
+                return project;
             }
         };
 
         presenter = new EditPackageContentsPresenterImpl(view);
         presenter.setController(controller);
         presenter.setInternalProperties(internalProperties);
-        presenter.setProfileService(profileService);
         presenter.setIpmService(ipmService);
     }
     

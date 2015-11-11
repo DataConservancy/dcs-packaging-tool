@@ -37,12 +37,6 @@ import java.util.Set;
 public interface EditPackageContentsPresenter extends Presenter {
 
     /**
-     * Sets the domain profile service that is used for determining property and relationship types, as well as acceptable artifact types.
-     * @param profileService the ProfileService
-     */
-    void setProfileService(DomainProfileService profileService);
-
-    /**
      * Sets the ipm service that's used for manipulating the tree.
      * @param ipmService the ipmService
      */

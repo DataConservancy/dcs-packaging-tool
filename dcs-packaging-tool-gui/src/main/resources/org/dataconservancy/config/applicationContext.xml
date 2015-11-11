@@ -97,15 +97,6 @@
 
   <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
 
-  <bean id="domainProfileObjectStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl">
-    <constructor-arg ref="uriGenerator"/>
-  </bean>
-
-  <bean id="profileService" class="org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl">
-    <constructor-arg ref="domainProfileObjectStore"/>
-    <constructor-arg ref="uriGenerator"/>
-  </bean>
-
   <bean id="propertyFormatService" class="org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl"/>
 
   <bean id="ipmService" class="org.dataconservancy.packaging.tool.impl.IPMServiceImpl">
@@ -151,7 +142,6 @@
     <constructor-arg ref="internalProperties"/>
     <constructor-arg value="${defaultRelationships.file}"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
-    <property name="profileService" ref="profileService"/>
     <property name="ipmService" ref="ipmService"/>
     <property name="headerView" ref="headerView"/>
     <property name="help" ref="help"/>
@@ -175,7 +165,6 @@
   <bean id="createNewPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.CreateNewPackagePresenterImpl">
     <constructor-arg ref="createNewPackageView" />
     <property name="controller" ref="controller" />
-    <property name="profileService" ref="profileService"/>
     <property name="ipmService" ref="ipmService"/>
     <property name="internalProperties" ref="internalProperties"/>
   </bean>
@@ -183,7 +172,6 @@
   <bean id="editPackageContentsPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.EditPackageContentsPresenterImpl">
     <constructor-arg ref="editPackageContentsView" />
     <property name="controller" ref="controller" />
-    <property name="profileService" ref="profileService" />
     <property name="ipmService" ref="ipmService"/>
     <property name="propertyFormatService" ref="propertyFormatService"/>
     <property name="internalProperties" ref="internalProperties"/>
@@ -228,6 +216,7 @@
     <property name="toolBuildRevision" value="${build.revision}"/>
     <property name="domainProfileStore" ref="domainProfileStore"/>
     <property name="packageStateSerializer" ref="packageStateSerializer"/>
+    <property name="uriGenerator" ref="uriGenerator"/>
   </bean>
 
 

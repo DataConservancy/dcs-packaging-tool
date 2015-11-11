@@ -51,7 +51,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     private FileChooser fileChooser;
 
     private IPMService ipmService;
-    private DomainProfileService profileService;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -102,7 +101,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                     ipmBuilderService.setOnSucceeded(workerStateEvent -> {
                         Node rootNode = (Node) workerStateEvent.getSource().getValue();
-                        controller.getPackageState().setPackageTree(rootNode);
+                        controller.setPackageTree(rootNode);
                         ipmBuilderService.reset();
                         controller.goToNextPage();
                     });
@@ -179,11 +178,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     }
 
     @Override
-    public void setProfileService(DomainProfileService profileService){
-        this.profileService = profileService;
-    }
-
-    @Override
     public void setIpmService(IPMService ipmService) {
         this.ipmService = ipmService;
     }
@@ -207,7 +201,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 @Override
                 protected Node call() throws Exception {
                     Node root = ipmService.createTreeFromFileSystem(root_artifact_dir.toPath());
-                    profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), root);
+                    controller.initializeDomainStoreAndServices(null);
+                    controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), root);
 
                     return root;
                 }

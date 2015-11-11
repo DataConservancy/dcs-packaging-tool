@@ -29,15 +29,25 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl;
+import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
+import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
+import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -62,6 +72,10 @@ public class Controller {
     private String packageStateFileExtension=".zip";
 
     private DomainProfileStore domainProfileStore;
+    private IpmRdfTransformService ipmRdfTransformService;
+    private Node packageTree;
+    private DomainProfileService domainProfileService;
+    private URIGenerator uriGenerator;
 
     /**
      * Application-scope metadata
@@ -94,6 +108,7 @@ public class Controller {
         createNewPackagePagesStack = new Stack<>();
         openExistingPackagePagesStack = new Stack<>();
         toolVersion = new ApplicationVersion();
+        ipmRdfTransformService = new IpmRdfTransformService();
         packageStateFileChooser = new FileChooser();
         packageStateFileChooser.setInitialFileName(packageStateFileExtension);
         initiatePagesStacks();
@@ -369,14 +384,22 @@ public class Controller {
         }
     }
 
-    public void savePackageStateFile() throws IOException {
-        packageStateFile=showSaveFileDialog(packageStateFileChooser);
-        if(packageStateFile != null) {
-            packageStateFileChooser.setInitialDirectory(packageStateFile.getParentFile());
-            packageStateFileChooser.setInitialFileName(packageStateFile.getName());
-            FileOutputStream fs = new FileOutputStream(packageStateFile);
-            packageStateSerializer.serialize(getPackageState(), fs);
-            fs.close();
+    public void savePackageStateFile() throws IOException, RDFTransformException {
+        if (packageState != null) {
+
+            //Convert the package node tree to rdf to set on the state.
+            if (packageTree != null) {
+                packageState.setPackageTree(ipmRdfTransformService.transformToRDF(packageTree));
+            }
+
+            packageStateFile = showSaveFileDialog(packageStateFileChooser);
+            if (packageStateFile != null) {
+                packageStateFileChooser.setInitialDirectory(packageStateFile.getParentFile());
+                packageStateFileChooser.setInitialFileName(packageStateFile.getName());
+                FileOutputStream fs = new FileOutputStream(packageStateFile);
+                packageStateSerializer.serialize(getPackageState(), fs);
+                fs.close();
+            }
         }
     }
 
@@ -483,5 +506,41 @@ public class Controller {
 
     public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer){
         this.packageStateSerializer = packageStateSerializer;
+    }
+
+    public Node getPackageTree() {
+        return packageTree;
+    }
+
+    public void setPackageTree(Node packageTree) {
+        this.packageTree = packageTree;
+    }
+
+    /**
+     * Initializes the DomainProfileObjectStore and the DomainProfileService.
+     * Note: DomainProfileService is not set until this method is called.
+     * @param existingModel The existing model to use for the object store, if null a new one will be created.
+     */
+    public void initializeDomainStoreAndServices(Model existingModel) {
+        DomainProfileObjectStore store;
+
+        if (existingModel == null) {
+            Model objectModel = ModelFactory.createDefaultModel();
+            store = new DomainProfileObjectStoreImpl(objectModel, uriGenerator);
+            packageState.setDomainObjectRDF(objectModel);
+        } else {
+            store = new DomainProfileObjectStoreImpl(existingModel, uriGenerator);
+            packageState.setDomainObjectRDF(existingModel);
+        }
+
+        domainProfileService = new DomainProfileServiceImpl(store, uriGenerator);
+    }
+
+    public DomainProfileService getDomainProfileService() {
+        return domainProfileService;
+    }
+
+    public void setUriGenerator(URIGenerator uriGenerator) {
+        this.uriGenerator = uriGenerator;
     }
 }

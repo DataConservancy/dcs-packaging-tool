@@ -111,15 +111,10 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
 
         Factory factory = new Factory();
         factory.setConfiguration(configuration);
-        
+
         PackageState state = new PackageState();
-        state.setPackageTree(project);
 
         controller = new Controller() {
-            @Override
-            public PackageState getPackageState() {
-               return state;
-            }
 
             @Override
             public File showSaveFileDialog(FileChooser chooser) {
@@ -134,14 +129,23 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
             public void showGeneratePackage() {
                 goToNextPage = true;
             }
+
+            @Override
+            public DomainProfileService getDomainProfileService() {
+                return profileService;
+            }
+
+            @Override
+            public PackageState getPackageState() {
+                return state;
+            }
         };
 
         controller.setFactory(factory);
-        controller.setPackageState(state);
+        controller.setPackageTree(project);
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
         view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
-        view.setProfileService(profileService);
         view.setIpmService(ipmService);
 
         HeaderView headerView = new HeaderViewImpl();
@@ -151,7 +155,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         
         presenter = new EditPackageContentsPresenterImpl(view);
         presenter.setController(controller);
-        presenter.setProfileService(profileService);
         presenter.setInternalProperties(internalProperties);
 
         // Setup controller to handle going to the next page.
