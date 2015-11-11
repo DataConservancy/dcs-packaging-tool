@@ -18,6 +18,8 @@
 
 package org.dataconservancy.packaging.tool.ser;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.oxm.support.AbstractMarshaller;
@@ -30,6 +32,8 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -133,7 +137,8 @@ public class JenaModelSerializer extends AbstractMarshaller {
     @Override
     protected void marshalOutputStream(Object o, OutputStream outputStream) throws XmlMappingException, IOException {
         Model model = (Model) o;
-        model.write(outputStream, lang, base);
+        // Prevent Jena writers from closing the output stream
+        model.write(new CloseShieldOutputStream(outputStream), lang, base);
     }
 
     /**
@@ -146,8 +151,37 @@ public class JenaModelSerializer extends AbstractMarshaller {
     @Override
     protected Object unmarshalInputStream(InputStream inputStream) throws XmlMappingException, IOException {
         Model model = modelFactory.newModel();
-        model.read(inputStream, base, lang);
+        // Prevent Jena readers from closing the input stream
+        model.read(new CloseShieldInputStream(inputStream), base, lang);
         return model;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Overridden in this implementation to always unmarshal an {@code InputStream} if it is available from {@code
+     * streamSource}, instead of wrapping it with a SAX {@code InputSource}.
+     * </p>
+     *
+     * @param streamSource {@inheritDoc}
+     * @return {@inheritDoc}
+     * @throws XmlMappingException {@inheritDoc}
+     * @throws IOException {@inheritDoc}
+     */
+    @Override
+    protected Object unmarshalStreamSource(StreamSource streamSource) throws XmlMappingException, IOException {
+        InputStream in = streamSource.getInputStream();
+        if (in != null) {
+            return unmarshalInputStream(in);
+        }
+
+        Reader r = streamSource.getReader();
+        if (r != null) {
+            return unmarshalReader(streamSource.getReader());
+        }
+
+
+        return unmarshalSaxSource(new SAXSource(new InputSource(streamSource.getSystemId())));
     }
 
     /**
