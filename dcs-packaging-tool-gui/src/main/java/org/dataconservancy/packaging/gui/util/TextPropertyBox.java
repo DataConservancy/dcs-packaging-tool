@@ -16,16 +16,15 @@
 
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.scene.Node;
 import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
-
-import java.time.LocalDate;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 
 /**
  * A text widget with a label and text input control, with possibility of adding validation to the text property
@@ -34,13 +33,13 @@ import java.time.LocalDate;
  * to the size of the VBox will necessitate adjusting the PropertyValidationListener class, which relies on the size
  * of the VBox in order to control presentation of this Label element.
  */
-public class TextPropertyBox extends VBox {
-    private Control propertyInput;
+public class TextPropertyBox extends VBox implements PropertyBox {
+    private TextInputControl propertyInput;
     private HBox propertyInputBox = new HBox(4);
     private Label validationImageLabel = new Label();
 
     /**
-     * Creates a non-validating property box for a property, with an initial String value
+     * Creates a validating property box for a property, with an initial String value
      * @param initialValue the intial value of the property
      * @param isEditable  indicates whether the text input control should be user-editable
      * @param helpText the help text for the field if any exists
@@ -65,7 +64,7 @@ public class TextPropertyBox extends VBox {
     public TextPropertyBox(TextField textField, PropertyValueHint validationType){
         propertyInput = textField;
         if(validationType != null) {
-            ((TextInputControl)propertyInput).textProperty().addListener(new PropertyValidationListener(this, validationType));
+            propertyInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
         }
         propertyInputBox.getChildren().add(propertyInput);
         propertyInputBox.getChildren().add(validationImageLabel);
@@ -74,52 +73,52 @@ public class TextPropertyBox extends VBox {
 
     private void createPropertyValueWidget(boolean editable, Object initialValue, String helpText, PropertyValueHint valueHint){
         if (valueHint == null) {
-            propertyInput = ControlFactory.createControl(ControlType.TEXT_FIELD, initialValue, helpText);
-            ((TextInputControl) propertyInput).setEditable(editable);
-        } else if (valueHint.equals(PropertyValueHint.DATE_TIME)) {
-            propertyInput = ControlFactory.createControl(ControlType.DATE_PICKER, initialValue, helpText);
-            propertyInput.setDisable(!editable);
+            propertyInput = (TextInputControl) ControlFactory.createControl(ControlType.TEXT_FIELD, initialValue, helpText);
+            propertyInput.setEditable(editable);
         } else if (valueHint.equals(PropertyValueHint.MULTI_LINE_TEXT)) {
-            propertyInput = ControlFactory.createControl(ControlType.TEXT_AREA, initialValue, helpText);
-            ((TextInputControl) propertyInput).setEditable(editable);
+            propertyInput = (TextInputControl) ControlFactory.createControl(ControlType.TEXT_AREA, initialValue, helpText);
+            propertyInput.setEditable(editable);
         } else {
-            propertyInput = ControlFactory.createControl(ControlType.TEXT_FIELD, initialValue, helpText);
-            ((TextInputControl) propertyInput).textProperty().addListener(new PropertyValidationListener(this, valueHint));
-            ((TextInputControl) propertyInput).setEditable(editable);
+            propertyInput = (TextInputControl) ControlFactory.createControl(ControlType.TEXT_FIELD, initialValue, helpText);
+            propertyInput.textProperty().addListener(new PropertyValidationListener(this, valueHint));
+            propertyInput.setEditable(editable);
         }
 
     }
+
     /**
      * @return the value of the TextInputControl in the PropertyBox
      */
+    @Override
     public String getValueAsString() {
-        return ((TextInputControl) propertyInput).getText();
-    }
-
-    /**
-     * @return the vale of the DatePicker in the PropertyBox
-     */
-    public LocalDate getValueAsDate() {
-        return ((DatePicker) propertyInput).getValue();
+        return propertyInput.getText();
     }
 
     /**
      * @return the value of the property box as an object, it's up to the client to determine the type.
      */
+    @Override
     public Object getValue() {
-        if (propertyInput instanceof TextInputControl) {
-            return getValueAsString();
-        } else {
-            return getValueAsDate();
-        }
+        return getValueAsString();
     }
 
     /**
      * Gets the text input control used to enter values, this allows externally setting listeners on the control.
      * @return The text input control for the PropertyBox.
      */
+    @Override
     public Control getPropertyInput() {
         return propertyInput;
+    }
+
+    @Override
+    public PropertyValueType getPropertyBoxValueType() {
+        return PropertyValueType.STRING;
+    }
+
+    @Override
+    public Node getView() {
+        return this;
     }
 }
 

@@ -9,5 +9,6 @@ public enum ControlType {
         TEXT_AREA,
         TEXT_FIELD,
         TEXT_FIELD_W_REMOVABLE_LABEL,
-        DATE_PICKER
+        DATE_PICKER,
+        NUMERIC
 }

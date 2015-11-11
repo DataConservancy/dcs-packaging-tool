@@ -69,8 +69,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
     private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
     List<RelationshipGroup> availableRelationshipGroups;
-    Map<String, List<String>> availableDisciplines;
-
+    private DisciplineLoadingService disciplineLoadingService;
     private ApplyButtonValidationListener applyButtonValidationListener;
     private DomainProfileService profileService;
 
@@ -87,7 +86,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         this.applyPopupButton = applyPopupButton;
 
         applyButtonValidationListener = new ApplyButtonValidationListener(applyPopupButton);
-        availableDisciplines = disciplineLoadingService.getAllDisciplines();
+        this.disciplineLoadingService = disciplineLoadingService;
         loadAvailableRelationships(availableRelationshipsPath);
     }
 
@@ -434,7 +433,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         }
 
         void addProperty(PropertyConstraint constraint, Node node) {
-            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService);
+            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService, disciplineLoadingService);
             nodePropertyBoxes.add(profilePropertyBox);
             getChildren().add(profilePropertyBox);
         }

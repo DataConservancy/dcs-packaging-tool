@@ -164,7 +164,22 @@ public class ControlFactory {
                     }
                 });
                 break;
-
+            case NUMERIC:
+                control = initialValue != null && initialValue instanceof String ? new NumericTextField((String)initialValue) : new NumericTextField();
+                control.setPrefWidth(textPrefWidth);
+                control.setOnMouseEntered(event -> {
+                    if (helpText != null && !helpText.isEmpty()) {
+                        if (control.getTooltip() == null) {
+                            Tooltip tooltip = new Tooltip(helpText);
+                            tooltip.setPrefWidth(350);
+                            tooltip.setWrapText(true);
+                            control.setTooltip(tooltip);
+                        } else {
+                            control.getTooltip().setText(helpText);
+                        }
+                    }
+                });
+                break;
             default:
                 throw new IllegalArgumentException("Unable to create a Control of unknown type: " + type.toString());
         }

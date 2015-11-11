@@ -18,68 +18,30 @@ package org.dataconservancy.packaging.gui.util;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.Control;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Widget for displaying combo boxes for selecting disciplines to add to an artifact.
  */
-public class DisciplinePropertyBox extends HBox {
+public class DisciplinePropertyBox extends HBox implements PropertyBox {
 
-    public DisciplinePropertyBox(String propertyLabel, Set<String> propertyValues, int maxOccurs, final Set<StringProperty> fields, int minOccurs, final boolean systemGenerated,
-                                 final Map<String, List<String>> availableDisciplines) {
+    private ComboBox<String> disciplineSelectionBox;
+
+    public DisciplinePropertyBox(String value, boolean editable, DisciplineLoadingService service, int prefWidth) {
         setAlignment(Pos.TOP_LEFT);
         setSpacing(30);
 
-        if (minOccurs > 0) {
-            propertyLabel += "*";
-        }
-
-        Label propertyNameLabel = new Label(propertyLabel);
-        propertyNameLabel.setMinWidth(84);
-        propertyNameLabel.setWrapText(true);
-        getChildren().add(propertyNameLabel);
-        boolean hasValue = false;
-
-        final Button addNewButton = new Button("+");
-        final EmptyFieldButtonDisableListener listener = new EmptyFieldButtonDisableListener(addNewButton);
-
-
-        final VBox propertyValuesBox = new VBox(24);
-        //If the property has values already add a text field for each one
-        if (propertyValues != null && !propertyValues.isEmpty()) {
-            for (String disciplineName : propertyValues) {
-                String disciplineGroup = findDisciplineGroup(disciplineName, availableDisciplines);
-
-                VBox disciplineSelectors = createDisciplineSelectors(availableDisciplines, systemGenerated, listener, addNewButton, fields, disciplineGroup, disciplineName);
-                propertyValuesBox.getChildren().add(disciplineSelectors);
-            }
-            hasValue = true;
-        //Otherwise create an empty text field for the value.
-        } else {
-            VBox disciplineSelectors = createDisciplineSelectors(availableDisciplines, systemGenerated, listener, addNewButton, fields, "", "");
-            propertyValuesBox.getChildren().add(disciplineSelectors);
-        }
-
-        getChildren().add(propertyValuesBox);
-
-        //If the ontology allows for more than one value on a property add a button to add more fields.
-        if (maxOccurs > 1) {
-            addNewButton.setDisable(!hasValue);
-            getChildren().add(addNewButton);
-
-            addNewButton.setOnAction(arg0 -> {
-                VBox disciplineSelectors = createDisciplineSelectors(availableDisciplines, systemGenerated, listener, addNewButton, fields, "", "");
-                propertyValuesBox.getChildren().add(disciplineSelectors);
-            });
-        }
+        final Map<String, List<String>> disciplineMap = service.getAllDisciplines();
+        getChildren().add(createDisciplineSelectors(disciplineMap, editable, findDisciplineGroup(value, service.getAllDisciplines()), value, prefWidth));
     }
 
     private String findDisciplineGroup(String discipline, Map<String, List<String>> disciplineMap) {
@@ -95,8 +57,7 @@ public class DisciplinePropertyBox extends HBox {
         return groupName;
     }
 
-    private VBox createDisciplineSelectors(final Map<String, List<String>> availableDisciplines, boolean systemGenerated, EmptyFieldButtonDisableListener listener,
-                                           Button addNewButton, Set<StringProperty> fields, String disciplineGroup, String disciplineValue) {
+    private VBox createDisciplineSelectors(final Map<String, List<String>> availableDisciplines, boolean editable, String disciplineGroup, String disciplineValue, int prefWidth) {
         VBox disciplineSelectors = new VBox(8);
 
         ComboBox<String> disciplineGroupBox = new ComboBox<>();
@@ -110,43 +71,63 @@ public class DisciplinePropertyBox extends HBox {
             disciplineGroupBox.setValue(disciplineGroup);
         }
 
-        disciplineGroupBox.setPrefWidth(ControlFactory.textPrefWidth);
-        disciplineGroupBox.setDisable(systemGenerated);
+        disciplineGroupBox.setPrefWidth(prefWidth);
+        disciplineGroupBox.setDisable(!editable);
 
         disciplineSelectors.getChildren().add(disciplineGroupBox);
 
-        final ComboBox<String> disciplineBox = new ComboBox<>();
+        disciplineSelectionBox = new ComboBox<>();
         List<String> startingGroup;
         if (disciplineGroup != null && !disciplineGroup.isEmpty()) {
             startingGroup = availableDisciplines.get(availableDisciplines.keySet().iterator().next());
-            disciplineBox.getItems().addAll(startingGroup);
+            disciplineSelectionBox.getItems().addAll(startingGroup);
         }
 
         if (disciplineValue != null && !disciplineValue.isEmpty()) {
-            disciplineBox.setValue(disciplineValue);
+            disciplineSelectionBox.setValue(disciplineValue);
         }
 
-        disciplineBox.setPrefWidth(ControlFactory.textPrefWidth);
-        disciplineBox.setDisable(systemGenerated);
-        disciplineBox.valueProperty().addListener(listener);
-        disciplineSelectors.getChildren().add(disciplineBox);
+        disciplineSelectionBox.setPrefWidth(prefWidth);
+        disciplineSelectionBox.setDisable(!editable);
+        disciplineSelectors.getChildren().add(disciplineSelectionBox);
 
         disciplineGroupBox.valueProperty().addListener((observableValue, oldValue, newValue) -> {
-            disciplineBox.getItems().clear();
+            disciplineSelectionBox.getItems().clear();
             if (availableDisciplines.get(newValue) != null) {
-                disciplineBox.getItems().addAll(availableDisciplines.get(newValue));
+                disciplineSelectionBox.getItems().addAll(availableDisciplines.get(newValue));
             }
         });
 
-        disciplineBox.valueProperty().addListener(listener);
-        addNewButton.setDisable(true);
         disciplineGroupBox.requestFocus();
 
         StringProperty propertyValue = new SimpleStringProperty();
-        propertyValue.bind(disciplineBox.valueProperty());
-        fields.add(propertyValue);
-
+        propertyValue.bind(disciplineSelectionBox.valueProperty());
 
         return disciplineSelectors;
+    }
+
+    @Override
+    public Object getValue() {
+        return disciplineSelectionBox.getValue();
+    }
+
+    @Override
+    public Control getPropertyInput() {
+        return disciplineSelectionBox;
+    }
+
+    @Override
+    public String getValueAsString() {
+        return disciplineSelectionBox.getValue();
+    }
+
+    @Override
+    public PropertyValueType getPropertyBoxValueType() {
+        return PropertyValueType.STRING;
+    }
+
+    @Override
+    public Node getView() {
+        return this;
     }
 }

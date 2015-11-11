@@ -23,6 +23,16 @@ import javafx.scene.control.TextField;
  */
 public class NumericTextField extends TextField
 {
+    public NumericTextField(String initialValue) {
+        super();
+        if (validate(initialValue)) {
+            super.setText(initialValue);
+        }
+    }
+
+    public NumericTextField() {
+        super();
+    }
 
     @Override
     public void replaceText(int start, int end, String text)

@@ -245,17 +245,34 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
                 PropertyValueType.COMPLEX) {
 
+
                 propertyBox.getValues().stream().filter(value -> value !=
                     null).forEach(value -> {
-                    if (value instanceof String) {
-                        if (!((String) value).isEmpty()) {
-                            Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                            profileService.addProperty(view.getPopupNode(), newProperty);
+                    if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() != null) {
+                        switch (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType()) {
+                            case DATE_TIME:
+                                Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                                newProperty.setDateTimeValue(new DateTime(((LocalDate) value).getYear(), ((LocalDate) value).getMonthValue(), ((LocalDate) value).getDayOfMonth(), 0, 0, 0));
+                                profileService.addProperty(view.getPopupNode(), newProperty);
+                                break;
+                            case LONG:
+                                newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                                newProperty.setLongValue((Long) value);
+                                profileService.addProperty(view.getPopupNode(), newProperty);
+                                break;
+                            default:
+                                if (!((String) value).isEmpty()) {
+                                    newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                                    profileService.addProperty(view.getPopupNode(), newProperty);
+                                }
                         }
-                    } else if (value instanceof LocalDate) {
-                        Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
-                        newProperty.setDateTimeValue(new DateTime(((LocalDate) value).getYear(), ((LocalDate) value).getMonthValue(), ((LocalDate) value).getDayOfMonth(), 0, 0, 0));
-                        profileService.addProperty(view.getPopupNode(), newProperty);
+                    } else {
+                        if (value instanceof String) {
+                            if (!((String) value).isEmpty()) {
+                                Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                                profileService.addProperty(view.getPopupNode(), newProperty);
+                            }
+                        }
                     }
                 });
 
