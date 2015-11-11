@@ -94,7 +94,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
                         "an instance of PackageModelBuilder for format " + formatId + ". One may not exist. ");
             }
 
-            builder.buildModel(desc, assembler);
+            builder.buildModel(packageState, assembler);
 
 
             //To support the cancelling of package creation we check here to see if the thread has been interrupted.

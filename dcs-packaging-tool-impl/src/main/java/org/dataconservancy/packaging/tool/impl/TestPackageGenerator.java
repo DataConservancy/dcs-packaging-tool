@@ -33,7 +33,6 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 public class TestPackageGenerator implements PackageGenerator {
 
 	@Override
-	public Package generatePackage(PackageState desc,
 	public Package generatePackage(PackageState packageState,
 			PackageGenerationParameters prefs) {
 		throw new UnsupportedOperationException(

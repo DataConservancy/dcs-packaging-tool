@@ -67,7 +67,7 @@ public class BasicPackageGenerationService implements PackageGenerationService {
 	}
 
 	@Override
-	public Package generatePackage(PackageState desc,
+	public Package generatePackage(PackageState packageState,
 			PackageGenerationParameters params) throws PackageToolException {
 
 		PackageGenerator generator;
@@ -89,7 +89,6 @@ public class BasicPackageGenerationService implements PackageGenerationService {
 
 		/* TODO:  Is there a means of validating PackageState? */
 
-		return generator.generatePackage(desc, params);
 		return generator.generatePackage(packageState, params);
 	}
 
