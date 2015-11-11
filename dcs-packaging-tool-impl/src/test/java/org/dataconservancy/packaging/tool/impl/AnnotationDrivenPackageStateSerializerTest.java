@@ -18,11 +18,13 @@
 
 package org.dataconservancy.packaging.tool.impl;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
@@ -48,12 +50,17 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
+import java.beans.PropertyDescriptor;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -251,18 +258,21 @@ public class AnnotationDrivenPackageStateSerializerTest {
         /*
          * Configure the live stream marshalling map with XStream converters
          */
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getMarshaller())
-                .setConverters(new ApplicationVersionConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getMarshaller())
-                .setConverters(new PackageNameConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getMarshaller())
-                .setConverters(new PackageMetadataConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller())
-                .setConverters(new ApplicationVersionConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getUnmarshaller())
-                .setConverters(new PackageNameConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getUnmarshaller())
-                .setConverters(new PackageMetadataConverter());
+
+        /* Marshallers */
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.USER_SPECIFIED_PROPERTIES).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.DOMAIN_PROFILE_LIST).getMarshaller()).getXStream());
+
+
+        /* Unmarshallers */
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.USER_SPECIFIED_PROPERTIES).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.DOMAIN_PROFILE_LIST).getUnmarshaller()).getXStream());
 
         /*
          * Configure the class under test with the mocked marshaller map, and the mock archive
@@ -317,7 +327,7 @@ public class AnnotationDrivenPackageStateSerializerTest {
     public void testSerializeStreamWithNullFieldInPackageState() throws Exception {
         state = new PackageState();
         StreamResult result = new StreamResult(new NullOutputStream());  // we're using mocks, so nothing will be
-                                                                         // written to the output stream
+        // written to the output stream
         assertNull(state.getCreationToolVersion());
 
         underTest.serializeToResult(state, StreamId.APPLICATION_VERSION, result);
@@ -412,7 +422,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
         ApplicationVersionConverter applicationVersionConverter = spy(new ApplicationVersionConverter());
         XStreamMarshaller xsm = (XStreamMarshaller) underTest.getMarshallerMap()
                 .get(StreamId.APPLICATION_VERSION).getMarshaller();
-        xsm.setConverters(applicationVersionConverter);
+        XStream x = xsm.getXStream();
+        x.registerConverter(applicationVersionConverter, XStream.PRIORITY_VERY_HIGH);  // because there is a non-spy
+                                                                                       // version of this already
+                                                                                       // registered in the configure
+                                                                                       // method
 
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         underTest.serialize(state, StreamId.APPLICATION_VERSION, result);
@@ -434,7 +448,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
         ApplicationVersionConverter applicationVersionConverter = spy(new ApplicationVersionConverter());
         XStreamMarshaller xsm = (XStreamMarshaller) underTest.getMarshallerMap()
                 .get(StreamId.APPLICATION_VERSION).getMarshaller();
-        xsm.setConverters(applicationVersionConverter);
+        XStream x = xsm.getXStream();
+        x.registerConverter(applicationVersionConverter, XStream.PRIORITY_VERY_HIGH);  // because there is a non-spy
+                                                                                       // version of this already
+                                                                                       // registered in the configure
+                                                                                       // method
 
         ByteArrayOutputStream result = new ByteArrayOutputStream();
 
@@ -485,4 +503,40 @@ public class AnnotationDrivenPackageStateSerializerTest {
         assertTrue(result.size() > 1);
     }
 
+    private XStream configure(XStream x) {
+        x.processAnnotations(PackageState.class);
+
+        /* APPLICATION_VERSION */
+        x.alias(StreamId.APPLICATION_VERSION.name(),
+                AbstractSerializationTest.TestObjects.applicationVersion.getClass());
+        PropertyDescriptor pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors()
+                .get(StreamId.APPLICATION_VERSION);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new ApplicationVersionConverter());
+
+        /* DOMAIN_PROFILE_LIST */
+        x.alias(StreamId.DOMAIN_PROFILE_LIST.name(),
+                 AbstractSerializationTest.TestObjects.domainProfileUris.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.DOMAIN_PROFILE_LIST);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new DomainProfileUriListConverter());
+
+        /* PACKAGE_METADATA */
+        x.alias(StreamId.PACKAGE_METADATA.name(),
+                 AbstractSerializationTest.TestObjects.packageMetadata.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.PACKAGE_METADATA);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new PackageMetadataConverter());
+
+        /* PACKAGE_NAME */
+        x.alias(StreamId.PACKAGE_NAME.name(),
+                 AbstractSerializationTest.TestObjects.packageName.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.PACKAGE_NAME);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new PackageNameConverter());
+
+        /* USER_SPECIFIED_PROPERTIES */
+        x.alias(StreamId.USER_SPECIFIED_PROPERTIES.name(),
+                 AbstractSerializationTest.TestObjects.userProperties.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.USER_SPECIFIED_PROPERTIES);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new UserPropertyConverter());
+
+        return x;
+    }
 }
