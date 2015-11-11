@@ -413,14 +413,26 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     void deserialize(PackageState state, StreamId streamId, ZipArchiveInputStream in) {
         ArchiveEntry entry = null;
         Object deserializedStream = null;
+        boolean all = streamId == null;
 
         // deserialize the specified stream identifier (or all stream identifiers if streamId is null) from the
         // inputStream to the package state
 
         try {
             while ((entry = (in.getNextEntry())) != null) {
-                if (streamId == null || streamId.name().equals(entry.getName())) {
+                if (all || streamId.name().equals(entry.getName())) {
+                    if (all) {
+                        streamId = StreamId.valueOf(entry.getName().toUpperCase());
+                    }
+
+                    if (!hasPropertyDescription(streamId)) {
+                        throw new NullPointerException(String.format(ERR_MISSING_DESCRIPTOR, streamId));
+                    }
+                    if (!hasUnmarshaller(streamId)) {
+                        throw new NullPointerException(String.format(ERR_MISSING_SPRINGMARSHALLER, streamId, streamId));
+                    }
                     deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+
                     propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
                 }
             }
@@ -586,6 +598,18 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                 });
 
         return results;
+    }
+
+    private boolean hasPropertyDescription(StreamId streamId) {
+        return propertyDescriptors.get(streamId) != null;
+    }
+
+    private boolean hasMarshaller(StreamId streamId) {
+        return marshallerMap.get(streamId).getMarshaller() != null;
+    }
+
+    private boolean hasUnmarshaller(StreamId streamId) {
+        return marshallerMap.get(streamId).getUnmarshaller() != null;
     }
 
     /**
