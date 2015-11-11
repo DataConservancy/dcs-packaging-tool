@@ -29,13 +29,16 @@ import org.apache.commons.io.output.NullOutputStream;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
+import org.dataconservancy.packaging.tool.ser.AbstractSerializationTest;
 import org.dataconservancy.packaging.tool.ser.AbstractXstreamTest;
 import org.dataconservancy.packaging.tool.ser.ApplicationVersionConverter;
 import org.dataconservancy.packaging.tool.ser.DefaultModelFactory;
+import org.dataconservancy.packaging.tool.ser.DomainProfileUriListConverter;
 import org.dataconservancy.packaging.tool.ser.JenaModelSerializer;
 import org.dataconservancy.packaging.tool.ser.PackageMetadataConverter;
 import org.dataconservancy.packaging.tool.ser.PackageNameConverter;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
+import org.dataconservancy.packaging.tool.ser.UserPropertyConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.oxm.Marshaller;
@@ -60,6 +63,7 @@ import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.T
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainProfileUris;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageMetadata;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.APPLICATION_VERSION_1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -150,6 +154,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setUnmarshaller(new JenaModelSerializer(new DefaultModelFactory()));
                 }
             });
+            put(StreamId.USER_SPECIFIED_PROPERTIES, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.USER_SPECIFIED_PROPERTIES);
+                    setMarshaller(new XStreamMarshaller());
+                    setUnmarshaller(new XStreamMarshaller());
+                }
+            });
         }
     };
 
@@ -201,6 +212,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setMarshaller(mock(Marshaller.class));
                 }
             });
+            put(StreamId.USER_SPECIFIED_PROPERTIES, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.USER_SPECIFIED_PROPERTIES);
+                    setUnmarshaller(mock(Unmarshaller.class));
+                    setMarshaller(mock(Marshaller.class));
+                }
+            });
         }
     };
 
@@ -228,6 +246,7 @@ public class AnnotationDrivenPackageStateSerializerTest {
         state.setPackageMetadataList(packageMetadata);
         state.setDomainProfileIdList(domainProfileUris);
         state.setDomainObjectRDF(domainObjectsRDF);
+        state.setUserSpecifiedProperties(userProperties);
 
         /*
          * Configure the live stream marshalling map with XStream converters
@@ -357,6 +376,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
                         verifiedStreamCount.incrementAndGet();
                         break;
 
+                    case USER_SPECIFIED_PROPERTIES:
+                        verify(streamMarshaller.getMarshaller())
+                                .marshal(eq(userProperties), isNotNull(Result.class));
+                        verifiedStreamCount.incrementAndGet();
+                        break;
                 }
             } catch (IOException e) {
                 fail("Encountered IOE: " + e.getMessage());
