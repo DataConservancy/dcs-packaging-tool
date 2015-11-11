@@ -73,6 +73,12 @@
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-ser</artifactId>
     </dependency>
+  
+    <dependency>
+      <groupId>org.ogce</groupId>
+      <artifactId>xpp3</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
