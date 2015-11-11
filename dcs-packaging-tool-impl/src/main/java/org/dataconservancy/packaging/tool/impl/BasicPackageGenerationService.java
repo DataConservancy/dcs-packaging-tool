@@ -90,6 +90,7 @@ public class BasicPackageGenerationService implements PackageGenerationService {
 		/* TODO:  Is there a means of validating PackageState? */
 
 		return generator.generatePackage(desc, params);
+		return generator.generatePackage(packageState, params);
 	}
 
 	private PackageGenerator getGenerator(PackagingFormat fmt) {

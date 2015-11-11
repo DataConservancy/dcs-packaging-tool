@@ -55,8 +55,8 @@ public class BOREMPackageGenerator implements PackageGenerator {
      * specified archiving and compression formats in the input {@code PackageGenerationParameters}. If the specified
      * formats are not recognized, the default "application/octet-stream" will be used.
      *
-     * @param desc
-     *            PackageDescription containing the content.
+     * @param packageState
+     *            a state object containing information about the package and its custodial content
      * @param params
      *            PackageGenerationParameters which are needed in or help inform the package generation process. Which
      *            parameters are required and which are optional depends on the implementations of the
@@ -67,7 +67,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
      * will be null.
      */
     @Override
-	public Package generatePackage(PackageState desc, PackageGenerationParameters params) {
+	public Package generatePackage(PackageState packageState, PackageGenerationParameters params) {
         //check for format
         String formatId = params.getParam(GeneralParameterNames.PACKAGE_FORMAT_ID, 0);
 
@@ -82,7 +82,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
 
         try {
             BagItPackageAssembler assembler = (BagItPackageAssembler)PackageAssemblerFactory.newAssembler(params);
-            PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(desc, params);
+            PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(packageState, params);
 
             if (assembler == null) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_OBJECT_INSTANTIATION_EXP, "Could not create " +

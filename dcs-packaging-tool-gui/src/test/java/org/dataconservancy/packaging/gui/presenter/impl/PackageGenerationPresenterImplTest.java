@@ -16,12 +16,18 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -39,6 +45,8 @@ import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.impl.PackageImpl;
 import org.dataconservancy.packaging.tool.model.*;
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -51,7 +59,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Tests that items are displayed correctly, packages generation success is handled correctly,
  * package generation errors are handled correctly.
  */
-@Ignore
 public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
     private PackageGenerationPresenterImpl presenter;
@@ -67,59 +74,34 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
     private File testFile = null;
     private File outputDirectory = null;
-    private File fakePDFile = null;
     private Controller controller;
+    private PackageState packageState;
+    private PackageGenerationParameters params;
 
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
     
     @Before
-    public void setup() throws IOException {
+    public void setup() throws IOException, URISyntaxException {
 
         outputChooserShown = false;
-        fakePDFile = tmpfolder.newFile("faker.json");
 
-        controller = new Controller() {
-            @Override
-            public void showHome(boolean clear) {
-            }
+        controller = mock(Controller.class);
+        when(controller.showOpenFileDialog(any())).thenReturn(testFile);
+        when(controller.showOpenDirectoryDialog(any())).thenReturn(outputDirectory);
 
-            @Override
-            public File showOpenFileDialog(FileChooser chooser) {
-                return testFile;
-            }
+        params = new PackageGenerationParameters();
 
-            @Override
-            public File showOpenDirectoryDialog(DirectoryChooser chooser) {
-                outputChooserShown = true;
-                return outputDirectory;
-            }
+        FileInfo fileInfo = mock(FileInfo.class);
+        when(fileInfo.getLocation()).thenReturn(tmpfolder.newFile().toURI());
+        Node packageTree = mock(Node.class);
+        when(packageTree.getFileInfo()).thenReturn(fileInfo);
+        when(controller.getPackageTree()).thenReturn(packageTree);
 
-            @Override
-            public PackageDescription getPackageDescription() {
-                return new PackageDescription();
-            }
+        packageState = mock(PackageState.class);
+        when(packageState.getPackageName()).thenReturn("packageName");
 
-            @Override
-            public File getPackageDescriptionFile() { return fakePDFile; }
-
-            @Override
-            public String getAvailableProjects() { return "MOO"; }
-        };
-        controller.setPackageState(new PackageState());
-
-        PackageDescriptionBuilder builder = new PackageDescriptionBuilder() {
-
-            @Override
-            public void serialize(PackageDescription packageDescription, OutputStream outputStream) throws PackageToolException {
-
-            }
-
-            @Override
-            public PackageDescription deserialize(InputStream inputStream) throws PackageToolException {
-                return new PackageDescription();
-            }
-        };
+        when(controller.getPackageState()).thenReturn(packageState);
 
         controller.setFactory(factory);
         factory.setController(controller);
@@ -136,38 +118,49 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         presenter = new PackageGenerationPresenterImpl(view);
         presenter.setPackageGenerationService(packageGenerationService);
         presenter.setPackageGenerationParametersBuilder(packageGenerationParamsBuilder);
-
         presenter.setController(controller);
     }
 
     /**
      * Ensure the presenter displays a node.
      */
-    @Ignore
     @Test
     public void testDisplay() {
         assertNotNull(presenter.display());
     }
 
     /**
-     * Ensure that event handlers do the right thing.
+     * Test that input values from GUI form are gathered  for package generation process.
      */
-    @Ignore
     @Test
-    public void testEventHandlers() {
+    public void testFormInputCollectedCorrectly() {
 
-        assertFalse(outputChooserShown);
-        view.getSelectOutputDirectoryButton().fire();
-        assertTrue(outputChooserShown);
+        presenter.display();
+        view.getArchiveToggleGroup().getToggles().get(1).setSelected(true);
+        String archiveChoice = view.getArchiveToggleGroup().getToggles().get(1).getUserData().toString();
+        view.getCompressionToggleGroup().getToggles().get(0).setSelected(true);
+        String compressionChoice = view.getCompressionToggleGroup().getToggles().get(0).getUserData().toString();
+        view.getSerializationToggleGroup().getToggles().get(1).setSelected(true);
+        String serializationChoice = view.getSerializationToggleGroup().getToggles().get(1).getUserData().toString();
+        view.getMd5CheckBox().setSelected(true);
+
+        view.getContinueButton().fire();
+        params = presenter.getGenerationParams();
+        assertEquals(1, params.getParam(GeneralParameterNames.ARCHIVING_FORMAT).size());
+        assertTrue(params.getParam(GeneralParameterNames.ARCHIVING_FORMAT).contains(archiveChoice));
+        assertEquals(1, params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).size());
+        assertTrue(params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).contains(compressionChoice));
+        assertEquals(1, params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).size());
+        assertTrue(params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).contains(serializationChoice));
+        System.out.println("test");
     }
 
-
     /**
-     * Tests that the builders throwing an exception is handled correctly
+     * Tests that status label is updated appropriately when package provided or configured generation parameters files
+     * could not be parsed
      *
      * @throws IOException
      */
-    @Ignore
     @Test
     public void testBuilderExceptions() throws IOException {
         presenter.setPackageGenerationParametersBuilder(new PackageGenerationParametersBuilder() {
@@ -197,7 +190,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
      *
      * @throws IOException
      */
-    @Ignore
+
     @Test
     public void testPackageGenerationError() throws IOException, InterruptedException {
         presenter.display();
@@ -225,15 +218,15 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         });
 
         outputDirectory = new File("./");
-        //view.getPackageNameField().textProperty().setValue("tempfile");
         view.getSelectOutputDirectoryButton().fire();
-
         assertFalse(view.getStatusLabel().isVisible());
 
         view.getContinueButton().fire();
 
         assertTrue(view.getStatusLabel().isVisible());
-        assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(), view.getStatusLabel().getText());
+        assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR)
+                + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(),
+                view.getStatusLabel().getText());
     }
 
     /**
@@ -245,7 +238,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     @Test
     public void testSuccessfulPackageGeneration() throws IOException, InterruptedException {
         //Check if what will become the package file already exists and if so delete it, this prevents the overwrite popup from appearing.
-        File createdFile = new File("./thePackage.tar.gz");
+        File createdFile = new File(presenter.getGenerationParams().getParam(GeneralParameterNames.PACKAGE_LOCATION).get(0),"thePackage.tar.gz");
         if (createdFile.exists()) {
             createdFile.delete();
         }
@@ -263,7 +256,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         pkgParams.addParam(GeneralParameterNames.PACKAGE_NAME, "thePackage");
         pkgParams.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "tar");
         pkgParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, "gz");
-        pkgParams.addParam(BagItParameterNames.PKG_BAG_DIR, "./thePackage.tar.gz");
 
         presenter.setTestBackgroundService();
 
@@ -288,7 +280,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         outputDirectory = new File("./");
 
-        //view.getPackageNameField().setText("thePackage");
         view.getStatusLabel().setVisible(false);
         view.getSelectOutputDirectoryButton().fire();
 
@@ -303,66 +294,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         }
     }
 
-    @Ignore
-    @Test
-    public void testEmptyOutputDirectoryProducesEmptyOutputFile() {
-        outputDirectory = null;
-        //view.getPackageNameField().setText("fake");
 
-        assertTrue(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
-    }
 
-    @Ignore
-    @Test
-    public void testEmptyPackageNameProducesEmptyOutputFile() {
-        presenter.display();
-
-        outputDirectory = new File("./");
-        view.getSelectOutputDirectoryButton().fire();
-        //view.getPackageNameField().setText("");
-
-        assertTrue(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
-    }
-
-    @Ignore
-    @Test
-    public void testOutputFileExistsIfPackageNameAndDirectoryValid() {
-        presenter.display();
-
-        //view.getPackageNameField().setText("fakefile");
-        outputDirectory = new File("./");
-        view.getSelectOutputDirectoryButton().fire();
-
-        assertFalse(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
-        assertTrue(view.getCurrentOutputDirectoryTextField().getText().endsWith("fakefile.tar.gz"));
-    }
-
-    @Ignore
-    @Test
-    public void testIllegalCharactersAreNotAllowedInPackage() {
-        presenter.display();
-
-        //view.getPackageNameField().setText("fake*file");
-        outputDirectory = new File("./");
-        view.getSelectOutputDirectoryButton().fire();
-
-        assertTrue(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
-        assertTrue(view.getStatusLabel().isVisible());
-        assertTrue(view.getStatusLabel().getText().startsWith(TextFactory.getText(ErrorKey.PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS)));
-    }
-
-    @Ignore
-    @Test
-    public void testLongFilenameShowsWarning() {
-        presenter.display();
-
-        //view.getPackageNameField().setText(StringUtils.rightPad("fakepackage", 300, "xyz"));
-        outputDirectory = new File("/tmp");
-        view.getSelectOutputDirectoryButton().fire();
-
-        assertFalse(view.getCurrentOutputDirectoryTextField().getText().isEmpty());
-        assertTrue(view.getStatusLabel().isVisible());
-
-        assertEquals(TextFactory.format(Messages.MessageKey.WARNING_FILENAME_LENGTH, view.getCurrentOutputDirectoryTextField().getText().length()), view.getStatusLabel().getText());
-    }
 }

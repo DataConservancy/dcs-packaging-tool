@@ -31,15 +31,14 @@ public interface PackageGenerator {
 	/**
 	 * Generate a package based upon the content specified in the
 	 * PackageState.
-	 * 
-	 * @param desc
-	 *            PackageState containing the content.
+	 *
+	 * @param packageState
+	 *            a state object containing information about the package and its custodial content
 	 * @param params
-	 *            User-selected Package Generation preferences, may also contain
-	 *            ref to format-specific preferences/configuration.
+	 *            Package Generation parameters used in generating the package.
 	 * @throws RuntimeException
 	 *             if there is a problem generating the package.
 	 */
-	public Package generatePackage(PackageState desc,
+	public Package generatePackage(PackageState packageState,
 			PackageGenerationParameters params);
 }

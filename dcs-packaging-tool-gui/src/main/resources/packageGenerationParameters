@@ -1,5 +1,5 @@
 Package-Format-Id = BOREM
-BagIt-Profile-Identifier = http://dataconservancy.org/formats/data-conservancy-pkg-0.9
+BagIt-Profile-Identifier = http://dataconservancy.org/formats/data-conservancy-pkg-1.0
 #Options for Checksum algorimth are: md5, sha1
 Checksum-Algs = md5
 #Options for Archiving-format are: tar, zip, none

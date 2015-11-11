@@ -23,7 +23,8 @@ import org.dataconservancy.packaging.tool.model.PackageToolException;
 /**
  * Manages the package generation workflow.
  * <p>
- * Upon {@link #generatePackage(PackageState, PackageGenerationParameters)},
+ * Upon {@link #generatePackage(org.dataconservancy.packaging.tool.model.PackageState,
+ * org.dataconservancy.packaging.tool.model.PackageGenerationParameters)},
  * this service will invoke an appropriate instance of PackageGenerator to
  * generate a package of the requested form.
  * </p>
@@ -33,8 +34,8 @@ public interface PackageGenerationService extends PackageGenerator {
 	 * Invoke the corresponding PackageGenerator to generate the requested
 	 * package.
 	 * 
-	 * @param state
-	 *            PackageState containing the content.
+	 * @param packageState
+	 *            a state object containing information about the package and its custodial content
 	 * @param params
 	 *            Execution parameters that specify user's choices among the
 	 *            package generation preferences. An appropriate
@@ -44,6 +45,6 @@ public interface PackageGenerationService extends PackageGenerator {
 	 *             if there is a problem generating the package.
 	 */
 	@Override
-	public Package generatePackage(PackageState state,
+	public Package generatePackage(PackageState packageState,
 			PackageGenerationParameters params) throws PackageToolException;
 }

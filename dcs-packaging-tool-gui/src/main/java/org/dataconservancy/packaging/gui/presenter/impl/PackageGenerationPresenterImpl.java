@@ -31,6 +31,8 @@ import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Factory;
+import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
@@ -163,8 +165,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 packageLocation = file;
                 generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, file.getAbsolutePath());
                 view.getContinueButton().setDisable(false);
+                view.getCurrentOutputDirectoryTextField().setText(file.getAbsolutePath());
             }
-            view.getCurrentOutputDirectoryTextField().setText(file.getAbsolutePath());
         });
 
         //Handles the user pressing the no thanks link on the create another package popup. This will take the user
@@ -311,8 +313,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         //If we have all the objects we need attempt to create a package with the package generation service, and check that we haven't been canceled
         if (generationParams != null && controller.getPackageState() != null && !Thread.currentThread().isInterrupted()) {
             try {
-                //TODO: update call to PackageGenerationService
-                //createdPackage = packageGenerationService.generatePackage(controller.getPackageState(), generationParams);
+                createdPackage = packageGenerationService.generatePackage(controller.getPackageState(), generationParams);
             } catch (PackageToolException e) {
                 log.error(e.getMessage());
                 return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
@@ -384,6 +385,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         //As an absolute fall back if the parameters can't be loaded from anywhere set them in the code.
         if (generationParams == null) {
+            view.getStatusLabel().setText(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR));
+            view.getStatusLabel().setVisible(true);
             loadDefaultPackageGenerationParams();
         }
 
@@ -508,7 +511,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 File outputDirectory = new File(filePath);
                 if (!outputDirectory.exists() &&!outputDirectory.mkdirs()) {
                         view.getStatusLabel().setText(TextFactory.getText(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR) +
-                        "Failed to create directory " + filePath);
+                        " Failed to create directory " + filePath);
                         view.getStatusLabel().setTextFill(Color.RED);
                         view.getStatusLabel().setVisible(true);
                 } else {
@@ -519,7 +522,9 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             packageLocation =
                     new File(controller.getPackageTree().getFileInfo().getLocation()).getParentFile();
         }
-        view.getCurrentOutputDirectoryTextField().setText(packageLocation.getAbsolutePath());
+        if (packageLocation != null) {
+            view.getCurrentOutputDirectoryTextField().setText(packageLocation.getAbsolutePath());
+        }
     }
 
     private File getPackageFile() {
@@ -580,6 +585,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         bind();
     }
 
+
+    protected PackageGenerationParameters getGenerationParams() {
+        return generationParams;
+    }
     /*
      * Simple interface that shadows JavaFX service this is used so we can create our own instance to use in testing.
      */
