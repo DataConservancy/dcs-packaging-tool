@@ -103,7 +103,8 @@ public class AnnotationDrivenPackageStateSerializerTest {
     private PackageState state = new PackageState();
 
     /**
-     * A map of StreamIds to live (not mocked) StreamMarshallers
+     * A map of StreamIds to live (not mocked) StreamMarshallers.  When adding or removing entries to this map you
+     * probably should also be updating {@link #mockedMarshallerMap}.
      */
     private Map<StreamId, StreamMarshaller> liveMarshallerMap = new HashMap<StreamId, StreamMarshaller>() {
         {
@@ -153,7 +154,8 @@ public class AnnotationDrivenPackageStateSerializerTest {
     };
 
     /**
-     * A map of StreamIds to mocked StreamMarshallers
+     * A map of StreamIds to mocked StreamMarshallers.  When adding or removing entries to this map you probably should
+     * also be updating {@link #liveMarshallerMap}.
      */
     private Map<StreamId, StreamMarshaller> mockedMarshallerMap = new HashMap<StreamId, StreamMarshaller>() {
         {
