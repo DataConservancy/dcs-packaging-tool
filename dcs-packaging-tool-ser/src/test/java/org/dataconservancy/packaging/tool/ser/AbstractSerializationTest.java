@@ -21,6 +21,9 @@ package org.dataconservancy.packaging.tool.ser;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -28,6 +31,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -51,6 +56,34 @@ public abstract class AbstractSerializationTest {
             {
                 put("foo", Arrays.asList("bar", "biz"));
                 put("baz", Arrays.asList("bar"));
+            }
+        };
+
+        private HashMap<URI, List<Property>> userDefinedProperties = new HashMap<URI, List<Property>>() {
+            {
+                try {
+                    PropertyType typeOne = new PropertyType();
+                    typeOne.setDomainPredicate(new URI("pred:1"));
+                    typeOne.setPropertyValueType(PropertyValueType.STRING);
+
+                    PropertyType typeTwo = new PropertyType();
+                    typeTwo.setDomainPredicate(new URI("pred:2"));
+                    typeTwo.setPropertyValueType(PropertyValueType.URI);
+
+                    Property propertyOne = new Property(typeOne);
+                    propertyOne.setStringValue("foo");
+
+                    Property propertyTwo = new Property(typeTwo);
+                    propertyTwo.setUriValue(new URI("value:foo"));
+
+                    Property propertyThree = new Property(typeOne);
+                    propertyThree.setStringValue("bar");
+
+                    put(new URI("node:1"), Arrays.asList(propertyOne, propertyTwo));
+                    put(new URI("node:2"), Collections.singletonList(propertyThree));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
