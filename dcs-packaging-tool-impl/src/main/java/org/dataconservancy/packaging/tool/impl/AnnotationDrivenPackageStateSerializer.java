@@ -139,6 +139,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
             "Allowed stream identifiers are: %s.";
 
     /**
+     * Placeholders: StreamId
+     */
+    private static final String ERR_MISSING_DESCRIPTOR = "No PropertyDescriptor found for streamId '%s'";
+
+    /**
      * Placeholders: method name, class name, error message
      */
     private static final String ERR_INVOKING_METHOD = "Error invoking the method named '%s' on an instance of '%s': %s";
@@ -445,7 +450,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
             signatureLength = IOUtils.readFully(in, signature);
             in.reset();
         } catch (IOException e) {
-            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, e.getMessage()), e);
+            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, "<unknown>", e.getMessage()), e);
         }
         return ZipArchiveInputStream.matches(signature, signatureLength);
     }
