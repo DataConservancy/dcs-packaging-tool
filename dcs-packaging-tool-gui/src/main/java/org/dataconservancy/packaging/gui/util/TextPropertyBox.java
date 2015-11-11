@@ -34,7 +34,7 @@ import java.time.LocalDate;
  * to the size of the VBox will necessitate adjusting the PropertyValidationListener class, which relies on the size
  * of the VBox in order to control presentation of this Label element.
  */
-public class PropertyBox extends VBox {
+public class TextPropertyBox extends VBox {
     private Control propertyInput;
     private HBox propertyInputBox = new HBox(4);
     private Label validationImageLabel = new Label();
@@ -47,7 +47,7 @@ public class PropertyBox extends VBox {
      * @param validationType indicates the ValidationType of validator that should be supplied to
                             the text control input
      */
-    public PropertyBox(Object initialValue, boolean isEditable, PropertyValueHint validationType, String helpText) {
+    public TextPropertyBox(Object initialValue, boolean isEditable, PropertyValueHint validationType, String helpText) {
         createPropertyValueWidget(isEditable, initialValue, helpText, validationType);
 
         propertyInputBox.getChildren().add(propertyInput);
@@ -62,7 +62,7 @@ public class PropertyBox extends VBox {
      *                       the text control input
      */
     //TODO: This should really go away, but is here to support repeatable box in the PackageMetadata view.
-    public PropertyBox(TextField textField, PropertyValueHint validationType){
+    public TextPropertyBox(TextField textField, PropertyValueHint validationType){
         propertyInput = textField;
         if(validationType != null) {
             ((TextInputControl)propertyInput).textProperty().addListener(new PropertyValidationListener(this, validationType));

@@ -33,18 +33,18 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
 
     //validationImageLabel provides the X or check image as a user guide
     private Label validationImageLabel;
-    private PropertyBox propertyBox;
+    private TextPropertyBox textPropertyBox;
     private PropertyValueHint validationType;
     private ImageView successImage;
     private ImageView failureImage;
 
     /**
      * A validation listener for a property box.
-     * @param propertyBox the property box whose text input control is to be listened to
+     * @param textPropertyBox the property box whose text input control is to be listened to
      * @param validationType the type of validation this input control's value requires
      */
-    public PropertyValidationListener(PropertyBox propertyBox, PropertyValueHint validationType) {
-        this.propertyBox = propertyBox;
+    public PropertyValidationListener(TextPropertyBox textPropertyBox, PropertyValueHint validationType) {
+        this.textPropertyBox = textPropertyBox;
         this.validationType = validationType;
         this.validationImageLabel = new Label();
         this.successImage = createSuccessImageView();
@@ -55,14 +55,14 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
         //If the field contains an invalid entry, we will have two children the propertyBox
         Label validationLabel;
-        if(propertyBox.getChildren().size() == 2){
-            validationLabel = (Label) propertyBox.getChildren().get(0);
+        if(textPropertyBox.getChildren().size() == 2){
+            validationLabel = (Label) textPropertyBox.getChildren().get(0);
         } else { //otherwise, we add the validation label, then see if the changed value is valid
             validationLabel = createValidationLabel();
-            propertyBox.getChildren().add(0, validationLabel);
+            textPropertyBox.getChildren().add(0, validationLabel);
         }
 
-        HBox propertyInputBox = (HBox) propertyBox.getChildren().get(1);
+        HBox propertyInputBox = (HBox) textPropertyBox.getChildren().get(1);
         validationImageLabel = (Label) propertyInputBox.getChildren().get(1);
         Validator validator = null;
         if (validationType != null) {
@@ -77,7 +77,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case PHONE_NUMBER:
                     case URL:
                     case EMAIL:
-                        propertyBox.getChildren().remove(validationLabel);
+                        textPropertyBox.getChildren().remove(validationLabel);
                         validationImageLabel.setGraphic(successImage);
                         break;
                 }
@@ -96,14 +96,14 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                         validationLabel.setText(TextFactory.format(Messages.MessageKey.EMAIL_VALIDATION_FAILURE, newValue));
                         break;
                     default:
-                        propertyBox.getChildren().remove(validationLabel);
+                        textPropertyBox.getChildren().remove(validationLabel);
                 }
             }
         } else {
             //This listener doesn't validate if a property is required or not so an empty value is considered valid
             //If user has deleted all contents of a validating field, reset the property box to its initial state
             validationImageLabel.setVisible(false);
-            propertyBox.getChildren().remove(validationLabel);
+            textPropertyBox.getChildren().remove(validationLabel);
 
         }
     }

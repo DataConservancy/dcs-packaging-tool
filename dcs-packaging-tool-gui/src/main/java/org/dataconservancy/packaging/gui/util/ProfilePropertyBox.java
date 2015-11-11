@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class ProfilePropertyBox extends VBox {
     PropertyConstraint propertyConstraint;
-    List<PropertyBox> textPropertyBoxes;
+    List<TextPropertyBox> textPropertyBoxes;
     List<ProfilePropertyBox> subPropertyBoxes;
     private double addNewButtonMaxWidth = 200;
     private PropertyFormatService formatService;
@@ -94,25 +94,25 @@ public class ProfilePropertyBox extends VBox {
                     } else {
                         value = formatService.formatPropertyValue(property);
                     }
-                    PropertyBox propertyBox = new PropertyBox(value, editable, property.getPropertyType().getPropertyValueHint(), "");
-                    propertyBox.getPropertyInput().setPrefWidth(250);
+                    TextPropertyBox textPropertyBox = new TextPropertyBox(value, editable, property.getPropertyType().getPropertyValueHint(), "");
+                    textPropertyBox.getPropertyInput().setPrefWidth(250);
 
-                    textPropertyBoxes.add(propertyBox);
-                    propertyValuesBox.getChildren().add(propertyBox);
-                    addChangeListenerToPropertyFields(propertyBox, listener);
+                    textPropertyBoxes.add(textPropertyBox);
+                    propertyValuesBox.getChildren().add(textPropertyBox);
+                    addChangeListenerToPropertyFields(textPropertyBox, listener);
 
                     listener.changed(null, "n/a", "n/a");
 
                 }
             } else {
-                PropertyBox propertyBox = new PropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
-                propertyBox.getPropertyInput().setPrefWidth(250);
+                TextPropertyBox textPropertyBox = new TextPropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
+                textPropertyBox.getPropertyInput().setPrefWidth(250);
 
-                textPropertyBoxes.add(propertyBox);
-                addChangeListenerToPropertyFields(propertyBox, listener);
+                textPropertyBoxes.add(textPropertyBox);
+                addChangeListenerToPropertyFields(textPropertyBox, listener);
                 listener.changed(null, "n/a", "n/a");
 
-                propertyValuesBox.getChildren().add(propertyBox);
+                propertyValuesBox.getChildren().add(textPropertyBox);
             }
 
             propertyLabelAndValueBox.getChildren().add(propertyValuesBox);
@@ -121,13 +121,13 @@ public class ProfilePropertyBox extends VBox {
                 propertyLabelAndValueBox.getChildren().add(addNewButton);
 
                 addNewButton.setOnAction(arg0 -> {
-                    PropertyBox propertyBox = new PropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
-                    propertyBox.getPropertyInput().setPrefWidth(250);
+                    TextPropertyBox textPropertyBox = new TextPropertyBox("", editable, propertyConstraint.getPropertyType().getPropertyValueHint(), "");
+                    textPropertyBox.getPropertyInput().setPrefWidth(250);
 
-                    propertyValuesBox.getChildren().add(propertyBox);
-                    addChangeListenerToPropertyFields(propertyBox, listener);
+                    propertyValuesBox.getChildren().add(textPropertyBox);
+                    addChangeListenerToPropertyFields(textPropertyBox, listener);
                     addNewButton.setDisable(true);
-                    requestFocusForNewGroup(propertyBox);
+                    requestFocusForNewGroup(textPropertyBox);
                 });
             }
         }
@@ -144,7 +144,7 @@ public class ProfilePropertyBox extends VBox {
     }
 
     public List<Object> getValues() {
-        return textPropertyBoxes.stream().map(PropertyBox::getValue).collect(Collectors.toList());
+        return textPropertyBoxes.stream().map(TextPropertyBox::getValue).collect(Collectors.toList());
     }
 
     public List<ProfilePropertyBox> getSubPropertyBoxes() {
@@ -158,22 +158,22 @@ public class ProfilePropertyBox extends VBox {
     /**
      * Adds a listener to all TextFields or TextInputControl within the specified pane.  Will dive into sub-panes as needed.
      *
-     * @param propertyBox    The property box to listen to
+     * @param textPropertyBox    The property box to listen to
      * @param listener The listener to attach to the TextInputControl
      */
-    private void addChangeListenerToPropertyFields(PropertyBox propertyBox,
+    private void addChangeListenerToPropertyFields(TextPropertyBox textPropertyBox,
                                                    ChangeListener<? super String> listener) {
 
-        if (propertyBox.getPropertyInput() instanceof TextInputControl) {
-            ((TextInputControl) propertyBox.getPropertyInput()).textProperty().addListener(listener);
+        if (textPropertyBox.getPropertyInput() instanceof TextInputControl) {
+            ((TextInputControl) textPropertyBox.getPropertyInput()).textProperty().addListener(listener);
         }
     }
 
     private void addChangeListenerToProfileBox(ProfilePropertyBox profilePropertyBox,
                                                     ChangeListener<? super String> listener) {
 
-        for (PropertyBox propertyBox : profilePropertyBox.textPropertyBoxes) {
-            addChangeListenerToPropertyFields(propertyBox, listener);
+        for (TextPropertyBox textPropertyBox : profilePropertyBox.textPropertyBoxes) {
+            addChangeListenerToPropertyFields(textPropertyBox, listener);
         }
     }
 
@@ -225,14 +225,14 @@ public class ProfilePropertyBox extends VBox {
          */
         private boolean anyGroupsEmpty() {
             if (textPropertyBoxes != null) {
-                for (PropertyBox textPropertyBox : textPropertyBoxes) {
-                    if (textPropertyBox.getPropertyInput() instanceof TextInputControl) {
-                        if (textPropertyBox.getValueAsString() == null ||
-                            textPropertyBox.getValueAsString().isEmpty()) {
+                for (TextPropertyBox textTextPropertyBox : textPropertyBoxes) {
+                    if (textTextPropertyBox.getPropertyInput() instanceof TextInputControl) {
+                        if (textTextPropertyBox.getValueAsString() == null ||
+                            textTextPropertyBox.getValueAsString().isEmpty()) {
                             return true;
                         }
                     } else {
-                        if (textPropertyBox.getValueAsDate() == null) {
+                        if (textTextPropertyBox.getValueAsDate() == null) {
                             return true;
                         }
                     }
@@ -241,14 +241,14 @@ public class ProfilePropertyBox extends VBox {
 
             if (subPropertyBoxes != null) {
                 for (ProfilePropertyBox profilePropertyBox : subPropertyBoxes) {
-                    for (PropertyBox textPropertyBox : profilePropertyBox.textPropertyBoxes) {
-                        if (textPropertyBox.getPropertyInput() instanceof TextInputControl) {
-                            if (textPropertyBox.getValueAsString() == null ||
-                                textPropertyBox.getValueAsString().isEmpty()) {
+                    for (TextPropertyBox textTextPropertyBox : profilePropertyBox.textPropertyBoxes) {
+                        if (textTextPropertyBox.getPropertyInput() instanceof TextInputControl) {
+                            if (textTextPropertyBox.getValueAsString() == null ||
+                                textTextPropertyBox.getValueAsString().isEmpty()) {
                                 return true;
                             }
                         } else {
-                            if (textPropertyBox.getValueAsDate() == null) {
+                            if (textTextPropertyBox.getValueAsDate() == null) {
                                 return true;
                             }
                         }

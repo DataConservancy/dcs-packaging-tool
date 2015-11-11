@@ -42,7 +42,7 @@ import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
-import org.dataconservancy.packaging.gui.util.PropertyBox;
+import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
@@ -341,8 +341,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.URL)) {
                 // TODO: this may have to be done via a button
-                PropertyBox propertyBox = new PropertyBox(textField, packageMetadata.getValidationType());
-                fieldContainer.getChildren().add(propertyBox);
+                TextPropertyBox textPropertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
+                fieldContainer.getChildren().add(textPropertyBox);
             }
 
             fieldContainer.getChildren().add(textField);
@@ -355,11 +355,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
-                PropertyBox propertyBox = new PropertyBox("", packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
-                propertyBox.getPropertyInput().setId(packageMetadata.getName());
-                allDynamicFields.add(propertyBox.getPropertyInput());
+                TextPropertyBox textPropertyBox = new TextPropertyBox("", packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
+                textPropertyBox.getPropertyInput().setId(packageMetadata.getName());
+                allDynamicFields.add(textPropertyBox.getPropertyInput());
 
-                fieldContainer.getChildren().add(propertyBox);
+                fieldContainer.getChildren().add(textPropertyBox);
             }
         }
         return fieldContainer;
