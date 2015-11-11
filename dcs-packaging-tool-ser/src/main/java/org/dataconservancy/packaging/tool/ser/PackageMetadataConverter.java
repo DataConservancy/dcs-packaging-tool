@@ -89,14 +89,7 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
 
     @Override
     public boolean canConvert(Class type) {
-        if (!Map.class.isAssignableFrom(type)) {
-            return false;
-        }
-
-        try {
-            @SuppressWarnings("unchecked")
-            Class<Map<String, List<String>>> foo = (Class<Map<String, List<String>>>) type;
-        } catch (Exception e) {
+        if (!LinkedHashMap.class.isAssignableFrom(type)) {
             return false;
         }
 
