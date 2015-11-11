@@ -59,34 +59,6 @@ public abstract class AbstractSerializationTest {
             }
         };
 
-        private HashMap<URI, List<Property>> userDefinedProperties = new HashMap<URI, List<Property>>() {
-            {
-                try {
-                    PropertyType typeOne = new PropertyType();
-                    typeOne.setDomainPredicate(new URI("pred:1"));
-                    typeOne.setPropertyValueType(PropertyValueType.STRING);
-
-                    PropertyType typeTwo = new PropertyType();
-                    typeTwo.setDomainPredicate(new URI("pred:2"));
-                    typeTwo.setPropertyValueType(PropertyValueType.URI);
-
-                    Property propertyOne = new Property(typeOne);
-                    propertyOne.setStringValue("foo");
-
-                    Property propertyTwo = new Property(typeTwo);
-                    propertyTwo.setUriValue(new URI("value:foo"));
-
-                    Property propertyThree = new Property(typeOne);
-                    propertyThree.setStringValue("bar");
-
-                    put(new URI("node:1"), Arrays.asList(propertyOne, propertyTwo));
-                    put(new URI("node:2"), Collections.singletonList(propertyThree));
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
         public static List<URI> domainProfileUris = new ArrayList<URI>() {
             {
                 try {
