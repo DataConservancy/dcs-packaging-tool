@@ -221,13 +221,6 @@ public abstract class AbstractPackageToolConverter implements Converter {
                     ERR_CANNOT_CONVERT, source.getClass().getName(), this.getClass().getName()));
         }
 
-        if (context.get(A_VERSION) != null) {
-            // we've already added metadata nodes to the writer; the caller is probably
-            // chaining calls to another converter using MarshallingContext.convertAnother(...).
-            // We don't want to add duplicate nodes, so we just return.
-            return;
-        }
-
         writer.startNode(E_SERIALIZATION);
         writer.addAttribute(A_VERSION, String.valueOf(version));
         writer.addAttribute(A_CONVERTER_CLASS, this.getClass().getName());
@@ -257,13 +250,6 @@ public abstract class AbstractPackageToolConverter implements Converter {
      * @param context a context that allows nested objects to be processed by XStream.
      */
     void beforeUnmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        if (context.get(A_VERSION) != null) {
-            // we've already unmarshalled metadata nodes from the reader; the caller is probably
-            // chaining calls to another converter using UnmarshallingContext.convertAnother(...).
-            // We won't be able to deserialize metadata nodes so we just return.
-            return;
-        }
-
         if (!E_SERIALIZATION.equals(reader.getNodeName())) {
             throw new ConversionException(
                     String.format(ERR_MISSING_EXPECTED_ELEMENT, E_SERIALIZATION, reader.getNodeName()));
