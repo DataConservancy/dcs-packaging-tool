@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.dataconservancy.packaging.tool.impl.generator.mocks;
+package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
 
-/** For testing with Spring.  This does nothing, but has to exist */
-public class MockPackageModelBuilder implements PackageModelBuilder {
+
+public class BagOreRemPackageModelBuilder
+        implements PackageModelBuilder {
+
     @Override
     public void init(PackageGenerationParameters params) {
+        /* We don't need this, actually! */
     }
 
     @Override
-    public void buildModel(PackageState desc, PackageAssembler assembler) {
+    public void buildModel(PackageState state, PackageAssembler assembler) {
+        // TODO Auto-generated method stub
+
     }
+
 }

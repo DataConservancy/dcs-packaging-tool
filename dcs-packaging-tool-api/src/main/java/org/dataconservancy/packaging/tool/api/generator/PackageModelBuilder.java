@@ -18,6 +18,7 @@ package org.dataconservancy.packaging.tool.api.generator;
 
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageState;
 
 /**
  * Creates resources to be packaged in accordance with some packaging model.
@@ -44,10 +45,10 @@ public interface PackageModelBuilder {
      * {@link PackageAssembler#assemblePackage()}.
      * </p>
      * 
-     * @param desc
-     *        A valid Package Description.
+     * @param state
+     *        A valid Package State.
      * @param assembler
      *        The assembler in which packaged resources will be created.
      */
-    public void buildModel(PackageDescription desc, PackageAssembler assembler);
+    public void buildModel(PackageState state, PackageAssembler assembler);
 }

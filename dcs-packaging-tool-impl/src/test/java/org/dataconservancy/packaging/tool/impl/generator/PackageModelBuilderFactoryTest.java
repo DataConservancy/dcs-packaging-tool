@@ -16,21 +16,22 @@
 
 package org.dataconservancy.packaging.tool.impl.generator;
 
-import org.dataconservancy.packaging.tool.api.OntologyIdentifiers;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageState;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath*:/test-applicationContext.xml"})
@@ -41,8 +42,7 @@ public class PackageModelBuilderFactoryTest {
 
     @Test
     public void testGetNewBuilder() throws InstantiationException, IllegalAccessException {
-        PackageDescription desc = new PackageDescription();
-        desc.setPackageOntologyIdentifier(OntologyIdentifiers.DCSBO.toString());
+        PackageState desc = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
         params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, folder.getRoot().getPath());
@@ -54,16 +54,16 @@ public class PackageModelBuilderFactoryTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testGetNewBuilderFailsIfNoFormatIdParameterSet() throws InstantiationException, IllegalAccessException {
-        PackageDescription desc = new PackageDescription();
+        PackageState state = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
 
-        PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(desc, params);
+        PackageModelBuilderFactory.newBuilder(state, params);
     }
 
 
     @Test
     public void testGetNewAssemblerReturnsNullIfNoMatchingAssemblerFound() throws InstantiationException, IllegalAccessException {
-        PackageDescription desc = new PackageDescription();
+        PackageState desc = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "not-a-real-builder");
 

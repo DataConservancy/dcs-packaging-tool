@@ -26,8 +26,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath*:/test-applicationContext.xml"})
@@ -48,7 +48,7 @@ public class PackageAssemblerFactoryTest {
     public void testGetNewAssemblerFailsIfNoFormatIdParameterSet() throws InstantiationException, IllegalAccessException {
         PackageGenerationParameters params = new PackageGenerationParameters();
 
-        PackageAssembler assembler = PackageAssemblerFactory.newAssembler(params);
+        PackageAssemblerFactory.newAssembler(params);
     }
 
 

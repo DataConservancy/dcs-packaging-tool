@@ -71,7 +71,6 @@
 
 
   <!-- SERVICES AND BUILDERS -->
-  <bean id="packageDescriptionValidator" class="org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator" />
   <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
   <bean id="packageMetadataService" class="org.dataconservancy.packaging.gui.services.PackageMetadataService">
     <constructor-arg ref="configuration"/>
@@ -85,7 +84,6 @@
         <entry key="TEST" value-ref="testPackageGenerator" />
       </map>
     </property>
-    <property name="packageDescriptionValidator" ref="packageDescriptionValidator" />
   </bean>
   -->
 

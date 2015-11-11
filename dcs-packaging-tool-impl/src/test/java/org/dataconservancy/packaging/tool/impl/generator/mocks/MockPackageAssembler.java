@@ -16,7 +16,6 @@
 
 package org.dataconservancy.packaging.tool.impl.generator.mocks;
 
-import org.dataconservancy.packaging.tool.api.*;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
@@ -26,7 +25,7 @@ import java.net.URI;
 
 
 /**
- * A sample Assembler for use in testing the factory
+ * A sample Assembler for use in testing the factory (spring wiring).  It does nothing, but needs to exist
  */
 public class MockPackageAssembler implements PackageAssembler {
     @Override

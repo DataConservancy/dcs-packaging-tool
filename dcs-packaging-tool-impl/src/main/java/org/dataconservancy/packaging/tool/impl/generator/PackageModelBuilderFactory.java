@@ -18,8 +18,8 @@ package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageState;
 
 import java.util.Map;
 
@@ -34,31 +34,16 @@ public class PackageModelBuilderFactory {
     /**
      * Provides an instance of {@link PackageModelBuilder} for assembling
      * packages.
-     * <p>
-     * Although the behaviour of the PackageModelBuilder is largely determined
-     * by the semantics of the package modeling ontology, it may still be
-     * influenced by provided parameters. The Builder produced by this method
-     * may be re-used repeatedly to build several unrelated packages, but they
-     * will all have the same configuration parameters.
-     * </p>
-     * <p>
-     * PackageModelBuilders are generally implemented for particular
-     * PackageDescription specifications (e.g. the DCS Business Object model,
-     * PLANETS model, etc), so providing the packaging format id via the
-     * parameters will allow the factory to choose the correct PackageModelBuilder
-     * for the given format, or throw an exception if the given
-     * specification is unsupported.
-     * </p>
      *
      * @param desc
-     *        The package description to use for selecting the correct builder
+     *        The package state to use for selecting the correct builder
      * @param params
      *        Package Generation Parameters
      * @return Fully configured PackageModelBulder.
      * @throws IllegalAccessException if no builders have been set on the factory
      * @throws InstantiationException if the params don't contain the package format id
      */
-    public static PackageModelBuilder newBuilder(PackageDescription desc, PackageGenerationParameters params)
+    public static PackageModelBuilder newBuilder(PackageState desc, PackageGenerationParameters params)
             throws IllegalAccessException, InstantiationException {
 
         if (builders == null || builders.size() == 0) {
@@ -73,20 +58,14 @@ public class PackageModelBuilderFactory {
             throw new IllegalArgumentException("The parameter list must contain a package format id");
         }
 
-        for (String builderId : builders.keySet()) {
-            if (builderId.equals(getModelBuilderId(desc.getPackageOntologyIdentifier(), formatId))) {
-                Class<? extends PackageModelBuilder> builderClass = builders.get(builderId);
-                PackageModelBuilder builder = builderClass.newInstance();
-                builder.init(params);
-                return builder;
-            }
+        if (builders.containsKey(formatId)) {
+            Class<? extends PackageModelBuilder> builderClass = builders.get(formatId);
+            PackageModelBuilder builder = builderClass.newInstance();
+            builder.init(params);
+            return builder;
         }
 
         return null;
-    }
-
-    public static String getModelBuilderId(String ontologyId, String formatId) {
-        return ontologyId + "-" + formatId;
     }
 
     public static void setBuilders(Map<String, Class<? extends PackageModelBuilder>> builders) {

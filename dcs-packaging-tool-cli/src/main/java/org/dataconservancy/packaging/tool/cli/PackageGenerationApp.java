@@ -16,11 +16,13 @@
 package org.dataconservancy.packaging.tool.cli;
 
 import java.io.*;
+
 import java.util.List;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
@@ -250,12 +252,10 @@ public class PackageGenerationApp {
             System.err.println("Using default values for all parameters");
         }
 
-        // Get and load the Package Descirption file, use it to get the content root location
+        // Get and load the Package State file, use it to get the content root location
         // This will be overridden always as it needs to match what's on disk, so shouldn't really
         // be provided in the params files anyway
-        PackageDescription desc = getPackageDescription();
-        packageParams.removeParam(GeneralParameterNames.CONTENT_ROOT_LOCATION);
-        packageParams.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, desc.getRootArtifactRef().getRefString());
+        PackageState desc = getPackageState();
 
         // Print package generation parameters, if desired
         if (info) {
@@ -271,8 +271,10 @@ public class PackageGenerationApp {
         PackageGenerationService generationService = appContext.getBean(
                 "packageGenerationService", PackageGenerationService.class);
 
+        
         Package pkg = generationService
                 .generatePackage(desc, packageParams);
+                
 
         // Write to the destination. do not write a package file if we have an exploded package
         if(!packageParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded")) {
@@ -317,35 +319,9 @@ public class PackageGenerationApp {
 	 * PackageDescription files are specified. It would be nice to handle STDIN
 	 * too (through the value '-' rather than file path).
 	 */
-	private PackageDescription getPackageDescription() {
-        PackageDescription packageDescription;
-
-		PackageDescriptionBuilder descriptionBuilder = appContext.getBean("packageDescriptionBuilder",
-                PackageDescriptionBuilder.class);
-
-        if (location == null || location.isEmpty()) {
-            try {
-                System.err.println("Reading Package Description from STDIN...");
-                if (debug) {
-                    log.debug("Loading description file from stdin.");
-                }
-                packageDescription = descriptionBuilder.deserialize(System.in);
-            } catch (Exception e) {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_INPUT_ERROR, e);
-            }
-        } else {
-           try {
-                if (debug) {
-                    log.debug("Loading description file: " + location);
-                }
-                FileInputStream fis = new FileInputStream(location);
-                packageDescription = descriptionBuilder.deserialize(fis);
-           } catch (FileNotFoundException e) {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
-           }
-        }
-
-		return packageDescription;
+	private PackageState getPackageState() {
+        /* TODO:  Implement */
+	    throw new UnsupportedOperationException();
 	}
 
 
