@@ -22,6 +22,7 @@ import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.View;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 
 import java.io.IOException;
 
@@ -69,7 +70,7 @@ public abstract class BasePresenterImpl implements Presenter {
     public void onBackPressed(){
         try {
             getController().savePackageStateFile();
-        } catch (IOException e) {
+        } catch (IOException | RDFTransformException e) {
             view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToPreviousPage();

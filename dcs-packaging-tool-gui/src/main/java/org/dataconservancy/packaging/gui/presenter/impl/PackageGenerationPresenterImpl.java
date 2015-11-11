@@ -453,7 +453,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION,
-                new File(controller.getPackageState().getPackageTree().getFileInfo().getLocation()).getParent());
+                new File(controller.getPackageTree().getFileInfo().getLocation()).getParent());
     }
 
     private void setViewToDefaults() {
@@ -517,7 +517,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
         } else {
             packageLocation =
-                    new File(controller.getPackageState().getPackageTree().getFileInfo().getLocation()).getParentFile();
+                    new File(controller.getPackageTree().getFileInfo().getLocation()).getParentFile();
         }
         view.getCurrentOutputDirectoryTextField().setText(packageLocation.getAbsolutePath());
     }

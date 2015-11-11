@@ -31,6 +31,7 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.joda.time.DateTime;
@@ -130,7 +131,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 if (Platform.isFxApplicationThread()) {
                     try {
                         getController().savePackageStateFile();
-                    } catch (IOException e) {
+                    } catch (IOException | RDFTransformException e) {
                         view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                         view.getErrorLabel().setVisible(true);
                     }
@@ -147,7 +148,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             updatePackageState();
             try{
                getController().savePackageStateFile();
-            } catch (IOException e){
+            } catch (IOException | RDFTransformException e){
                 view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                 view.getErrorLabel().setVisible(true);
             }

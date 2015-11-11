@@ -394,7 +394,7 @@ public class DcsBOProfile
          * hasFixity.setReadOnly(true);
          */
 
-        hasFormat.setLabel("Fixity");
+        hasFormat.setLabel("Format");
         hasFormat
                 .setDescription("A data property specifying the format of a File");
         hasFormat.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
@@ -545,7 +545,7 @@ public class DcsBOProfile
                                                   exactlyOne(hasDescription),
                                                   exactlyOne(hasCreateDate),
                                                   exactlyOne(hasModifiedDate),
-                                                  exactlyOne(hasFormat),
+                                                  atLeastOne(hasFormat),
                                                   exactlyOne(hasSize)));
 
         metadata.setPropertyConstraints(Arrays
@@ -553,7 +553,7 @@ public class DcsBOProfile
                         exactlyOne(hasDescription),
                         exactlyOne(hasCreateDate),
                         exactlyOne(hasModifiedDate),
-                        exactlyOne(hasFormat),
+                        atLeastOne(hasFormat),
                         exactlyOne(hasSize)));
 
         /* Now we do "complex properties */
@@ -753,6 +753,14 @@ public class DcsBOProfile
         PropertyConstraint constraint = new PropertyConstraint();
         constraint.setPropertyType(prop);
         constraint.setMin(0);
+        constraint.setMax(-1);
+        return constraint;
+    }
+
+    private static PropertyConstraint atLeastOne(PropertyType prop) {
+        PropertyConstraint constraint = new PropertyConstraint();
+        constraint.setPropertyType(prop);
+        constraint.setMin(1);
         constraint.setMax(-1);
         return constraint;
     }

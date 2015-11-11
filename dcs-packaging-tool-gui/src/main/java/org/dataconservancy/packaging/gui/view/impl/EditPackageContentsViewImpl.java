@@ -62,7 +62,6 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -71,7 +70,6 @@ import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
-import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
@@ -104,7 +102,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Stage artifactDetailsWindow;
     private Scene artifactDetailsScene;
     private Node popupNode;
-    private DomainProfileService profileService;
     private IPMService ipmService;
     private Map<Node, NodeComparison> refreshResult;
 
@@ -326,7 +323,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             if (packageNode.isIgnored()) {
                 contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
             } else {
-                List<NodeTransform> nodeTransforms = profileService.getNodeTransforms(packageNode);
+                List<NodeTransform> nodeTransforms = presenter.getController().getDomainProfileService().getNodeTransforms(packageNode);
 
                 contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
                 optionsLabel.setContextMenu(contextMenu);
@@ -632,7 +629,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             popupNode = packageNode;
             artifactRelationshipFields = new HashSet<>();
 
-            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(packageNode, metadataInheritanceButtonMap, profileService);
+            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(packageNode, metadataInheritanceButtonMap, presenter.getController().getDomainProfileService());
 
             if (artifactDetailsScene == null) {
                 artifactDetailsScene = new Scene(propertiesPane, 540, 500);
@@ -669,10 +666,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public Button getReenableWarningsButton() {
         return reenableWarningsButton;
-    }
-
-    public void setProfileService(DomainProfileService profileService) {
-        this.profileService = profileService;
     }
 
     public void setIpmService(IPMService ipmService) {

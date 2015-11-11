@@ -127,6 +127,11 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 public PackageState getPackageState() {
                     return packageState;
                 }
+
+                @Override
+                public DomainProfileService getDomainProfileService() {
+                    return mock(DomainProfileService.class);
+                }
             };
             controller.setFactory(factory);
             factory.setController(controller);
@@ -142,9 +147,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             IPMService ipmService = mock(IPMService.class);
             when(ipmService.createTreeFromFileSystem(any(Path.class))).thenReturn(root);
             presenter.setIpmService(ipmService);
-
-            DomainProfileService profileService = mock(DomainProfileService.class);
-            presenter.setProfileService(profileService);
 
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);

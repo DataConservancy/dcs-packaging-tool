@@ -67,7 +67,6 @@ import java.util.prefs.Preferences;
 public class EditPackageContentsPresenterImpl extends BasePresenterImpl implements EditPackageContentsPresenter, PreferenceChangeListener {
 
     private EditPackageContentsView view;
-    private DomainProfileService profileService;
     private IPMService ipmService;
     private PropertyFormatService propertyFormatService;
     private File packageDescriptionFile;
@@ -142,7 +141,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 }
 
                 //save the PackageDescription to the file
-                trimEmptyProperties(controller.getPackageState().getPackageTree());
+                trimEmptyProperties(controller.getPackageTree());
             }
         });
         
@@ -155,7 +154,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
             //Perform simple validation to make sure the package description is valid.
-            if (!profileService.validateTree(controller.getPackageState().getPackageTree())) {
+            if (!controller.getDomainProfileService().validateTree(controller.getPackageTree())) {
                 view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
                     if (view.getWarningPopup() != null &&
                         view.getWarningPopup().isShowing()) {
@@ -186,7 +185,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
                 //save the PackageDescription to the file
 
-                trimEmptyProperties(controller.getPackageState().getPackageTree());
+                trimEmptyProperties(controller.getPackageTree());
 
                 controller.setPackageDescriptionFile(packageDescriptionFile);
                 controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
@@ -218,8 +217,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
 
         view.getRefreshPopupPositiveButton().setOnAction(event -> {
-            ipmService.mergeTree(controller.getPackageState().getPackageTree(), view.getRefreshResult());
-            profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), controller.getPackageState().getPackageTree());
+            ipmService.mergeTree(controller.getPackageTree(), view.getRefreshResult());
+            controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), controller.getPackageTree());
 
             displayPackageTree();
             view.getRefreshPopup().hide();
@@ -239,7 +238,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
         if (!propertyBox.getPropertyConstraint().getPropertyType().isReadOnly()) {
             //First remove all properties of the given type, to be replaced with the new ones
-            profileService.removeProperty(view.getPopupNode(), propertyBox.getPropertyConstraint().getPropertyType());
+            controller.getDomainProfileService().removeProperty(view.getPopupNode(), propertyBox.getPropertyConstraint().getPropertyType());
             //If it's not complex loop through the values and set them on the node
 
             if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
@@ -253,24 +252,24 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                             case DATE_TIME:
                                 Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
                                 newProperty.setDateTimeValue(new DateTime(((LocalDate) value).getYear(), ((LocalDate) value).getMonthValue(), ((LocalDate) value).getDayOfMonth(), 0, 0, 0));
-                                profileService.addProperty(view.getPopupNode(), newProperty);
+                                controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
                                 break;
                             case LONG:
                                 newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
                                 newProperty.setLongValue((Long) value);
-                                profileService.addProperty(view.getPopupNode(), newProperty);
+                                controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
                                 break;
                             default:
                                 if (!((String) value).isEmpty()) {
                                     newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                                    profileService.addProperty(view.getPopupNode(), newProperty);
+                                    controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
                                 }
                         }
                     } else {
                         if (value instanceof String) {
                             if (!((String) value).isEmpty()) {
                                 Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                                profileService.addProperty(view.getPopupNode(), newProperty);
+                                controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
                             }
                         }
                     }
@@ -408,11 +407,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         if (node.getChildren() != null) {
             inheritablePropertyTypes.stream().filter(inheritablePropertyType -> view.getInheritMetadataCheckBoxMap().get(inheritablePropertyType).isSelected()).forEach(inheritablePropertyType -> {
-                List<Property> inheritablePropertyValues = profileService.getProperties(node, inheritablePropertyType);
+                List<Property> inheritablePropertyValues = controller.getDomainProfileService().getProperties(node, inheritablePropertyType);
                 if (inheritablePropertyValues != null) {
                     for (Property inheritablePropertyValue : inheritablePropertyValues) {
                         for (Node child : node.getChildren()) {
-                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> profileService.addProperty(child, inheritablePropertyValue));
+                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> controller.getDomainProfileService().addProperty(child, inheritablePropertyValue));
 
                             if (child.getChildren() != null) {
                                 child.getChildren().forEach(this::applyMetadataInheritance);
@@ -427,7 +426,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     @Override
     public void changeType(Node node, NodeTransform transform) {
         if (node != null && transform != null) {
-            profileService.transformNode(node, transform);
+            controller.getDomainProfileService().transformNode(node, transform);
 
             displayPackageTree();
 
@@ -440,11 +439,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 }
             }
         }
-    }
-
-    @Override
-    public void setProfileService(DomainProfileService profileService){
-        this.profileService = profileService;
     }
 
     @Override
@@ -530,7 +524,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         try {
             Node node = ipmService.createTreeFromFileSystem(contentToAdd);
             parent.addChild(node);
-            profileService.assignNodeTypes(controller.getPrimaryDomainProfile(), parent);
+            controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), parent);
 
             //Refresh the tree display
             displayPackageTree();
@@ -571,19 +565,18 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     public void displayPackageTree() {
-        if (controller.getPackageState() != null && controller.getPackageState().getPackageTree() != null) {
-            view.getArtifactTreeView().setRoot(buildTree(controller.getPackageState().getPackageTree(),
+        if (controller.getPackageTree() != null) {
+            view.getArtifactTreeView().setRoot(buildTree(controller.getPackageTree(),
                     view.getShowIgnored().selectedProperty().getValue()));
             view.getRoot().setExpanded(true);
             sortTree(view.getRoot());
-            for (URI nodeID : expandedNodes) {
-                if (nodeID !=null) {
-                    TreeItem expandedItem = findItem(view.getRoot(), nodeID);
-                    if (expandedItem != null) {
-                        expandedItem.setExpanded(true);
-                    }
+            expandedNodes.stream().filter(nodeID -> nodeID !=
+                null).forEach(nodeID -> {
+                TreeItem expandedItem = findItem(view.getRoot(), nodeID);
+                if (expandedItem != null) {
+                    expandedItem.setExpanded(true);
                 }
-            }
+            });
         }
     }
 
