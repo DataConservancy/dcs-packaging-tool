@@ -37,7 +37,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
@@ -129,15 +128,15 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             updatePackageState();
             if (validateRequiredFields()) {
                 if (Platform.isFxApplicationThread()) {
-                    try (FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))) {
-                        packageStateSerializer.serialize(getController().getPackageState(), fis);
+                    try {
+                        getController().savePackageStateFile();
                     } catch (IOException e) {
                         view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                         view.getErrorLabel().setVisible(true);
                     }
+                }
                     view.getErrorLabel().setVisible(false);
                     getController().goToNextPage();
-                }
             } else {
                 view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
                 view.getErrorLabel().setVisible(true);
@@ -146,9 +145,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         view.getSaveButton().setOnAction(event -> {
             updatePackageState();
-
-            try(FileOutputStream fis = new FileOutputStream(controller.showSaveFileDialog(view.getPackageMetadataFileChooser()))){
-                packageStateSerializer.serialize(getController().getPackageState(), fis);
+            try{
+               getController().savePackageStateFile();
             } catch (IOException e){
                 view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                 view.getErrorLabel().setVisible(true);
@@ -159,6 +157,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     @Override
     public void onBackPressed() {
+        updatePackageState();
         if (Platform.isFxApplicationThread()) {
             view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
             view.getWarningPopup().setConfirmEventHandler(event -> {
@@ -250,11 +249,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     @Override
     public void setDomainProfileStore(DomainProfileStore domainProfileStore) {
         this.domainProfileStore = domainProfileStore;
-    }
-
-    @Override
-    public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer) {
-        this.packageStateSerializer = packageStateSerializer;
     }
 
 }

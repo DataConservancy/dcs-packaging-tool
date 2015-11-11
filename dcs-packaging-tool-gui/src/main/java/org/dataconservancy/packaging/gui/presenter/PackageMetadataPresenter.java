@@ -43,11 +43,4 @@ public interface PackageMetadataPresenter extends Presenter {
      * @param domainProfileStore
      */
     public void setDomainProfileStore(DomainProfileStore domainProfileStore);
-
-    /**
-     * Sets the PackageStateSerializer to be used to serialize the PackageState
-     * @param packageStateSerializer
-     */
-    public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer);
-
 }

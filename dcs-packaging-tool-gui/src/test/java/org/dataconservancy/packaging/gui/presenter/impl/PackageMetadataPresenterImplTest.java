@@ -69,7 +69,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
     private Configuration configuration;
 
     @Before
-    public void setup() throws InterruptedException, IOException {
+    public void setup() throws IOException {
             showNextPage = false;
 
             Controller controller = new Controller() {
@@ -148,6 +148,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
     /**
      * Tests that hitting continue without a domain profile displays an error message.
      */
+    @Ignore //domain profile is never null now, pulldown menu has a default value
     @Test
     public void testContinueWithoutDomainProfile() {
         presenter.display();
