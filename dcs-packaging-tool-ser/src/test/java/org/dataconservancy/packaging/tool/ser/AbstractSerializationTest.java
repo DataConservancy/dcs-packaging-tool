@@ -102,6 +102,34 @@ public abstract class AbstractSerializationTest {
 
         public static Model domainObjectsRDF;
 
+        public static HashMap<URI, List<Property>> userProperties = new HashMap<URI, List<Property>>() {
+            {
+                try {
+                    PropertyType typeOne = new PropertyType();
+                    typeOne.setDomainPredicate(new URI("pred:1"));
+                    typeOne.setPropertyValueType(PropertyValueType.STRING);
+
+                    PropertyType typeTwo = new PropertyType();
+                    typeTwo.setDomainPredicate(new URI("pred:2"));
+                    typeTwo.setPropertyValueType(PropertyValueType.URI);
+
+                    Property propertyOne = new Property(typeOne);
+                    propertyOne.setStringValue("foo");
+
+                    Property propertyTwo = new Property(typeTwo);
+                    propertyTwo.setUriValue(new URI("value:foo"));
+
+                    Property propertyThree = new Property(typeOne);
+                    propertyThree.setStringValue("bar");
+
+                    put(new URI("node:1"), Arrays.asList(propertyOne, propertyTwo));
+                    put(new URI("node:2"), Arrays.asList(propertyThree));
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
         static {
             applicationVersion.setBuildNumber("1");
             applicationVersion.setBuildRevision("abcdefg");
@@ -133,5 +161,8 @@ public abstract class AbstractSerializationTest {
 
         public static ClassPathResource DOMAINOBJECTS_RDF_1 =
                 new ClassPathResource("org/dataconservancy/packaging/tool/ser/domain-objects-rdf-v1.ser");
+
+        public static ClassPathResource USER_PROPERTIES_1 =
+                        new ClassPathResource("org/dataconservancy/packging/tool/ser/user-property-v1.ser");
     }
 }
