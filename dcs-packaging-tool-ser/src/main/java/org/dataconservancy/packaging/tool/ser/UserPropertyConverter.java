@@ -131,10 +131,10 @@ public class UserPropertyConverter extends AbstractPackageToolConverter {
 
     @Override
     public boolean canConvert(Class type) {
-        if (!HashMap.class.isAssignableFrom(type)) {
-            return false;
+        if (HashMap.class.isAssignableFrom(type)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

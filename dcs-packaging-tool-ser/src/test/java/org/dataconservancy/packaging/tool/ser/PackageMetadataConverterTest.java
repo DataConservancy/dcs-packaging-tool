@@ -18,6 +18,7 @@
 
 package org.dataconservancy.packaging.tool.ser;
 
+import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppReader;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
@@ -33,6 +34,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +47,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest {
 
-    private HashMap<String, List<String>> testMap = new HashMap<String, List<String>>() {
+    private LinkedHashMap<String, List<String>> testMap = new LinkedHashMap<String, List<String>>() {
         {
             put("foo", Arrays.asList("bar", "biz"));
             put("baz", Arrays.asList("bar"));
@@ -80,12 +82,12 @@ public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest
 
     @Test
     public void testCanConvert() throws Exception {
-        assertTrue(underTest.canConvert(new HashMap<String, List<String>>().getClass()));
+        assertTrue(underTest.canConvert(new LinkedHashMap<String, List<String>>().getClass()));
 
         // this can happen due to type erasure.  We could defend against runtime exceptions
         // by using String.valueOf(...) every time we read an element of the map, but at
         // this juncture we don't do that.
-        assertTrue(underTest.canConvert(new HashMap<Number, List<Number>>().getClass()));
+        assertTrue(underTest.canConvert(new LinkedHashMap<Number, List<Number>>().getClass()));
     }
 
     @Test
@@ -105,6 +107,20 @@ public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest
 
     @Test(expected = ClassCastException.class)
     public void testMarshalWithNonStringMap() throws Exception {
+        StringWriter writer = new StringWriter();
+
+        Map<Number, Number> testMap = new LinkedHashMap<Number, Number>() {
+            {
+                put(1, 2);
+                put(3, 4);
+            }
+        };
+
+        underTest.marshal(testMap, new PrettyPrintWriter(writer), getMarshalingContext());
+    }
+
+    @Test(expected = ConversionException.class)
+    public void testMarshalWithHashMap() throws Exception {
         StringWriter writer = new StringWriter();
 
         Map<Number, Number> testMap = new HashMap<Number, Number>() {
