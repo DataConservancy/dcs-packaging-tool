@@ -149,7 +149,12 @@ public class ProfilePropertyBox extends VBox {
         if (propertyType != null && propertyType.getPropertyValueType() != null) {
             switch (propertyType.getPropertyValueType()) {
                 case LONG:
-                    return new NumericPropertyBox(initialValue, editable, "");
+                    //We display file sizes as formatted text, with size labels so we can't use a NumericPropertyBox
+                    if (propertyType.getPropertyValueHint() != null && propertyType.getPropertyValueHint().equals(PropertyValueHint.FILE_SIZE)) {
+                        return new TextPropertyBox(initialValue, editable, propertyType.getPropertyValueHint(), "");
+                    } else {
+                        return new NumericPropertyBox(initialValue, editable, "");
+                    }
                 case DATE_TIME:
                     return new DatePropertyBox(initialValue, editable, "");
                 case STRING:
