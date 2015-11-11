@@ -118,4 +118,11 @@ public interface View<T extends Presenter> {
      * @param help the help object to use for the presenter
      */
     public void setHelp(Help help);
+
+    /**
+     * Returns the error label to report problems back to the user
+     * @return
+     */
+    Label getErrorLabel();
+
 }

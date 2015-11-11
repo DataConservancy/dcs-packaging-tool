@@ -25,6 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.WarningPopup;
+import org.dataconservancy.packaging.gui.view.impl.BaseViewImpl;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
 import java.util.List;
@@ -116,10 +117,10 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     boolean isFormAlreadyDrawn();
 
     /**
-     * Gets the file chooser where the user saves the package metadata
+     * Gets the file chooser where the user saves the package state
      * @return file chooser
      */
-    FileChooser getPackageMetadataFileChooser();
+    FileChooser getPackageStateFileChooser();
 
     /**
      * Given a field name, it tells the presenter whether it's failed GUI validation or not.

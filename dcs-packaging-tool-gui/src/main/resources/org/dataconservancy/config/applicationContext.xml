@@ -118,7 +118,6 @@
     <property name="packageMetadataService" ref="packageMetadataService"/>
     <property name="internalProperties" ref="internalProperties"/>
     <property name="domainProfileStore" ref="domainProfileStore"/>
-    <property name="packageStateSerializer" ref="packageStateSerializer"/>
   </bean>
 
   <bean id="openExistingPackagePresenter" class="org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl">
@@ -228,6 +227,7 @@
     <property name="toolBuildTimestamp" value="${build.timeStamp}"/>
     <property name="toolBuildRevision" value="${build.revision}"/>
     <property name="domainProfileStore" ref="domainProfileStore"/>
+    <property name="packageStateSerializer" ref="packageStateSerializer"/>
   </bean>
 
 
@@ -259,7 +259,7 @@
         <entry key="USER_SPECIFIED_PROPERTIES" value-ref="userSpecifiedPropertiesMarshaller"/>
       </map>
     </property>
-    <property name="archive" value="false"/>
+    <property name="archive" value="true"/>
   </bean>
 
   <bean id="applicationVersionMarshaller"  class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">

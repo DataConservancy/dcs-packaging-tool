@@ -17,9 +17,13 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import org.dataconservancy.packaging.gui.Controller;
+import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.View;
+
+import java.io.IOException;
 
 /**
  * Base class that controls event handlers for UI elements common to each screen. 
@@ -62,7 +66,12 @@ public abstract class BasePresenterImpl implements Presenter {
         this.view = view;
     }
 
-    public void onBackPressed() {
+    public void onBackPressed(){
+        try {
+            getController().savePackageStateFile();
+        } catch (IOException e) {
+            view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+        }
         getController().goToPreviousPage();
     }
 }

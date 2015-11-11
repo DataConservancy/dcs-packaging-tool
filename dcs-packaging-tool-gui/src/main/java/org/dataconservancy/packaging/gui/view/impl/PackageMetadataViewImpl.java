@@ -21,7 +21,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -43,10 +42,8 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
-import org.dataconservancy.packaging.gui.util.RemovableLabel;
 import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
-import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
@@ -67,7 +64,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     //The value of the combobox domain profiles
     private ComboBox<String> domainProfilesComboBox;
 
-    private Label errorLabel;
+    //private Label errorLabel;
     private ScrollPane contentScrollPane;
     private VBox content;
     private VBox requiredVBox;
@@ -76,7 +73,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private List<Node> allDynamicFields;
     private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
-    private FileChooser packageMetadataFileChooser;
+    private FileChooser packageStateFileChooser;
     private Set<String> failedValidation;
 
     private boolean allowsMultipleDomainProfiles = true;
@@ -95,7 +92,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
             warningPopup = new WarningPopup();
         }
 
-        packageMetadataFileChooser = new FileChooser();
+        packageStateFileChooser = new FileChooser();
+        packageStateFileChooser.setInitialFileName(".zip");
 
         //Set up the text for the controls in the footer.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -301,8 +299,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public FileChooser getPackageMetadataFileChooser() {
-        return packageMetadataFileChooser;
+    public FileChooser getPackageStateFileChooser() {
+        return packageStateFileChooser;
     }
 
     /**
@@ -341,8 +339,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.URL)) {
                 // TODO: this may have to be done via a button
-                TextPropertyBox textPropertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
-                fieldContainer.getChildren().add(textPropertyBox);
+                TextPropertyBox propertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
+                fieldContainer.getChildren().add(propertyBox);
             }
 
             fieldContainer.getChildren().add(textField);
@@ -355,11 +353,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
-                TextPropertyBox textPropertyBox = new TextPropertyBox("", packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
-                textPropertyBox.getPropertyInput().setId(packageMetadata.getName());
-                allDynamicFields.add(textPropertyBox.getPropertyInput());
+                TextPropertyBox propertyBox = new TextPropertyBox("", packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
+                propertyBox.getPropertyInput().setId(packageMetadata.getName());
+                allDynamicFields.add(propertyBox.getPropertyInput());
 
-                fieldContainer.getChildren().add(textPropertyBox);
+                fieldContainer.getChildren().add(propertyBox);
             }
         }
         return fieldContainer;

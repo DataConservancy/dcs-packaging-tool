@@ -17,6 +17,8 @@
 package org.dataconservancy.packaging.gui;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -35,6 +37,7 @@ import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -53,6 +56,10 @@ public class Controller {
     private File rootArtifactDir;
     //END TODO
     private PackageState packageState;
+    private File packageStateFile;
+    private FileChooser packageStateFileChooser;
+    private PackageStateSerializer packageStateSerializer;
+    private String packageStateFileExtension=".zip";
 
     private DomainProfileStore domainProfileStore;
 
@@ -87,6 +94,8 @@ public class Controller {
         createNewPackagePagesStack = new Stack<>();
         openExistingPackagePagesStack = new Stack<>();
         toolVersion = new ApplicationVersion();
+        packageStateFileChooser = new FileChooser();
+        packageStateFileChooser.setInitialFileName(packageStateFileExtension);
         initiatePagesStacks();
     }
 
@@ -231,7 +240,7 @@ public class Controller {
     }
 
     /**
-     * Pops up a dialog that waits for the user to choose a file.ReM-Serialization-Format
+     * Pops up a dialog that waits for the user to choose a file.
      *
      * @param chooser the FileChooser
      * @return file chosen or null on cancel
@@ -328,7 +337,7 @@ public class Controller {
     }
 
     /**
-     * Shows the current page, a tells the presenter if it should clear it's information.
+     * Shows the current page, a tells the presenter if it should clear its information.
      */
     private void showPage() {
         factory.getHeaderView().highlightNextPage(currentPage);
@@ -360,6 +369,17 @@ public class Controller {
         }
     }
 
+    public void savePackageStateFile() throws IOException {
+        packageStateFile=showSaveFileDialog(packageStateFileChooser);
+        if(packageStateFile != null) {
+            packageStateFileChooser.setInitialDirectory(packageStateFile.getParentFile());
+            packageStateFileChooser.setInitialFileName(packageStateFile.getName());
+            FileOutputStream fs = new FileOutputStream(packageStateFile);
+            packageStateSerializer.serialize(getPackageState(), fs);
+            fs.close();
+        }
+    }
+
     public void setPackageDescription(PackageDescription description) {
         this.packageDescription = description;
     }
@@ -374,6 +394,14 @@ public class Controller {
 
     public File getPackageDescriptionFile() {
         return packageDescriptionFile;
+    }
+
+    public void setPackageStateFile(File packageStateFile) {
+        this.packageStateFile = packageStateFile;
+    }
+
+    public File getPackageStateFile(){
+        return packageStateFile;
     }
 
     public File getContentRoot() {
@@ -451,5 +479,9 @@ public class Controller {
 
     public Stack<Page> getOpenExistingPackagePagesStack() {
         return openExistingPackagePagesStack;
+    }
+
+    public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer){
+        this.packageStateSerializer = packageStateSerializer;
     }
 }
