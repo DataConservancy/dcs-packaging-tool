@@ -48,6 +48,7 @@ public class PackageState {
     /**
      * Package's tree structure
      */
+    @Serialize(streamId = StreamId.PACKAGE_TREE)
     private Model packageTree;
 
     /**

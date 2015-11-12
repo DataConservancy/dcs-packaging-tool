@@ -44,6 +44,7 @@ import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.T
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainProfileUris;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageMetadata;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageTreeRDF;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -112,6 +113,7 @@ public class PackageStateSerializationIT {
         state.setDomainObjectRDF(domainObjectsRDF);
         state.setPackageMetadataList(packageMetadata);
         state.setPackageName(packageName);
+        state.setPackageTree(packageTreeRDF);
 
         return state;
     }

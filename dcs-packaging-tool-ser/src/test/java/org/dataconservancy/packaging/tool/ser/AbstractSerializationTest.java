@@ -31,12 +31,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.DOMAINOBJECTS_RDF_1;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.PACKAGE_TREE_RDF_1;
 
 /**
  * Base test class of all serialization tests.
@@ -74,6 +74,8 @@ public abstract class AbstractSerializationTest {
 
         public static Model domainObjectsRDF;
 
+        public static Model packageTreeRDF;
+
         public static HashMap<URI, List<Property>> userProperties = new HashMap<URI, List<Property>>() {
             {
                 try {
@@ -108,6 +110,7 @@ public abstract class AbstractSerializationTest {
             applicationVersion.setBuildTimeStamp("1234");
             try {
                 domainObjectsRDF = ModelFactory.createDefaultModel().read(DOMAINOBJECTS_RDF_1.getInputStream(), null);
+                packageTreeRDF = ModelFactory.createDefaultModel().read(PACKAGE_TREE_RDF_1.getInputStream(), null);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -135,6 +138,10 @@ public abstract class AbstractSerializationTest {
                 new ClassPathResource("org/dataconservancy/packaging/tool/ser/domain-objects-rdf-v1.ser");
 
         public static ClassPathResource USER_PROPERTIES_1 =
-                        new ClassPathResource("org/dataconservancy/packging/tool/ser/user-property-v1.ser");
+                new ClassPathResource("org/dataconservancy/packaging/tool/ser/user-property-v1.ser");
+
+        public static ClassPathResource PACKAGE_TREE_RDF_1 =
+                new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-tree-rdf-v1.ser");
+
     }
 }
