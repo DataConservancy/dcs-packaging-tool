@@ -430,7 +430,6 @@ public class DcsBOProfile
         hasAlottedStorage.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasAlottedStorage"));
         hasAlottedStorage.setPropertyValueType(PropertyValueType.LONG);
-        hasAlottedStorage.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
 
         hasUsedStorage.setLabel("Used Storage");
         hasUsedStorage
@@ -438,7 +437,6 @@ public class DcsBOProfile
         hasUsedStorage.setDomainPredicate(URI.create(NS_DCS_ONTOLOGY_BOM
                 + "hasUsedStorage"));
         hasUsedStorage.setPropertyValueType(PropertyValueType.LONG);
-        hasUsedStorage.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
 
         hasStartDate.setLabel("Start Date");
         hasStartDate

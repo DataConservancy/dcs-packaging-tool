@@ -158,6 +158,11 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
             addNewPropertyListener.fieldAdded();
         }
 
+        //Error label that lets the user know they either need to specify a URI or one of our known property types.
+        final Label requiresURILabel = new Label(TextFactory.getText(Labels.LabelKey.PREDICATE_MUST_BE_URI_OR_KNOWN));
+        requiresURILabel.setTextFill(Color.RED);
+        requiresURILabel.setVisible(false);
+
         /*
          * Creates a converter that converts the combobox string into a PropertyType object. It's important to note this differs from the
          * cell factory that provides the dropdown list which uses the property type label, this uses the domain predicate.
@@ -181,15 +186,25 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                 }
 
                 if (propertyType == null) {
-                    propertyType = new PropertyType();
-                    propertyType.setLabel(s);
-                    propertyType.setDescription(s);
+                    Validator uriValidator = ValidatorFactory.getValidator(PropertyValueHint.URI);
+                    if (uriValidator != null && uriValidator.isValid(s)) {
+                        propertyType = new PropertyType();
+                        propertyType.setLabel(s);
+                        propertyType.setDescription(s);
 
-                    try {
-                        propertyType.setDomainPredicate(new URI(s));
-                    } catch (URISyntaxException e) {
-                        //TODO: Show error to the user that it needs to be a URI
+                        try {
+                            propertyType.setDomainPredicate(new URI(s));
+                        } catch (URISyntaxException e) {
+                            requiresDisabled.setValue(true);
+                            requiresURILabel.setVisible(true);
+                        }
+                    } else {
+                        requiresDisabled.setValue(true);
+                        requiresURILabel.setVisible(true);
                     }
+
+                    requiresDisabled.setValue(false);
+                    requiresURILabel.setVisible(false);
                 }
 
                 return propertyType;
@@ -209,11 +224,6 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
             }
         }
 
-        //Error label that lets the user know they either need to specify a URI or one of our known property types.
-        final Label requiresURILabel = new Label(TextFactory.getText(Labels.LabelKey.PREDICATE_MUST_BE_URI_OR_KNOWN));
-        requiresURILabel.setTextFill(Color.RED);
-        requiresURILabel.setVisible(false);
-
         //Listens for changes to the predicate value and adjusts other fields accordingly.
         propertyTypeComboBox.valueProperty().addListener((observableValue, propertyType, newPropertyType) -> {
             if (newPropertyType != null) {
@@ -221,6 +231,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                 if (vocabularyComboBox.getValue().getPropertyTypes().contains(newPropertyType)) {
                     requiresDisabled.setValue(true);
                     requiresUri.setValue(newPropertyType.getPropertyValueType() != null && newPropertyType.getPropertyValueType().equals(PropertyValueType.URI));
+                    requiresURILabel.setVisible(false);
                 } else {
                     requiresDisabled.setValue(false);
 
@@ -229,8 +240,8 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                 }
             } else {
                 //If the predicate entered isn't valid or a known type, disable all other fields and display a warning.
-                requiresURILabel.setVisible(true);
                 requiresDisabled.setValue(true);
+                requiresURILabel.setVisible(true);
             }
         });
 
@@ -447,10 +458,12 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
     public PropertyType getUserDefinedPropertyType() {
         PropertyType type = propertyTypeComboBox.getValue();
-        if (requiresUri.getValue()) {
-            type.setPropertyValueType(PropertyValueType.URI);
-        } else {
-            type.setPropertyValueType(PropertyValueType.STRING);
+        if (type != null) {
+            if (requiresUri.getValue()) {
+                type.setPropertyValueType(PropertyValueType.URI);
+            } else {
+                type.setPropertyValueType(PropertyValueType.STRING);
+            }
         }
         return type;
     }

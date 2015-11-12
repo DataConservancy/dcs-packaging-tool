@@ -8,7 +8,12 @@ public class URIValidator implements Validator {
     @Override
     public boolean isValid(String string) {
         try {
-            new URI(string);
+            URI uri = new URI(string);
+            if (uri.getScheme() == null || uri.getScheme().isEmpty()) {
+                return false;
+            } else if (uri.getSchemeSpecificPart() == null || uri.getSchemeSpecificPart().isEmpty()) {
+                return false;
+            }
             return true;
         } catch (URISyntaxException e) {
             return false;
