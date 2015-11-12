@@ -32,7 +32,7 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
-import org.dataconservancy.packaging.gui.model.UserDefinedPropertyGroup;
+import org.dataconservancy.packaging.gui.model.UserDefinedPropertyVocabulary;
 import org.dataconservancy.packaging.gui.model.UserDefinedPropertyGroupJSONBuilder;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
 import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
@@ -72,7 +72,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
     private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
-    List<UserDefinedPropertyGroup> availableUserDefinedPropertyGroups;
+    List<UserDefinedPropertyVocabulary> availableUserDefinedPropertyVocabularies;
     private DisciplineLoadingService disciplineLoadingService;
     private ApplyButtonValidationListener applyButtonValidationListener;
     private DomainProfileService profileService;
@@ -306,7 +306,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewUserDefinedPropertyButton);
 
         if (userDefinedPropertyValues == null || userDefinedPropertyValues.isEmpty()) {
-            UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyGroups, addNewRelationshipListener);
+            UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyVocabularies, addNewRelationshipListener);
             relationshipsBox.getChildren().add(userDefinedPropertyBox);
             userDefinedProperties.add(userDefinedPropertyBox);
             addNewUserDefinedPropertyButton.setDisable(true);
@@ -314,7 +314,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
             Map<PropertyType, List<String>> propertyMap = sortAlreadySetPropertyValues(userDefinedPropertyValues);
             //Otherwise loop through the PropertyTypes and create a box for each one.
             for (PropertyType propertyType : propertyMap.keySet()) {
-                UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(propertyType, propertyMap.get(propertyType), availableUserDefinedPropertyGroups, addNewRelationshipListener);
+                UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(propertyType, propertyMap.get(propertyType), availableUserDefinedPropertyVocabularies, addNewRelationshipListener);
                 relationshipsBox.getChildren().add(userDefinedPropertyBox);
                 userDefinedProperties.add(userDefinedPropertyBox);
 
@@ -328,7 +328,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
 
         addNewUserDefinedPropertyButton.setOnAction(arg0 -> {
-            UserDefinedPropertyBox newUserDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyGroups, addNewRelationshipListener);
+            UserDefinedPropertyBox newUserDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyVocabularies, addNewRelationshipListener);
             userDefinedProperties.add(newUserDefinedPropertyBox);
             int buttonIndex = relationshipsBox.getChildren().indexOf(addNewUserDefinedPropertyButton);
 
@@ -402,7 +402,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
                 }
                 InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream(path);
                 if (fileStream != null) {
-                    availableUserDefinedPropertyGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
+                    availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
                 } else {
                     log.error("Error reading classpath relationships file: " + relationshipsPath);
                 }
@@ -411,7 +411,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
                 File paramFile = new File(relationshipsPath);
                 if (paramFile.exists()) {
                     try {
-                        availableUserDefinedPropertyGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(new FileInputStream(paramFile));
+                        availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(new FileInputStream(paramFile));
                     } catch (FileNotFoundException e) {
                         log.error("Error reading selected relationships file: " + relationshipsPath + " " + e.getMessage());
                     }
@@ -420,10 +420,10 @@ public class NodePropertyWindowBuilder implements CssConstants {
         }
 
         //If the file is null attempt to load the built in resource file.
-        if (availableUserDefinedPropertyGroups.isEmpty()) {
+        if (availableUserDefinedPropertyVocabularies.isEmpty()) {
             InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream("/defaultRelationships");
             if (fileStream != null) {
-                availableUserDefinedPropertyGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
+                availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
             }
             else {
                 log.error("Error reading default relationships file. Couldn't find classpath file: /defaultRelationships");

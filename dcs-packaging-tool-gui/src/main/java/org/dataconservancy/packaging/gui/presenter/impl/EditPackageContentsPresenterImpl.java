@@ -287,29 +287,40 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             //First loop through all the properties in the popup
             view.getProfilePropertyBoxes().forEach(this::savePropertyFromBox);
 
+            List<Property> userDefinedProperties = new ArrayList<>();
             //Then loop through all the user defined properties in the popup and save them to package state
             for(UserDefinedPropertyBox userDefinedPropertyBox : view.getUserDefinedPropertyBoxes()) {
                 if (userDefinedPropertyBox.getUserDefinedPropertyType() != null
-                    && userDefinedPropertyBox.getUserDefinedPropertyObjects() != null && !userDefinedPropertyBox.getUserDefinedPropertyObjects().isEmpty()) {
+                    && userDefinedPropertyBox.getUserDefinedPropertyValues() != null && !userDefinedPropertyBox.getUserDefinedPropertyValues().isEmpty()) {
                     PropertyType propertyType = userDefinedPropertyBox.getUserDefinedPropertyType();
 
-                    for (TextPropertyBox propertyBox : userDefinedPropertyBox.getUserDefinedPropertyObjects()) {
-                        Property newProperty = new Property(propertyType);
+                    for (TextPropertyBox propertyBox : userDefinedPropertyBox.getUserDefinedPropertyValues()) {
+                        if (propertyBox.getValueAsString() != null && !propertyBox.getValueAsString().isEmpty()) {
+                            Property newProperty = new Property(propertyType);
 
-                        if (propertyType.getPropertyValueType() != null && propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
-                            try {
-                                newProperty.setUriValue(new URI(propertyBox.getValueAsString()));
-                            } catch (URISyntaxException e) {
-                                //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
-                                newProperty.getPropertyType().setPropertyValueType(PropertyValueType.STRING);
+                            if (propertyType.getPropertyValueType() != null &&
+                                propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
+                                try {
+                                    newProperty.setUriValue(new URI(propertyBox.getValueAsString()));
+                                } catch (URISyntaxException e) {
+                                    //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
+                                    newProperty.getPropertyType().setPropertyValueType(PropertyValueType.STRING);
+                                    newProperty.setStringValue(propertyBox.getValueAsString());
+                                }
+                            } else {
                                 newProperty.setStringValue(propertyBox.getValueAsString());
                             }
-                        } else {
-                            newProperty.setStringValue(propertyBox.getValueAsString());
+
+                            userDefinedProperties.add(newProperty);
                         }
                     }
                 }
             }
+
+            if (controller.getPackageState().getUserSpecifiedProperties() == null) {
+                controller.getPackageState().setUserSpecifiedProperties(new HashMap<>());
+            }
+            controller.getPackageState().getUserSpecifiedProperties().put(view.getPopupNode().getIdentifier(), userDefinedProperties);
 
             //apply metadata inheritance
             applyMetadataInheritance(view.getPopupNode());

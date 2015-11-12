@@ -37,7 +37,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     private TextInputControl propertyInput;
     private HBox propertyInputBox = new HBox(4);
     private Label validationImageLabel = new Label();
-
+    private PropertyValidationListener validationListener = null;
     /**
      * Creates a validating property box for a property, with an initial String value
      * @param initialValue the intial value of the property
@@ -64,7 +64,8 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     public TextPropertyBox(TextField textField, PropertyValueHint validationType){
         propertyInput = textField;
         if(validationType != null) {
-            propertyInput.textProperty().addListener(new PropertyValidationListener(this, validationType));
+            validationListener = new PropertyValidationListener(this, validationType);
+            propertyInput.textProperty().addListener(validationListener);
         }
         propertyInputBox.getChildren().add(propertyInput);
         propertyInputBox.getChildren().add(validationImageLabel);
@@ -80,10 +81,15 @@ public class TextPropertyBox extends VBox implements PropertyBox {
             propertyInput.setEditable(editable);
         } else {
             propertyInput = (TextInputControl) ControlFactory.createControl(ControlType.TEXT_FIELD, initialValue, helpText);
-            propertyInput.textProperty().addListener(new PropertyValidationListener(this, valueHint));
+            validationListener = new PropertyValidationListener(this, valueHint);
+            propertyInput.textProperty().addListener(validationListener);
             propertyInput.setEditable(editable);
         }
 
+    }
+
+    public void changePropertyValidationType(PropertyValueHint validationType) {
+        validationListener.updateValidationType(validationType);
     }
 
     /**

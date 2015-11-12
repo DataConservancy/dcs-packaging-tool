@@ -23,13 +23,13 @@ import java.util.List;
  * A java model of a group of propertyTypes. These relationship groups are made up of one or more PropertyType objects.
  * RelationshipGroups are parsed from a configuration file and displayed to users to supply propertyTypes for artifact in the GUI.
  */
-public class UserDefinedPropertyGroup {
+public class UserDefinedPropertyVocabulary {
     private String label;
     private String description;
     private String groupUrl;
     private List<PropertyType> propertyTypes;
 
-    public UserDefinedPropertyGroup(String label, String description, String groupUrl, List<PropertyType> propertyTypes) {
+    public UserDefinedPropertyVocabulary(String label, String description, String groupUrl, List<PropertyType> propertyTypes) {
         this.label = label;
         this.description = description;
         this.groupUrl = groupUrl;
@@ -55,9 +55,9 @@ public class UserDefinedPropertyGroup {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserDefinedPropertyGroup)) return false;
+        if (!(o instanceof UserDefinedPropertyVocabulary)) return false;
 
-        UserDefinedPropertyGroup other = (UserDefinedPropertyGroup) o;
+        UserDefinedPropertyVocabulary other = (UserDefinedPropertyVocabulary) o;
 
         if (label == null) {
             if (other.label != null)

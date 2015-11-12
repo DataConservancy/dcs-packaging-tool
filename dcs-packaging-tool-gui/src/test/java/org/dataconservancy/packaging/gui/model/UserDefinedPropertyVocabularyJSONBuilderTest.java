@@ -33,9 +33,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * Tests the serialization and deserialization of relationship groups to and from json.
  */
-public class UserDefinedPropertyGroupJSONBuilderTest {
+public class UserDefinedPropertyVocabularyJSONBuilderTest {
 
-    private List<UserDefinedPropertyGroup> testGroups;
+    private List<UserDefinedPropertyVocabulary> testGroups;
     private PropertyType propertyTypeOne;
     private PropertyType propertyTypeTwo;
 
@@ -59,7 +59,7 @@ public class UserDefinedPropertyGroupJSONBuilderTest {
         propertyList.add(propertyTypeOne);
         propertyList.add(propertyTypeTwo);
 
-        UserDefinedPropertyGroup testGroup = new UserDefinedPropertyGroup("group", "group description", "http://testgroup.org", propertyList);
+        UserDefinedPropertyVocabulary testGroup = new UserDefinedPropertyVocabulary("group", "group description", "http://testgroup.org", propertyList);
 
         testGroups = new ArrayList<>();
         testGroups.add(testGroup);
@@ -98,7 +98,7 @@ public class UserDefinedPropertyGroupJSONBuilderTest {
     @Test
     public void testDeserialization() {
         InputStream is = new ByteArrayInputStream(serializedGroup.getBytes());
-        List<UserDefinedPropertyGroup> returnedGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(is);
+        List<UserDefinedPropertyVocabulary> returnedGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(is);
         assertEquals(testGroups, returnedGroups);
     }
 
@@ -108,7 +108,7 @@ public class UserDefinedPropertyGroupJSONBuilderTest {
         UserDefinedPropertyGroupJSONBuilder.serialize(testGroups, outStream);
 
         InputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
-        List<UserDefinedPropertyGroup> roundTrippedGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(inStream);
+        List<UserDefinedPropertyVocabulary> roundTrippedGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(inStream);
 
         assertEquals(testGroups, roundTrippedGroups);
     }

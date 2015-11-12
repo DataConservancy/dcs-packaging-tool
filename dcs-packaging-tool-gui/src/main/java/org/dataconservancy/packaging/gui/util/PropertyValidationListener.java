@@ -51,6 +51,10 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
         this.failureImage = createFailureImageView();
     }
 
+    public void updateValidationType(PropertyValueHint validationType) {
+        this.validationType = validationType;
+    }
+
     @Override
     public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
         //If the field contains an invalid entry, we will have two children the propertyBox

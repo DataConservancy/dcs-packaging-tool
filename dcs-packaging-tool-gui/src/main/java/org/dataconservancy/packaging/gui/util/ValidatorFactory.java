@@ -35,6 +35,8 @@ public class ValidatorFactory {
                 return new PhoneNumberValidator();
             case URL:
                 return new UrlValidator();
+            case URI:
+                return new URIValidator();
             default:
                 return null;
         }
