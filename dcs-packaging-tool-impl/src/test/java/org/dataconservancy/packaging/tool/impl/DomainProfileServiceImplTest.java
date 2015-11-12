@@ -415,6 +415,45 @@ public class DomainProfileServiceImplTest {
         assertEquals(1, result.size());
         assertEquals(profile.getBarnMediaChildToFarmTransform(), result.get(0));
     }
+    
+    @Test
+    public void testGetNodeTransformsWithIgnoredNodes() {
+        Node root = ipmfact.createSimpleTree();
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+
+        root.walk(store::updateObject);
+
+        // One transform because cow has media child
+        List<NodeTransform> result = service.getNodeTransforms(cow);
+        
+        assertEquals(1, result.size());
+        assertEquals(profile.getMoveMediaFromCowToBarnTransform(), result.get(0));
+        
+        // Ignore child, now has different transform available
+        media.setIgnored(true);
+
+        result = service.getNodeTransforms(cow);
+        assertEquals(1, result.size());
+        assertEquals(profile.getCowToStockpileTransform(), result.get(0));
+
+        // No transform for barn because has cow child
+        assertEquals(0, service.getNodeTransforms(barn).size());
+
+        // Ignore child, now has transform available
+        cow.setIgnored(true);
+
+        result = service.getNodeTransforms(barn);
+        assertEquals(1, result.size());
+        assertEquals(profile.getBarnNoChildToFarmTransform(), result.get(0));
+        
+        // No node transforms on ignored node
+        
+        barn.setIgnored(true);
+        result = service.getNodeTransforms(barn);
+        assertEquals(0, result.size());
+    }
 
     @Test
     public void testBarnMediaChildToFarmNodeTransform() {
