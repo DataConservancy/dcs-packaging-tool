@@ -234,28 +234,28 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
      *
      * @throws IOException
      */
-    @Ignore
     @Test
     public void testSuccessfulPackageGeneration() throws IOException, InterruptedException {
+        File packageLocation = tmpfolder.newFolder();
         //Check if what will become the package file already exists and if so delete it, this prevents the overwrite popup from appearing.
-        File createdFile = new File(presenter.getGenerationParams().getParam(GeneralParameterNames.PACKAGE_LOCATION).get(0),"thePackage.tar.gz");
+        File createdFile = new File(packageLocation, controller.getPackageState().getPackageName()+".tar.gz");
         if (createdFile.exists()) {
             createdFile.delete();
         }
 
         testFile = tmpfolder.newFile("test");
-
         PrintWriter fileOut = new PrintWriter(testFile);
-
         fileOut.println("foo");
         fileOut.close();
 
-        final Package pkg = new PackageImpl(testFile, "thePackage", null);
+        final Package pkg = new PackageImpl(testFile, controller.getPackageState().getPackageName(), null);
 
         final PackageGenerationParameters pkgParams = new PackageGenerationParameters();
-        pkgParams.addParam(GeneralParameterNames.PACKAGE_NAME, "thePackage");
+        pkgParams.addParam(GeneralParameterNames.PACKAGE_NAME, controller.getPackageState().getPackageName());
         pkgParams.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "tar");
         pkgParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, "gz");
+        pkgParams.addParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, "xml");
+        pkgParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation.getAbsolutePath());
 
         presenter.setTestBackgroundService();
 
@@ -275,10 +275,10 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         });
 
-        presenter.setPackageGenerationService((desc, params) -> pkg);
+        presenter.setPackageGenerationService((state, params) -> pkg);
         presenter.display();
 
-        outputDirectory = new File("./");
+        outputDirectory = packageLocation;
 
         view.getErrorLabel().setVisible(false);
         view.getSelectOutputDirectoryButton().fire();
