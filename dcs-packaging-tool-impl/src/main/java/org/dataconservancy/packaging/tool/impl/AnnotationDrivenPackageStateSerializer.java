@@ -110,10 +110,6 @@ import java.util.zip.CRC32;
  * <dt>archive</dt>
  * <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
  * When this flag is false, other archive-related properties are not consulted.</dd>
- * <dt>archiveFormat</dt>
- * <dd>A string indicating the format the archive should take.  Supported value are:
- * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
- * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
  * <dt>compress</dt>
  * <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
  * <dt>arxStreamFactory</dt>
@@ -188,13 +184,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * Whether or not we are serializing streams into an archive (zip or tar)
      */
     private boolean archive = true;
-
-    /**
-     * The archive format to use (when {@link #archive} is {@code true})
-     *
-     * Right now this isn't a requirement (support of multiple archive formats) so this support has been commented out.
-     */
-//    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
 
     /**
      * Whether or not to compress the archive (when {@link #archive} is {@code true})
@@ -468,50 +457,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         }
         return ZipArchiveInputStream.matches(signature, signatureLength);
     }
-
-    /**
-     * Whether or not compression will be used when writing to the {@code OutputStream}.  The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @return true if compression is being used
-     */
-    public boolean isCompress() {
-        return compress;
-    }
-
-    /**
-     * Whether or not compression will be used when writing to the {@code OutputStream}.  The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @param compress if compression is being used
-     */
-    public void setCompress(boolean compress) {
-        this.compress = compress;
-    }
-
-    /**
-     * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
-     * used to represent the format using values from
-     * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory}. The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @return a string representing the format of the archive
-     */
-//    public String getArchiveFormat() {
-//        return archiveFormat;
-//    }
-
-    /**
-     * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
-     * used to represent the format using values from
-     * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory}.  The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @param archiveFormat a string representing the format of the archive
-     */
-//    public void setArchiveFormat(String archiveFormat) {
-//        this.archiveFormat = archiveFormat;
-//    }
 
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
