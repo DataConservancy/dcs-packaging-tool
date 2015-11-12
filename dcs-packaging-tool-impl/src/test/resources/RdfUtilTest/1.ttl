@@ -1,0 +1,23 @@
+@prefix A: <http://example.org/A#> .
+@base <http://example.org/RdfUtilTest> .
+
+# The entire graph is all "local" to a root resource - it consists entirely
+# of hash URIs or connected blank nodes
+<> a A:Directory ;
+  A:hasFile <#File1> ;
+  A:details [
+      A:fileName "Music" ;
+      A:acl [
+          a A:ACL ;
+          A:accessTo <http://example.org/farm/Cows/Gladys> ;
+      ]
+  ] .
+<#File1> a A:File ;
+  A:details [
+      A:fileName "moo.mp3" ;
+      A:acl [
+          a A:ACL ;
+          A:accessTo <http://example.org/farm/Cows/Gladys> ;
+      ]
+  ] .
+  

@@ -1,0 +1,13 @@
+@prefix A: <http://example.org/A#> .
+
+# This graph has two root resources that define 'local' graphs 
+# consisting of connected blank nodes
+<http://example.org/RdfUtilTest/Directory1> a A:Directory ;
+  A:hasFile <http://example.org/RdfUtilTest/File1> ;
+  A:acl [
+      A:fileName "Music" ;
+      A:acl [
+          a A:ACL ;
+          A:accessTo <http://example.org/farm/Cows/Gladys> ;
+      ]
+  ] .
