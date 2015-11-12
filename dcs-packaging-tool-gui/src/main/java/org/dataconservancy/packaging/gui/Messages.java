@@ -30,7 +30,9 @@ public class Messages {
         PHONE_VALIDATION_FAILURE("phonevalidation.failure"),
         EMAIL_VALIDATION_FAILURE("emailvalidation.failure"),
         REFRESH_STATUS_MESSAGE("refreshstatus.message"),
-        URI_VALIDATION_FAILURE("urivalidation.failure");
+        URI_VALIDATION_FAILURE("urivalidation.failure"),
+        FILE_NAME_VALIDATION_FAILURE("filenamevalidation.failure");
+
 
         String property;
 

@@ -31,7 +31,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
@@ -76,8 +75,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private FileChooser packageStateFileChooser;
     private Set<String> failedValidation;
 
-    private boolean allowsMultipleDomainProfiles = true;
-
     public PackageMetadataViewImpl() {
         super();
         
@@ -120,16 +117,16 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         // setup static fields
         HBox topRow = new HBox(40);
 
-        VBox packageNameEntryFields = new VBox(4);
+        //since we want this field to be valitatable, we create a PackageMetadata
+        //object to pass to createFieldsView
+        PackageMetadata packageNameMetadata = new PackageMetadata();
+        packageNameMetadata.setName(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL));
+        packageNameMetadata.setEditable(true);
+        packageNameMetadata.setValidationType(PropertyValueHint.FILE_NAME);
+
+        VBox packageNameEntryFields = createFieldsView(packageNameMetadata);
+        packageNameEntryFields.setPrefWidth(310);
         packageNameEntryFields.setAlignment(Pos.TOP_LEFT);
-
-        Label packageNameLabel = new Label(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL));
-        packageNameEntryFields.getChildren().add(packageNameLabel);
-
-        packageNameField = (TextField) ControlFactory.createControl(ControlType.TEXT_FIELD, null, null);
-        packageNameEntryFields.getChildren().add(packageNameField);
-        packageNameField.setPrefWidth(310);
-
         topRow.getChildren().add(packageNameEntryFields);
 
         VBox domainProfileVBox = new VBox(4);
@@ -226,11 +223,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             formAlreadyDrawn = true;
         }
-    }
-
-    @Override
-    public Label getErrorLabel() {
-        return this.errorLabel;
     }
 
     @Override
@@ -353,6 +345,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 propertyBox.getPropertyInput().setId(packageMetadata.getName());
                 allDynamicFields.add(propertyBox.getPropertyInput());
 
+                //sorry for this hack, need to set this value here
+                if(packageMetadata.getName().equals(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL))){
+                    packageNameField = (TextField) propertyBox.getPropertyInput();
+                }
                 fieldContainer.getChildren().add(propertyBox);
             }
         }
