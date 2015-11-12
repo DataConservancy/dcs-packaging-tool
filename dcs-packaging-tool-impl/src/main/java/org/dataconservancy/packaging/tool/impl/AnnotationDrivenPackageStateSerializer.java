@@ -604,11 +604,21 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         return propertyDescriptors.get(streamId) != null;
     }
 
+    private boolean hasStreamMarshaller(StreamId streamId) {
+        return marshallerMap.get(streamId) != null;
+    }
+
     private boolean hasMarshaller(StreamId streamId) {
+        if (!hasStreamMarshaller(streamId)) {
+            throw new NullPointerException("StreamId '" + streamId + "' does not have a StreamMarshaller configured.");
+        }
         return marshallerMap.get(streamId).getMarshaller() != null;
     }
 
     private boolean hasUnmarshaller(StreamId streamId) {
+        if (!hasStreamMarshaller(streamId)) {
+            throw new NullPointerException("StreamId '" + streamId + "' does not have a StreamMarshaller configured.");
+        }
         return marshallerMap.get(streamId).getUnmarshaller() != null;
     }
 
