@@ -48,7 +48,7 @@ public class PackageState {
     /**
      * Package's tree structure
      */
-    @Serialize(streamId = StreamId.PACKAGE_TREE, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
+//    @Serialize(streamId = StreamId.PACKAGE_TREE, scope = {SerializationScope.WIP, SerializationScope.PACKAGE})
     private Model packageTree;
 
     /**
