@@ -48,7 +48,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -709,7 +708,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         VBox content = new VBox(48);
         content.setPrefWidth(300);
-        content.getChildren().add(errorLabel);
+        Label errorMessageLabel = new Label(errorMessage);
+        errorMessageLabel.setWrapText(true);
+        content.getChildren().add(errorMessageLabel);
 
         if (allowFutureHide) {
             content.getChildren().add(hideFutureWarningPopupCheckBox);
