@@ -27,6 +27,7 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
+import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -218,7 +219,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * A Map containing PropertyDescriptors for each field in PackageState that may be (de)serialized by this
      * implementation.  The PropertyDescriptor is used to access the field in the PackageState using reflection.
      */
-    private Map<StreamId, PropertyDescriptor> propertyDescriptors = getStreamDescriptors();
+    private Map<StreamId, PropertyDescriptor> propertyDescriptors =
+            SerializationAnnotationUtil.getStreamDescriptors(PackageState.class);
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
@@ -567,37 +569,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     public void setArchive(boolean archive) {
         this.archive = archive;
-    }
-
-    /**
-     * Answers a {@code Map} of {@link PropertyDescriptor} instances, which are used to reflectively access the
-     * {@link Serialize serializable} streams on {@link PackageState} instances.
-     * <p>
-     * Use of {@code PropertyDescriptor} is simply a convenience in lieu of the use of underlying Java reflection.
-     * </p>
-     * <p>
-     * This method looks for fields annotated by the {@code Serialize} annotation on the {@code PackageState.class}.
-     * A {@code PropertyDescriptor} is created for each field, and is keyed by the {@code StreamId} in the returned
-     * {@code Map}.
-     * </p>
-     *
-     * @return a Map of PropertyDescriptors keyed by their StreamId.
-     */
-    static Map<StreamId, PropertyDescriptor> getStreamDescriptors() {
-        HashMap<StreamId, PropertyDescriptor> results = new HashMap<>();
-
-        Arrays.stream(PackageState.class.getDeclaredFields())
-                .filter(candidateField -> AnnotationUtils.getAnnotation(candidateField, Serialize.class) != null)
-                .forEach(annotatedField -> {
-                    AnnotationAttributes attributes = AnnotationUtils.getAnnotationAttributes(annotatedField,
-                            AnnotationUtils.getAnnotation(annotatedField, Serialize.class));
-                    StreamId streamId = (StreamId) attributes.get("streamId");
-                    PropertyDescriptor descriptor =
-                            BeanUtils.getPropertyDescriptor(PackageState.class, annotatedField.getName());
-                    results.put(streamId, descriptor);
-                });
-
-        return results;
     }
 
     private boolean hasPropertyDescription(StreamId streamId) {
