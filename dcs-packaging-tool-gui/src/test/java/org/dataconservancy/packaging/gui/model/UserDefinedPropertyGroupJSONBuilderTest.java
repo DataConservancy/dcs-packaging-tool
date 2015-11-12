@@ -73,13 +73,13 @@ public class UserDefinedPropertyGroupJSONBuilderTest {
                  "   \"description\": \"" + propertyTypeOne.getDescription() + "\",\n" +
                  "   \"requiresURI\": " + true + ",\n" +
                  "   \"label\": \"" + propertyTypeOne.getLabel() + "\",\n" +
-                 "   \"relationshipURI\": \"" + propertyTypeOne.getDomainPredicate() + "\"\n" +
+                 "   \"predicate\": \"" + propertyTypeOne.getDomainPredicate() + "\"\n" +
             "    },\n" +
             "    {\n" +
                  "   \"description\": \"" + propertyTypeTwo.getDescription() + "\",\n" +
                  "   \"requiresURI\": " + false + ",\n" +
                  "   \"label\": \"" + propertyTypeTwo.getLabel() + "\",\n" +
-                 "   \"relationshipURI\": \"" + propertyTypeTwo.getDomainPredicate() + "\"\n" +
+                 "   \"predicate\": \"" + propertyTypeTwo.getDomainPredicate() + "\"\n" +
             "   }\n" +
             "]\n" +
         "}]";

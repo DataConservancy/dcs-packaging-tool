@@ -32,15 +32,19 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
-import org.dataconservancy.packaging.gui.model.RelationshipGroup;
-import org.dataconservancy.packaging.gui.model.RelationshipGroupJSONBuilder;
+import org.dataconservancy.packaging.gui.model.UserDefinedPropertyGroup;
+import org.dataconservancy.packaging.gui.model.UserDefinedPropertyGroupJSONBuilder;
 import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
+import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
+import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,19 +72,18 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
     private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
-    List<RelationshipGroup> availableRelationshipGroups;
+    List<UserDefinedPropertyGroup> availableUserDefinedPropertyGroups;
     private DisciplineLoadingService disciplineLoadingService;
     private ApplyButtonValidationListener applyButtonValidationListener;
     private DomainProfileService profileService;
 
     private Map<PropertyCategory, PropertyCategoryBox> categoryMap;
     private List<ProfilePropertyBox> nodePropertyBoxes;
+    private List<UserDefinedPropertyBox> userDefinedProperties;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public NodePropertyWindowBuilder(Hyperlink cancelPopupLink,
-                                     Button applyPopupButton,
-                                     String availableRelationshipsPath,
+    public NodePropertyWindowBuilder(Hyperlink cancelPopupLink, Button applyPopupButton, String availableRelationshipsPath,
                                      DisciplineLoadingService disciplineLoadingService) {
         this.cancelPopupLink = cancelPopupLink;
         this.applyPopupButton = applyPopupButton;
@@ -92,9 +95,10 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
     public Pane buildArtifactPropertiesLayout(Node node,
                                               Map<PropertyType, CheckBox> metadataInheritanceButtonMap,
-                                              DomainProfileService profileService) {
+                                              DomainProfileService profileService, List<Property> userDefinedPropertyValues) {
         categoryMap = new HashMap<>();
         nodePropertyBoxes = new ArrayList<>();
+        userDefinedProperties = new ArrayList<>();
 
         artifactDetailsLayout = new BorderPane();
         artifactDetailsLayout.setMinHeight(500);
@@ -106,7 +110,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
         this.profileService = profileService;
 
-        createNodePropertiesView(node);
+        createNodePropertiesView(node, userDefinedPropertyValues);
 
         return artifactDetailsLayout;
     }
@@ -115,12 +119,16 @@ public class NodePropertyWindowBuilder implements CssConstants {
         return nodePropertyBoxes;
     }
 
+    public List<UserDefinedPropertyBox> getUserDefinedPropertyBoxes() {
+        return userDefinedProperties;
+    }
+
     /*
      * Creates an artifact details popup. This popup's content is a tabbed view, with a tab for general properties,
      * creator properties, and relationships.
      * @param artifact
      */
-    private void createNodePropertiesView(Node node) {
+    private void createNodePropertiesView(Node node, List<Property> userDefinedProperties) {
 
         //The property popup will consist of the three tabs, general, creator and relationships.
         TabPane propertiesPopup = new TabPane();
@@ -142,7 +150,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         ScrollPane relationshipPane = new ScrollPane();
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        relationshipPane.setContent(createRelationshipTab(node));
+        relationshipPane.setContent(createRelationshipTab(userDefinedProperties));
         relationshipPane.setMinWidth(500);
         relationshipPane.setFitToWidth(true);
         relationshipTab.setContent(relationshipPane);
@@ -265,27 +273,9 @@ public class NodePropertyWindowBuilder implements CssConstants {
         final Label propertyNameLabel = new Label(propertyType.getLabel());
         propertyNameLabel.setPrefWidth(400);
         propertyNameLabel.getStyleClass().add(CssConstants.BOLD_TEXT_CLASS);
-        //propertyNameLabel.setStyle(CssConstants.BOLD_TEXT_CLASS);
-
-        /* TODO: If we want to list the node types that can inherit a property we need to loop through types and check if it has that property
-        StringBuilder sb = new StringBuilder();
-        final String typeSeparator = ", ";
-        for (String inheritingTypes : presenter.getInheritingTypes(artifactType, propertyName)) {
-            sb.append(ontologyLabels.get(inheritingTypes));
-            sb.append(typeSeparator);
-        }
-        sb.deleteCharAt(sb.lastIndexOf(typeSeparator));
-
-        final Label descendantTypesLabel = new Label(String.format(labels.get(Labels.LabelKey.INHERITANCE_DESCENDANT_TYPE),
-                sb.toString()));
-        descendantTypesLabel.setPrefWidth(400);
-        descendantTypesLabel.setWrapText(true);
-        */
 
         propNameAndExplation.getChildren().add(propertyNameLabel);
-        //propNameAndExplation.getChildren().add(descendantTypesLabel);
 
-        //propertyBox.getChildren().add(propertyNameLabel);
         propertyBox.getChildren().add(propNameAndExplation);
 
         final CheckBox applyPropertyValueToChildrenCheckBox = new CheckBox();
@@ -301,60 +291,79 @@ public class NodePropertyWindowBuilder implements CssConstants {
      * @param artifact
      * @return
      */
-    private VBox createRelationshipTab(final Node node) {
+    private VBox createRelationshipTab(List<Property> userDefinedPropertyValues) {
         final VBox relationshipsBox = new VBox(38);
 
-        //TODO: NO idea how were going to do this just diplay all triples on the node??
+        final double addNewButtonMaxWidth = 200;
+
         relationshipsBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
-        //If there aren't any existing relationships add an empty relationship box
 
-        //add advice explaining that hierarchical relationships are not modifiable
-        Label hierarchicalAdviceLabel = new Label(TextFactory.getText(Labels.LabelKey.HIERARCHICAL_ADVICE_LABEL));
-        hierarchicalAdviceLabel.setAlignment(Pos.TOP_LEFT);
-
-        relationshipsBox.getChildren().add(hierarchicalAdviceLabel);
         //Create the button for adding new relationships this will add a new set of relationship controls.
-        final Button addNewRelationshipButton = new Button(TextFactory.getText(Labels.LabelKey.ADD_RELATIONSHIP_BUTTON));
-        /*
-        addNewRelationshipButton.setMaxWidth(addNewButtonMaxWidth);
+        final Button addNewUserDefinedPropertyButton = new Button(TextFactory.getText(Labels.LabelKey.ADD_RELATIONSHIP_BUTTON));
 
-        final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewRelationshipButton);
+        addNewUserDefinedPropertyButton.setMaxWidth(addNewButtonMaxWidth);
 
-        if (artifact.getRelationships().isEmpty()) {
-            EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
-            artifactRelationshipFields.add(container);
-            relationshipsBox.getChildren().add(new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener));
-            addNewRelationshipButton.setDisable(true);
+        final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewUserDefinedPropertyButton);
+
+        if (userDefinedPropertyValues == null || userDefinedPropertyValues.isEmpty()) {
+            UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyGroups, addNewRelationshipListener);
+            relationshipsBox.getChildren().add(userDefinedPropertyBox);
+            userDefinedProperties.add(userDefinedPropertyBox);
+            addNewUserDefinedPropertyButton.setDisable(true);
         } else {
-            //Otherwise loop through the relationships and create a box for each one.
-            for (PackageRelationship relationship : artifact.getRelationships()) {
-                EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
-                artifactRelationshipFields.add(container);
-                relationshipsBox.getChildren().add(new RelationshipSelectionBox(artifact, relationship, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener));
-                if (relationship.getTargets() == null || relationship.getTargets().isEmpty()) {
-                    addNewRelationshipButton.setDisable(true);
+            Map<PropertyType, List<String>> propertyMap = sortAlreadySetPropertyValues(userDefinedPropertyValues);
+            //Otherwise loop through the PropertyTypes and create a box for each one.
+            for (PropertyType propertyType : propertyMap.keySet()) {
+                UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(propertyType, propertyMap.get(propertyType), availableUserDefinedPropertyGroups, addNewRelationshipListener);
+                relationshipsBox.getChildren().add(userDefinedPropertyBox);
+                userDefinedProperties.add(userDefinedPropertyBox);
+
+                if (propertyMap.get(propertyType) == null || propertyMap.get(propertyType).isEmpty()) {
+                    addNewUserDefinedPropertyButton.setDisable(true);
                 }
             }
         }
-        */
-        relationshipsBox.getChildren().add(addNewRelationshipButton);
 
-        /*
-        addNewRelationshipButton.setOnAction(arg0 -> {
-            EditPackageContentsViewImpl.NodeRelationshipContainer container = new EditPackageContentsViewImpl.NodeRelationshipContainer();
-            artifactRelationshipFields.add(container);
-            VBox newRelationshipBox = new RelationshipSelectionBox(artifact, null, container, availableRelationshipGroups, labels, packageOntologyService, addNewRelationshipListener);
-            int buttonIndex = relationshipsBox.getChildren().indexOf(addNewRelationshipButton);
+        relationshipsBox.getChildren().add(addNewUserDefinedPropertyButton);
 
-            relationshipsBox.getChildren().add(buttonIndex, newRelationshipBox);
 
-            addNewRelationshipButton.setDisable(true);
-            requestFocusForNewGroup(newRelationshipBox);
+        addNewUserDefinedPropertyButton.setOnAction(arg0 -> {
+            UserDefinedPropertyBox newUserDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyGroups, addNewRelationshipListener);
+            userDefinedProperties.add(newUserDefinedPropertyBox);
+            int buttonIndex = relationshipsBox.getChildren().indexOf(addNewUserDefinedPropertyButton);
+
+            relationshipsBox.getChildren().add(buttonIndex, newUserDefinedPropertyBox);
+
+            addNewUserDefinedPropertyButton.setDisable(true);
         });
-        */
+
         return relationshipsBox;
     }
 
+    private Map<PropertyType, List<String>> sortAlreadySetPropertyValues(List<Property> propertyValues) {
+        Map<PropertyType, List<String>> propertyMap = new HashMap<>();
+
+        for (Property property : propertyValues) {
+
+            String propertyValue;
+
+            if (property.getPropertyType().getPropertyValueType() != null && property.getPropertyType().getPropertyValueType().equals(PropertyValueType.URI)) {
+                propertyValue = property.getUriValue().toString();
+            } else {
+                propertyValue = property.getStringValue();
+            }
+
+            if (propertyMap.keySet().contains(property.getPropertyType())) {
+                propertyMap.get(property.getPropertyType()).add(propertyValue);
+            } else {
+                List<String> newPropertyValues = new ArrayList<>();
+                newPropertyValues.add(propertyValue);
+                propertyMap.put(property.getPropertyType(), newPropertyValues);
+            }
+        }
+
+        return propertyMap;
+    }
 
 
     //Sorts properties in the order of single value required, multi value required, optional single value, optional multi value
@@ -393,7 +402,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
                 }
                 InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream(path);
                 if (fileStream != null) {
-                    availableRelationshipGroups = RelationshipGroupJSONBuilder.deserialize(fileStream);
+                    availableUserDefinedPropertyGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
                 } else {
                     log.error("Error reading classpath relationships file: " + relationshipsPath);
                 }
@@ -402,7 +411,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
                 File paramFile = new File(relationshipsPath);
                 if (paramFile.exists()) {
                     try {
-                        availableRelationshipGroups = RelationshipGroupJSONBuilder.deserialize(new FileInputStream(paramFile));
+                        availableUserDefinedPropertyGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(new FileInputStream(paramFile));
                     } catch (FileNotFoundException e) {
                         log.error("Error reading selected relationships file: " + relationshipsPath + " " + e.getMessage());
                     }
@@ -411,10 +420,10 @@ public class NodePropertyWindowBuilder implements CssConstants {
         }
 
         //If the file is null attempt to load the built in resource file.
-        if (availableRelationshipGroups.isEmpty()) {
+        if (availableUserDefinedPropertyGroups.isEmpty()) {
             InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream("/defaultRelationships");
             if (fileStream != null) {
-                availableRelationshipGroups = RelationshipGroupJSONBuilder.deserialize(fileStream);
+                availableUserDefinedPropertyGroups = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
             }
             else {
                 log.error("Error reading default relationships file. Couldn't find classpath file: /defaultRelationships");

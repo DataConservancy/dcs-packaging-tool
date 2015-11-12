@@ -18,14 +18,13 @@ package org.dataconservancy.packaging.gui.view;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.NodeRelationshipContainer;
+import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
 
 import javafx.scene.control.Label;
 
@@ -98,12 +97,12 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * @return the container that holds the text fields representing the properties
      */
     List<ProfilePropertyBox> getProfilePropertyBoxes();
-    
+
     /**
-     * Gets the container that holds the text fields representing the relationships. 
-     * @return  the container that holds the text fields representing the relationships
+     * Gets the container that holds the user defined properties.
+     * @return the container that holds the text fields representing user defined properties
      */
-    Set<NodeRelationshipContainer> getArtifactRelationshipFields();
+    List<UserDefinedPropertyBox> getUserDefinedPropertyBoxes();
     
     /**
      * Gets the artifact that is being displayed in the popup. 

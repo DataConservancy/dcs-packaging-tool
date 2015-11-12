@@ -17,12 +17,8 @@
 package org.dataconservancy.packaging.gui.view.impl;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -65,16 +61,17 @@ import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
-import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
+import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
@@ -85,10 +82,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
@@ -130,9 +125,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     //Controls that are displayed in the package artifact popup.
     private Hyperlink cancelPopupLink;
     private Button applyPopupButton;
-
-    //Storage for mapping popup fields to properties on the artifacts. 
-    private Set<NodeRelationshipContainer> artifactRelationshipFields;
 
     private InternalProperties internalProperties;
 
@@ -522,9 +514,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             itemList.add(separator);
 
             for (final NodeTransform transform : nodeTransforms) {
-                final List<PropertyType> invalidProperties = new ArrayList<>();
+                final List<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> invalidProperties = new ArrayList<>();
 
-                List<PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
+                List<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
                 invalidProperties.addAll(packageNode.getNodeType().getPropertyConstraints().stream().filter(newTypeConstraint -> !newTypeProperties.contains(newTypeConstraint.getPropertyType())).map(PropertyConstraint::getPropertyType).collect(Collectors.toList()));
 
                 MenuItem item = new MenuItem(transform.getLabel());
@@ -572,10 +564,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     //Creates a string that lists all the invalid properties in single line list.
-    private String formatInvalidProperties(List<PropertyType> invalidProperties) {
+    private String formatInvalidProperties(List<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> invalidProperties) {
         String invalidPropertyString = "";
 
-        for (PropertyType property : invalidProperties) {
+        for (org.dataconservancy.packaging.tool.model.dprofile.PropertyType property : invalidProperties) {
             invalidPropertyString += property.getLabel() + "\n";
         }
 
@@ -627,9 +619,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         if (artifactDetailsWindow != null) {
             popupNode = packageNode;
-            artifactRelationshipFields = new HashSet<>();
 
-            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(packageNode, metadataInheritanceButtonMap, presenter.getController().getDomainProfileService());
+            List<Property> userDefinedProperties = null;
+            if (presenter.getController().getPackageState().getUserSpecifiedProperties() != null) {
+                userDefinedProperties = presenter.getController().getPackageState().getUserSpecifiedProperties().get(packageNode.getIdentifier());
+            }
+
+            Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(packageNode, metadataInheritanceButtonMap, presenter.getController().getDomainProfileService(),
+                                                                              userDefinedProperties);
 
             if (artifactDetailsScene == null) {
                 artifactDetailsScene = new Scene(propertiesPane, 540, 500);
@@ -696,24 +693,20 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return windowBuilder.getNodePropertyBoxes();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public List<UserDefinedPropertyBox> getUserDefinedPropertyBoxes() {
+        return windowBuilder.getUserDefinedPropertyBoxes();
+    }
+
     public Node getPopupNode() {
         return popupNode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public PackageToolPopup getWarningPopup() {
         return warningPopup;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void showWarningPopup(String title, String errorMessage, boolean allowNegative, boolean allowFutureHide) {
         if (warningPopup == null) {
@@ -880,31 +873,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return hideFutureWarningPopupCheckBox;
     }
 
-    /**
-     * Simple container class for holding artifact relationships
-     * text fields to link from the UI to artifact.
-     */
-    public static class NodeRelationshipContainer {
-        public ObservableValue<Relationship> relationship;
-        public Set<StringProperty> relationshipTargets = new HashSet<>();
-        public BooleanProperty requiresURI = new SimpleBooleanProperty(true);
-
-        public ObservableValue<Relationship> getRelationship() {
-            return relationship;
-        }
-
-        public Set<StringProperty> getRelationshipTargets() {
-            return relationshipTargets;
-        }
-
-        public BooleanProperty requiresURI() { return requiresURI; }
-    }
-
-    @Override
-    public Set<NodeRelationshipContainer> getArtifactRelationshipFields() {
-        return artifactRelationshipFields;
-    }
-
     @Override
     public Label getErrorMessageLabel() {
         return errorMessageLabel;
@@ -916,7 +884,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     @Override
-    public Map<PropertyType, CheckBox> getInheritMetadataCheckBoxMap() {
+    public Map<org.dataconservancy.packaging.tool.model.dprofile.PropertyType, CheckBox> getInheritMetadataCheckBoxMap() {
         return metadataInheritanceButtonMap;
     }
 

@@ -22,16 +22,14 @@ import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.TextFactory;
-import org.dataconservancy.packaging.gui.model.Relationship;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
+import org.dataconservancy.packaging.gui.util.TextPropertyBox;
+import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
-import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl.NodeRelationshipContainer;
-import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
-import org.dataconservancy.packaging.tool.model.PackageRelationship;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -47,6 +45,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -288,48 +287,28 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             //First loop through all the properties in the popup
             view.getProfilePropertyBoxes().forEach(this::savePropertyFromBox);
 
-            //Then loop through all relationships and set them on the artifact.
-            List<PackageRelationship> relationships = new ArrayList<>();
-            for(NodeRelationshipContainer relationshipContainer : view.getArtifactRelationshipFields()) {
-                if (relationshipContainer.getRelationship().getValue() != null) {
-                    Relationship relationship = relationshipContainer.getRelationship().getValue();
-                    if (relationship.getRelationshipUri() != null && !relationship.getRelationshipUri().isEmpty()) {
+            //Then loop through all the user defined properties in the popup and save them to package state
+            for(UserDefinedPropertyBox userDefinedPropertyBox : view.getUserDefinedPropertyBoxes()) {
+                if (userDefinedPropertyBox.getUserDefinedPropertyType() != null
+                    && userDefinedPropertyBox.getUserDefinedPropertyObjects() != null && !userDefinedPropertyBox.getUserDefinedPropertyObjects().isEmpty()) {
+                    PropertyType propertyType = userDefinedPropertyBox.getUserDefinedPropertyType();
 
-                        String relationshipUri = relationship.getRelationshipUri();
-                        //Only save a hierarchical relationship if it was already on the object and thus created by the system.
-                        //TODO Are we still going to ban structural relationships??
-                        //TODO Can we store generic triples on domain objects?
-                        /*
-                        if (packageOntologyService.isRelationshipHierarchical(view.getPopupNode(), relationshipUri)) {
-                            if (view.getPopupNode().getRelationshipByName(relationshipUri) != null) {
-                                relationships.add(new PackageRelationship(relationshipUri, relationshipContainer.requiresURI.get(), view.getPopupNode().getRelationshipByName(relationshipUri).getTargets()));
-                            }
-                        } else if (RDFURIValidator.isValid(relationshipUri)) {
-                            //If it's not hierarchical we just add it
-                            Set<String> targets = new HashSet<>();
-                            for (StringProperty field : relationshipContainer.getRelationshipTargets()) {
-                                //If target is not empty or null and is a valid RDF URI
-                                if (field.getValueAsString() != null && !field.getValueAsString().isEmpty()) {
-                                    if (relationshipContainer.requiresURI().getValueAsString()) {
-                                        if (RDFURIValidator.isValid(field.getValueAsString())) {
-                                            targets.add(field.getValueAsString());
-                                        }
-                                    } else {
-                                        targets.add(field.getValueAsString());
-                                    }
-                                }
-                            }
+                    for (TextPropertyBox propertyBox : userDefinedPropertyBox.getUserDefinedPropertyObjects()) {
+                        Property newProperty = new Property(propertyType);
 
-                            //If we have target values add the relationship to the set to be added to the artifact.
-                            //Any partially completed relationships will be discarded, both a definition
-                            //and at least one target need to be specified.
-                            if (!targets.isEmpty()) {
-                                relationships.add(new PackageRelationship(relationshipUri, relationshipContainer.requiresURI.get(), targets));
+                        if (propertyType.getPropertyValueType() != null && propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
+                            try {
+                                newProperty.setUriValue(new URI(propertyBox.getValueAsString()));
+                            } catch (URISyntaxException e) {
+                                //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
+                                newProperty.getPropertyType().setPropertyValueType(PropertyValueType.STRING);
+                                newProperty.setStringValue(propertyBox.getValueAsString());
                             }
-                        } */
+                        } else {
+                            newProperty.setStringValue(propertyBox.getValueAsString());
+                        }
                     }
                 }
-
             }
 
             //apply metadata inheritance
@@ -403,7 +382,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     protected void applyMetadataInheritance(Node node) {
-        Set<PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
+        Set<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
 
         if (node.getChildren() != null) {
             inheritablePropertyTypes.stream().filter(inheritablePropertyType -> view.getInheritMetadataCheckBoxMap().get(inheritablePropertyType).isSelected()).forEach(inheritablePropertyType -> {
