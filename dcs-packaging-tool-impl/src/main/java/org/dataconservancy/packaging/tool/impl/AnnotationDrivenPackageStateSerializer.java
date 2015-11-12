@@ -29,9 +29,6 @@ import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
-import org.springframework.beans.BeanUtils;
-import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.oxm.Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
@@ -43,9 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
@@ -110,8 +105,6 @@ import java.util.zip.CRC32;
  * <dt>archive</dt>
  * <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
  * When this flag is false, other archive-related properties are not consulted.</dd>
- * <dt>compress</dt>
- * <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
  * <dt>arxStreamFactory</dt>
  * <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
  * </dl>
@@ -184,11 +177,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * Whether or not we are serializing streams into an archive (zip or tar)
      */
     private boolean archive = true;
-
-    /**
-     * Whether or not to compress the archive (when {@link #archive} is {@code true})
-     */
-    private boolean compress = true;
 
     /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
