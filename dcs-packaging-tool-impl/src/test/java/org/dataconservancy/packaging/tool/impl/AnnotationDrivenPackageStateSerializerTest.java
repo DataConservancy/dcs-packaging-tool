@@ -40,6 +40,7 @@ import org.dataconservancy.packaging.tool.ser.DomainProfileUriListConverter;
 import org.dataconservancy.packaging.tool.ser.JenaModelSerializer;
 import org.dataconservancy.packaging.tool.ser.PackageMetadataConverter;
 import org.dataconservancy.packaging.tool.ser.PackageNameConverter;
+import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
 import org.dataconservancy.packaging.tool.ser.UserPropertyConverter;
 import org.junit.Before;
@@ -428,7 +429,7 @@ public class AnnotationDrivenPackageStateSerializerTest {
         PackageState state = new PackageState();  // a new instance of PackageState with no internal state
         underTest.deserialize(state, in);
 
-        Map<StreamId, PropertyDescriptor> pds = AnnotationDrivenPackageStateSerializer.getStreamDescriptors();
+        Map<StreamId, PropertyDescriptor> pds = SerializationAnnotationUtil.getStreamDescriptors(PackageState.class);
         assertTrue(pds.size() > 0);
         pds.keySet().stream().forEach(streamId -> {
             try {
@@ -553,32 +554,33 @@ public class AnnotationDrivenPackageStateSerializerTest {
         /* APPLICATION_VERSION */
         x.alias(StreamId.APPLICATION_VERSION.name(),
                 AbstractSerializationTest.TestObjects.applicationVersion.getClass());
-        PropertyDescriptor pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors()
+        PropertyDescriptor pd = SerializationAnnotationUtil.getStreamDescriptors(PackageState.class)
                 .get(StreamId.APPLICATION_VERSION);
         x.registerLocalConverter(PackageState.class, pd.getName(), new ApplicationVersionConverter());
 
         /* DOMAIN_PROFILE_LIST */
         x.alias(StreamId.DOMAIN_PROFILE_LIST.name(),
                  AbstractSerializationTest.TestObjects.domainProfileUris.getClass());
-        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.DOMAIN_PROFILE_LIST);
+        pd = SerializationAnnotationUtil.getStreamDescriptors(PackageState.class).get(StreamId.DOMAIN_PROFILE_LIST);
         x.registerLocalConverter(PackageState.class, pd.getName(), new DomainProfileUriListConverter());
 
         /* PACKAGE_METADATA */
         x.alias(StreamId.PACKAGE_METADATA.name(),
                  AbstractSerializationTest.TestObjects.packageMetadata.getClass());
-        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.PACKAGE_METADATA);
+        pd = SerializationAnnotationUtil.getStreamDescriptors(PackageState.class).get(StreamId.PACKAGE_METADATA);
         x.registerLocalConverter(PackageState.class, pd.getName(), new PackageMetadataConverter());
 
         /* PACKAGE_NAME */
         x.alias(StreamId.PACKAGE_NAME.name(),
                  AbstractSerializationTest.TestObjects.packageName.getClass());
-        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.PACKAGE_NAME);
+        pd = SerializationAnnotationUtil.getStreamDescriptors(PackageState.class).get(StreamId.PACKAGE_NAME);
         x.registerLocalConverter(PackageState.class, pd.getName(), new PackageNameConverter());
 
         /* USER_SPECIFIED_PROPERTIES */
         x.alias(StreamId.USER_SPECIFIED_PROPERTIES.name(),
                  AbstractSerializationTest.TestObjects.userProperties.getClass());
-        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.USER_SPECIFIED_PROPERTIES);
+        pd = SerializationAnnotationUtil.getStreamDescriptors(PackageState.class)
+                .get(StreamId.USER_SPECIFIED_PROPERTIES);
         x.registerLocalConverter(PackageState.class, pd.getName(), new UserPropertyConverter());
 
         return x;

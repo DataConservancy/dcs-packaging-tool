@@ -27,10 +27,8 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
+import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
-import org.springframework.beans.BeanUtils;
-import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.oxm.Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
@@ -42,9 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
@@ -109,12 +105,6 @@ import java.util.zip.CRC32;
  * <dt>archive</dt>
  * <dd>Flag used during serialization, controlling whether or not the output produces an archive (zip or tar).
  * When this flag is false, other archive-related properties are not consulted.</dd>
- * <dt>archiveFormat</dt>
- * <dd>A string indicating the format the archive should take.  Supported value are:
- * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#ZIP} and
- * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory#TAR}</dd>
- * <dt>compress</dt>
- * <dd>Flag used during serialization to control whether or not the archive is being compressed.</dd>
  * <dt>arxStreamFactory</dt>
  * <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
  * </dl>
@@ -189,18 +179,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     private boolean archive = true;
 
     /**
-     * The archive format to use (when {@link #archive} is {@code true})
-     *
-     * Right now this isn't a requirement (support of multiple archive formats) so this support has been commented out.
-     */
-//    private String archiveFormat = org.apache.commons.compress.archivers.ArchiveStreamFactory.ZIP;
-
-    /**
-     * Whether or not to compress the archive (when {@link #archive} is {@code true})
-     */
-    private boolean compress = true;
-
-    /**
      * Abstraction used to support the creation of ArchiveOutputStream and ArchiveEntry instances for
      * a particular archive format (when {@link #archive} is {@code true}). Because we are not supporting multiple
      * archive formats at this time (the requirement is to support ZIP only), this field is set to the
@@ -218,7 +196,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * A Map containing PropertyDescriptors for each field in PackageState that may be (de)serialized by this
      * implementation.  The PropertyDescriptor is used to access the field in the PackageState using reflection.
      */
-    private Map<StreamId, PropertyDescriptor> propertyDescriptors = getStreamDescriptors();
+    private Map<StreamId, PropertyDescriptor> propertyDescriptors =
+            SerializationAnnotationUtil.getStreamDescriptors(PackageState.class);
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
@@ -468,50 +447,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     }
 
     /**
-     * Whether or not compression will be used when writing to the {@code OutputStream}.  The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @return true if compression is being used
-     */
-    public boolean isCompress() {
-        return compress;
-    }
-
-    /**
-     * Whether or not compression will be used when writing to the {@code OutputStream}.  The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @param compress if compression is being used
-     */
-    public void setCompress(boolean compress) {
-        this.compress = compress;
-    }
-
-    /**
-     * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
-     * used to represent the format using values from
-     * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory}. The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @return a string representing the format of the archive
-     */
-//    public String getArchiveFormat() {
-//        return archiveFormat;
-//    }
-
-    /**
-     * The format used when serializing streams to an archive.  Supported formats are tar and zip.  Strings are
-     * used to represent the format using values from
-     * {@link org.apache.commons.compress.archivers.ArchiveStreamFactory}.  The implementation only
-     * considers this setting when the {@link #archive archive flag} is {@code true}.
-     *
-     * @param archiveFormat a string representing the format of the archive
-     */
-//    public void setArchiveFormat(String archiveFormat) {
-//        this.archiveFormat = archiveFormat;
-//    }
-
-    /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
      * may be (de)serialized by this implementation.
      */
@@ -567,37 +502,6 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     public void setArchive(boolean archive) {
         this.archive = archive;
-    }
-
-    /**
-     * Answers a {@code Map} of {@link PropertyDescriptor} instances, which are used to reflectively access the
-     * {@link Serialize serializable} streams on {@link PackageState} instances.
-     * <p>
-     * Use of {@code PropertyDescriptor} is simply a convenience in lieu of the use of underlying Java reflection.
-     * </p>
-     * <p>
-     * This method looks for fields annotated by the {@code Serialize} annotation on the {@code PackageState.class}.
-     * A {@code PropertyDescriptor} is created for each field, and is keyed by the {@code StreamId} in the returned
-     * {@code Map}.
-     * </p>
-     *
-     * @return a Map of PropertyDescriptors keyed by their StreamId.
-     */
-    static Map<StreamId, PropertyDescriptor> getStreamDescriptors() {
-        HashMap<StreamId, PropertyDescriptor> results = new HashMap<>();
-
-        Arrays.stream(PackageState.class.getDeclaredFields())
-                .filter(candidateField -> AnnotationUtils.getAnnotation(candidateField, Serialize.class) != null)
-                .forEach(annotatedField -> {
-                    AnnotationAttributes attributes = AnnotationUtils.getAnnotationAttributes(annotatedField,
-                            AnnotationUtils.getAnnotation(annotatedField, Serialize.class));
-                    StreamId streamId = (StreamId) attributes.get("streamId");
-                    PropertyDescriptor descriptor =
-                            BeanUtils.getPropertyDescriptor(PackageState.class, annotatedField.getName());
-                    results.put(streamId, descriptor);
-                });
-
-        return results;
     }
 
     private boolean hasPropertyDescription(StreamId streamId) {

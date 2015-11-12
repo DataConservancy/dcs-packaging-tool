@@ -221,6 +221,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         }
 
         ArrayList<NodeTransform> result = new ArrayList<>();
+        
+        if (node.isIgnored()) {
+            return result;
+        }
 
         for (NodeTransform tr : node.getNodeType().getDomainProfile().getNodeTransforms()) {
             if (can_transform(node, tr)) {
