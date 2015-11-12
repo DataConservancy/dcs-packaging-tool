@@ -42,7 +42,8 @@ public class Errors {
         PACKAGE_TREE_BUILD_ERROR("packagetreebuild.error"),
         INACCESSIBLE_CONTENT_DIR("inaccessiblepackagecontent.error"),
         ADD_CONTENT_ERROR("addcontent.error"),
-        IO_CREATE_ERROR("iocreate.error");
+        IO_CREATE_ERROR("iocreate.error"),
+        UNIGNORE_ERROR("unignoretype.error");
 
 
         private String property;

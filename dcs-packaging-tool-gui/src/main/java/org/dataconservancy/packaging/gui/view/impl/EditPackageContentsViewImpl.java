@@ -47,8 +47,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -368,8 +368,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         refreshPopupPositiveButton.getStyleClass().add(CLICKABLE);
         refreshPopupNegativeButton = new Button(TextFactory.getText(LabelKey.REJECT_BUTTON));
         refreshPopupNegativeButton.getStyleClass().add(CLICKABLE);
-
-       // windowBuilder = new PackageArtifactWindowBuilder(labels, ontologyLabels, cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService, messages);
     }
 
     @Override
@@ -507,9 +505,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             itemList.add(separator);
 
             for (final NodeTransform transform : nodeTransforms) {
-                final List<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> invalidProperties = new ArrayList<>();
+                final List<PropertyType> invalidProperties = new ArrayList<>();
 
-                List<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
+                List<PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
                 invalidProperties.addAll(packageNode.getNodeType().getPropertyConstraints().stream().filter(newTypeConstraint -> !newTypeProperties.contains(newTypeConstraint.getPropertyType())).map(PropertyConstraint::getPropertyType).collect(Collectors.toList()));
 
                 MenuItem item = new MenuItem(transform.getLabel());
@@ -557,10 +555,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     //Creates a string that lists all the invalid properties in single line list.
-    private String formatInvalidProperties(List<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> invalidProperties) {
+    private String formatInvalidProperties(List<PropertyType> invalidProperties) {
         String invalidPropertyString = "";
 
-        for (org.dataconservancy.packaging.tool.model.dprofile.PropertyType property : invalidProperties) {
+        for (PropertyType property : invalidProperties) {
             invalidPropertyString += property.getLabel() + "\n";
         }
 
@@ -598,8 +596,18 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     //Note this code is broken out into a protected method so that it can be executed by the test
-    protected void toggleItemIgnore(TreeItem<Node> node, boolean status) {
-        ipmService.ignoreNode(node.getValue(), status);
+    protected void toggleItemIgnore(TreeItem<Node> node, boolean ignored) {
+        ipmService.ignoreNode(node.getValue(), ignored);
+
+        errorLabel.setVisible(false);
+
+        if (!ignored && !presenter.getController().getDomainProfileService().validateTree(node.getValue())) {
+            if (!presenter.getController().getDomainProfileService().assignNodeTypes(presenter.getController().getPrimaryDomainProfile(), node.getValue())) {
+                ipmService.ignoreNode(node.getValue(), true);
+                errorLabel.setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
+                errorLabel.setVisible(true);
+            }
+        }
 
         // Rebuild the entire TreeView and reselect the current PackageArtifact
 
@@ -662,25 +670,16 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         this.ipmService = ipmService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Hyperlink getCancelPopupHyperlink() {
         return cancelPopupLink;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Button getApplyPopupButton() {
         return applyPopupButton;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<ProfilePropertyBox> getProfilePropertyBoxes() {
         return windowBuilder.getNodePropertyBoxes();
