@@ -42,7 +42,7 @@ public class AnnotationDrivenXStreamMarshallerFactory extends XStreamMarshallerF
         streamDescriptors.forEach((s, pd) -> {
             AbstractPackageToolConverter c;
             if ((c = converters.get(s)) != null) {
-                x.registerLocalConverter(pd.getPropertyType(), pd.getName(), c);
+                x.registerLocalConverter(PackageState.class, pd.getName(), c);
             }
         });
     }
