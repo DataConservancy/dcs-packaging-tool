@@ -207,9 +207,12 @@ public class IPMServiceImpl implements IPMService {
                 Node existingNode = existingLocationMap.get(location);
                 Node comparisonNode = comparisonLocationMap.get(location);
 
-                //In the event we refreshed on a sub node, the sub node is the root of the comparison tree,
-                //so we'll compare the file system parents
-                if (existingNode.getParent() != null && comparisonNode.getParent() == null) {
+                //This is a specialized case that occurs when we create a node in the tree with no backing file entity
+                if (existingNode.getParent() != null && existingNode.getParent().getFileInfo() == null) {
+                    checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
+                } else if (existingNode.getParent() != null && comparisonNode.getParent() == null) {
+                    //In the event we refreshed on a sub node, the sub node is the root of the comparison tree,
+                    //so we'll compare the file system parents
                     Path comparisonNodePath = Paths.get(comparisonNode.getFileInfo().getLocation());
                     if (existingNode.getParent().getFileInfo().getLocation().equals(comparisonNodePath.getParent().toUri())) {
                         checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
@@ -285,7 +288,11 @@ public class IPMServiceImpl implements IPMService {
     }
 
     private void addNodeLocation(Node node, Map<URI, Node> nodeLocationMap) {
-        nodeLocationMap.put(node.getFileInfo().getLocation(), node);
+
+        //If the node has no file information leave it out of the map
+        if (node.getFileInfo() != null) {
+            nodeLocationMap.put(node.getFileInfo().getLocation(), node);
+        }
 
         if (node.getChildren() != null) {
             for (Node child : node.getChildren()) {

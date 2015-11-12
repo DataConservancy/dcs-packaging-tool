@@ -217,13 +217,38 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         view.getRefreshPopupPositiveButton().setOnAction(event -> {
             ipmService.mergeTree(controller.getPackageTree(), view.getRefreshResult());
+            List<Node> currentlyIgnoredNodes = new ArrayList<>();
+            getIgnoredNodes(view.getRoot().getValue(), currentlyIgnoredNodes);
+
+            //To assign node types from the refresh we must unignore nodes so all nodes are considered
+            for (Node node : currentlyIgnoredNodes) {
+                ipmService.ignoreNode(node, false);
+            }
+
             controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), controller.getPackageTree());
+
+            //Once we're done assigning types we'll reignore whatever was previously ignored
+            for (Node node : currentlyIgnoredNodes) {
+                ipmService.ignoreNode(node, true);
+            }
 
             displayPackageTree();
             view.getRefreshPopup().hide();
         });
 
         view.getRefreshPopupNegativeButton().setOnAction(event -> view.getRefreshPopup().hide());
+    }
+
+    private void getIgnoredNodes(Node node, List<Node> ignoredNodes) {
+        if (node.isIgnored()) {
+            ignoredNodes.add(node);
+        }
+
+        if (node.getChildren() != null) {
+            for (Node child : node.getChildren()) {
+                getIgnoredNodes(child, ignoredNodes);
+            }
+        }
     }
 
     @Override

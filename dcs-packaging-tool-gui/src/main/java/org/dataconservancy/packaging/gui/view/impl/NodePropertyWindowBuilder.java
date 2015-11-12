@@ -34,7 +34,6 @@ import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.UserDefinedPropertyVocabulary;
 import org.dataconservancy.packaging.gui.model.UserDefinedPropertyGroupJSONBuilder;
-import org.dataconservancy.packaging.gui.util.ApplyButtonValidationListener;
 import org.dataconservancy.packaging.gui.util.EmptyFieldButtonDisableListener;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
@@ -74,7 +73,6 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
     List<UserDefinedPropertyVocabulary> availableUserDefinedPropertyVocabularies;
     private DisciplineLoadingService disciplineLoadingService;
-    private ApplyButtonValidationListener applyButtonValidationListener;
     private DomainProfileService profileService;
 
     private Map<PropertyCategory, PropertyCategoryBox> categoryMap;
@@ -88,7 +86,6 @@ public class NodePropertyWindowBuilder implements CssConstants {
         this.cancelPopupLink = cancelPopupLink;
         this.applyPopupButton = applyPopupButton;
 
-        applyButtonValidationListener = new ApplyButtonValidationListener(applyPopupButton);
         this.disciplineLoadingService = disciplineLoadingService;
         loadAvailableRelationships(availableRelationshipsPath);
     }

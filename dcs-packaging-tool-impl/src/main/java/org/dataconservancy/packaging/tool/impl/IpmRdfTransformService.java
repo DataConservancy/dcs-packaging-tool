@@ -118,7 +118,9 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
 
         nodeResource.addLiteral(IS_IGNORED, node.isIgnored());
         nodeResource.addProperty(HAS_DOMAIN_OBJECT, node.getDomainObject().toString());
-        nodeResource.addProperty(HAS_FILE_INFO, transformToRDF(node.getFileInfo(), nodeModel));
+        if (node.getFileInfo() != null) {
+            nodeResource.addProperty(HAS_FILE_INFO, transformToRDF(node.getFileInfo(), nodeModel));
+        }
 
         return nodeResource;
     }
