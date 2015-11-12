@@ -330,7 +330,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         if (!generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded") && !Thread.currentThread().isInterrupted()) {
             //If we've successfully generated a package, save the package to the provided output directory,
             //unless we wanted the package exploded, in which case there is no package file produced
-           /* if (createdPackage != null) {
+            if (createdPackage != null) {
                 try {
                     if (createdPackage.isAvailable()) {
                         FileOutputStream fos = new FileOutputStream(packageFile);
@@ -348,7 +348,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             } else {
                 log.error(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " Created package was null.");
                 return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR);
-            }*/
+            }
         }
 
         return "";
@@ -516,11 +516,15 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                         view.getErrorLabel().setVisible(true);
                 } else {
                     packageLocation = outputDirectory;
+                    generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation.getAbsolutePath());
+
                 }
             }
         } else {
             packageLocation =
                     new File(controller.getPackageTree().getFileInfo().getLocation()).getParentFile();
+            generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation.getAbsolutePath());
+
         }
         if (packageLocation != null) {
             view.getCurrentOutputDirectoryTextField().setText(packageLocation.getAbsolutePath());
@@ -542,8 +546,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         File packageFile;
-        if (controller.getPackageState().getOutputDirectory() != null) {
-            packageFile = new File(controller.getPackageState().getOutputDirectory(), packageFileName);
+        if (packageLocation != null) {
+            packageFile = new File(packageLocation, packageFileName);
         } else {
             packageFile = new File("./", packageFileName);
         }
