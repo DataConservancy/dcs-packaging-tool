@@ -207,19 +207,16 @@ public class IPMServiceImpl implements IPMService {
                 Node existingNode = existingLocationMap.get(location);
                 Node comparisonNode = comparisonLocationMap.get(location);
 
-                //If the node is root or the node's parent location is the same then we consider it the same
-                if ((existingNode.getParent() == null && comparisonNode.getParent() == null) || existingNode.getParent().getFileInfo().getLocation().equals(comparisonNode.getParent().getFileInfo().getLocation())) {
-                    if (existingNode.getFileInfo().isFile()
-                            && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5))
-                            && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1))) {
-
-                        //The checksums are different so we consider this an update
-                        nodeMap.put(comparisonNode, new NodeComparison(NodeComparison.Status.UPDATED, existingNode));
-                        comparisonLocationMap.remove(location);
-                    } else {
-                        //The file location is completely unchanged and not updated
-                        comparisonLocationMap.remove(location);
+                //In the event we refreshed on a sub node, the sub node is the root of the comparison tree,
+                //so we'll compare the file system parents
+                if (existingNode.getParent() != null && comparisonNode.getParent() == null) {
+                    Path comparisonNodePath = Paths.get(comparisonNode.getFileInfo().getLocation());
+                    if (existingNode.getParent().getFileInfo().getLocation().equals(comparisonNodePath.getParent().toUri())) {
+                        checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
                     }
+                } else if ((existingNode.getParent() == null && comparisonNode.getParent() == null) || existingNode.getParent().getFileInfo().getLocation().equals(comparisonNode.getParent().getFileInfo().getLocation())) {
+                    //If both nodes are root or the node's parent location is the same then we consider it the same
+                    checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
                 } else {
                     //The node has moved so we consider it a delete and add.
                     markNodesRemoved(existingNode, existingNode.getParent(), nodeMap);
@@ -265,6 +262,19 @@ public class IPMServiceImpl implements IPMService {
         return nodeMap;
     }
 
+    private void checkFileUpdate(URI location, Node existingNode, Node comparisonNode, Map<Node, NodeComparison> nodeMap, Map<URI, Node> comparisonLocationMap) {
+        if (existingNode.getFileInfo().isFile() && comparisonNode.getFileInfo().isFile()
+                && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5))
+                && !existingNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(comparisonNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1))) {
+
+            //The checksums are different so we consider this an update
+            nodeMap.put(comparisonNode, new NodeComparison(NodeComparison.Status.UPDATED, existingNode));
+            comparisonLocationMap.remove(location);
+        } else {
+            //The file location is completely unchanged and not updated
+            comparisonLocationMap.remove(location);
+        }
+    }
     private void markNodesRemoved(Node node, Node parent, Map<Node, NodeComparison> nodeMap) {
         nodeMap.put(node, new NodeComparison(NodeComparison.Status.DELETED, parent));
         if (node.getChildren() != null) {
