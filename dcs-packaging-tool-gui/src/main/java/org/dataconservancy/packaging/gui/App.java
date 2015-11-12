@@ -46,7 +46,9 @@ public class App extends Application {
     }
 
     public void start(Stage stage) throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"classpath*:org/dataconservancy/config/applicationContext.xml",
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
+                new String[]{"classpath*:org/dataconservancy/config/applicationContext.xml",
+                        "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
                 "classpath*:applicationContext.xml"});
 
         // min supported size is 800x600

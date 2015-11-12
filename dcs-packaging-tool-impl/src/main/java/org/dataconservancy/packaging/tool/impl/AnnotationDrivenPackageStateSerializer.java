@@ -419,7 +419,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         // inputStream to the package state
 
         try {
-            while ((entry = (in.getNextEntry())) != null) {
+            while ((entry = in.getNextEntry()) != null) {
                 if (all || streamId.name().equals(entry.getName())) {
                     if (all) {
                         streamId = StreamId.valueOf(entry.getName().toUpperCase());

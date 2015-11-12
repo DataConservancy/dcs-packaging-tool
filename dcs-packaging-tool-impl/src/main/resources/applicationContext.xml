@@ -52,4 +52,11 @@
     </property>
   </bean>
 
+  <!-- (DE)SERIALIZATION -->
+  <bean id="packageStateSerializer"
+        class="org.dataconservancy.packaging.tool.impl.AnnotationDrivenPackageStateSerializer">
+    <property name="marshallerMap" ref="marshallerMap"/>
+    <property name="archive" value="true"/>
+  </bean>
+
 </beans>
