@@ -21,9 +21,12 @@ import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.presenter.impl.EditPackageContentsPresenterImpl;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.api.IPMService;
+import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.dataconservancy.packaging.tool.profile.util.DcBoIpmFactory;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
+import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -54,6 +58,10 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Qualifier("ipmService")
     private IPMService ipmService;
 
+    @Autowired
+    @Qualifier("domainProfileStore")
+    private DomainProfileStore domainProfileStore;
+
     private Node project;
     private Node collection;
     private Node dataItem;
@@ -73,6 +81,8 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         view.setHeaderView(headerView);
         view.setHelp(help);
 
+        PackageState state = new PackageState();
+        state.setDomainProfileIdList(Collections.singletonList(new DcsBOProfile().getIdentifier()));
         Controller controller = new Controller() {
             @Override
             public File showSaveFileDialog(FileChooser chooser) {
@@ -88,7 +98,18 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
             public Node getPackageTree() {
                 return project;
             }
+
+            @Override
+            public PackageState getPackageState() {
+                return state;
+            }
         };
+
+        controller.setDomainProfileStore(domainProfileStore);
+        controller.setPackageState(state);
+        controller.initializeDomainStoreAndServices(null);
+
+        controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), project);
 
         presenter = new EditPackageContentsPresenterImpl(view);
         presenter.setController(controller);
