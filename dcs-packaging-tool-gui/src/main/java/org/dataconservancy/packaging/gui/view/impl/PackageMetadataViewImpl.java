@@ -121,6 +121,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         //object to pass to createFieldsView
         PackageMetadata packageNameMetadata = new PackageMetadata();
         packageNameMetadata.setName(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL));
+        packageNameMetadata.setLabel(packageNameMetadata.getName().replace("-"," "));
         packageNameMetadata.setEditable(true);
         packageNameMetadata.setValidationType(PropertyValueHint.FILE_NAME);
 
@@ -301,7 +302,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         VBox fieldContainer = new VBox(4);
 
         HBox fieldLabelHbox = new HBox(4);
-        Label fieldLabel = new Label(packageMetadata.getName());
+        Label fieldLabel = new Label(packageMetadata.getLabel());
         fieldLabel.setPadding(new Insets(3, 0, 0, 0));
         fieldLabelHbox.getChildren().add(fieldLabel);
 
