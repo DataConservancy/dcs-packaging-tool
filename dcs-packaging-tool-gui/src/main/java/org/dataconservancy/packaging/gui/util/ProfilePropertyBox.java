@@ -25,6 +25,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -173,13 +174,46 @@ public class ProfilePropertyBox extends VBox {
         //If we dont' have a hint we just assume it's a text property.
         return new TextPropertyBox(initialValue, editable, null, "");
     }
+
     private void createChildProfilePropertyBoxes(List<ProfilePropertyBox> nodePropertyBoxes, Node node, DomainProfileService profileService, GroupPropertyChangeListener listener, VBox propertyValueBox) {
-        for (PropertyConstraint subConstraint : propertyConstraint.getPropertyType().getComplexPropertyConstraints()) {
+        List<PropertyConstraint> sortedProperties = new ArrayList<>();
+
+        //Get the property name key set and then create a sorted list from it.
+        sortedProperties.addAll(propertyConstraint.getPropertyType().getComplexPropertyConstraints());
+        sortProperties(sortedProperties);
+
+        for (PropertyConstraint subConstraint : sortedProperties) {
             ProfilePropertyBox subProfilePropertyBox = new ProfilePropertyBox(subConstraint, node, profileService, disciplineLoadingService);
             nodePropertyBoxes.add(subProfilePropertyBox);
             propertyValueBox.getChildren().add(subProfilePropertyBox);
             addChangeListenerToProfileBox(subProfilePropertyBox, listener);
         }
+    }
+
+    //Sorts properties in the order of single value required, multi value required, optional single value, optional multi value
+    private void sortProperties(List<PropertyConstraint> propertyConstraints) {
+        Collections.sort(propertyConstraints, (propertyOne, propertyTwo) -> {
+
+            int propertyOneMaxOccurs = propertyOne.getMaximum();
+            int propertyOneMinOccurs = propertyOne.getMinimum();
+
+            int propertyTwoMaxOccurs = propertyTwo.getMaximum();
+            int propertyTwoMinOccurs = propertyTwo.getMinimum();
+
+            if (propertyOneMinOccurs == propertyTwoMinOccurs && propertyOneMaxOccurs == propertyTwoMaxOccurs) {
+                return 0;
+            }
+
+            if (propertyOneMinOccurs == propertyTwoMinOccurs) {
+                if (propertyOneMaxOccurs < propertyTwoMaxOccurs) {
+                    return -1;
+                }
+            } else if (propertyOneMinOccurs > propertyTwoMinOccurs) {
+                return -1;
+            }
+
+            return 1;
+        });
     }
 
     public List<Object> getValues() {

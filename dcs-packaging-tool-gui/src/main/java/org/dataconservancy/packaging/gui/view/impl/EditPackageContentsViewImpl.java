@@ -211,7 +211,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         artifactTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (artifactDetailsWindow != null && artifactDetailsWindow.isShowing()) {
                 presenter.saveCurrentNode();
-                showArtifactDetails(newValue.getValue(), null);
+                showNodePropertiesWindow(newValue.getValue(), null);
             }
         });
 
@@ -424,7 +424,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         propertiesItem.setOnAction(actionEvent -> {
             VBox detailsBox = new VBox();
             detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
-            showArtifactDetails(packageNode, label);
+            showNodePropertiesWindow(packageNode, label);
             artifactTree.getSelectionModel().select(treeItem);
         });
 
@@ -615,7 +615,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
 
     @Override
-    public void showArtifactDetails(Node packageNode, javafx.scene.Node anchorNode) {
+    public void showNodePropertiesWindow(Node packageNode, javafx.scene.Node anchorNode) {
 
         if (artifactDetailsWindow != null) {
             popupNode = packageNode;

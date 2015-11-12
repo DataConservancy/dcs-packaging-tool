@@ -66,7 +66,7 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * @param treeNode  the node
      * @param anchorNode The scene object the artifact details window should initially anchor too
      */
-    void showArtifactDetails(Node treeNode, javafx.scene.Node anchorNode);
+    void showNodePropertiesWindow(Node treeNode, javafx.scene.Node anchorNode);
 
     /**
      * Gets the file chooser that's used for saving the pacakge description file. 

@@ -147,7 +147,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         ScrollPane relationshipPane = new ScrollPane();
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        relationshipPane.setContent(createRelationshipTab(userDefinedProperties));
+        relationshipPane.setContent(createUserDefinedPropertiesTab(userDefinedProperties));
         relationshipPane.setMinWidth(500);
         relationshipPane.setFitToWidth(true);
         relationshipTab.setContent(relationshipPane);
@@ -284,11 +284,11 @@ public class NodePropertyWindowBuilder implements CssConstants {
     }
 
     /*
-     * Creates the relationship tab in the popup. Relationships are handled differently from properties and are constructed using the {@code createRelationshipBox} method.
+     * Creates the user defined properties tab in the popup. User defined properties are handled differently because they break the notion of the profile
      * @param artifact
      * @return
      */
-    private VBox createRelationshipTab(List<Property> userDefinedPropertyValues) {
+    private VBox createUserDefinedPropertiesTab(List<Property> userDefinedPropertyValues) {
         final VBox relationshipsBox = new VBox(38);
 
         final double addNewButtonMaxWidth = 200;
@@ -361,7 +361,6 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         return propertyMap;
     }
-
 
     //Sorts properties in the order of single value required, multi value required, optional single value, optional multi value
     private void sortProperties(List<PropertyConstraint> propertyConstraints) {
