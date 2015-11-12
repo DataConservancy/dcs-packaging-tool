@@ -59,7 +59,22 @@ public abstract class AbstractSerializationTest {
             }
         };
 
-        private HashMap<URI, List<Property>> userDefinedProperties = new HashMap<URI, List<Property>>() {
+        public static List<URI> domainProfileUris = new ArrayList<URI>() {
+            {
+                try {
+                    add(new URI("http://example.org/domain/v1"));
+                    add(new URI("http://example.org/properties/v1"));
+                    add(new URI("http://other.org/properties"));
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+
+            }
+        };
+
+        public static Model domainObjectsRDF;
+
+        public static HashMap<URI, List<Property>> userProperties = new HashMap<URI, List<Property>>() {
             {
                 try {
                     PropertyType typeOne = new PropertyType();
@@ -80,27 +95,12 @@ public abstract class AbstractSerializationTest {
                     propertyThree.setStringValue("bar");
 
                     put(new URI("node:1"), Arrays.asList(propertyOne, propertyTwo));
-                    put(new URI("node:2"), Collections.singletonList(propertyThree));
+                    put(new URI("node:2"), Arrays.asList(propertyThree));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
             }
         };
-
-        public static List<URI> domainProfileUris = new ArrayList<URI>() {
-            {
-                try {
-                    add(new URI("http://example.org/domain/v1"));
-                    add(new URI("http://example.org/properties/v1"));
-                    add(new URI("http://other.org/properties"));
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-
-            }
-        };
-
-        public static Model domainObjectsRDF;
 
         static {
             applicationVersion.setBuildNumber("1");
@@ -133,5 +133,8 @@ public abstract class AbstractSerializationTest {
 
         public static ClassPathResource DOMAINOBJECTS_RDF_1 =
                 new ClassPathResource("org/dataconservancy/packaging/tool/ser/domain-objects-rdf-v1.ser");
+
+        public static ClassPathResource USER_PROPERTIES_1 =
+                        new ClassPathResource("org/dataconservancy/packging/tool/ser/user-property-v1.ser");
     }
 }

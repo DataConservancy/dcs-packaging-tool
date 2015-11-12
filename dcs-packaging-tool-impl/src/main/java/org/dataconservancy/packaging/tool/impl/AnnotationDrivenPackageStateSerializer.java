@@ -139,6 +139,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
             "Allowed stream identifiers are: %s.";
 
     /**
+     * Placeholders: StreamId
+     */
+    private static final String ERR_MISSING_DESCRIPTOR = "No PropertyDescriptor found for streamId '%s'";
+
+    /**
      * Placeholders: method name, class name, error message
      */
     private static final String ERR_INVOKING_METHOD = "Error invoking the method named '%s' on an instance of '%s': %s";
@@ -217,7 +222,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
     @Override
     public void deserialize(PackageState state, InputStream in) {
-
+        deserialize(state, null, in);
     }
 
     /**
@@ -408,14 +413,26 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     void deserialize(PackageState state, StreamId streamId, ZipArchiveInputStream in) {
         ArchiveEntry entry = null;
         Object deserializedStream = null;
+        boolean all = streamId == null;
 
         // deserialize the specified stream identifier (or all stream identifiers if streamId is null) from the
         // inputStream to the package state
 
         try {
             while ((entry = (in.getNextEntry())) != null) {
-                if (streamId == null || streamId.name().equals(entry.getName())) {
+                if (all || streamId.name().equals(entry.getName())) {
+                    if (all) {
+                        streamId = StreamId.valueOf(entry.getName().toUpperCase());
+                    }
+
+                    if (!hasPropertyDescription(streamId)) {
+                        throw new NullPointerException(String.format(ERR_MISSING_DESCRIPTOR, streamId));
+                    }
+                    if (!hasUnmarshaller(streamId)) {
+                        throw new NullPointerException(String.format(ERR_MISSING_SPRINGMARSHALLER, streamId, streamId));
+                    }
                     deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+
                     propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
                 }
             }
@@ -445,7 +462,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
             signatureLength = IOUtils.readFully(in, signature);
             in.reset();
         } catch (IOException e) {
-            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, e.getMessage()), e);
+            throw new RuntimeException(String.format(ERR_UNMARSHALLING_STREAM, "<unknown>", e.getMessage()), e);
         }
         return ZipArchiveInputStream.matches(signature, signatureLength);
     }
@@ -581,6 +598,28 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                 });
 
         return results;
+    }
+
+    private boolean hasPropertyDescription(StreamId streamId) {
+        return propertyDescriptors.get(streamId) != null;
+    }
+
+    private boolean hasStreamMarshaller(StreamId streamId) {
+        return marshallerMap.get(streamId) != null;
+    }
+
+    private boolean hasMarshaller(StreamId streamId) {
+        if (!hasStreamMarshaller(streamId)) {
+            throw new NullPointerException("StreamId '" + streamId + "' does not have a StreamMarshaller configured.");
+        }
+        return marshallerMap.get(streamId).getMarshaller() != null;
+    }
+
+    private boolean hasUnmarshaller(StreamId streamId) {
+        if (!hasStreamMarshaller(streamId)) {
+            throw new NullPointerException("StreamId '" + streamId + "' does not have a StreamMarshaller configured.");
+        }
+        return marshallerMap.get(streamId).getUnmarshaller() != null;
     }
 
     /**

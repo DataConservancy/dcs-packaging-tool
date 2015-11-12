@@ -131,17 +131,10 @@ public class UserPropertyConverter extends AbstractPackageToolConverter {
 
     @Override
     public boolean canConvert(Class type) {
-        if (!Map.class.isAssignableFrom(type)) {
-            return false;
+        if (HashMap.class.isAssignableFrom(type)) {
+            return true;
         }
 
-        try {
-            @SuppressWarnings("unchecked")
-            Class<Map<URI, List<Property>>> foo = (Class<Map<URI, List<Property>>>) type;
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }

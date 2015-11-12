@@ -27,6 +27,7 @@ import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
 
     @Override
     public Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        HashMap<String, List<String>> result = new HashMap<>();
+        LinkedHashMap<String, List<String>> result = new LinkedHashMap<>();
 
         if (!E_PACKAGE_METADATA.equals(reader.getNodeName())) {
             throw new ConversionException(
@@ -89,17 +90,10 @@ public class PackageMetadataConverter extends AbstractPackageToolConverter {
 
     @Override
     public boolean canConvert(Class type) {
-        if (!Map.class.isAssignableFrom(type)) {
-            return false;
+        if (LinkedHashMap.class.isAssignableFrom(type)) {
+            return true;
         }
 
-        try {
-            @SuppressWarnings("unchecked")
-            Class<Map<String, List<String>>> foo = (Class<Map<String, List<String>>>) type;
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }

@@ -18,24 +18,30 @@
 
 package org.dataconservancy.packaging.tool.impl;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
+import org.dataconservancy.packaging.tool.ser.AbstractSerializationTest;
 import org.dataconservancy.packaging.tool.ser.AbstractXstreamTest;
 import org.dataconservancy.packaging.tool.ser.ApplicationVersionConverter;
 import org.dataconservancy.packaging.tool.ser.DefaultModelFactory;
+import org.dataconservancy.packaging.tool.ser.DomainProfileUriListConverter;
 import org.dataconservancy.packaging.tool.ser.JenaModelSerializer;
 import org.dataconservancy.packaging.tool.ser.PackageMetadataConverter;
 import org.dataconservancy.packaging.tool.ser.PackageNameConverter;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
+import org.dataconservancy.packaging.tool.ser.UserPropertyConverter;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.oxm.Marshaller;
@@ -45,12 +51,17 @@ import org.springframework.oxm.xstream.XStreamMarshaller;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
+import java.beans.PropertyDescriptor;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,6 +71,7 @@ import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.T
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainProfileUris;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageMetadata;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.APPLICATION_VERSION_1;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -103,7 +115,8 @@ public class AnnotationDrivenPackageStateSerializerTest {
     private PackageState state = new PackageState();
 
     /**
-     * A map of StreamIds to live (not mocked) StreamMarshallers
+     * A map of StreamIds to live (not mocked) StreamMarshallers.  When adding or removing entries to this map you
+     * probably should also be updating {@link #mockedMarshallerMap}.
      */
     private Map<StreamId, StreamMarshaller> liveMarshallerMap = new HashMap<StreamId, StreamMarshaller>() {
         {
@@ -149,11 +162,19 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setUnmarshaller(new JenaModelSerializer(new DefaultModelFactory()));
                 }
             });
+            put(StreamId.USER_SPECIFIED_PROPERTIES, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.USER_SPECIFIED_PROPERTIES);
+                    setMarshaller(new XStreamMarshaller());
+                    setUnmarshaller(new XStreamMarshaller());
+                }
+            });
         }
     };
 
     /**
-     * A map of StreamIds to mocked StreamMarshallers
+     * A map of StreamIds to mocked StreamMarshallers.  When adding or removing entries to this map you probably should
+     * also be updating {@link #liveMarshallerMap}.
      */
     private Map<StreamId, StreamMarshaller> mockedMarshallerMap = new HashMap<StreamId, StreamMarshaller>() {
         {
@@ -199,6 +220,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setMarshaller(mock(Marshaller.class));
                 }
             });
+            put(StreamId.USER_SPECIFIED_PROPERTIES, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.USER_SPECIFIED_PROPERTIES);
+                    setUnmarshaller(mock(Unmarshaller.class));
+                    setMarshaller(mock(Marshaller.class));
+                }
+            });
         }
     };
 
@@ -226,22 +254,26 @@ public class AnnotationDrivenPackageStateSerializerTest {
         state.setPackageMetadataList(packageMetadata);
         state.setDomainProfileIdList(domainProfileUris);
         state.setDomainObjectRDF(domainObjectsRDF);
+        state.setUserSpecifiedProperties(userProperties);
 
         /*
          * Configure the live stream marshalling map with XStream converters
          */
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getMarshaller())
-                .setConverters(new ApplicationVersionConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getMarshaller())
-                .setConverters(new PackageNameConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getMarshaller())
-                .setConverters(new PackageMetadataConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller())
-                .setConverters(new ApplicationVersionConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getUnmarshaller())
-                .setConverters(new PackageNameConverter());
-        ((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getUnmarshaller())
-                .setConverters(new PackageMetadataConverter());
+
+        /* Marshallers */
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.USER_SPECIFIED_PROPERTIES).getMarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.DOMAIN_PROFILE_LIST).getMarshaller()).getXStream());
+
+
+        /* Unmarshallers */
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.APPLICATION_VERSION).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_NAME).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.PACKAGE_METADATA).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.USER_SPECIFIED_PROPERTIES).getUnmarshaller()).getXStream());
+        configure(((XStreamMarshaller) liveMarshallerMap.get(StreamId.DOMAIN_PROFILE_LIST).getUnmarshaller()).getXStream());
 
         /*
          * Configure the class under test with the mocked marshaller map, and the mock archive
@@ -296,7 +328,7 @@ public class AnnotationDrivenPackageStateSerializerTest {
     public void testSerializeStreamWithNullFieldInPackageState() throws Exception {
         state = new PackageState();
         StreamResult result = new StreamResult(new NullOutputStream());  // we're using mocks, so nothing will be
-                                                                         // written to the output stream
+        // written to the output stream
         assertNull(state.getCreationToolVersion());
 
         underTest.serializeToResult(state, StreamId.APPLICATION_VERSION, result);
@@ -355,6 +387,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
                         verifiedStreamCount.incrementAndGet();
                         break;
 
+                    case USER_SPECIFIED_PROPERTIES:
+                        verify(streamMarshaller.getMarshaller())
+                                .marshal(eq(userProperties), isNotNull(Result.class));
+                        verifiedStreamCount.incrementAndGet();
+                        break;
                 }
             } catch (IOException e) {
                 fail("Encountered IOE: " + e.getMessage());
@@ -362,7 +399,50 @@ public class AnnotationDrivenPackageStateSerializerTest {
         });
 
         assertEquals(mockedMarshallerMap.size(), verifiedStreamCount.intValue());
+    }
 
+    @Test
+    public void testUnmarshalEntireState() throws Exception {
+        // First, create a state file to unmarshal
+        // 1. It must be a zip archive; unmarshalling a non-archive package state file isn't supported
+        // 2. We use the liveMarshallerMap; no mocks.
+        // 3. We use a live ArchiveStreamFactory
+        underTest.setArchive(true);
+        underTest.setMarshallerMap(liveMarshallerMap);
+        underTest.setArxStreamFactory(new ZipArchiveStreamFactory());
+        File tmp = File.createTempFile(this.getClass().getName() + "_UnmarshalEntireState", ".zip");
+        OutputStream out = new FileOutputStream(tmp);
+        underTest.serialize(state, out);
+        assertTrue(tmp.exists() && tmp.length() > 1);
+
+        // Verify that we wrote out a zip file.
+        final byte[] signature = new byte[12];
+        InputStream in = new BufferedInputStream(new FileInputStream(tmp));
+        in.mark(signature.length);
+        int bytesRead = org.apache.commons.compress.utils.IOUtils.readFully(in, signature);
+        assertTrue(ZipArchiveInputStream.matches(signature, bytesRead));
+        in.reset();
+
+        // Create a new instance of PackageState, and deserialize the zip archive created above, which contains the
+        // test objects from the {@link #state prepared instance} of PackageState
+        PackageState state = new PackageState();  // a new instance of PackageState with no internal state
+        underTest.deserialize(state, in);
+
+        Map<StreamId, PropertyDescriptor> pds = AnnotationDrivenPackageStateSerializer.getStreamDescriptors();
+        assertTrue(pds.size() > 0);
+        pds.keySet().stream().forEach(streamId -> {
+            try {
+                assertNotNull("Expected non-null value for PackageState field '" + pds.get(streamId).getName() + "', " +
+                                "StreamId '" + streamId + "'",
+                        pds.get(streamId).getReadMethod().invoke(state));
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                fail(e.getMessage());
+            }
+        });
+
+        IOUtils.closeQuietly(in);
+        IOUtils.closeQuietly(out);
+        FileUtils.deleteQuietly(tmp);
     }
 
     @Test
@@ -386,7 +466,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
         ApplicationVersionConverter applicationVersionConverter = spy(new ApplicationVersionConverter());
         XStreamMarshaller xsm = (XStreamMarshaller) underTest.getMarshallerMap()
                 .get(StreamId.APPLICATION_VERSION).getMarshaller();
-        xsm.setConverters(applicationVersionConverter);
+        XStream x = xsm.getXStream();
+        x.registerConverter(applicationVersionConverter, XStream.PRIORITY_VERY_HIGH);  // because there is a non-spy
+                                                                                       // version of this already
+                                                                                       // registered in the configure
+                                                                                       // method
 
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         underTest.serialize(state, StreamId.APPLICATION_VERSION, result);
@@ -408,7 +492,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
         ApplicationVersionConverter applicationVersionConverter = spy(new ApplicationVersionConverter());
         XStreamMarshaller xsm = (XStreamMarshaller) underTest.getMarshallerMap()
                 .get(StreamId.APPLICATION_VERSION).getMarshaller();
-        xsm.setConverters(applicationVersionConverter);
+        XStream x = xsm.getXStream();
+        x.registerConverter(applicationVersionConverter, XStream.PRIORITY_VERY_HIGH);  // because there is a non-spy
+                                                                                       // version of this already
+                                                                                       // registered in the configure
+                                                                                       // method
 
         ByteArrayOutputStream result = new ByteArrayOutputStream();
 
@@ -459,4 +547,40 @@ public class AnnotationDrivenPackageStateSerializerTest {
         assertTrue(result.size() > 1);
     }
 
+    private XStream configure(XStream x) {
+        x.processAnnotations(PackageState.class);
+
+        /* APPLICATION_VERSION */
+        x.alias(StreamId.APPLICATION_VERSION.name(),
+                AbstractSerializationTest.TestObjects.applicationVersion.getClass());
+        PropertyDescriptor pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors()
+                .get(StreamId.APPLICATION_VERSION);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new ApplicationVersionConverter());
+
+        /* DOMAIN_PROFILE_LIST */
+        x.alias(StreamId.DOMAIN_PROFILE_LIST.name(),
+                 AbstractSerializationTest.TestObjects.domainProfileUris.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.DOMAIN_PROFILE_LIST);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new DomainProfileUriListConverter());
+
+        /* PACKAGE_METADATA */
+        x.alias(StreamId.PACKAGE_METADATA.name(),
+                 AbstractSerializationTest.TestObjects.packageMetadata.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.PACKAGE_METADATA);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new PackageMetadataConverter());
+
+        /* PACKAGE_NAME */
+        x.alias(StreamId.PACKAGE_NAME.name(),
+                 AbstractSerializationTest.TestObjects.packageName.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.PACKAGE_NAME);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new PackageNameConverter());
+
+        /* USER_SPECIFIED_PROPERTIES */
+        x.alias(StreamId.USER_SPECIFIED_PROPERTIES.name(),
+                 AbstractSerializationTest.TestObjects.userProperties.getClass());
+        pd = AnnotationDrivenPackageStateSerializer.getStreamDescriptors().get(StreamId.USER_SPECIFIED_PROPERTIES);
+        x.registerLocalConverter(PackageState.class, pd.getName(), new UserPropertyConverter());
+
+        return x;
+    }
 }

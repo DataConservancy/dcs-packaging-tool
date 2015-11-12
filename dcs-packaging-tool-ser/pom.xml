@@ -113,6 +113,12 @@
       <artifactId>jena-core</artifactId>
       <scope>compile</scope>
     </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>compile</scope>
+    </dependency> 
     
     <!-- Test ===================================================== -->
     
@@ -134,12 +140,6 @@
       <scope>test</scope>
     </dependency> 
 
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <scope>test</scope>
-    </dependency> 
-    
   </dependencies>
 
 </project>
