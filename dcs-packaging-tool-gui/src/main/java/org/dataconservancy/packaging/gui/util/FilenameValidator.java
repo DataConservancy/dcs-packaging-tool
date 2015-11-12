@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by jrm on 11/12/15.
+ * This validator checks for validity of file path components as defined by the Data Conservancy BagIt Provile Version 1.0
  */
 public class FilenameValidator implements Validator {
 
@@ -35,7 +35,7 @@ public class FilenameValidator implements Validator {
 
     protected boolean isInvalidFileName(String fileName) {
         Matcher matcher = pattern.matcher(fileName);
-        return containsAny(fileName, blacklist) || matcher.matches() || fileName.length() > 256 || containsIllegalUnicode(fileName);
+        return containsAny(fileName, blacklist) || matcher.matches() || fileName.length() >= 256 || containsIllegalUnicode(fileName);
     }
 
     private static boolean containsAny(String fileName, String blacklist) {
@@ -59,6 +59,6 @@ public class FilenameValidator implements Validator {
                 return true;
             }
         }
-            return false;
+        return false;
     }
 }
