@@ -18,24 +18,28 @@ v1.0. In addition to the name, the following properties can be used to describe 
 <packageMetadataList>
     <packageMetadata>
         <name>BagIt-Profile-Identifier</name>
+        <label>BagIt Profile Identifier</label>
         <requiredness>REQUIRED</requiredness>
         <editable>false</editable>
         <visible>false</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Package-Manifest</name>
+        <label>Package Manifest</label>
         <requiredness>RECOMMENDED</requiredness>
         <editable>false</editable>
         <visible>false</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Name</name>
+        <label>Contact Name</label>
         <requiredness>REQUIRED</requiredness>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Phone</name>
+        <label>Contact Phone</label>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>PHONE_NUMBER</validationType>
         <editable>true</editable>
@@ -43,6 +47,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Contact-Email</name>
+        <label>Contact Email</label>
         <requiredness>REQUIRED</requiredness>
         <validationType>EMAIL</validationType>
         <editable>true</editable>
@@ -50,6 +55,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Keyword</name>
+        <label>Keyword</label>
         <requiredness>OPTIONAL</requiredness>
         <helpText>A keyword string</helpText>
         <repeatable>true</repeatable>
@@ -58,6 +64,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>External-Identifier</name>
+        <label>External Identifier</label>
         <requiredness>OPTIONAL</requiredness>
         <helpText>Sender-provided Identifier of the package. There should be a one-to-one mapping between the External-Identifier and the Bag-Group-Identifier.</helpText>
         <editable>true</editable>
@@ -65,6 +72,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>External-Description</name>
+        <label>External Description</label>
         <requiredness>OPTIONAL</requiredness>
         <helpText>Description of A brief explanation of the contents and provenance.</helpText>
         <editable>true</editable>
@@ -72,6 +80,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Internal-Sender-Identifier</name>
+        <label>Internal Sender Identifier</label>
         <requiredness>OPTIONAL</requiredness>
         <repeatable>true</repeatable>
         <editable>true</editable>
@@ -80,6 +89,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Internal-Sender-Description</name>
+        <label>Internal Sender Description</label>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
         <visible>true</visible>
@@ -87,18 +97,21 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Source-Organization</name>
+        <label>Source Organization</label>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Organization-Address</name>
+        <label>Organization Address</label>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Count</name>
+        <label>Bag Count</label>
         <requiredness>RECOMMENDED</requiredness>
         <editable>true</editable>
         <visible>true</visible>
@@ -106,6 +119,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Group-Identifier</name>
+        <label>Bag Group Identifier</label>
         <requiredness>RECOMMENDED</requiredness>
         <editable>true</editable>
         <visible>true</visible>
@@ -113,6 +127,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Rights-String</name>
+        <label>Rights String</label>
         <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
         <visible>true</visible>
@@ -120,6 +135,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Rights-URI</name>
+        <label>Rights URI</label>
         <requiredness>OPTIONAL</requiredness>
         <repeatable>true</repeatable>
         <editable>true</editable>
@@ -128,17 +144,20 @@ v1.0. In addition to the name, the following properties can be used to describe 
     </packageMetadata>
     <packageMetadata>
         <name>Bagging-Date</name>
+        <label>Bagging Date</label>
         <requiredness>RECOMMENDED</requiredness>
         <visible>true</visible>
         <validationType>DATE_TIME</validationType>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Size</name>
+        <label>Bag Size</label>
         <requiredness>RECOMMENDED</requiredness>
         <helpText> The size or approximate size of the bag, intended primarily for human consumption.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Payload-Oxum</name>
+        <label>Payload Oxum</label>
         <requiredness>RECOMMENDED</requiredness>
         <helpText>The "octetstream sum" of the payload directory, in the format "&lt;octetcount&gt;.&lt;streamcount&gt;" (number-of-bytes.number-of-files).</helpText>
     </packageMetadata>

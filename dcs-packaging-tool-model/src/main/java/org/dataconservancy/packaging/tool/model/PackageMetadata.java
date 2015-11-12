@@ -36,6 +36,7 @@ public class PackageMetadata {
     }
 
     private String name;
+    private String label;
     private PropertyValueHint validationType;
     private String helpText;
     @XmlAttribute(name = "editable")
@@ -67,10 +68,6 @@ public class PackageMetadata {
         return validationType;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setValidationType(PropertyValueHint validationType) {
         this.validationType = validationType;
     }
@@ -82,6 +79,16 @@ public class PackageMetadata {
     public String getName() {
         return name;
     }
+
+    public void setName(String name) { this.name = name; }
+
+    /**
+     * Returns the (display) label of the metadata field
+     * @return
+     */
+    public String getLabel() { return label; }
+
+    public void setLabel(String label){ this.label = label;}
 
     /**
      * Returns the help text associated with the metadata field.
@@ -141,6 +148,7 @@ public class PackageMetadata {
         if (isVisible != that.isVisible) return false;
         if (helpText != null ? !helpText.equals(that.helpText) : that.helpText != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (label != null ? !label.equals(that.label) : that.label != null) return false;
         if (requiredness != that.requiredness) return false;
         if (validationType != that.validationType) return false;
 
@@ -150,6 +158,7 @@ public class PackageMetadata {
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (label != null ? label.hashCode() : 0);
         result = 31 * result + (validationType != null ? validationType.hashCode() : 0);
         result = 31 * result + (helpText != null ? helpText.hashCode() : 0);
         result = 31 * result + (isEditable ? 1 : 0);

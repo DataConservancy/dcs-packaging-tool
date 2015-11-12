@@ -15,6 +15,7 @@
 <packageMetadataList>
     <packageMetadata>
         <name>Package-Metadata-Required</name>
+        <label>Package Metadata Required</label>
         <requiredness>REQUIRED</requiredness>
         <helpText>This is the help text for Package-Metadata-1</helpText>
         <editable>true</editable>
@@ -22,30 +23,35 @@
     </packageMetadata>
     <packageMetadata>
         <name>Package-Metadata-Recommended</name>
+        <label>Package Metadata Recommended</label>
         <requiredness>RECOMMENDED</requiredness>
         <helpText>This is the help text for Package-Metadata-2</helpText>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Package-Metadata-Optional</name>
+        <label>Package Metadata Optional</label>
         <requiredness>OPTIONAL</requiredness>
         <helpText>This is the help text for Package-Metadata-2</helpText>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Email-Metadata</name>
+        <label>Email Metadata</label>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>EMAIL</validationType>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Phone-Metadata</name>
+        <label>Phone Metadata</label>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>PHONE_NUMBER</validationType>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Repeatable-Metadata</name>
+        <label>Repeatable Metadata</label>
         <requiredness>MISSPELLED</requiredness>
         <validationType>MISSPELLED</validationType>
         <repeatable>true</repeatable>
@@ -53,21 +59,26 @@
     </packageMetadata>
     <packageMetadata>
         <name>Editable-Metadata</name>
+        <label>Editable Metadata</label>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Visible-Metadata</name>
+        <label>Visible Metadata</label>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Invisible-Metadata</name>
+        <label>Invisible Metadata</label>
         <visible>false</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Missing-Booleans</name>
+        <label>Missing Booleans</label>
     </packageMetadata>
     <packageMetadata>
         <name>Missing-Enums</name>
+        <label>Missing Enums</label>
     </packageMetadata>
 </packageMetadataList>
