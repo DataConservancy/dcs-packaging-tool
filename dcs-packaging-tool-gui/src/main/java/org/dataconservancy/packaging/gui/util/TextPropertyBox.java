@@ -90,6 +90,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
 
     public void changePropertyValidationType(PropertyValueHint validationType) {
         validationListener.updateValidationType(validationType);
+        validationListener.changed(propertyInput.textProperty(), propertyInput.getText(), propertyInput.getText());
     }
 
     /**

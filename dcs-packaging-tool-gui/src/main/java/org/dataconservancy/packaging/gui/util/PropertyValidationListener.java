@@ -81,6 +81,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case PHONE_NUMBER:
                     case URL:
                     case EMAIL:
+                    case URI:
                         textPropertyBox.getChildren().remove(validationLabel);
                         validationImageLabel.setGraphic(successImage);
                         break;
@@ -98,6 +99,9 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                         break;
                     case EMAIL:
                         validationLabel.setText(TextFactory.format(Messages.MessageKey.EMAIL_VALIDATION_FAILURE, newValue));
+                        break;
+                    case URI:
+                        validationLabel.setText(TextFactory.format(Messages.MessageKey.URI_VALIDATION_FAILURE, newValue));
                         break;
                     default:
                         textPropertyBox.getChildren().remove(validationLabel);

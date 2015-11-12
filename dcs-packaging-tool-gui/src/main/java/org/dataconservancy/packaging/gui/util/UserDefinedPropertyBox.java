@@ -296,21 +296,19 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         requiresURICheckBox.selectedProperty().bindBidirectional(requiresUri);
         getChildren().add(requiresURICheckBox);
 
-        final VBox propertyValuesBox = new VBox(3);
-        propertyValuesBox.setPrefWidth(ControlFactory.textPrefWidth);
+        final VBox propertyValuesBox = new VBox(6);
 
         Label propertyValueLabel = new Label(TextFactory.getText(Labels.LabelKey.USER_DEFINED_PROPERTY_VALUE_LABEL));
         getChildren().add(propertyValueLabel);
         boolean empty = true;
 
         //create a HBox to hold text field and validating result image label
-        final HBox valueInputBox = new HBox(15);
+        final HBox valueInputBox = new HBox(12);
         targetType.bind(Bindings.when(requiresUri).then(TextFactory.getText(Labels.LabelKey.URI_LABEL)).otherwise(TextFactory.getText(Labels.LabelKey.LITERAL_LABEL)));
 
         Label typeLabel = new Label();
         typeLabel.textProperty().bind(targetType);
-        typeLabel.setMaxWidth(100);
-        typeLabel.setMinWidth(100);
+        typeLabel.setPrefWidth(100);
         valueInputBox.getChildren().add(typeLabel);
 
         //Create a button that allows for adding a new property value field box.
@@ -319,20 +317,20 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
         //If there aren't any values already just create an empty box to specify one.
         if (values == null || values.isEmpty()) {
-            TextPropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
+            PropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
 
-            propertyValuesBox.getChildren().add(propertyValueBox);
+            propertyValuesBox.getChildren().add(propertyValueBox.getView());
         } else {
             empty = false;
             //Otherwise loop through the relationship targets and create a text field for each one.
 
             for (String value : values) {
-                TextPropertyBox propertyValueBox = createPropertyValueBox(value, emptyPropertyValueListener, addNewPropertyListener);
+                PropertyBox propertyValueBox = createPropertyValueBox(value, emptyPropertyValueListener, addNewPropertyListener);
 
                 if (((TextInputControl)propertyValueBox.getPropertyInput()).getText().isEmpty()) {
                     empty = true;
                 }
-                propertyValuesBox.getChildren().add(propertyValueBox);
+                propertyValuesBox.getChildren().add(propertyValueBox.getView());
             }
         }
 
@@ -344,15 +342,15 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
         addNewButton.setOnAction(arg0 -> {
 
-            TextPropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
+            PropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
 
-            propertyValuesBox.getChildren().add(propertyValueBox);
+            propertyValuesBox.getChildren().add(propertyValueBox.getView());
             addNewButton.setDisable(true);
             propertyValueBox.getPropertyInput().requestFocus();
         });
     }
 
-    private TextPropertyBox createPropertyValueBox(String value, EmptyFieldButtonDisableListener emptyPropertyValueListener, EmptyFieldButtonDisableListener emptyPropertyListener) {
+    private PropertyBox createPropertyValueBox(String value, EmptyFieldButtonDisableListener emptyPropertyValueListener, EmptyFieldButtonDisableListener emptyPropertyListener) {
         TextPropertyBox propertyValueBox;
         if (requiresUri.getValue()) {
             propertyValueBox = new TextPropertyBox(value, true, PropertyValueHint.URI, "");
@@ -369,7 +367,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         });
 
         userDefinedPropertyValues.add(propertyValueBox);
-        propertyValueBox.getPropertyInput().setMinWidth(260);
+        propertyValueBox.getPropertyInput().setPrefWidth(250);
 
         ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyValueListener);
         ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyListener);

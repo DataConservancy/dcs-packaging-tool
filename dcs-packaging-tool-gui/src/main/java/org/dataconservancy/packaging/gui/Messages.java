@@ -29,7 +29,8 @@ public class Messages {
         URL_VALIDATION_FAILURE("urlvalidation.failure"),
         PHONE_VALIDATION_FAILURE("phonevalidation.failure"),
         EMAIL_VALIDATION_FAILURE("emailvalidation.failure"),
-        REFRESH_STATUS_MESSAGE("refreshstatus.message");
+        REFRESH_STATUS_MESSAGE("refreshstatus.message"),
+        URI_VALIDATION_FAILURE("urivalidation.failure");
 
         String property;
 
