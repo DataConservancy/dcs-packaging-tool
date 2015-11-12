@@ -69,42 +69,49 @@
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="xStreamMarshaller"/>
             <property name="unmarshaller" ref="xStreamMarshaller"/>
+            <property name="streamId" value="APPLICATION_VERSION"/>
           </bean>
         </entry>
         <entry key="DOMAIN_PROFILE_LIST">
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="xStreamMarshaller"/>
             <property name="unmarshaller" ref="xStreamMarshaller"/>
+            <property name="streamId" value="DOMAIN_PROFILE_LIST"/>
           </bean>
         </entry>
         <entry key="PACKAGE_METADATA">
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="xStreamMarshaller"/>
             <property name="unmarshaller" ref="xStreamMarshaller"/>
+            <property name="streamId" value="PACKAGE_METADATA"/>
           </bean>
         </entry>
         <entry key="PACKAGE_NAME">
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="xStreamMarshaller"/>
             <property name="unmarshaller" ref="xStreamMarshaller"/>
+            <property name="streamId" value="PACKAGE_NAME"/>
           </bean>
         </entry>
         <entry key="USER_SPECIFIED_PROPERTIES">
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="xStreamMarshaller"/>
             <property name="unmarshaller" ref="xStreamMarshaller"/>
+            <property name="streamId" value="USER_SPECIFIED_PROPERTIES"/>
           </bean>
         </entry>
         <entry key="DOMAIN_OBJECTS">
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="jenaMarshaller"/>
             <property name="unmarshaller" ref="jenaMarshaller"/>
+            <property name="streamId" value="DOMAIN_OBJECTS"/>
           </bean>
         </entry>
         <entry key="PACKAGE_TREE">
           <bean class="org.dataconservancy.packaging.tool.ser.StreamMarshaller">
             <property name="marshaller" ref="jenaMarshaller"/>
             <property name="unmarshaller" ref="jenaMarshaller"/>
+            <property name="streamId" value="PACKAGE_TREE"/>
           </bean>
         </entry>
       </map>
