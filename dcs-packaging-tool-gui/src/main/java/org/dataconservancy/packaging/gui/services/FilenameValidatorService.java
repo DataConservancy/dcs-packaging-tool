@@ -16,7 +16,7 @@
 
 package org.dataconservancy.packaging.gui.services;
 
-import org.dataconservancy.packaging.gui.Configuration;
+import org.dataconservancy.packaging.gui.util.FilenameValidator;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -26,32 +26,28 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 /**
  * This service is responsible for checking all filenames in a filesystem tree which is being
  * considered for processing into a package, and flagging all filenames which violate naming conventions
- * which have been implemented in the interest of cross-platform compatibility.  This service as currently implemented
- * will test for conformance with the Bagit version 0.97 specification section 7.2.2. The windows filenames are hard coded in
- * this class, but we will allow other characters to differ from the default set &lt; &gt; : " / | ? *  via configuration.
+ * which have been implemented in the interest of cross-platform compatibility.
+ * This validator checks for validity of file paths as defined by the Data Conservancy BagIt Provile Version 1.0
  */
 public class FilenameValidatorService {
 
-    public FilenameValidatorService(Configuration configuration) {
-        this.blacklist = configuration.getPackageFilenameIllegalCharacters();
+    public FilenameValidatorService() {
+        filenameValidator = new FilenameValidator();
     }
 
-    private String blacklist;
-    private String windowsReservedNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$";
-    private Pattern pattern = Pattern.compile(windowsReservedNamesRegex);
+    private FilenameValidator filenameValidator;
 
     /**
      * This method takes a root path and checks for invalid names in the tree headed by the given path
      *
      * @param rootDirectoryPath the root path of the filesystem tree to be checked for invalid file names
      * @return a List of invalid file names, empty if all names are valid. Each entry in the list will have an invalid
-     *  character or reserved filename in the final path component. There will be one entry for each error to be fixed.
+     * character or reserved filename in the final path component. There will be one entry for each error to be fixed.
      * @throws IOException if the file at rootDirectoryPath cannot be found
      * @throws InterruptedException if the walk is interrupted
      */
@@ -61,40 +57,23 @@ public class FilenameValidatorService {
         Files.walkFileTree(rootDirectoryPath, new SimpleFileVisitor<Path>() {
 
             @Override
-             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
-                 throws IOException{
-                if (isInvalidPathComponent(path.getFileName().toString())) {
+            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
+                    throws IOException {
+                if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
                     invalidFilenames.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
-             }
+            }
 
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                if (isInvalidPathComponent(path.getFileName().toString())) {
+                if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
                     invalidFilenames.add(path.toString());
                 }
                 return FileVisitResult.CONTINUE;
             }
         });
         return invalidFilenames;
-    }
-
-    protected boolean isInvalidPathComponent(String fileName){
-        Matcher matcher = pattern.matcher(fileName);
-        return containsAny(fileName, blacklist) || matcher.matches();
-    }
-
-    private static boolean containsAny(String fileName, String blacklist) {
-        for (int i = 0; i < fileName.length(); i++) {
-            char c = fileName.charAt(i);
-            for (int j = 0; j < blacklist.length(); j++) {
-                if ( blacklist.charAt(j) == c) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

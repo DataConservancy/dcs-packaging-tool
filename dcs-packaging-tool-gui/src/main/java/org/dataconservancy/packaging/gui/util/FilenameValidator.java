@@ -16,36 +16,33 @@
 
 package org.dataconservancy.packaging.gui.util;
 
-import org.dataconservancy.packaging.gui.Configuration;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by jrm on 11/12/15.
+ * This validator checks for validity of file path components as defined by the Data Conservancy BagIt Provile Version 1.0
  */
 public class FilenameValidator implements Validator {
 
-    //private Configuration configuration;
-    private String windowsReservedNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$";
+    private String windowsReservedNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])($|\\..*$)";
     private Pattern pattern = Pattern.compile(windowsReservedNamesRegex);
-    private String blacklist = "<>:\"/\\|?*";
+    private String blacklist = "<>:\"/\\|?*~";
 
     @Override
-    public boolean isValid(String filename){
-       return(!isInvalidFileName(filename));
+    public boolean isValid(String filename) {
+        return (!isInvalidFileName(filename));
     }
 
-    protected boolean isInvalidFileName(String fileName){
+    protected boolean isInvalidFileName(String fileName) {
         Matcher matcher = pattern.matcher(fileName);
-        return containsAny(fileName, blacklist) || matcher.matches() || fileName.length() > 256;
+        return containsAny(fileName, blacklist) || matcher.matches() || fileName.length() >= 256 || containsIllegalUnicode(fileName);
     }
 
     private static boolean containsAny(String fileName, String blacklist) {
         for (int i = 0; i < fileName.length(); i++) {
             char c = fileName.charAt(i);
             for (int j = 0; j < blacklist.length(); j++) {
-                if ( blacklist.charAt(j) == c) {
+                if (blacklist.charAt(j) == c) {
                     return true;
                 }
             }
@@ -53,7 +50,15 @@ public class FilenameValidator implements Validator {
         return false;
     }
 
-   // private void setConfiguration(Configuration configuration){
-  //      this.configuration = configuration;
-   // }
+    private static boolean containsIllegalUnicode(String fileName) {
+        for (int i = 0; i < fileName.length(); i++) {
+            char c = fileName.charAt(i);
+            int j = (int) c;
+            if (((Integer.parseInt("00", 16) <= j) && (j <= Integer.parseInt("1f", 16))) ||
+                    (j >= Integer.parseInt("7f", 16))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
