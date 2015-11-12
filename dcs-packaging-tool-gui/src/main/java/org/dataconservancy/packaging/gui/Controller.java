@@ -158,6 +158,7 @@ public class Controller {
         contentRoot = null;
         rootArtifactDir = null;
         packageState = new PackageState(this.toolVersion);
+        packageStateFile = null;
 
         if (clear) {
             clearPresenters();
@@ -386,15 +387,15 @@ public class Controller {
 
     public void savePackageStateFile() throws IOException, RDFTransformException {
         if (packageState != null) {
-
             //Convert the package node tree to rdf to set on the state.
             if (packageTree != null) {
                 packageState.setPackageTree(ipmRdfTransformService.transformToRDF(packageTree));
             }
-
-            packageStateFile = showSaveFileDialog(packageStateFileChooser);
+            if(packageStateFile == null){
+               packageStateFile = showSaveFileDialog(packageStateFileChooser);
+            }
             if (packageStateFile != null) {
-                try(FileOutputStream fs = new FileOutputStream(packageStateFile)){
+                try (FileOutputStream fs = new FileOutputStream(packageStateFile)) {
                     packageStateSerializer.serialize(getPackageState(), fs);
                 }
                 packageStateFileChooser.setInitialDirectory(packageStateFile.getParentFile());

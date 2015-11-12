@@ -31,6 +31,8 @@ public class ValidatorFactory {
         switch(type){
             case EMAIL:
                 return new EmailValidator();
+            case FILE_NAME:
+                return new FilenameValidator();
             case PHONE_NUMBER:
                 return new PhoneNumberValidator();
             case URL:
