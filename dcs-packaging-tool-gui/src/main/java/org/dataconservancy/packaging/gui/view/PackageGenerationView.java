@@ -57,12 +57,6 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
      * @return  the button that is used to select an output directory
      */
     Button getSelectOutputDirectoryButton();
-
-    /**
-     * A label that is used to display messages to the user, mostly used for displaying error messages.
-     * @return   a   label that is used to display messages to the user
-     */
-    Label getStatusLabel();
     
     /**
      * Shows a popup when package generation was successful.

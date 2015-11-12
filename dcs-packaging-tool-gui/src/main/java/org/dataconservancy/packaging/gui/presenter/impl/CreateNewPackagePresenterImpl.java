@@ -94,7 +94,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                     ipmBuilderService.setOnFailed(workerStateEvent -> {
                         displayExceptionMessage(workerStateEvent.getSource().getException());
-                        view.getErrorMessage().setVisible(true);
+                        view.getErrorLabel().setVisible(true);
                         ipmBuilderService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
                     });
@@ -111,17 +111,17 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 } else if (root_artifact_dir != null &&
                         (!root_artifact_dir.exists() ||
                              !root_artifact_dir.canRead())) {
-                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
-                    view.getErrorMessage().setVisible(true);
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
+                    view.getErrorLabel().setVisible(true);
                 } else if (controller.getPackageDescription() != null) {
                     controller.goToNextPage();
                 } else {
-                    view.getErrorMessage().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
-                    view.getErrorMessage().setVisible(true);
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
+                    view.getErrorLabel().setVisible(true);
                 }
             } catch (Exception e) {
-                view.getErrorMessage().setText(TextFactory.format(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE, e.getMessage()));
-                view.getErrorMessage().setVisible(true);
+                view.getErrorLabel().setText(TextFactory.format(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE, e.getMessage()));
+                view.getErrorLabel().setVisible(true);
                 log.error(e.getMessage());
             }
         });
@@ -142,7 +142,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         view.getChooseContentDirectoryTextField().setText(root_artifact_dir.getPath());
                         //view.getSelectedPackageDescriptionTextField().setText("");
                         //If the error message happens to be visible erase it.
-                        view.getErrorMessage().setVisible(false);
+                        view.getErrorLabel().setVisible(false);
                         directoryChooser.setInitialDirectory(dir);
                     }
                 });
@@ -152,7 +152,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     @Override
     public void clear() {
         view.getChooseContentDirectoryTextField().setText("");
-        view.getErrorMessage().setText("");
+        view.getErrorLabel().setText("");
 
         content_dir = null;
         root_artifact_dir = null;
@@ -173,8 +173,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 && ((PackageDescriptionCreatorException) throwable).hasDetail()) {
             errorMessage = errorMessage + "\n" + ((PackageDescriptionCreatorException) throwable).getDetail();
         }
-        view.getErrorMessage().setText(errorMessage);
-        view.getErrorMessage().setVisible(true);
+        view.getErrorLabel().setText(errorMessage);
+        view.getErrorLabel().setVisible(true);
     }
 
     @Override

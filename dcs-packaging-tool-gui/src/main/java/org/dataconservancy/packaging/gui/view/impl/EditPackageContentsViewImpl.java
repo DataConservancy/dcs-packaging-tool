@@ -108,8 +108,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     private Button reenableWarningsButton;
 
-    private Label errorMessageLabel;
-
     //Metadata Inheritance Controls
     private Map<PropertyType, CheckBox> metadataInheritanceButtonMap;
 
@@ -169,12 +167,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(buttonBar);
 
         //Creates the error message that appears at the top of the screen.
-        errorMessageLabel = new Label();
-        errorMessageLabel.setTextFill(Color.RED);
-        errorMessageLabel.setVisible(false);
-        errorMessageLabel.setWrapText(true);
-        errorMessageLabel.setMaxWidth(600);
-        content.getChildren().add(errorMessageLabel);
+        content.getChildren().add(errorLabel);
 
         //Creates the file chooser that's used to save the package description to a file.
         packageStateFileChooser = new FileChooser();
@@ -324,7 +317,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             //When the options label is clicked show the context menu.
             optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
                 if (e.getButton() == MouseButton.PRIMARY) {
-                    errorMessageLabel.setVisible(false);
+                    errorLabel.setVisible(false);
                     contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
                 }
             });
@@ -717,9 +710,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         VBox content = new VBox(48);
         content.setPrefWidth(300);
-        Label errorMessageLabel = new Label(errorMessage);
-        errorMessageLabel.setWrapText(true);
-        content.getChildren().add(errorMessageLabel);
+        content.getChildren().add(errorLabel);
 
         if (allowFutureHide) {
             content.getChildren().add(hideFutureWarningPopupCheckBox);
@@ -871,11 +862,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public CheckBox getHideFutureWarningPopupCheckbox() {
         return hideFutureWarningPopupCheckBox;
-    }
-
-    @Override
-    public Label getErrorMessageLabel() {
-        return errorMessageLabel;
     }
 
     @Override

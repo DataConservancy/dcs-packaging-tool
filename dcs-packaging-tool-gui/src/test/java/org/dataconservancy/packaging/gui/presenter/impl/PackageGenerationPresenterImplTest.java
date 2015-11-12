@@ -181,8 +181,8 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         presenter.display();
 
-        assertTrue(view.getStatusLabel().isVisible());
-        assertEquals(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR), view.getStatusLabel().getText());
+        assertTrue(view.getErrorLabel().isVisible());
+        assertEquals(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR), view.getErrorLabel().getText());
     }
 
     /**
@@ -219,14 +219,14 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         outputDirectory = new File("./");
         view.getSelectOutputDirectoryButton().fire();
-        assertFalse(view.getStatusLabel().isVisible());
+        assertFalse(view.getErrorLabel().isVisible());
 
         view.getContinueButton().fire();
 
-        assertTrue(view.getStatusLabel().isVisible());
+        assertTrue(view.getErrorLabel().isVisible());
         assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR)
                 + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(),
-                view.getStatusLabel().getText());
+                view.getErrorLabel().getText());
     }
 
     /**
@@ -280,13 +280,13 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         outputDirectory = new File("./");
 
-        view.getStatusLabel().setVisible(false);
+        view.getErrorLabel().setVisible(false);
         view.getSelectOutputDirectoryButton().fire();
 
         view.getContinueButton().fire();
 
         assertTrue(createdFile.exists());
-        assertFalse(view.getStatusLabel().isVisible());
+        assertFalse(view.getErrorLabel().isVisible());
 
         //Clean up the newly created file
         if (!createdFile.delete()) {

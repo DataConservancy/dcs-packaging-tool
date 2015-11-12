@@ -143,12 +143,6 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * @return  the hide future warning checkbox
      */
     CheckBox getHideFutureWarningPopupCheckbox();
-    
-    /**
-     * Gets the error message label that appears at the top of the screen.
-     * @return The error message label
-     */
-    Label getErrorMessageLabel();
 
     CheckBox getShowIgnored();
 

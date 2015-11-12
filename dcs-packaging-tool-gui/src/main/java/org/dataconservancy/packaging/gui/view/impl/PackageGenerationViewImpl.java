@@ -64,8 +64,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     private DirectoryChooser outputDirectoryChooser;
     private TextField currentOutputDirectoryTextField;
     private Button selectOutputDirectoryButton;
-    
-    private Label statusLabel;
 
     //Radio buttons for the archive types.
     private RadioButton tarArchiveButton;
@@ -128,11 +126,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         
         //Create a label to show any status messages at the top of the screen.
         HBox status = new HBox();
-        statusLabel = new Label();
-        statusLabel.setVisible(false);
-        statusLabel.setWrapText(true);
-        //statusLabel.setMaxWidth(600);
-        status.getChildren().add(statusLabel);
+        status.getChildren().add(errorLabel);
         status.setAlignment(Pos.TOP_CENTER);
 
         content.getChildren().add(status);
@@ -308,11 +302,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     @Override
     public DirectoryChooser getOutputDirectoryChooser() {
         return outputDirectoryChooser;
-    }
-    
-    @Override
-    public Label getStatusLabel() {
-        return statusLabel;
     }
     
     @Override

@@ -91,7 +91,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
     public void clear() {
         // Default method body
         view.getChoosePackageDirectoryTextField().setText("");
-        view.getErrorMessage().setText("");
+        view.getErrorLabel().setText("");
 
         contentDir = null;
         rootArtifactDir = null;

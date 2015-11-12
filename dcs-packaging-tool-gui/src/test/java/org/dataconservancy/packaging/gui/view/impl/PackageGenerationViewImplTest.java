@@ -39,7 +39,7 @@ public class PackageGenerationViewImplTest extends BaseGuiTest {
     @Test
     public void testComponentsNotNull() {
         assertNotNull(view.getContinueButton());
-        assertNotNull(view.getStatusLabel());
+        assertNotNull(view.getErrorLabel());
         assertNotNull(view.getNoThanksLink());
 
         assertNotNull(view.getArchiveToggleGroup());

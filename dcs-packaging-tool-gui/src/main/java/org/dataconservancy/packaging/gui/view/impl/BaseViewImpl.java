@@ -26,6 +26,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Popup;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Help;
@@ -91,6 +92,10 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         footerControls.getChildren().add(continueButton);
 
         errorLabel=new Label();
+        errorLabel.setTextFill(Color.RED);
+        errorLabel.setVisible(false);
+        errorLabel.setWrapText(true);
+        errorLabel.setMaxWidth(600);
         
         footerView.setRight(footerControls);
         

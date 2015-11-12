@@ -46,7 +46,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     private TextField currentBaseDirectory;
     
     private ProgressDialogPopup progressIndicatorPopUp;
-    private Label errorMessage;
     private VBox content;
 
     public CreateNewPackageViewImpl() {
@@ -61,11 +60,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
 
         setCenter(content);
         content.setAlignment(Pos.TOP_CENTER);
-        errorMessage = new Label();
-        errorMessage.setTextFill(Color.RED);
-        errorMessage.setWrapText(true);
-        errorMessage.setMaxWidth(600);
-        content.getChildren().add(errorMessage);
+        content.getChildren().add(errorLabel);
 
         //Create a vbox that will display the options for generating a package, either selecting a base directory or
         //choosing an existing package description. 
@@ -105,8 +100,8 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     }
 
     @Override
-    public Label getErrorMessage() {
-        return errorMessage;
+    public Label getErrorLabel() {
+        return errorLabel;
     }
 
     @Override

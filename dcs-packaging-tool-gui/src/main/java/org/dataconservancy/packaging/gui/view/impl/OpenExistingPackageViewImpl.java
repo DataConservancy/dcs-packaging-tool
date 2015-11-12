@@ -42,8 +42,6 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     private Button choosePackageFileButton;
     private TextField choosePackageFileTextField;
 
-    private Label errorMessage;
-
     public OpenExistingPackageViewImpl() {
         super();
 
@@ -56,11 +54,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
 
         setCenter(content);
         content.setAlignment(Pos.TOP_CENTER);
-        errorMessage = new Label();
-        errorMessage.setTextFill(Color.RED);
-        errorMessage.setWrapText(true);
-        errorMessage.setMaxWidth(600);
-        content.getChildren().add(errorMessage);
+        content.getChildren().add(errorLabel);
 
         VBox infoVBox = new VBox(4);
         Label selectOneOptionLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_ONE_OPTION_LABEL));
@@ -160,11 +154,6 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     @Override
     public TextField getChoosePackageFileTextField() {
         return choosePackageFileTextField;
-    }
-
-    @Override
-    public Label getErrorMessage() {
-        return errorMessage;
     }
 
     @Override

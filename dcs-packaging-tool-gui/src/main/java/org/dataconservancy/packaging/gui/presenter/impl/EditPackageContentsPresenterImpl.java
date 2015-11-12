@@ -92,7 +92,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         String disciplinePath = controller.getFactory().getConfiguration().getDisciplineMap();
         view.setupWindowBuilder(disciplinePath);
 
-        view.getErrorMessageLabel().setVisible(false);
+        view.getErrorLabel().setVisible(false);
 
         displayPackageTree();
 
@@ -131,12 +131,12 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     stream = new FileOutputStream(packageDescriptionFile);
                 } catch (IOException e) {
                     log.error(e.getMessage());
-                    view.getErrorMessageLabel().setText(TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) + e.getMessage());
-                    view.getErrorMessageLabel().setVisible(true);
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) + e.getMessage());
+                    view.getErrorLabel().setVisible(true);
                 }
 
-                if (view.getErrorMessageLabel().isVisible()) {
-                    view.getErrorMessageLabel().setVisible(false);
+                if (view.getErrorLabel().isVisible()) {
+                    view.getErrorLabel().setVisible(false);
                 }
 
                 //save the PackageDescription to the file
@@ -174,13 +174,13 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     stream = new FileOutputStream(packageDescriptionFile);
                 } catch (IOException e) {
                     log.error(e.getMessage());
-                    view.getErrorMessageLabel().setText(
+                    view.getErrorLabel().setText(
                         TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) +
                             e.getMessage());
-                    view.getErrorMessageLabel().setVisible(true);
+                    view.getErrorLabel().setVisible(true);
                 }
 
-                view.getErrorMessageLabel().setVisible(false);
+                view.getErrorLabel().setVisible(false);
 
                 //save the PackageDescription to the file
 
@@ -510,10 +510,10 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         } catch (IOException e) {
             log.error(e.getMessage());
-            view.getErrorMessageLabel().setText(
+            view.getErrorLabel().setText(
                 TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) +
                     e.getMessage());
-            view.getErrorMessageLabel().setVisible(true);
+            view.getErrorLabel().setVisible(true);
         }
     }
 

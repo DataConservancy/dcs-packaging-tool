@@ -67,10 +67,4 @@ public interface OpenExistingPackageView extends View<OpenExistingPackagePresent
      * @return The TextField to use for entering the in content directory.
      */
     TextField getChoosePackageFileTextField();
-
-    /**
-     * Label for displaying an error message to the user, typically when a required field has not been selected.
-     * @return Label for displaying an error message to the user
-     */
-    Label getErrorMessage();
 }

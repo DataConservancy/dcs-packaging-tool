@@ -47,12 +47,6 @@ public interface CreateNewPackageView extends View<CreateNewPackagePresenter> {
      */
     TextField getChooseContentDirectoryTextField();
 
-    /**
-     * Label for displaying an error message to the user, typically when a required field has not been selected.
-     * @return Label for displaying an error message to the user
-     */
-    Label getErrorMessage();
-
     void showProgressIndicatorPopUp();
 
     PackageToolPopup getProgressIndicatorPopUp();

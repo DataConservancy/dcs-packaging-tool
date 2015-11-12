@@ -187,12 +187,12 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
         view.getChooseContentDirectoryButton().fire();
         assertTrue(showDirectoryDialog);
         
-        assertEquals(0, view.getErrorMessage().getText().length());
+        assertEquals(0, view.getErrorLabel().getText().length());
         assertFalse(showNextPage);
         view.getContinueButton().fire();
         assertFalse(showNextPage);
 
-        assertTrue(view.getErrorMessage().getText().length() > 0);
+        assertTrue(view.getErrorLabel().getText().length() > 0);
     }
 
     /**
@@ -206,8 +206,8 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
         PackageDescriptionCreatorException exception = new PackageDescriptionCreatorException(exceptionMsg, exceptionDetails);
         presenter.displayExceptionMessage(exception);
         assertFalse(showNextPage);
-        assertTrue(view.getErrorMessage().getText().contains(exceptionMsg));
-        assertTrue(view.getErrorMessage().getText().contains(exceptionDetails));
+        assertTrue(view.getErrorLabel().getText().contains(exceptionMsg));
+        assertTrue(view.getErrorLabel().getText().contains(exceptionDetails));
     }
 
     private class ExecuteContinueRule implements TestRule {
@@ -264,7 +264,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                     view.getChooseContentDirectoryButton().fire();
                     assertTrue(showDirectoryDialog);
 
-                    assertEquals(0, view.getErrorMessage().getText().length());
+                    assertEquals(0, view.getErrorLabel().getText().length());
                     assertFalse(showNextPage);
                     view.getContinueButton().fire();
                 } catch (Exception e) {

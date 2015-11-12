@@ -394,11 +394,11 @@ public class Controller {
 
             packageStateFile = showSaveFileDialog(packageStateFileChooser);
             if (packageStateFile != null) {
+                try(FileOutputStream fs = new FileOutputStream(packageStateFile)){
+                    packageStateSerializer.serialize(getPackageState(), fs);
+                }
                 packageStateFileChooser.setInitialDirectory(packageStateFile.getParentFile());
                 packageStateFileChooser.setInitialFileName(packageStateFile.getName());
-                FileOutputStream fs = new FileOutputStream(packageStateFile);
-                packageStateSerializer.serialize(getPackageState(), fs);
-                fs.close();
             }
         }
     }

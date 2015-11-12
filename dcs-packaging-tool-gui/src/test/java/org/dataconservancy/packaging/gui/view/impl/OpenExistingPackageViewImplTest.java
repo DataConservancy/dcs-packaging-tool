@@ -45,7 +45,7 @@ public class OpenExistingPackageViewImplTest extends BaseGuiTest {
         assertNotNull(view.getChoosePackageDirectoryTextField());
         assertNotNull(view.getChoosePackageDirectoryButton());
         assertNotNull(view.getContinueButton());
-        assertNotNull(view.getErrorMessage());
+        assertNotNull(view.getErrorLabel());
     }
 
 
