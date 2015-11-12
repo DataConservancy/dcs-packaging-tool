@@ -146,7 +146,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         //Create the relationship tab that displays all relationships the artifact has.
         Tab relationshipTab = new Tab();
         relationshipTab.setClosable(false);
-        relationshipTab.setText(TextFactory.getText(Labels.LabelKey.RELATIONSHIPS_LABEL));
+        relationshipTab.setText(TextFactory.getText(Labels.LabelKey.USER_PROPERTIES_LABEL));
         ScrollPane relationshipPane = new ScrollPane();
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -299,7 +299,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         relationshipsBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
 
         //Create the button for adding new relationships this will add a new set of relationship controls.
-        final Button addNewUserDefinedPropertyButton = new Button(TextFactory.getText(Labels.LabelKey.ADD_RELATIONSHIP_BUTTON));
+        final Button addNewUserDefinedPropertyButton = new Button(TextFactory.getText(Labels.LabelKey.ADD_NEW_PROPERTY_BUTTON));
 
         addNewUserDefinedPropertyButton.setMaxWidth(addNewButtonMaxWidth);
 
