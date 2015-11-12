@@ -16,8 +16,6 @@
 
 package org.dataconservancy.packaging.gui.util;
 
-import org.dataconservancy.packaging.gui.Configuration;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +24,7 @@ import java.util.regex.Pattern;
  */
 public class FilenameValidator implements Validator {
 
-    //private Configuration configuration;
-    private String windowsReservedNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$";
+    private String windowsReservedNamesRegex = "^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])($|\\..*$)";
     private Pattern pattern = Pattern.compile(windowsReservedNamesRegex);
     private String blacklist = "<>:\"/\\|?*";
 
@@ -52,8 +49,4 @@ public class FilenameValidator implements Validator {
         }
         return false;
     }
-
-   // private void setConfiguration(Configuration configuration){
-  //      this.configuration = configuration;
-   // }
 }
