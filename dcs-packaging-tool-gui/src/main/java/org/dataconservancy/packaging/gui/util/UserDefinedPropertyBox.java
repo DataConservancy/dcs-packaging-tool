@@ -248,10 +248,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
                 if (newGroup.getPropertyTypes() != null && !newGroup.getPropertyTypes().isEmpty()) {
                     propertyTypeComboBox.getItems().clear();
-                    //TODO: This show/hide is a hack to work around a javafx2 bug where the combo box list isn't correctly measured on the first pass. If we upgrade to java 8 this should be removed.
-                    propertyTypeComboBox.show();
                     propertyTypeComboBox.getItems().addAll(newGroup.getPropertyTypes());
-                    propertyTypeComboBox.hide();
                     propertyTypeComboBox.setValue(newGroup.getPropertyTypes().iterator().next());
 
                 } else {
