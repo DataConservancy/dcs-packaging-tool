@@ -38,6 +38,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.FileAssociation;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyCategory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
@@ -162,6 +163,8 @@ public class DcsBOProfile
     private final PropertyType mbox = new PropertyType();
 
     private final PropertyType homepage = new PropertyType();
+
+    private final PropertyCategory creatorCategory = new PropertyCategory();
 
     private static final PrefixMap PREFIX_MAP = PrefixMapFactory
             .create(Ontologies.PREFIX_MAP);
@@ -300,6 +303,11 @@ public class DcsBOProfile
     }
 
     private void definePropertyTypes() {
+
+        creatorCategory.setLabel("Creators");
+        creatorCategory.setDescription("The creators of a domain object.");
+        creatorCategory.setPropertyTypes(Collections.singletonList(hasCreator));
+
         hasBusinessID.setLabel("Business ID");
         hasBusinessID
                 .setDescription("A data property specifying a business identifier for the BusinessObject");
@@ -416,6 +424,7 @@ public class DcsBOProfile
                 + "hasCreator"));
         hasCreator.setPropertyValueType(PropertyValueType.COMPLEX);
         hasCreator.setPropertyValueHint(PropertyValueHint.CONTACT_INFO);
+        hasCreator.setCategory(creatorCategory);
 
         hasPublisher.setLabel("Publisher");
         hasPublisher
