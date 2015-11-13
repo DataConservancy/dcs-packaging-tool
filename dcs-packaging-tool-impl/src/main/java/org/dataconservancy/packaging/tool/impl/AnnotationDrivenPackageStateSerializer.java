@@ -399,6 +399,10 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
         try {
             while ((entry = in.getNextEntry()) != null) {
+                if (entry.getSize() == 0) {
+                    // Skip empty entries
+                    continue;
+                }
                 if (all || streamId.name().equals(entry.getName())) {
                     if (all) {
                         streamId = StreamId.valueOf(entry.getName().toUpperCase());
@@ -415,7 +419,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                     propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
                 }
             }
-        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+        } catch (Exception e) {
             if (streamId == null) {
                 throw new RuntimeException(String.format(ERR_UNMARSHALLING_ARCHIVE, e.getMessage()), e);
             } else {

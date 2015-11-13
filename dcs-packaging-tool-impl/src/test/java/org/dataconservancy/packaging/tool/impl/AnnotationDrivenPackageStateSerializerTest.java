@@ -45,6 +45,7 @@ import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
 import org.dataconservancy.packaging.tool.ser.UserPropertyConverter;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
 import org.springframework.oxm.xstream.XStreamMarshaller;
@@ -63,9 +64,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.applicationVersion;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainObjectsRDF;
@@ -548,6 +551,70 @@ public class AnnotationDrivenPackageStateSerializerTest {
         assertTrue(result.size() > 1);
     }
 
+    @Test
+    public void testDeserializeEmptyArchive() throws Exception {
+        PackageState state = new PackageState();
+        underTest.setMarshallerMap(liveMarshallerMap);
+        BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(ZipLong.LFH_SIG.getBytes()));
+
+        underTest.deserialize(state, in);
+
+        assertEmptyOrNullStreamsOnPackageState(state);
+    }
+
+    @Test
+    public void testDeserializeEmptyStream() throws Exception {
+        ClassPathResource stateWithEmptyStream = new ClassPathResource("/stateWithEmptyStream.zip");
+        BufferedInputStream in = new BufferedInputStream(stateWithEmptyStream.getInputStream());
+
+        PackageState state = new PackageState();
+        underTest.setMarshallerMap(liveMarshallerMap);
+
+        underTest.deserialize(state, in);
+        assertEmptyOrNullStreamsOnPackageState(state, StreamId.USER_SPECIFIED_PROPERTIES);
+    }
+
+    /**
+     * Asserts that all @Serialize annotated fields on the supplied state have a null value.  If an annotated field
+     * is a Collection or a Map, they are allowed to be not null, but they must be empty.
+     *
+     * @param state the state object
+     */
+    private void assertEmptyOrNullStreamsOnPackageState(PackageState state) {
+        assertEmptyOrNullStreamsOnPackageState(state, null);
+    }
+
+    /**
+     * Asserts that specified streams on the supplied state have a null value.  If a stream
+     * is a Collection or a Map, they are allowed to be not null, but they must be empty.
+     *
+     * @param state the state object
+     */
+    private void assertEmptyOrNullStreamsOnPackageState(PackageState state, StreamId... streamIds) {
+        boolean all = (streamIds == null || streamIds.length == 0);
+
+        SerializationAnnotationUtil.getStreamDescriptors(PackageState.class).forEach((streamId, pd) -> {
+            if (all || Stream.of(streamIds).anyMatch(candidate -> candidate == streamId)) {
+                Class<?> type = pd.getPropertyType();
+                try {
+                    Object fieldValue = pd.getReadMethod().invoke(state);
+                    if (Collection.class.isAssignableFrom(type) && fieldValue != null) {
+                        assertTrue("Expected empty collection for streamId " + streamId + ", field " + pd.getName() +
+                                " on " + PackageState.class.getName(), ((Collection) fieldValue).isEmpty());
+                    } else if (Map.class.isAssignableFrom(type) && fieldValue != null) {
+                        assertTrue("Expected empty collection for streamId " + streamId + ", field " + pd.getName() +
+                                " on " + PackageState.class.getName(), ((Map) fieldValue).isEmpty());
+                    } else {
+                        assertNull("Expected 'null' value for streamId " + streamId + ", field " + pd.getName() + " on " +
+                                PackageState.class.getName(), fieldValue);
+                    }
+                } catch (Exception e) {
+                    fail(e.getMessage());
+                }
+            }
+        });
+    }
+
     private XStream configure(XStream x) {
         x.processAnnotations(PackageState.class);
 
@@ -585,4 +652,5 @@ public class AnnotationDrivenPackageStateSerializerTest {
 
         return x;
     }
+    
 }
