@@ -36,6 +36,11 @@ public class IPMServiceImpl implements IPMService {
      * Creates a Node in the tree for the given path, and will recurse the file structure to add all child files and folders.
      */
     private Node createTree(Node parent, Path path) throws IOException {
+        //Check if the process is being cancelled by GUI
+        if (Thread.currentThread().isInterrupted()) {
+            return null;
+        }
+
         //Tests to ensure any symbolic links do not create cycles in the tree.
         try {
             if (visitedFiles.contains(path.toRealPath())) {
@@ -90,6 +95,9 @@ public class IPMServiceImpl implements IPMService {
             if (Files.isDirectory(path)) {
                 DirectoryStream<Path> stream = Files.newDirectoryStream(path);
                 for (Path childPath : stream) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
                     createTree(node, childPath);
                 }
 

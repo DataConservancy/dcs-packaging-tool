@@ -527,6 +527,11 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     private boolean assign_node_types(DomainProfile profile, Node node) {
+        //Add support for the process being stopped by the GUI
+        if (Thread.currentThread().isInterrupted()) {
+            return true;
+        }
+
         List<NodeType> valid_types = get_possible_types(profile, node);
 
         if (valid_types.isEmpty()) {
@@ -542,6 +547,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             node.setNodeType(nt);
 
             for (Node child : node.getChildren()) {
+                //Add support for the process being stopped by the GUI
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 if (!child.isIgnored() && !assign_node_types(profile, child)) {
                     continue next;
                 }

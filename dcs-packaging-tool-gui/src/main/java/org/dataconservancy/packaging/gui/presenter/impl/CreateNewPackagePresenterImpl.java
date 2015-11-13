@@ -108,9 +108,12 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                 ipmBuilderService.setOnSucceeded(workerStateEvent -> {
                     Node rootNode = (Node) workerStateEvent.getSource().getValue();
-                    controller.setPackageTree(rootNode);
                     ipmBuilderService.reset();
-                    super.onContinuePressed();
+
+                    if (rootNode != null) {
+                        controller.setPackageTree(rootNode);
+                        super.onContinuePressed();
+                    }
                 });
 
                 ipmBuilderService.start();
@@ -181,7 +184,17 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 @Override
                 protected Node call() throws Exception {
                     Node root = ipmService.createTreeFromFileSystem(root_artifact_dir.toPath());
+
+                    //To support the cancelling of tree creation we check if the thread is interrupted
+                    if (Thread.currentThread().isInterrupted()) {
+                        return null;
+                    }
                     controller.initializeDomainStoreAndServices(null);
+
+                    if (Thread.currentThread().isInterrupted()) {
+                        return null;
+                    }
+
                     if (!controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), root)) {
                         throw new IllegalStateException("Unable to assign Profile types to this file tree, please select a different profile or directory.");
                     }
