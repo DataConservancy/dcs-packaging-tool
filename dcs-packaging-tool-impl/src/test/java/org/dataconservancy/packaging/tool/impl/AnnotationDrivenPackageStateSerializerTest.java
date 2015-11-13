@@ -151,13 +151,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
             final JenaModelSerializer serializer = new JenaModelSerializer(new DefaultModelFactory());
             serializer.setLang("TTL");
 
-//            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
-//                {
-//                    setStreamId(StreamId.PACKAGE_TREE);
-//                    setMarshaller(serializer);
-//                    setUnmarshaller(serializer);
-//                }
-//            });
+            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.PACKAGE_TREE);
+                    setMarshaller(serializer);
+                    setUnmarshaller(serializer);
+                }
+            });
             put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.DOMAIN_PROFILE_LIST);
@@ -210,13 +210,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setUnmarshaller(mock(Unmarshaller.class));
                 }
             });
-//            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
-//                {
-//                    setStreamId(StreamId.PACKAGE_TREE);
-//                    setUnmarshaller(mock(Unmarshaller.class));
-//                    setMarshaller(mock(Marshaller.class));
-//                }
-//            });
+            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.PACKAGE_TREE);
+                    setUnmarshaller(mock(Unmarshaller.class));
+                    setMarshaller(mock(Marshaller.class));
+                }
+            });
             put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.DOMAIN_PROFILE_LIST);
@@ -266,9 +266,11 @@ public class AnnotationDrivenPackageStateSerializerTest {
         state.setDomainProfileIdList(domainProfileUris);
         state.setDomainObjectRDF(domainObjectsRDF);
         state.setUserSpecifiedProperties(userProperties);
+        state.setPackageTree(packageTreeRDF);
 
         /*
-         * Configure the live stream marshalling map with XStream converters
+         * Configure the live stream marshalling map with XStream converters.  Not all streams are marshalled by
+         * XStream.  The PACKAGE_TREE and DOMAIN_OBJECTS streams are RDF, and marshalled by Jena.
          */
 
         /* Marshallers */
