@@ -20,7 +20,6 @@ package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
@@ -29,7 +28,9 @@ import java.beans.PropertyDescriptor;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -87,6 +88,15 @@ public class SerializeEqualsTester {
                 fail(e.getMessage());
             }
 
+            if (fieldOne == null) {
+                assertNull("Field " + pd.getName() + " from the first object was null, but it was not null for the" +
+                        "second object.", fieldTwo);
+                return;
+            }
+
+            assertNotNull("Field " + pd.getName() + " from the first object was not null, but it was null for the" +
+                    " second object.", fieldTwo);
+
             if (Model.class.isAssignableFrom(fieldOne.getClass()) &&
                     Model.class.isAssignableFrom(fieldTwo.getClass())) {
                 assertModelEquals((Model) fieldOne, (Model) fieldTwo);
@@ -94,6 +104,7 @@ public class SerializeEqualsTester {
                 assertEquals(fieldOne, fieldTwo);
             }
         });
+
 
         return true;
     }
