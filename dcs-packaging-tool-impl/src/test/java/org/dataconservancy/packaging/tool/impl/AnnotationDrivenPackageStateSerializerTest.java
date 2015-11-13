@@ -145,13 +145,17 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     setUnmarshaller(new XStreamMarshaller());
                 }
             });
-//            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
-//                {
-//                    setStreamId(StreamId.PACKAGE_TREE);
-//                    setMarshaller(new JenaModelSerializer(new DefaultModelFactory()));
-//                    setUnmarshaller(new JenaModelSerializer(new DefaultModelFactory()));
-//                }
-//            });
+
+            final JenaModelSerializer serializer = new JenaModelSerializer(new DefaultModelFactory());
+            serializer.setLang("TTL");
+
+            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+                {
+                    setStreamId(StreamId.PACKAGE_TREE);
+                    setMarshaller(serializer);
+                    setUnmarshaller(serializer);
+                }
+            });
             put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.DOMAIN_PROFILE_LIST);
@@ -162,8 +166,9 @@ public class AnnotationDrivenPackageStateSerializerTest {
             put(StreamId.DOMAIN_OBJECTS, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.DOMAIN_OBJECTS);
-                    setMarshaller(new JenaModelSerializer(new DefaultModelFactory()));
-                    setUnmarshaller(new JenaModelSerializer(new DefaultModelFactory()));
+                    setMarshaller(serializer);
+                    setUnmarshaller(serializer);
+
                 }
             });
             put(StreamId.USER_SPECIFIED_PROPERTIES, new StreamMarshaller() {
