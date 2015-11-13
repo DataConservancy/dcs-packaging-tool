@@ -16,19 +16,11 @@
 
 package org.dataconservancy.packaging.gui;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
-
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
@@ -42,12 +34,18 @@ import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
-import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 /**
  * Root container for application that manages changes between presenters.
@@ -59,17 +57,12 @@ public class Controller {
     /**
      * Package-scope metadata
      */
-    //TODO: these fields can be removed once PackageState contains IPM nodes and other object currently in the domain profile branch.
-    private PackageDescription packageDescription;
-    private File packageDescriptionFile;
-    private File contentRoot;
-    private File rootArtifactDir;
-    //END TODO
+
     private PackageState packageState;
     private File packageStateFile;
     private FileChooser packageStateFileChooser;
     private PackageStateSerializer packageStateSerializer;
-    private String packageStateFileExtension=".zip";
+    private String packageStateFileExtension="*.zip";
 
     private DomainProfileStore domainProfileStore;
     private IpmRdfTransformService ipmRdfTransformService;
@@ -81,7 +74,6 @@ public class Controller {
      * Application-scope metadata
      */
     private String defaultPackageGenerationParametersFilePath;
-    private String availableProjects;
     private ApplicationVersion toolVersion;
 
     /**
@@ -109,7 +101,7 @@ public class Controller {
         toolVersion = new ApplicationVersion();
         ipmRdfTransformService = new IpmRdfTransformService();
         packageStateFileChooser = new FileChooser();
-        packageStateFileChooser.setInitialFileName(packageStateFileExtension);
+        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package State File (.zip)", packageStateFileExtension));
         initiatePagesStacks();
     }
 
@@ -139,7 +131,6 @@ public class Controller {
 
     public void startApp() {
         defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
-        availableProjects = factory.getConfiguration().getAvailableProjects();
         showHome(true);
     }
 
@@ -151,10 +142,7 @@ public class Controller {
     public void showHome(boolean clear) {
         container.setTop((VBox) factory.getHeaderView());
         currentPage = Page.HOMEPAGE;
-        packageDescription = null;
-        packageDescriptionFile = null;
-        contentRoot = null;
-        rootArtifactDir = null;
+
         packageState = new PackageState(this.toolVersion);
         packageStateFile = null;
         packageStateFileChooser.setInitialFileName(packageStateFileExtension);
@@ -403,53 +391,6 @@ public class Controller {
         }
     }
 
-    public void setPackageDescription(PackageDescription description) {
-        this.packageDescription = description;
-    }
-
-    public PackageDescription getPackageDescription() {
-        return packageDescription;
-    }
-
-    public void setPackageDescriptionFile(File packageDescriptionFile) {
-        this.packageDescriptionFile = packageDescriptionFile;
-    }
-
-    public File getPackageDescriptionFile() {
-        return packageDescriptionFile;
-    }
-
-    public void setPackageStateFile(File packageStateFile) {
-        this.packageStateFile = packageStateFile;
-    }
-
-    public File getPackageStateFile(){
-        return packageStateFile;
-    }
-
-    public File getContentRoot() {
-        return contentRoot;
-    }
-
-    public void setContentRoot(File contentRoot) {
-        this.contentRoot = contentRoot;
-    }
-
-    public File getRootArtifactDir() {
-        return rootArtifactDir;
-    }
-
-    public void setRootArtifactDir(File rootArtifactDir) {
-        this.rootArtifactDir = rootArtifactDir;
-    }
-
-    public String getAvailableProjects() {
-        return availableProjects;
-    }
-
-    public void setAvailableProjects(String availableProjects) {
-        this.availableProjects = availableProjects;
-    }
 
     public PackageState getPackageState() {
         return packageState;
