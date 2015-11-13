@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
@@ -62,13 +63,13 @@ public class ProfilePropertyBox extends VBox {
            TextFactory.getText(Labels.LabelKey.ADD_NEW_BUTTON));
         addNewButton.setMaxWidth(addNewButtonMaxWidth);
         addNewButton.setDisable(true);
-        addNewButton.setAlignment(Pos.BOTTOM_RIGHT);
 
         final boolean editable = !propertyConstraint.getPropertyType().isReadOnly();
 
         final GroupPropertyChangeListener listener = new GroupPropertyChangeListener(addNewButton);
 
         if (propertyConstraint.getPropertyType().getPropertyValueType().equals(PropertyValueType.COMPLEX)) {
+            addNewButton.setText(TextFactory.format(Messages.MessageKey.ADD_NEW_MESSAGE, propertyConstraint.getPropertyType().getLabel()));
             subPropertyBoxes = new ArrayList<>();
             createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener, propertyValuesBox);
             getChildren().add(propertyValuesBox);

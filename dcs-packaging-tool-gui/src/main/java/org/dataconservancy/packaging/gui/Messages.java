@@ -31,8 +31,8 @@ public class Messages {
         EMAIL_VALIDATION_FAILURE("emailvalidation.failure"),
         REFRESH_STATUS_MESSAGE("refreshstatus.message"),
         URI_VALIDATION_FAILURE("urivalidation.failure"),
-        FILE_NAME_VALIDATION_FAILURE("filenamevalidation.failure");
-
+        FILE_NAME_VALIDATION_FAILURE("filenamevalidation.failure"),
+        ADD_NEW_MESSAGE("addnew.message");
 
         String property;
 
