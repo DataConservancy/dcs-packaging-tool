@@ -32,7 +32,15 @@ public class FilenameValidatorTest {
 
     @Test
     public void testBlacklistedCharacters(){
-        Assert.assertFalse(fnv.isValid("has:aColon"));
+        Assert.assertFalse(fnv.isValid("has:Colon"));
+        Assert.assertFalse(fnv.isValid("has\"Quote"));
+        Assert.assertFalse(fnv.isValid("has*Asterisk"));
+        Assert.assertFalse(fnv.isValid("has/Solidus"));
+        Assert.assertFalse(fnv.isValid("has<LessThan"));
+        Assert.assertFalse(fnv.isValid("has>GreaterThan"));
+        Assert.assertFalse(fnv.isValid("has\\ReverseSolus"));
+        Assert.assertFalse(fnv.isValid("has|VerticalLine"));
+        Assert.assertFalse(fnv.isValid("has~Tilde"));
     }
 
     @Test
@@ -63,5 +71,16 @@ public class FilenameValidatorTest {
         Assert.assertTrue(fnv.isValid("COMPACT"));
         Assert.assertFalse(fnv.isValid("LPT1"));
         Assert.assertTrue(fnv.isValid("LPT0"));
+        Assert.assertTrue(fnv.isValid("COM10"));
     }
+
+    @Test
+    public void testBadComponents(){
+        Assert.assertFalse(fnv.isValid("."));
+        Assert.assertFalse(fnv.isValid(".."));
+        Assert.assertFalse(fnv.isValid("./"));
+        Assert.assertFalse(fnv.isValid("../"));
+        Assert.assertFalse(fnv.isValid("~"));
+    }
+
 }
