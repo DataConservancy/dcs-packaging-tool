@@ -25,8 +25,8 @@ import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
-import org.dataconservancy.packaging.gui.util.TextPropertyBox;
-import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
+import org.dataconservancy.packaging.gui.util.Validator;
+import org.dataconservancy.packaging.gui.util.ValidatorFactory;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
@@ -37,6 +37,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.joda.time.DateTime;
@@ -251,15 +252,31 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                                 break;
                             default:
                                 if (!((String) value).isEmpty()) {
-                                    newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                                    controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
+                                    //Only save valid properties
+                                    Validator validator = null;
+                                    if (propertyBox.getPropertyConstraint().getPropertyType() != null
+                                        && propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint() != null) {
+                                        validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
+                                    }
+                                    if (validator == null || validator.isValid((String) value)) {
+                                        newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                                        controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
+                                    }
                                 }
                         }
                     } else {
                         if (value instanceof String) {
                             if (!((String) value).isEmpty()) {
-                                Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                                controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
+                                //Only save valid properties
+                                Validator validator = null;
+                                if (propertyBox.getPropertyConstraint().getPropertyType() != null
+                                    && propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint() != null) {
+                                    validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
+                                }
+                                if (validator == null || validator.isValid((String) value)) {
+                                    Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                                    controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
+                                }
                             }
                         }
                     }
@@ -280,33 +297,42 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
             List<Property> userDefinedProperties = new ArrayList<>();
             //Then loop through all the user defined properties in the popup and save them to package state
-            for(UserDefinedPropertyBox userDefinedPropertyBox : view.getUserDefinedPropertyBoxes()) {
-                if (userDefinedPropertyBox.getUserDefinedPropertyType() != null
-                    && userDefinedPropertyBox.getUserDefinedPropertyValues() != null && !userDefinedPropertyBox.getUserDefinedPropertyValues().isEmpty()) {
-                    PropertyType propertyType = userDefinedPropertyBox.getUserDefinedPropertyType();
+            //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
+            view.getUserDefinedPropertyBoxes().stream().filter(userDefinedPropertyBox ->
+                                                                   userDefinedPropertyBox.getUserDefinedPropertyType() !=
+                                                                       null &&
+                                                                       userDefinedPropertyBox.getUserDefinedPropertyValues() !=
+                                                                           null &&
+                                                                       !userDefinedPropertyBox.getUserDefinedPropertyValues().isEmpty()).forEach(userDefinedPropertyBox -> {
+                PropertyType propertyType = userDefinedPropertyBox.getUserDefinedPropertyType();
 
-                    for (TextPropertyBox propertyBox : userDefinedPropertyBox.getUserDefinedPropertyValues()) {
-                        if (propertyBox.getValueAsString() != null && !propertyBox.getValueAsString().isEmpty()) {
-                            Property newProperty = new Property(propertyType);
+                //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
+                userDefinedPropertyBox.getUserDefinedPropertyValues().stream().filter(propertyBox ->
+                                                                                          propertyBox.getValueAsString() !=
+                                                                                              null &&
+                                                                                              !propertyBox.getValueAsString().isEmpty()).forEach(propertyBox -> {
+                    Property newProperty = new Property(propertyType);
 
-                            if (propertyType.getPropertyValueType() != null &&
-                                propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
-                                try {
-                                    newProperty.setUriValue(new URI(propertyBox.getValueAsString()));
-                                } catch (URISyntaxException e) {
-                                    //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
-                                    newProperty.getPropertyType().setPropertyValueType(PropertyValueType.STRING);
-                                    newProperty.setStringValue(propertyBox.getValueAsString());
-                                }
-                            } else {
+                    if (propertyType.getPropertyValueType() != null &&
+                        propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
+                        Validator uriValidator = ValidatorFactory.getValidator(PropertyValueHint.URI);
+                        if (uriValidator == null ||
+                            uriValidator.isValid(propertyBox.getValueAsString())) {
+                            try {
+                                newProperty.setUriValue(new URI(propertyBox.getValueAsString()));
+                            } catch (URISyntaxException e) {
+                                //The user checked the URI box but didn't enter a URI this should never happen with validation, but fix it here
+                                newProperty.getPropertyType().setPropertyValueType(PropertyValueType.STRING);
                                 newProperty.setStringValue(propertyBox.getValueAsString());
                             }
-
-                            userDefinedProperties.add(newProperty);
                         }
+                    } else {
+                        newProperty.setStringValue(propertyBox.getValueAsString());
                     }
-                }
-            }
+
+                    userDefinedProperties.add(newProperty);
+                });
+            });
 
             if (controller.getPackageState().getUserSpecifiedProperties() == null) {
                 controller.getPackageState().setUserSpecifiedProperties(new HashMap<>());
