@@ -97,14 +97,14 @@ public class IPMServiceIT {
 
         assertTrue(underTest.mergeTree(root, nodeMap));
 
-        Node horseNode = findNodeForFile(root, horseFile.toURI());
+        Node horseNode = findNodeForFile(root, horseFile.toPath().toRealPath().toUri());
         assertNotNull(horseNode);
-        assertEquals(horseNode.getParent().getFileInfo().getLocation(), secondSubDir.toURI());
+        assertEquals(horseNode.getParent().getFileInfo().getLocation(), secondSubDir.toPath().toRealPath().toUri());
 
         Node subDirBFileNode = findNodeForFile(root, subDirBFile.toURI());
         assertNull(subDirBFileNode);
 
-        Node subDirFileNode = findNodeForFile(root, subDirFile.toURI());
+        Node subDirFileNode = findNodeForFile(root, subDirFile.toPath().toRealPath().toUri());
         assertNotNull(subDirFileNode);
         assertTrue(subDirFileNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(newSha1Checksum));
         assertTrue(subDirFileNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(newMd5Checksum));
@@ -154,9 +154,9 @@ public class IPMServiceIT {
 
         assertTrue(underTest.mergeTree(root, nodeMap));
 
-        assertEquals(newDir.toURI(), root.getFileInfo().getLocation());
+        assertEquals(newDir.toPath().toRealPath().toUri(), root.getFileInfo().getLocation());
         assertEquals(1, root.getChildren().size());
-        assertEquals(newSubDir.toURI(), root.getChildren().get(0).getFileInfo().getLocation());
+        assertEquals(newSubDir.toPath().toRealPath().toUri(), root.getChildren().get(0).getFileInfo().getLocation());
     }
 
     /**
@@ -189,7 +189,7 @@ public class IPMServiceIT {
         Node root = underTest.createTreeFromFileSystem(mainDir.toPath());
         assertNotNull(root);
         
-        Node subDirFileTwoNode = findNodeForFile(root, subDirFileTwo.toURI());
+        Node subDirFileTwoNode = findNodeForFile(root, subDirFileTwo.toPath().toRealPath().toUri());
         assertNotNull(subDirFileTwoNode);
         
         URI identifierTwo = URI.create("compare:two");
