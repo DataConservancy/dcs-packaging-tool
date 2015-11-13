@@ -102,7 +102,7 @@ public class IPMServiceTest {
      * @throws Exception
      */
     @Test(expected=IOException.class)
-    public void simLinkCycleTest() throws Exception {
+    public void symLinkCycleTest() throws Exception {
         File tempDir = tmpfolder.newFolder("moo");
 
         File subdir = new File(tempDir, "cow");
@@ -119,6 +119,91 @@ public class IPMServiceTest {
         }
 
         underTest.createTreeFromFileSystem(tempDir.toPath());
+    }
+
+    /**
+     * Tests that symbolic links to file are added to the package.
+     * @throws Exception
+     */
+    @Test
+    public void validSymLinkToFileTest() throws Exception {
+        File linkedFile = tmpfolder.newFile("linkedFile");
+        File tempDir = tmpfolder.newFolder("validSymLinkToFileTest");
+
+        File subdir = new File(tempDir, "cow");
+        subdir.mkdir();
+
+        Path link = Paths.get(subdir.getPath(), "link");
+        link.toFile().deleteOnExit();
+
+        try {
+            Files.createSymbolicLink(link, linkedFile.toPath());
+        } catch (UnsupportedOperationException e) {
+            /* Nothing we can do if the system doesn't support symlinks */
+            return;
+        }
+
+        Node node = underTest.createTreeFromFileSystem(tempDir.toPath());
+
+        assertNotNull(node);
+        assertEquals(1, node.getChildren().size());
+        assertEquals(1, node.getChildren().get(0).getChildren().size());
+        assertEquals("linkedFile", node.getChildren().get(0).getChildren().get(0).getFileInfo().getName());
+    }
+
+    /**
+     * Tests that symbolic links to file are added to the package.
+     * @throws Exception
+     */
+    @Test
+    public void validSymLinkToDirectoryTest() throws Exception {
+        File linkedDir = tmpfolder.newFolder("linkedDir");
+        File linkedFileA = new File(linkedDir, "linkedFileA.txt");
+        Files.createFile(linkedFileA.toPath());
+
+        File linkedFileB = new File(linkedDir, "linkedFileB.txt");
+        Files.createFile(linkedFileB.toPath());
+
+        File tempDir = tmpfolder.newFolder("validSymLinkToDirectoryTest");
+
+        File subdir = new File(tempDir, "cow");
+        subdir.mkdir();
+
+        Path link = Paths.get(subdir.getPath(), "link");
+        link.toFile().deleteOnExit();
+
+        try {
+            Files.createSymbolicLink(link, linkedDir.toPath());
+        } catch (UnsupportedOperationException e) {
+            /* Nothing we can do if the system doesn't support symlinks */
+            return;
+        }
+
+        Node root = underTest.createTreeFromFileSystem(tempDir.toPath());
+
+        assertNotNull(root);
+        assertEquals(1, root.getChildren().size());
+        Node cowNode = root.getChildren().get(0);
+
+        assertEquals(1, cowNode.getChildren().size());
+
+        Node linkedDirNode = cowNode.getChildren().get(0);
+        assertEquals("linkedDir", linkedDirNode.getFileInfo().getName());
+
+        assertEquals(2, linkedDirNode.getChildren().size());
+
+        boolean foundFileA = false;
+        boolean foundFileB = false;
+        for (Node child : linkedDirNode.getChildren()) {
+            if (child.getFileInfo().getName().equalsIgnoreCase("linkedFileA.txt")) {
+                foundFileA = true;
+            } else if (child.getFileInfo().getName().equalsIgnoreCase("linkedFileB.txt")) {
+                foundFileB = true;
+            }
+        }
+
+        assertTrue(foundFileA);
+        assertTrue(foundFileB);
     }
 
     /**

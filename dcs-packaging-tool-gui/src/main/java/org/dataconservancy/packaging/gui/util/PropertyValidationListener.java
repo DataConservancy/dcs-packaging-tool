@@ -17,6 +17,7 @@ package org.dataconservancy.packaging.gui.util;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -67,6 +68,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
         }
 
         HBox propertyInputBox = (HBox) textPropertyBox.getChildren().get(1);
+        propertyInputBox.setAlignment(Pos.CENTER);
         validationImageLabel = (Label) propertyInputBox.getChildren().get(1);
         Validator validator = null;
         if (validationType != null) {
