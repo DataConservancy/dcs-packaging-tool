@@ -127,7 +127,8 @@ public class Labels {
         FILE_MISSING_TIP("backingfilenotfound.tip"),
         REFRESH_STATUS_LABEL("refreshstatus.label"),
         REFRESH_LOCATION_LABEL("refreshlocation.label"),
-        NO_BACKING_FILE_LABEL("nobackingfile.label");
+        NO_BACKING_FILE_LABEL("nobackingfile.label"),
+        UNASSIGNED_LABEL("unassigned.label");
 
         private String property;
 

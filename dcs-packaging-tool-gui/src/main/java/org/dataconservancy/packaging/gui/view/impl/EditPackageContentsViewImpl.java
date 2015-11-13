@@ -229,6 +229,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         //add 2 here to get rid of horizontal scroll bar
         artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
 
+        //For these cell factories p.getValue returns the TreeItem<Node> p.getValue.getValue returns the node.
         artifactColumn.setCellValueFactory(p -> {
             Node packageNode = p.getValue().getValue();
 
@@ -282,17 +283,18 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         typeColumn.setCellValueFactory(p -> {
-            // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-            // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
-            String type = p.getValue().getValue().getNodeType().getLabel();
-            Label typeLabel = new Label(type);
+            Label typeLabel = new Label(TextFactory.getText(LabelKey.UNASSIGNED_LABEL));
             typeLabel.setPrefWidth(typeColumn.getWidth());
+
+            if (p.getValue().getValue().getNodeType() != null) {
+                String type = p.getValue().getValue().getNodeType().getLabel();
+                typeLabel.setText(type);
+            }
             return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
         optionsColumn.setCellValueFactory(p -> {
-            // p.getValueAsString() returns the TreeItem<PackageArtifact> instance for a particular TreeTableView row,
-            // p.getValueAsString().getValueAsString() returns the PackageArtifact instance inside the TreeItem<PackageArtifact>
+
             Node packageNode = p.getValue().getValue();
             Label optionsLabel = new Label();
             final ContextMenu contextMenu = new ContextMenu();

@@ -182,7 +182,9 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 protected Node call() throws Exception {
                     Node root = ipmService.createTreeFromFileSystem(root_artifact_dir.toPath());
                     controller.initializeDomainStoreAndServices(null);
-                    controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), root);
+                    if (!controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), root)) {
+                        throw new IllegalStateException("Unable to assign Profile types to this file tree, please select a different profile or directory.");
+                    }
 
                     return root;
                 }

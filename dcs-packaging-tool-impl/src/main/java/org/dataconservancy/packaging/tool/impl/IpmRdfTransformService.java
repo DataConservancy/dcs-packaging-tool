@@ -70,8 +70,14 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         //Create a resource for the node object
         Resource nodeResource = nodeModel.createResource();
         nodeResource.addProperty(RDF.type, IPM_NODE_TYPE);
-        nodeResource.addProperty(HAS_ID, node.getIdentifier().toString());
-        nodeResource.addProperty(HAS_NODE_TYPE, node.getNodeType().getIdentifier().toString());
+
+        if (node.getIdentifier() != null) {
+            nodeResource.addProperty(HAS_ID, node.getIdentifier().toString());
+        }
+
+        if (node.getNodeType() != null && node.getNodeType().getIdentifier() != null) {
+            nodeResource.addProperty(HAS_NODE_TYPE, node.getNodeType().getIdentifier().toString());
+        }
 
         if (node.getSubNodeTypes() != null) {
             for (NodeType subType : node.getSubNodeTypes()) {
@@ -81,7 +87,7 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
 
         if (node.getParent() == null) {
             nodeResource.addLiteral(IS_ROOT, true);
-        } else {
+        } else if (node.getParent().getIdentifier() != null){
             List<Resource> parentList = nodeModel.listResourcesWithProperty(HAS_ID, node.getParent().getIdentifier().toString()).toList();
             //If the node isn't returned by the search create the parent
             if (parentList == null || parentList.isEmpty()) {
@@ -98,16 +104,20 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         if (node.getChildren() != null) {
             ArrayList<RDFNode> childNodes = new ArrayList<>();
             for (Node child : node.getChildren()) {
-                List<Resource> childList = nodeModel.listResourcesWithProperty(HAS_ID, child.getIdentifier().toString()).toList();
-                //If the node isn't returned by the search create the child
-                if (childList == null || childList.isEmpty()) {
-                    Resource childResource = createNodeResource(nodeModel, child);
-                    childNodes.add(childResource);
-                } else {
-                    if (childList.size() > 1) {
-                        throw new RDFTransformException("Expected there to be only one node resource with id: " + child.getIdentifier());
+                if (child.getIdentifier() != null) {
+                    List<Resource> childList = nodeModel.listResourcesWithProperty(HAS_ID, child.getIdentifier().toString()).toList();
+                    //If the node isn't returned by the search create the child
+                    if (childList == null || childList.isEmpty()) {
+                        Resource childResource = createNodeResource(nodeModel, child);
+                        childNodes.add(childResource);
                     } else {
-                        childNodes.add(childList.get(0));
+                        if (childList.size() > 1) {
+                            throw new RDFTransformException(
+                                "Expected there to be only one node resource with id: " +
+                                    child.getIdentifier());
+                        } else {
+                            childNodes.add(childList.get(0));
+                        }
                     }
                 }
             }
@@ -117,7 +127,10 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         }
 
         nodeResource.addLiteral(IS_IGNORED, node.isIgnored());
-        nodeResource.addProperty(HAS_DOMAIN_OBJECT, node.getDomainObject().toString());
+
+        if (node.getDomainObject() != null) {
+            nodeResource.addProperty(HAS_DOMAIN_OBJECT, node.getDomainObject().toString());
+        }
         if (node.getFileInfo() != null) {
             nodeResource.addProperty(HAS_FILE_INFO, transformToRDF(node.getFileInfo(), nodeModel));
         }
