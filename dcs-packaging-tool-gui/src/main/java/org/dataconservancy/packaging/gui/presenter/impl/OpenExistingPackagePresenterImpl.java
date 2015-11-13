@@ -1,109 +1,157 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
-import javafx.scene.Node;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
-import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.LinkedHashMap;
+import javafx.scene.Node;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
-public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
-        implements Presenter {
-
+public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implements Presenter {
     private OpenExistingPackageView view;
-    private File contentDir;
-    private File rootArtifactDir;
     private DirectoryChooser directoryChooser;
     private FileChooser fileChooser;
+    private PackageState loadedState;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public OpenExistingPackagePresenterImpl(OpenExistingPackageView view) {
         super(view);
         this.view = view;
-        this.contentDir = null;
-        directoryChooser = new DirectoryChooser();
-        fileChooser = new FileChooser();
+        this.directoryChooser = new DirectoryChooser();
+        this.fileChooser = new FileChooser();
 
         view.setPresenter(this);
         bind();
+    }   
+
+    private PackageState load_package_state(File file) throws IOException {
+        PackageState state = new PackageState();
+        
+        try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
+            clearError();
+            controller.getPackageStateSerializer().deserialize(state, is);
+            view.getContinueButton().setDisable(false);
+        }
+        
+        return state;
     }
-
+    
+    // TODO
+    
+    private PackageState load_package_state_from_package(File file) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+    
+    private PackageState load_package_state_from_exploded_package(File file) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+    
     private void bind() {
+        bindBaseElements();
+        
+        // User selects a package state file
+        view.getChooseInProgressPackageFileButton().setOnAction(event -> {
+            File file = controller.showOpenFileDialog(fileChooser);
+           
+            if (file == null) {
+                return;
+            }
+            
+            clear();
+            
+            view.getChooseInProgressPackageFileTextField().setText(file.getName());
 
-        //Handles the user pressing the button to choose the content directory of the package
-        view.getChoosePackageDirectoryButton().setOnAction(event -> {
-           // TODO: Handle choosing a directory and validating the dir.
+            try {
+                loadedState = load_package_state(file);
+                view.getContinueButton().setDisable(false);
+            } catch (IOException e) {
+                showError(TextFactory.format(ErrorKey.PACKAGE_STATE_LOAD_ERROR));
+                log.error(e.getMessage());
+            }
         });
 
-        view.getChooseInProgressPackageFileButton().setOnAction(event -> {
-            // TODO: Handle choosing a package file and validating it. Also need to ask for a dir to decompress if the file is compressed.
-
-            /* Here's some existing code that may be reused.
-            File descriptionFile = controller.showOpenFileDialog(fileChooser);
-
-            if (descriptionFile != null) {
-                try {
-                    FileInputStream fis = new FileInputStream(descriptionFile);
-                    PackageDescription description = packageDescriptionBuilder.deserialize(fis);
-                    //If the selected package description file is valid set it on the controller and remove the content directory if it was set.
-                    if (description != null) {
-                        //contentDir = null;
-                        controller.setPackageDescription(description);
-                        controller.setPackageDescriptionFile(descriptionFile);
-                        controller.setRootArtifactDir(null);
-                        controller.setContentRoot(null);
-                        contentDir = null;
-                        rootArtifactDir = null;
-
-                        view.getErrorMessage().setVisible(false);
-                        view.getSelectedPackageDescriptionTextField().setText(descriptionFile.getPath());
-                        view.getChooseContentDirectoryTextField().setText("");
-                        fileChooser.setInitialDirectory(descriptionFile.getParentFile());
-                    }
-                } catch (FileNotFoundException | PackageToolException e) {
-                    view.getErrorMessage().setText(messages.formatPackageDescriptionBuilderFailure(descriptionFile.getName()));
-                    view.getErrorMessage().setVisible(true);
-                    log.error(e.getMessage());
-                }
+        // User selects an serialized package
+        view.getChoosePackageFileButton().setOnAction(event -> {
+            File file = controller.showOpenFileDialog(fileChooser);
+            
+            if (file == null) {
+                return;
             }
-            */
+            
+            clear();
+            
+            view.getChoosePackageFileTextField().setText(file.getName());
+
+            try {
+                loadedState = load_package_state_from_package(file);
+                view.getContinueButton().setDisable(false);
+            } catch (IOException e) {
+                showError(TextFactory.format(ErrorKey.PACKAGE_STATE_LOAD_ERROR));
+                log.error(e.getMessage());
+            }
+        });
+
+        // User selects an exploded package
+        view.getChoosePackageDirectoryButton().setOnAction(event -> {
+            File file = controller.showOpenDirectoryDialog(directoryChooser);
+            
+            if (file == null) {
+                return;
+            }
+            
+            clear();
+            
+            view.getChoosePackageDirectoryTextField().setText(file.getName());
+
+            try {
+                loadedState = load_package_state_from_exploded_package(file);
+                view.getContinueButton().setDisable(false);
+            } catch (IOException e) {
+                showError(TextFactory.format(ErrorKey.PACKAGE_STATE_LOAD_ERROR));
+                log.error(e.getMessage());
+            }
         });
     }
 
     @Override
     public void onContinuePressed() {
-        // TODO: Needs to be able to read the existing package metadata whether via a dir or file and set it in the
-        // PackageState and move the user to the package metadata page. i.e.:
-        getController().getPackageState().setPackageName("FakeLoadedPackageName");
-        // clear the current list
-        getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
-        getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, "FakeProfile");
+        controller.setPackageState(loadedState);
         super.onContinuePressed();
     }
 
     @Override
     public void clear() {
-        // Default method body
-        view.getChoosePackageDirectoryTextField().setText("");
-        view.getErrorLabel().setText("");
+        clearError();
 
-        contentDir = null;
-        rootArtifactDir = null;
+        view.getChooseInProgressPackageFileTextField().setText("");
+        view.getChoosePackageDirectoryTextField().setText("");
+        view.getChoosePackageFileTextField().setText(""); 
+        
+        loadedState = null;
+        view.getContinueButton().setDisable(true);
     }
 
     @Override
     public Node display() {
-        //Setup help content and then rebind the base class to this view.
+        // Setup help content and then rebind the base class to this view.        
+        // TODO What is this doing? 
         view.setupHelp();
         setView(view);
-        super.bindBaseElements();
 
+        clear();
+        
         return view.asNode();
     }
 }

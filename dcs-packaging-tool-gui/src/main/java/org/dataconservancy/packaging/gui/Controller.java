@@ -499,6 +499,10 @@ public class Controller {
     public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer){
         this.packageStateSerializer = packageStateSerializer;
     }
+    
+    public PackageStateSerializer getPackageStateSerializer() {
+        return packageStateSerializer;
+    }
 
     public Node getPackageTree() {
         return packageTree;
