@@ -17,7 +17,6 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import javafx.scene.Node;
-import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.presenter.HomepagePresenter;
 import org.dataconservancy.packaging.gui.view.HomepageView;
 
@@ -50,11 +49,6 @@ public class HomepagePresenterImpl extends BasePresenterImpl implements Homepage
 
     @Override
     public Node display() {
-        //Setup help content and then rebind the base class to this view.
-        view.setupHelp();
-        setView(view);
-        super.bindBaseElements();
-
         return view.asNode();
     }
 

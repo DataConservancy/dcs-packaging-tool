@@ -18,9 +18,7 @@ package org.dataconservancy.packaging.gui.view.impl;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
@@ -37,7 +35,7 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
     private Button createNewPackageButton;
     private Button openExistingPackageButton;
 
-    public HomepageViewImpl() {
+    public HomepageViewImpl(Help help) {
         super();
         createNewPackageButton = new Button(TextFactory.getText(Labels.LabelKey.CREATE_NEW_PACKAGE));
         openExistingPackageButton = new Button(TextFactory.getText(Labels.LabelKey.OPEN_EXISTING_PACKAGE));
@@ -53,7 +51,7 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
         content.getChildren().add(openExistingPackageButton);
 
         setCenter(content);
-
+        setHelpPopupContent(help.get(Help.HelpKey.HOMEPAGE_HELP));
     }
 
     @Override
@@ -64,14 +62,5 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
     @Override
     public Button getOpenExistingPackageButton() {
         return openExistingPackageButton;
-    }
-
-    @Override
-    public void setupHelp() {
-        Label helpText = new Label(help.get(Help.HelpKey.HOMEPAGE_HELP));
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);
     }
 }

@@ -75,11 +75,10 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         dataItem = collection.getChildren().get(0);
         dataFile = dataItem.getChildren().get(0);
 
-        view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships");
+        view = new EditPackageContentsViewImpl(internalProperties, "classpath:/defaultRelationships", help);
         HeaderView headerView = new HeaderViewImpl();
         view.setIpmService(ipmService);
         view.setHeaderView(headerView);
-        view.setHelp(help);
 
         PackageState state = new PackageState();
         state.setDomainProfileIdList(Collections.singletonList(new DcsBOProfile().getIdentifier()));

@@ -16,7 +16,6 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.beans.property.StringProperty;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -32,10 +31,10 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
+
+import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
@@ -75,9 +74,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     private RadioButton zipCompressionButton;
     private RadioButton noneCompressionButton;
 
-    //The value of the combobox for externalProjectId
-    private StringProperty externalProjectIdProperty;
-
     //Toggle groups that control the input of the archive and compression groups, and simplify the presenter.
     private ToggleGroup compressionToggleGroup;
     private ToggleGroup archiveToggleGroup;
@@ -108,7 +104,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
     private ScrollPane contentScrollPane;
 
-    public PackageGenerationViewImpl() {
+    public PackageGenerationViewImpl(Help help) {
         super();
         
         contentScrollPane = new ScrollPane();
@@ -297,6 +293,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         cancelOverwriteButton = new Button(TextFactory.getText(LabelKey.CANCEL_BUTTON));
         okOverwriteButton = new Button(TextFactory.getText(LabelKey.OK_BUTTON));
 
+        setHelpPopupContent(help.get(HelpKey.PACKAGE_GENERATION_HELP));         
     }
 
     @Override
@@ -485,15 +482,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     @Override
     public void scrollToTop() {
         contentScrollPane.setVvalue(0);
-    }
-
-    @Override
-    public void setupHelp() {
-        Label helpText = new Label(help.get(HelpKey.PACKAGE_GENERATION_HELP));
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);         
     }
 
     public void loadAvailableProjects(String availableProjectsFilePath) {

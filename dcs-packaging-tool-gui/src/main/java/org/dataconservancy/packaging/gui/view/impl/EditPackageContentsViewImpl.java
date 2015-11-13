@@ -48,13 +48,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Errors;
+import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -133,7 +133,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Button refreshPopupPositiveButton;
     private Button refreshPopupNegativeButton;
 
-    public EditPackageContentsViewImpl(final InternalProperties internalProperties, final String availableRelationshipsPath) {
+    public EditPackageContentsViewImpl(final InternalProperties internalProperties, final String availableRelationshipsPath, final Help help) {
         super();
         this.internalProperties = internalProperties;
         this.availableRelationshipsPath = availableRelationshipsPath;
@@ -369,6 +369,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         refreshPopupPositiveButton.getStyleClass().add(CLICKABLE);
         refreshPopupNegativeButton = new Button(TextFactory.getText(LabelKey.REJECT_BUTTON));
         refreshPopupNegativeButton.getStyleClass().add(CLICKABLE);
+        
+        setHelpPopupContent(help.get(HelpKey.PACKAGE_DESCRIPTION_HELP));
     }
 
     @Override
@@ -853,16 +855,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     public Map<org.dataconservancy.packaging.tool.model.dprofile.PropertyType, CheckBox> getInheritMetadataCheckBoxMap() {
         return metadataInheritanceButtonMap;
     }
-
-    @Override
-    public void setupHelp() {
-        Label helpText = new Label(help.get(HelpKey.PACKAGE_DESCRIPTION_HELP));
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);
-    }
-
+   
     @Override
     public void setupWindowBuilder(String disciplineFilePath){
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);

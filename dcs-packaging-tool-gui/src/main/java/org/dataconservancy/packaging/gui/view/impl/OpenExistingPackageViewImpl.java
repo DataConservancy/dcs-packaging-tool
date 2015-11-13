@@ -23,8 +23,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -42,7 +40,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     private Button choosePackageFileButton;
     private TextField choosePackageFileTextField;
 
-    public OpenExistingPackageViewImpl() {
+    public OpenExistingPackageViewImpl(Help help) {
         super();
 
         getContinueButton().setText(TextFactory.getText(Labels.LabelKey.CONTINUE_BUTTON));
@@ -123,7 +121,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
 
         content.getChildren().add(chooseFileDirSelectionFields);
 
-
+        setHelpPopupContent(help.get(Help.HelpKey.OPEN_EXISTING_PACKAGE));
     }
 
     @Override
@@ -154,14 +152,5 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     @Override
     public TextField getChoosePackageFileTextField() {
         return choosePackageFileTextField;
-    }
-
-    @Override
-    public void setupHelp() {
-        Label helpText = new Label(help.get(Help.HelpKey.OPEN_EXISTING_PACKAGE));
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);
     }
 }

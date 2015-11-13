@@ -22,9 +22,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
 
+import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -48,7 +47,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     private ProgressDialogPopup progressIndicatorPopUp;
     private VBox content;
 
-    public CreateNewPackageViewImpl() {
+    public CreateNewPackageViewImpl(Help help) {
         super();
 
         getContinueButton().setText(TextFactory.getText(LabelKey.CONTINUE_BUTTON));
@@ -92,6 +91,8 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         packageSelectionFields.getChildren().add(baseDirectorySelectionFields);   
 
         content.getChildren().add(packageSelectionFields);
+        
+        setHelpPopupContent(help.get(HelpKey.CREATE_NEW_PACKAGE_HELP));
     }
 
     @Override
@@ -107,15 +108,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     @Override
     public TextField getChooseContentDirectoryTextField() {
         return currentBaseDirectory;
-    }
-
-    @Override
-    public void setupHelp() {
-        Label helpText = new Label(help.get(HelpKey.CREATE_NEW_PACKAGE_HELP));
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);         
     }
 
     @Override

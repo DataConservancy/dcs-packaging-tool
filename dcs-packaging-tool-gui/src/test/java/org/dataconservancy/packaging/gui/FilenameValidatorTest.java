@@ -78,8 +78,6 @@ public class FilenameValidatorTest {
     public void testBadComponents(){
         Assert.assertFalse(fnv.isValid("."));
         Assert.assertFalse(fnv.isValid(".."));
-        Assert.assertFalse(fnv.isValid("./"));
-        Assert.assertFalse(fnv.isValid("../"));
         Assert.assertFalse(fnv.isValid("~"));
     }
 

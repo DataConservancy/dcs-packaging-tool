@@ -147,4 +147,40 @@ public class UriUtilityTest {
 
         assertEquals("file:///some/fake/dir/fake.file", UriUtility.makeFileUriString(f, d).toString());
     }
+
+     // Check that when using the FileUtility to get a file's URI string that it has three slashes (IE, file:///)
+    @Test
+    public void bagUriIsProperWithTwoSlashes() throws URISyntaxException {
+        File f = new File("fake.file");
+
+        assertTrue(UriUtility.makeBagUriString(f, null).toString().startsWith("bag://"));
+    }
+
+    // Check that if a base directory is not passed in, it will just use the File URI absolute
+    @Test
+    public void bagUriProperlyCreatedWithNoBaseDirectory() throws URISyntaxException {
+        File f = new File("/some/fake/dir/fake.file");
+
+        assertEquals("bag://some/fake/dir/fake.file", UriUtility.makeBagUriString(f, null).toString());
+    }
+
+
+       // Check that if a base directory is passed in, it will create the File URI relative to the base directory
+    @Test
+    public void bagUriProperlyRelativeToBaseDirectory() throws URISyntaxException {
+        File f = new File("/some/fake/dir/fake.file");
+        File d = new File("/some/fake");
+
+        assertEquals("bag://dir/fake.file", UriUtility.makeBagUriString(f, d).toString());
+    }
+
+    // Check that if a base directory is passed in that isn't part of the file's path, it just uses the files path
+    @Test
+    public void fbagUriUsesOwnPathWhenBasedirNotInPath() throws URISyntaxException {
+        File f = new File("/some/fake/dir/fake.file");
+        File d = new File("/another");
+
+        assertEquals("bag://some/fake/dir/fake.file", UriUtility.makeBagUriString(f, d).toString());
+    }
+
 }

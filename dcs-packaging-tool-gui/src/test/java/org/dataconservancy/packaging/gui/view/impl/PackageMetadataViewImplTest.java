@@ -43,7 +43,7 @@ public class PackageMetadataViewImplTest extends BaseGuiTest {
     @Before
     public void setup() throws IOException {
 
-        view = new PackageMetadataViewImpl();
+        view = new PackageMetadataViewImpl(help);
         service = new PackageMetadataService(configuration);
 
     }

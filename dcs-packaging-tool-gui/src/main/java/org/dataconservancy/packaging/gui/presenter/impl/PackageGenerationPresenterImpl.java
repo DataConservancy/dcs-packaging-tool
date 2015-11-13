@@ -97,11 +97,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         generationParams = null;
         loadPackageGenerationParams();
 
-        //Setup help content and then rebind the base class to this view.
-        view.setupHelp();
-        setView(view);
-        super.bindBaseElements();
-
         if (packageLocation == null) {
             view.getContinueButton().setDisable(true);
         }
@@ -776,7 +771,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         public void cancel() {
         }
 
-        private class AsyncWorker implements Worker {
+        private class AsyncWorker implements Worker<Object> {
 
 
             private String message;
@@ -806,7 +801,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
 
             @Override
-            public ReadOnlyObjectProperty valueProperty() {
+            public ReadOnlyObjectProperty<Object> valueProperty() {
                 return null;
             }
 

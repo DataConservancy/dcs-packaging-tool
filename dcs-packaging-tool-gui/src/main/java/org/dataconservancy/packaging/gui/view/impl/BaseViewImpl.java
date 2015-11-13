@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.view.impl;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -27,9 +28,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
 import org.dataconservancy.packaging.gui.CssConstants;
-import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
@@ -51,7 +52,6 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     protected Popup aboutPopup;
     private Node helpContent;
     private Node aboutContent;
-    protected Help help;
     protected Label errorLabel;
 
     final double rem = javafx.scene.text.Font.getDefault().getSize();
@@ -133,10 +133,11 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     
     @Override
     public void showHelpPopup() {
-
+        Scene scene = headerView.getHelpLink().getScene();
+        
         Point2D point = headerView.getHelpLink().localToScene(0.0,  0.0);
-        double x = headerView.getHelpLink().getScene().getWindow().getX() + point.getX();
-        double y = headerView.getHelpLink().getScene().getWindow().getY() + point.getY();
+        double x = scene.getWindow().getX() + point.getX();
+        double y = scene.getWindow().getY() + point.getY();
         x -= 250;
         y += 80;
 
@@ -180,14 +181,25 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
             }
         }
 
-        helpPopup.show(getScene().getWindow(), x, y);
+        helpPopup.show(scene.getWindow(), x, y);
     }
 
+    public void setHelpPopupContent(String msg) {
+        Label helpText = new Label(msg);
+        helpText.setMaxWidth(300);
+        helpText.setWrapText(true);
+        helpText.setTextAlignment(TextAlignment.CENTER);
+        
+        setHelpPopupContent(helpText);
+    }
+    
     @Override
     public void showAboutPopup() {
+        Scene scene = headerView.getAboutLink().getScene();
+        
         Point2D point = headerView.getAboutLink().localToScene(0.0,  0.0);
-        double x = headerView.getAboutLink().getScene().getWindow().getX() + point.getX();
-        double y = headerView.getAboutLink().getScene().getWindow().getY() + point.getY();
+        double x = scene.getWindow().getX() + point.getX();
+        double y = scene.getWindow().getY() + point.getY();
 
         //X and Y are now the location of the button, if we leave that as the position the button will be covered. Offset slightly so it doesn't cover the button
         x -= 250;
@@ -250,7 +262,8 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
             popupAboutView.setBottom(versionFooter);
 
         }
-        aboutPopup.show(getScene().getWindow(), x, y);
+        
+        aboutPopup.show(scene.getWindow(), x, y);
     }
 
     @Override
@@ -277,11 +290,6 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         return headerView.getHelpLink();
     }
     
-    @Override
-    public void setHelp(Help help) {
-        this.help = help;
-    }
-
     @Override
     public Label getErrorLabel(){ return errorLabel;}
 }

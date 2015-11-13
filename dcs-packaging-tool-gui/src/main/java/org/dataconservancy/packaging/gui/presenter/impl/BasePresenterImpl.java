@@ -41,9 +41,11 @@ public abstract class BasePresenterImpl implements Presenter {
 
     public BasePresenterImpl(View<?> view) {
         this.view = view;
+        
+        bind();
     }
     
-    protected void bindBaseElements() {
+    private void bind() {
         view.getHeaderViewAboutLink().setOnAction(arg0 -> view.showAboutPopup());
         
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());

@@ -37,14 +37,14 @@ public @interface Serialize {
     /**
      * Used to identify the stream that is the target of (de)serialization.
      *
-     * @return
+     * @return id
      */
     StreamId streamId();
 
     /**
      * Serialization scope is used to mark what fields will get serialized when.
      *
-     * @return
+     * @return scope
      */
     SerializationScope[] scope() default { SerializationScope.WIP };
 

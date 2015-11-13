@@ -100,20 +100,13 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             controller.getCrossPageProgressIndicatorPopUp().hide();
         }
 
-        //Setup help content and then rebind the base class to this view.
-        view.setupHelp();
-        setView(view);
-
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         preferences.addPreferenceChangeListener(this);
-
-        super.bindBaseElements();
         
         return view.asNode();
     }
 
     private void bind() {
-
         //Displays the file selector, and then saves the package description to the given file. 
         view.getSaveButton().setOnAction(arg0 -> {
             if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
@@ -569,7 +562,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             sortTree(view.getRoot());
             expandedNodes.stream().filter(nodeID -> nodeID !=
                 null).forEach(nodeID -> {
-                TreeItem expandedItem = findItem(view.getRoot(), nodeID);
+                TreeItem<?> expandedItem = findItem(view.getRoot(), nodeID);
+                
                 if (expandedItem != null) {
                     expandedItem.setExpanded(true);
                 }
