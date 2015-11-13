@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.dcs.util;
 
+import org.apache.commons.lang.SystemUtils;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -674,8 +675,11 @@ public class FilePathUtilTest {
 
     @Test
     public void testIllegalCharacterDetectedInPath() throws IOException {
-        final File testFile = tmpFolder.newFolder("testIllegalCharacterDetectedInPath");
-        Assert.assertFalse(FilePathUtil.hasValidFilePath(testFile));
+        //This test doesn't run on windows
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            final File testFile = tmpFolder.newFolder("testIllegalCharacterDetectedInPath:oops");
+            Assert.assertFalse(FilePathUtil.hasValidFilePath(testFile));
+        }
     }
 
     /**
