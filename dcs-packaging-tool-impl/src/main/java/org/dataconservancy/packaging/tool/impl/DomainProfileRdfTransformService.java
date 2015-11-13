@@ -452,11 +452,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             categoryResource.addProperty(RDFS.comment, category.getDescription());
         }
 
-        if (category.getPropertyTypes() != null && !category.getPropertyTypes().isEmpty()) {
-            for (PropertyType type : category.getPropertyTypes()) {
-                categoryResource.addProperty(HAS_PROPERTY_TYPE, transformToRdf(model, type));
-            }
-        }
         return categoryResource;
     }
 
@@ -590,15 +585,19 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
         profile.setPropertyTypes(propertyTypes);
 
-        List<PropertyCategory> propertyCategories = new ArrayList<>();
-        for (RDFNode propertyCategoryNode : model.listObjectsOfProperty(profileResource, HAS_PROPERTY_CATEGORY).toList()) {
-            if (!propertyCategoryNode.isResource()) {
-                throw new RDFTransformException("Expected node " + propertyCategoryNode + " to be a resource");
-            }
+        if (profileResource.hasProperty(HAS_PROPERTY_CATEGORY)) {
+            List<PropertyCategory> propertyCategories = new ArrayList<>();
+            for (RDFNode propertyCategoryNode : model.listObjectsOfProperty(profileResource, HAS_PROPERTY_CATEGORY).toList()) {
+                if (!propertyCategoryNode.isResource()) {
+                    throw new RDFTransformException(
+                        "Expected node " + propertyCategoryNode +
+                            " to be a resource");
+                }
 
-            propertyCategories.add(transformToPropertyCategory(propertyCategoryNode.asResource(), model, profile));
+                propertyCategories.add(transformToPropertyCategory(propertyCategoryNode.asResource(), model, profile));
+            }
+            profile.setPropertyCategories(propertyCategories);
         }
-        profile.setPropertyCategories(propertyCategories);
 
         List<NodeTransform> nodeTransforms = new ArrayList<>();
         for (RDFNode nodeTransformNode : model.listObjectsOfProperty(profileResource, HAS_NODE_TRANSFORM).toList()) {
@@ -734,16 +733,6 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             category.setDescription(getLiteral(resource, RDFS.comment).getString());
         }
 
-        List<PropertyType> propertyTypes = new ArrayList<>();
-        for (RDFNode propertyTypeNode : model.listObjectsOfProperty(resource, HAS_PROPERTY_TYPE).toList()) {
-            if (!propertyTypeNode.isResource()) {
-                throw new RDFTransformException(
-                    "Expected node " + propertyTypeNode + " to be resource");
-            }
-
-            propertyTypes.add(transformToPropertyType(propertyTypeNode.asResource(), profile, model));
-        }
-        category.setPropertyTypes(propertyTypes);
         return category;
     }
 

@@ -1,9 +1,13 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class ModelEqualsAndHashCodeTest {
     @Test
@@ -59,16 +63,7 @@ public class ModelEqualsAndHashCodeTest {
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();
     }
-    
-    @Test
-    public void PropertyCategoryTest() {
-        EqualsVerifier
-                .forClass(PropertyCategory.class)
-                .allFieldsShouldBeUsed().withRedefinedSuperclass()
-                .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
-                .verify();
-    }
-    
+
     @Test
     public void PropertyConstraintTest() {
         EqualsVerifier

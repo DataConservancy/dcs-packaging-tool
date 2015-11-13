@@ -232,6 +232,8 @@ public class DcsBOProfile
                                        name,
                                        mbox,
                                        phone));
+
+        setPropertyCategories(Collections.singletonList(creatorCategory));
     }
 
     private void defineNodeTypes() {
@@ -306,7 +308,6 @@ public class DcsBOProfile
 
         creatorCategory.setLabel("Creators");
         creatorCategory.setDescription("The creators of a domain object.");
-        creatorCategory.setPropertyTypes(Collections.singletonList(hasCreator));
 
         hasBusinessID.setLabel("Business ID");
         hasBusinessID

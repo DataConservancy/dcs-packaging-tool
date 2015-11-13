@@ -66,14 +66,21 @@ public class FarmDomainProfile extends DomainProfile {
         feed_node_type = new NodeType();
         stockpile_node_type = new NodeType();
 
+        PropertyCategory saleCategory = new PropertyCategory();
+        saleCategory.setLabel("Sale Properties");
+        saleCategory.setDescription("Properties relevant to the sale of animals.");
+        setPropertyCategories(Collections.singletonList(saleCategory));
+
         weight_property_type = new PropertyType();
         weight_property_type.setPropertyValueType(PropertyValueType.LONG);
         weight_property_type.setPropertyValueHint(PropertyValueHint.NUMBER);
         weight_property_type.setDomainPredicate(URI.create("farm:weight"));
+        weight_property_type.setCategory(saleCategory);
 
         PropertyType breed = new PropertyType();
         breed.setPropertyValueType(PropertyValueType.STRING);
         breed.setDomainPredicate(URI.create("farm:breed"));
+        breed.setCategory(saleCategory);
 
         title_property_type = new PropertyType();
         title_property_type.setPropertyValueType(PropertyValueType.STRING);
@@ -257,12 +264,6 @@ public class FarmDomainProfile extends DomainProfile {
         media_node_type.setSuppliedProperties(supplied_media_properties);
         media_node_type.setFileAssociation(FileAssociation.REGULAR_FILE);
         media_node_type.setDomainProfile(this);
-
-        PropertyCategory saleCategory = new PropertyCategory();
-        saleCategory.setPropertyTypes(Arrays.asList(weight_property_type, breed));
-        saleCategory.setLabel("Sale Properties");
-        saleCategory.setDescription("Properties relevant to the sale of animals.");
-        setPropertyCategories(Collections.singletonList(saleCategory));
 
         NodeConstraint no_child_constraint = new NodeConstraint();
         no_child_constraint.setMatchesNone(true);
