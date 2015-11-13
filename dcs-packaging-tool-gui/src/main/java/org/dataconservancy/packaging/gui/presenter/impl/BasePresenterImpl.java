@@ -24,6 +24,9 @@ import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.View;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+
 import java.io.IOException;
 
 /**
@@ -85,5 +88,28 @@ public abstract class BasePresenterImpl implements Presenter {
             view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToNextPage();
+    }
+    
+    /**
+     * Display an error message in red using the view error label.
+     * 
+     * @param msg
+     */
+    public void showError(String msg) {
+        Label label = view.getErrorLabel(); 
+        
+        label.setText(msg);
+        label.setTextFill(Color.RED);
+        label.setVisible(true);
+    }
+    
+    /**
+     * Clear the message in the view error label and hide it.
+     */
+    public void clearError() {
+        Label label = view.getErrorLabel(); 
+        
+        label.setText("");
+        label.setVisible(false);
     }
 }
