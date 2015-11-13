@@ -33,6 +33,7 @@ public class Errors {
         OUTPUT_DIRECTORY_AND_PACKAGE_NAME_MISSING("outputdirectoryandpackagenamemissing.error"),
         PACKAGE_TREE_VALIDATION_ERROR("packagetreevalidation.error"),
         PACKAGE_STATE_SAVE_ERROR("packagestatesave.error"),
+        PACKAGE_STATE_LOAD_ERROR("packagestateload.error"),
         HIERARCHICAL_RELATIONSHIP_ERROR("hierarchicalrelationship.error"),
         INVALID_RELATIONSHIP_ERROR("invalidrelationship.error"),
         PARAM_LOADING_ERROR("paramsloading.error"),
