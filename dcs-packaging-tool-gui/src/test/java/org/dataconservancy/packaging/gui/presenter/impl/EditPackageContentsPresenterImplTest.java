@@ -156,7 +156,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         presenter = new EditPackageContentsPresenterImpl(view);
         presenter.setController(controller);
         presenter.setInternalProperties(internalProperties);
-
+        view.setPresenter(presenter);
         // Setup controller to handle going to the next page.
         controller.setCreateNewPackage(true);
         controller.getCreateNewPackagePagesStack().clear();
@@ -176,16 +176,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
     @Test
     public void testDisplay() throws InterruptedException {
         assertNotNull(presenter.display());
-    }
-
-    /**
-     * Ensure that event handlers do the right thing.
-     */
-    @Test
-    public void testEventHandlers() {
-        assertFalse(goToNextPage);
-        view.getContinueButton().fire();
-        assertTrue(goToNextPage);
     }
     
     /**

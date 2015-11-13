@@ -36,17 +36,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
 
     private void bind() {
 
-        // Handles the user pressing the continue button in the footer.
-        view.getContinueButton().setOnAction(event -> {
-            // TODO: Needs to be able to read the existing package metadata whether via a dir or file and set it in the
-            // PackageState and move the user to the package metadata page. i.e.:
-            getController().getPackageState().setPackageName("FakeLoadedPackageName");
-            // clear the current list
-            getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
-            getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, "FakeProfile");
-            getController().goToNextPage();
-        });
-
         //Handles the user pressing the button to choose the content directory of the package
         view.getChoosePackageDirectoryButton().setOnAction(event -> {
            // TODO: Handle choosing a directory and validating the dir.
@@ -85,6 +74,17 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl
             }
             */
         });
+    }
+
+    @Override
+    public void onContinuePressed() {
+        // TODO: Needs to be able to read the existing package metadata whether via a dir or file and set it in the
+        // PackageState and move the user to the package metadata page. i.e.:
+        getController().getPackageState().setPackageName("FakeLoadedPackageName");
+        // clear the current list
+        getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
+        getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, "FakeProfile");
+        super.onContinuePressed();
     }
 
     @Override

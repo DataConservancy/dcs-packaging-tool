@@ -125,25 +125,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.setupOptionalFields(packageMetadataService.getOptionalPackageMetadata());
         }
 
-        view.getContinueButton().setOnAction(event -> {
-            updatePackageState();
-            if (validateRequiredFields()) {
-                if (Platform.isFxApplicationThread()) {
-                    try {
-                        getController().savePackageStateFile();
-                    } catch (IOException | RDFTransformException e) {
-                        view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
-                        view.getErrorLabel().setVisible(true);
-                    }
-                }
-                    view.getErrorLabel().setVisible(false);
-                    getController().goToNextPage();
-            } else {
-                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
-                view.getErrorLabel().setVisible(true);
-            }
-        });
-
         view.getSaveButton().setOnAction(event -> {
             updatePackageState();
             try{
@@ -154,6 +135,27 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             }
         });
 
+    }
+
+    @Override
+    public void onContinuePressed() {
+        updatePackageState();
+        if (validateRequiredFields()) {
+            if (Platform.isFxApplicationThread()) {
+                try {
+                    getController().savePackageStateFile();
+                } catch (IOException | RDFTransformException e) {
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                    view.getErrorLabel().setVisible(true);
+                }
+            }
+
+            view.getErrorLabel().setVisible(false);
+            super.onContinuePressed();
+        } else {
+            view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
+            view.getErrorLabel().setVisible(true);
+        }
     }
 
     @Override
@@ -182,7 +184,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
 
         // Clear the domain profile list and reset the values on the current state of the form
-        getController().getPackageState().setDomainProfileIdList(new ArrayList<URI>());
+        getController().getPackageState().setDomainProfileIdList(new ArrayList<>());
         String domainProfileName = view.getDomainProfilesComboBox().getValue();
         if(domainProfileName != null && !domainProfileName.isEmpty()) {
             List<URI> domainProfileIdList = new ArrayList<>();
@@ -230,16 +232,13 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         }
 
         //now check other required fields
-        if (getController().getPackageState().getPackageName() == null ||
-                getController().getPackageState().getPackageName().isEmpty() ||
-                getController().getPackageState().getDomainProfileIdList() == null ||
-                getController().getPackageState().getDomainProfileIdList().isEmpty() ||
-                !getController().getPackageState().getPackageMetadataList().keySet().contains(GeneralParameterNames.DOMAIN_PROFILE))
-        {
-            return false;
-        }
+        return !(getController().getPackageState().getPackageName() == null ||
+                     getController().getPackageState().getPackageName().isEmpty() ||
+                     getController().getPackageState().getDomainProfileIdList() ==
+                         null ||
+                     getController().getPackageState().getDomainProfileIdList().isEmpty() ||
+                     !getController().getPackageState().getPackageMetadataList().keySet().contains(GeneralParameterNames.DOMAIN_PROFILE));
 
-        return true;
     }
 
     @Override

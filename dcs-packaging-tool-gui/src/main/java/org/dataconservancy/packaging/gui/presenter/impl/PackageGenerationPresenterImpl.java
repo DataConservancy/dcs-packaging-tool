@@ -31,9 +31,6 @@ import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
-import org.dataconservancy.packaging.gui.Factory;
-import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
@@ -44,7 +41,6 @@ import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.BoremParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
@@ -283,23 +279,22 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         if (Platform.isFxApplicationThread()) {
             ((ProgressDialogPopup) view.getProgressPopup()).setCancelEventHandler(event -> backgroundService.cancel());
         }
+    }
 
+    @Override
+    public void onContinuePressed() {
         /*Handles when the continue button is pressed in the footer.
         * In this case it creates package params based on the options selected, it then tries to generate a package and
         * save it to the output directory. If successful a popup is shown asking the user if they want to create another
         * package, otherwise an error message is displayed informing the user what went wrong
         * and error is logged.
         */
-        view.getContinueButton().setOnAction(arg0 -> {
-            view.getErrorLabel().setVisible(false);
-            if (Platform.isFxApplicationThread()) {
-                view.getProgressPopup().show();
-            }
-            backgroundService.setOverwriteFile(false);
-            backgroundService.execute();
-
-        });
-
+        view.getErrorLabel().setVisible(false);
+        if (Platform.isFxApplicationThread()) {
+            view.getProgressPopup().show();
+        }
+        backgroundService.setOverwriteFile(false);
+        backgroundService.execute();
     }
 
     /*
@@ -309,7 +304,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
      */
 
     private String generateAndSavePackage(File packageFile) {
-        Package createdPackage = null;
+        Package createdPackage;
         //If we have all the objects we need attempt to create a package with the package generation service, and check that we haven't been canceled
         if (generationParams != null && controller.getPackageState() != null && !Thread.currentThread().isInterrupted()) {
             try {
@@ -536,7 +531,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         if (generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT) != null &&
                 !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).isEmpty() &&
-                !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT).equals("exploded")) {
+                !generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0).equals("exploded")) {
             packageFileName += "." + generationParams.getParam(GeneralParameterNames.ARCHIVING_FORMAT, 0);
         }
 

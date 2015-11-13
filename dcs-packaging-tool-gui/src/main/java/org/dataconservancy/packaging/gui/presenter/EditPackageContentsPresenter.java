@@ -56,12 +56,6 @@ public interface EditPackageContentsPresenter extends Presenter {
     void changeType(Node node, NodeTransform transform);
 
     /**
-     * Trims out empty properties from the package tree to keep it clean and uncluttered.
-     * @param node The node to clean
-     */
-    void trimEmptyProperties(Node node);
-
-    /**
      * Rerun the ontology service on the PackageDescription and redisplay the resulting PackageTree.
      */
     void rebuildTreeView();

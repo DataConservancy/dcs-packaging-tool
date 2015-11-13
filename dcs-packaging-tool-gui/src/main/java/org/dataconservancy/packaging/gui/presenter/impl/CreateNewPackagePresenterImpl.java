@@ -19,14 +19,12 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
-import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -44,12 +42,8 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
     private CreateNewPackageView view;
 
-    private File content_dir;
-    private File root_artifact_dir; //has content_dir as parent
-
     private DirectoryChooser directoryChooser;
-    private FileChooser fileChooser;
-
+    private File selectedDir;
     private IPMService ipmService;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -57,74 +51,13 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     public CreateNewPackagePresenterImpl(CreateNewPackageView view) {
         super(view);
         this.view = view;
-        this.content_dir = null;
         directoryChooser = new DirectoryChooser();
-        fileChooser = new FileChooser();
-
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package Description (*.json)", "*.json"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 
         view.setPresenter(this);
         bind();
     }
 
     private void bind() {
-       
-        //Handles the continue button in the footer being pressed. Validates that all required fields are present, sets the state on the controller,
-        //and instructs the controller to move to the next page.
-        view.getContinueButton().setOnAction(arg0 -> {
-            try {
-                if (root_artifact_dir != null && root_artifact_dir.exists() &&
-                    root_artifact_dir.canRead()) {
-
-                    final PackageIpmBuilderService ipmBuilderService = new PackageIpmBuilderService(root_artifact_dir);
-
-                    view.showProgressIndicatorPopUp();
-
-                    ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> ipmBuilderService.cancel());
-
-                    controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
-                    controller.setContentRoot(content_dir);
-                    controller.setRootArtifactDir(root_artifact_dir);
-
-                    ipmBuilderService.setOnCancelled(event -> {
-                        ipmBuilderService.reset();
-                        controller.getCrossPageProgressIndicatorPopUp().hide();
-                    });
-
-                    ipmBuilderService.setOnFailed(workerStateEvent -> {
-                        displayExceptionMessage(workerStateEvent.getSource().getException());
-                        view.getErrorLabel().setVisible(true);
-                        ipmBuilderService.reset();
-                        controller.getCrossPageProgressIndicatorPopUp().hide();
-                    });
-
-                    ipmBuilderService.setOnSucceeded(workerStateEvent -> {
-                        Node rootNode = (Node) workerStateEvent.getSource().getValue();
-                        controller.setPackageTree(rootNode);
-                        ipmBuilderService.reset();
-                        controller.goToNextPage();
-                    });
-
-                    ipmBuilderService.start();
-
-                } else if (root_artifact_dir != null &&
-                        (!root_artifact_dir.exists() ||
-                             !root_artifact_dir.canRead())) {
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
-                    view.getErrorLabel().setVisible(true);
-                } else if (controller.getPackageDescription() != null) {
-                    controller.goToNextPage();
-                } else {
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
-                    view.getErrorLabel().setVisible(true);
-                }
-            } catch (Exception e) {
-                view.getErrorLabel().setText(TextFactory.format(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE, e.getMessage()));
-                view.getErrorLabel().setVisible(true);
-                log.error(e.getMessage());
-            }
-        });
 
         //Handles the user pressing the button to choose a base directory to create a package from.
         view.getChooseContentDirectoryButton()
@@ -134,18 +67,68 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                         directoryChooser.setInitialDirectory(null);
                     }
 
-                    File dir = controller.showOpenDirectoryDialog(directoryChooser);
+                    selectedDir = controller.showOpenDirectoryDialog(directoryChooser);
 
-                    if (dir != null) {
-                        root_artifact_dir = dir;
-                        content_dir = root_artifact_dir.getParentFile();
-                        view.getChooseContentDirectoryTextField().setText(root_artifact_dir.getPath());
+                    if (selectedDir != null) {
+                        view.getChooseContentDirectoryTextField().setText(selectedDir.getPath());
                         //view.getSelectedPackageDescriptionTextField().setText("");
                         //If the error message happens to be visible erase it.
                         view.getErrorLabel().setVisible(false);
-                        directoryChooser.setInitialDirectory(dir);
+                        directoryChooser.setInitialDirectory(selectedDir);
                     }
                 });
+
+    }
+
+    @Override
+    public void onContinuePressed() {
+        try {
+            if (selectedDir != null && selectedDir.exists() &&
+                selectedDir.canRead()) {
+
+                final PackageIpmBuilderService ipmBuilderService = new PackageIpmBuilderService(selectedDir);
+
+                view.showProgressIndicatorPopUp();
+
+                ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> ipmBuilderService.cancel());
+
+                controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
+
+                ipmBuilderService.setOnCancelled(event -> {
+                    ipmBuilderService.reset();
+                    controller.getCrossPageProgressIndicatorPopUp().hide();
+                });
+
+                ipmBuilderService.setOnFailed(workerStateEvent -> {
+                    displayExceptionMessage(workerStateEvent.getSource().getException());
+                    view.getErrorLabel().setVisible(true);
+                    ipmBuilderService.reset();
+                    controller.getCrossPageProgressIndicatorPopUp().hide();
+                });
+
+                ipmBuilderService.setOnSucceeded(workerStateEvent -> {
+                    Node rootNode = (Node) workerStateEvent.getSource().getValue();
+                    controller.setPackageTree(rootNode);
+                    ipmBuilderService.reset();
+                    super.onContinuePressed();
+                });
+
+                ipmBuilderService.start();
+
+            } else if (selectedDir != null &&
+                    (!selectedDir.exists() ||
+                         !selectedDir.canRead())) {
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
+                view.getErrorLabel().setVisible(true);
+            } else {
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
+                view.getErrorLabel().setVisible(true);
+            }
+        } catch (Exception e) {
+            view.getErrorLabel().setText(TextFactory.format(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE, e.getMessage()));
+            view.getErrorLabel().setVisible(true);
+            log.error(e.getMessage());
+        }
 
     }
 
@@ -153,9 +136,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     public void clear() {
         view.getChooseContentDirectoryTextField().setText("");
         view.getErrorLabel().setText("");
-
-        content_dir = null;
-        root_artifact_dir = null;
     }
 
     public javafx.scene.Node display() {

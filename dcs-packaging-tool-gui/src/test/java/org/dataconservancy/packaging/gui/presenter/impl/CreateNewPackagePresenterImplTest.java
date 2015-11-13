@@ -177,23 +177,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
         view.getChooseContentDirectoryButton().fire();
         assertTrue(showDirectoryDialog);
     }
-    
-    /**
-     * Tests that hitting continue without setting a content directory or an existing package description displays an error message.
-     */
-    @Test
-    public void testContinueWithoutDirectoryGeneratesError() {
-        assertFalse(showDirectoryDialog);
-        view.getChooseContentDirectoryButton().fire();
-        assertTrue(showDirectoryDialog);
-        
-        assertEquals(0, view.getErrorLabel().getText().length());
-        assertFalse(showNextPage);
-        view.getContinueButton().fire();
-        assertFalse(showNextPage);
-
-        assertTrue(view.getErrorLabel().getText().length() > 0);
-    }
 
     /**
      * Tests that given an exception, displayExceptionMessage() method will pass the exception's messages to the user via

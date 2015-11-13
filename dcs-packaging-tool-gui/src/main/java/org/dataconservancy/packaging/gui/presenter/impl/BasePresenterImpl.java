@@ -46,6 +46,8 @@ public abstract class BasePresenterImpl implements Presenter {
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
 
         view.getCancelLink().setOnAction(event -> onBackPressed());
+
+        view.getContinueButton().setOnAction(event -> onContinuePressed());
     }
 
     @Override
@@ -67,12 +69,21 @@ public abstract class BasePresenterImpl implements Presenter {
         this.view = view;
     }
 
-    public void onBackPressed(){
+    public void onBackPressed() {
         try {
             getController().savePackageStateFile();
         } catch (IOException | RDFTransformException e) {
             view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToPreviousPage();
+    }
+
+    public void onContinuePressed() {
+        try {
+            getController().savePackageStateFile();
+        } catch (IOException | RDFTransformException e) {
+            view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+        }
+        getController().goToNextPage();
     }
 }

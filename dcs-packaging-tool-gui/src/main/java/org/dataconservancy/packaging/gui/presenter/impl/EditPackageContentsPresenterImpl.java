@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -30,6 +31,7 @@ import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -41,8 +43,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -68,7 +68,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     private EditPackageContentsView view;
     private IPMService ipmService;
     private PropertyFormatService propertyFormatService;
-    private File packageDescriptionFile;
     private Preferences preferences;
 
     private Set<URI> expandedNodes;
@@ -120,77 +119,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 view.getArtifactDetailsWindow().hide();
             }
 
-            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
-
-            //Still check if it's null in case user hit cancel
-            if (packageDescriptionFile != null) {
-                controller.setPackageDescriptionFile(packageDescriptionFile);
-
-                FileOutputStream stream = null;
-                try{
-                    stream = new FileOutputStream(packageDescriptionFile);
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) + e.getMessage());
-                    view.getErrorLabel().setVisible(true);
-                }
-
-                if (view.getErrorLabel().isVisible()) {
-                    view.getErrorLabel().setVisible(false);
-                }
-
-                //save the PackageDescription to the file
-                trimEmptyProperties(controller.getPackageTree());
+            try {
+                getController().savePackageStateFile();
+            } catch (IOException | RDFTransformException e) {
+                view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
             }
-        });
-        
-        //Validates the package description, saves it, then moves on to the next page.
-        view.getContinueButton().setOnAction(arg0 -> {
-
-            //Close property window if it's showing
-            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
-                view.getArtifactDetailsWindow().hide();
-            }
-
-            //Perform simple validation to make sure the package description is valid.
-            if (!controller.getDomainProfileService().validateTree(controller.getPackageTree())) {
-                view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
-                    if (view.getWarningPopup() != null &&
-                        view.getWarningPopup().isShowing()) {
-                        view.getWarningPopup().hide();
-                    }
-                });
-                view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), "Tree was not valid", false, false);
-                return;
-            }
-
-            //bring up a save file dialog box
-            packageDescriptionFile = controller.showSaveFileDialog(view.getPackageStateFileChooser());
-
-            if (packageDescriptionFile != null) {
-
-                FileOutputStream stream = null;
-                try {
-                    stream = new FileOutputStream(packageDescriptionFile);
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                    view.getErrorLabel().setText(
-                        TextFactory.getText(ErrorKey.PACKAGE_STATE_SAVE_ERROR) +
-                            e.getMessage());
-                    view.getErrorLabel().setVisible(true);
-                }
-
-                view.getErrorLabel().setVisible(false);
-
-                //save the PackageDescription to the file
-
-                trimEmptyProperties(controller.getPackageTree());
-
-                controller.setPackageDescriptionFile(packageDescriptionFile);
-                controller.getPackageState().setOutputDirectory(packageDescriptionFile.getParentFile());
-                controller.goToNextPage();
-            }
-
         });
 
         //Cancels the property popup, which closes the popup with out saving any changes.
@@ -252,9 +185,42 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     @Override
+    public void onContinuePressed() {
+        //Close property window if it's showing
+        if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
+            view.getArtifactDetailsWindow().hide();
+        }
+
+        //Perform simple validation to make sure the package description is valid.
+        if (!controller.getDomainProfileService().validateTree(controller.getPackageTree())) {
+            view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                if (view.getWarningPopup() != null &&
+                    view.getWarningPopup().isShowing()) {
+                    view.getWarningPopup().hide();
+                }
+            });
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), "Tree was not valid", false, false);
+            return;
+        }
+        super.onContinuePressed();
+    }
+
+    @Override
     public void onBackPressed() {
         if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
             view.getArtifactDetailsWindow().hide();
+        }
+
+        //Perform simple validation to make sure the package description is valid.
+        if (!controller.getDomainProfileService().validateTree(controller.getPackageTree())) {
+            view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                if (view.getWarningPopup() != null &&
+                    view.getWarningPopup().isShowing()) {
+                    view.getWarningPopup().hide();
+                }
+            });
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), "Tree was not valid", false, false);
+            return;
         }
         super.onBackPressed();
     }
@@ -364,13 +330,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         });
 
         if (node.getChildren() != null) {
-            for (Node child : node.getChildren()) {
-                if (!showIgnoredArtifacts && child.isIgnored()) {
-                    continue;
-                } else {
-                    item.getChildren().add(buildTree(child, showIgnoredArtifacts));
-                }
-            }
+            node.getChildren().stream().filter(child -> showIgnoredArtifacts ||
+                !child.isIgnored()).forEach(child -> item.getChildren().add(buildTree(child, showIgnoredArtifacts)));
         }
         
         return item;
@@ -410,11 +371,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
         
         return null;
-    }
-
-    @Override
-    public void trimEmptyProperties(Node node) {
-
     }
 
     protected void applyMetadataInheritance(Node node) {
