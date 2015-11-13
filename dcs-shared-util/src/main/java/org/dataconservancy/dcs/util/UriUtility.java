@@ -90,4 +90,26 @@ public class UriUtility {
 
         return new URI("file", null, "///"+path, null);
     }
+
+     /**
+     * Create a URI string for a file in a BagIt bag,
+     * @param file The file to check.  This doesn't have to be an actual existing file
+     * @param basedir The directory to make the file URI relative to.  Can be null.  If not null, the basedir must be
+     *                in the path of the file parameter, or an exception will be thrown
+     * @return A string representing the URI to the file on the local disk.
+     * @throws URISyntaxException if there is an error in the URI syntax
+     */
+    public static URI makeBagUriString(File file, File basedir) throws URISyntaxException {
+        if (basedir == null) {
+            basedir = new File(".");
+        }
+
+        String path = FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(basedir.getPath(), file));
+
+        // Remove leading slashes from the path
+        path = path.replaceFirst("^\\/*", "");
+
+        return new URI("bag", null, "//"+path, null);
+    }
+
 }
