@@ -19,6 +19,11 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
@@ -46,6 +51,7 @@ import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.T
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageTreeRDF;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -120,7 +126,7 @@ public class PackageStateSerializationIT {
 
     /**
      * Serializes the entire PackageState object to a zip file, then re-reads the zip file and initializes a fresh
-     * PackageState object.
+     * PackageState object.  The two state objects are compared for equality.
      *
      * @throws Exception
      */
@@ -141,10 +147,39 @@ public class PackageStateSerializationIT {
         // Verify the non-nullity of each @Serialize field in PackageState
         annotatedPackageStateFields.forEach((streamId, descriptor) -> {
             try {
-                assertNotNull(descriptor.getReadMethod().invoke(deserializedState));
+                assertNotNull(
+                        "Expected non-null value for field " + descriptor.getName() + " on deserialized PackageState",
+                        descriptor.getReadMethod().invoke(deserializedState));
             } catch (Exception e) {
                 fail(e.getMessage());
             }
         });
+
+        SerializeEqualsTester.serializeEquals(state, deserializedState);
+    }
+
+    /**
+     * Scratch test to insure that the {@link SerializeEqualsTester#assertModelEquals(Model, Model)} is doing the
+     * right thing with blank nodes.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testScratchBlankNodeEquality() throws Exception {
+        Model one = ModelFactory.createDefaultModel();
+        Model two = ModelFactory.createDefaultModel();
+
+        one.add(one.createResource(AnonId.create()), one.createProperty("foo", "bar"),
+                one.createResource("http://foo.bar.baz/"));
+
+        two.add(two.createResource(AnonId.create()), two.createProperty("foo", "bar"),
+                two.createResource("http://foo.bar.baz/"));
+
+//        Statement sOne = one.listStatements().nextStatement();
+//        Statement sTwo = two.listStatements().nextStatement();
+//        System.err.println(sOne);
+//        System.err.println(sTwo);
+
+        SerializeEqualsTester.assertModelEquals(one, two);
     }
 }
