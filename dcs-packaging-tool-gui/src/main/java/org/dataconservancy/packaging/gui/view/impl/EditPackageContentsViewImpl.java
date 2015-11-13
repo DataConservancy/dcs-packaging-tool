@@ -381,28 +381,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return artifactTree;
     }
 
-    public FileChooser getPackageStateFileChooser(){
-        File existingDescriptionFile = presenter.getController().getPackageDescriptionFile();
-        if(existingDescriptionFile != null){
-            packageStateFileChooser.setInitialDirectory(existingDescriptionFile.getParentFile());
-            packageStateFileChooser.setInitialFileName(existingDescriptionFile.getName());
-        } else if (presenter.getController().getRootArtifactDir() != null) {
-            String fileName = presenter.getController().getRootArtifactDir().getName();
-            if (fileName.isEmpty()) {
-                fileName = "description";
-            }
-            packageStateFileChooser.setInitialFileName(fileName + ".json");
-            if (presenter.getController().getContentRoot() != null) {
-                packageStateFileChooser.setInitialDirectory(presenter.getController().getContentRoot());
-            } else {
-                packageStateFileChooser.setInitialDirectory(presenter.getController().getRootArtifactDir());
-            }
-        } else {
-            packageStateFileChooser.setInitialFileName("default.json");
-        }
-        return packageStateFileChooser;
-    }
-
     @Override
     public CheckBox getFullPathCheckBox(){
         return fullPath;

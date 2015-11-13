@@ -16,26 +16,22 @@
 
 package org.dataconservancy.packaging.gui.view;
 
-import java.util.List;
-import java.util.Map;
-
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableView;
 import javafx.stage.Stage;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
-
-import javafx.scene.control.Label;
-
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TreeItem;
-import javafx.stage.FileChooser;
-import javafx.scene.control.Button;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A view that shows the pacakge description tree, and displays a popup to show package artifact properties.
@@ -68,11 +64,6 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      */
     void showNodePropertiesWindow(Node treeNode, javafx.scene.Node anchorNode);
 
-    /**
-     * Gets the file chooser that's used for saving the pacakge description file. 
-     * @return the file chooser
-     */
-    FileChooser getPackageStateFileChooser();
 
     /**
      * Gets the checkbox used to determine if the full path should be shown or not
