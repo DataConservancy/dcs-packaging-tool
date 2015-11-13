@@ -38,7 +38,6 @@ public class Configuration {
 
     private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
     private String ontologyFile;
-    private String packageFilenameIllegalCharacters;
 
     //the default application configuration directory
     private String configurationDirectory;
@@ -66,13 +65,6 @@ public class Configuration {
     public String getOntologyFile() {
         return ontologyFile;
     }
-
-    @Option(name="--illegalchars", aliases={"-x"}, usage="Sets the list of characters not allowed in package filenames")
-    public void setPackageFilenameIllegalCharacters(String illegalChars) {
-        this.packageFilenameIllegalCharacters = illegalChars;
-    }
-
-    public String getPackageFilenameIllegalCharacters() { return packageFilenameIllegalCharacters; }
 
     @Option(name="--external-projects", aliases={"-xp"}, usage="Sets the external project identifiers file")
     public void setAvailableProjects(String availableProjects){

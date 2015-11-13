@@ -36,7 +36,6 @@ public class Errors {
         HIERARCHICAL_RELATIONSHIP_ERROR("hierarchicalrelationship.error"),
         INVALID_RELATIONSHIP_ERROR("invalidrelationship.error"),
         PARAM_LOADING_ERROR("paramsloading.error"),
-        PACKAGE_FILENAME_HAS_ILLEGAL_CHARACTERS("packageFilenameIllegalCharacters.error"),
         OUTPUT_DIR_NOT_CREATED_ERROR("outputDirNotCreated.error"),
         PROPERTY_LOSS_WARNING("propertyloss.warning"),
         PACKAGE_TREE_BUILD_ERROR("packagetreebuild.error"),

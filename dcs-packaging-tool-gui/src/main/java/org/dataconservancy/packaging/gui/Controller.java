@@ -81,7 +81,6 @@ public class Controller {
      * Application-scope metadata
      */
     private String defaultPackageGenerationParametersFilePath;
-    private String packageFilenameIllegalCharacters;
     private String availableProjects;
     private ApplicationVersion toolVersion;
 
@@ -140,7 +139,6 @@ public class Controller {
 
     public void startApp() {
         defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
-        packageFilenameIllegalCharacters = factory.getConfiguration().getPackageFilenameIllegalCharacters();
         availableProjects = factory.getConfiguration().getAvailableProjects();
         showHome(true);
     }
@@ -442,14 +440,6 @@ public class Controller {
 
     public void setRootArtifactDir(File rootArtifactDir) {
         this.rootArtifactDir = rootArtifactDir;
-    }
-
-    public String getPackageFilenameIllegalCharacters() {
-        return packageFilenameIllegalCharacters;
-    }
-
-    public void setPackageFilenameIllegalCharacters(String illegalCharacters) {
-        this.packageFilenameIllegalCharacters = illegalCharacters;
     }
 
     public String getAvailableProjects() {

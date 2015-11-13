@@ -35,7 +35,8 @@ public class FilenameValidator implements Validator {
 
     protected boolean isInvalidFileName(String fileName) {
         Matcher matcher = pattern.matcher(fileName);
-        return containsAny(fileName, blacklist) || matcher.matches() || fileName.length() >= 256 || containsIllegalUnicode(fileName);
+        return fileName.equals(".") || fileName.equals("..") || containsAny(fileName, blacklist) || matcher.matches() ||
+                fileName.length() >= 256 || containsIllegalUnicode(fileName);
     }
 
     private static boolean containsAny(String fileName, String blacklist) {

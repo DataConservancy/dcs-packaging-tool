@@ -106,8 +106,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         controller.setFactory(factory);
         factory.setController(controller);
 
-        controller.setPackageFilenameIllegalCharacters(factory.getConfiguration().getPackageFilenameIllegalCharacters());
-
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
         view = new PackageGenerationViewImpl();
         view.setHelp(help);
