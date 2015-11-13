@@ -674,7 +674,7 @@ public class FilePathUtilTest {
 
     @Test
     public void testIllegalCharacterDetectedInPath() throws IOException {
-        final File testFile = tmpFolder.newFolder("badFileName:oops");
+        final File testFile = tmpFolder.newFolder("testIllegalCharacterDetectedInPath");
         Assert.assertFalse(FilePathUtil.hasValidFilePath(testFile));
     }
 
