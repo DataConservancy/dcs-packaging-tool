@@ -31,7 +31,7 @@ import org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator;
 import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
 import org.dataconservancy.packaging.tool.impl.TestPackageGenerator;
 import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
-import org.dataconservancy.packaging.tool.impl.generator.BagOreRemPackageModelBuilder;
+import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl;
 import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory;
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory;
 import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
@@ -76,7 +76,7 @@ public class Factory {
         PackageAssemblerFactory.setAssemblers(assemblers);
         
         Map<String, Class<? extends PackageModelBuilder>> builders = new HashMap<>();
-        builders.put("http://dataconservancy.org/spec/dcs-pkg-desc-BOREM", BagOreRemPackageModelBuilder.class);
+        builders.put("http://dataconservancy.org/spec/dcs-pkg-desc-BOREM", PackageModelBuilderImpl.class);
         PackageModelBuilderFactory.setBuilders(builders);
     }
 

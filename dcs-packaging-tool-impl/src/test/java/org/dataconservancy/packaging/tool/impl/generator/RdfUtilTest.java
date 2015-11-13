@@ -35,7 +35,7 @@ public class RdfUtilTest {
     @Test
     public void allLocalTest() throws Exception {
         try (InputStream in =
-                RdfUtilTest.class.getResourceAsStream("/RdfUtilTest/1.ttl")) {
+                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/1.ttl")) {
             Model orig = ModelFactory.createDefaultModel();
             orig.read(in, null, "TTL");
 
@@ -44,7 +44,7 @@ public class RdfUtilTest {
 
             Model excised =
                     RdfUtil.cut(orig, RdfUtil.selectLocal(orig
-                            .getResource("http://example.org/RdfUtilTest")));
+                            .getResource("http://example.org/TestDomainObject")));
 
             assertEquals(0, orig.listStatements().toSet().size());
             assertEquals(COUNT, excised.listStatements().toSet().size());
@@ -59,7 +59,7 @@ public class RdfUtilTest {
     @Test
     public void singleTreeHashTest() throws Exception {
         try (InputStream in =
-                RdfUtilTest.class.getResourceAsStream("/RdfUtilTest/1.ttl")) {
+                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/1.ttl")) {
             Model orig = ModelFactory.createDefaultModel();
             orig.read(in, null, "TTL");
 
@@ -69,7 +69,7 @@ public class RdfUtilTest {
             Model excised =
                     RdfUtil.cut(orig,
                                 RdfUtil.selectLocal(orig
-                                        .getResource("http://example.org/RdfUtilTest#File1")));
+                                        .getResource("http://example.org/TestDomainObject#File1")));
 
             assertEquals(0, orig.listStatements().toSet().size());
             assertEquals(COUNT, excised.listStatements().toSet().size());
@@ -83,13 +83,13 @@ public class RdfUtilTest {
         int triple_count_2b = 0;
 
         try (InputStream in =
-                RdfUtilTest.class.getResourceAsStream("/RdfUtilTest/2a.ttl")) {
+                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2a/2a.ttl")) {
             orig.read(in, null, "TTL");
             triple_count_2a = orig.listStatements().toSet().size();
         }
 
         try (InputStream in =
-                RdfUtilTest.class.getResourceAsStream("/RdfUtilTest/2b.ttl")) {
+                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2a/2b/2b.ttl")) {
             orig.read(in, null, "TTL");
             triple_count_2b =
                     orig.listStatements().toSet().size() - triple_count_2a;
@@ -98,13 +98,13 @@ public class RdfUtilTest {
         Model triples_2a =
                 RdfUtil.cut(orig,
                             RdfUtil.selectLocal(orig
-                                    .getResource("http://example.org/RdfUtilTest/Directory1")));
+                                    .getResource("http://example.org/TestDomainObject/Directory1")));
         assertEquals(triple_count_2a, triples_2a.listStatements().toSet()
                 .size());
 
         Model triples_2b =
                 RdfUtil.cut(orig, RdfUtil.selectLocal(orig
-                        .getResource("http://example.org/RdfUtilTest/File1")));
+                        .getResource("http://example.org/TestDomainObject/File1")));
         assertEquals(triple_count_2b, triples_2b.listStatements().toSet()
                 .size());
 

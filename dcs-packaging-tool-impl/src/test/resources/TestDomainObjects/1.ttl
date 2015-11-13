@@ -1,5 +1,5 @@
 @prefix A: <http://example.org/A#> .
-@base <http://example.org/RdfUtilTest> .
+@base <http://example.org/TestDomainObject> .
 
 # The entire graph is all "local" to a root resource - it consists entirely
 # of hash URIs or connected blank nodes

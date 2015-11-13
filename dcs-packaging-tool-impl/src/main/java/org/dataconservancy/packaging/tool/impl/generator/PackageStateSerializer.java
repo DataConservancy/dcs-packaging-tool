@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,26 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
-import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
-import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
-import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
-import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 
-public class BagOreRemPackageModelBuilder
-        implements PackageModelBuilder {
+public class PackageStateSerializer
+        implements NodeVisitor {
 
     @Override
-    public void init(PackageGenerationParameters params) {
-        /* We don't need this, actually! */
+    public void init(PackageModelBuilderState state) {
+        // TODO Auto-generated method stub
+
     }
 
     @Override
-    public void buildModel(PackageState state, PackageAssembler assembler) {
+    public void visitNode(Node node, PackageModelBuilderState state) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void finish(PackageModelBuilderState state) {
         // TODO Auto-generated method stub
 
     }

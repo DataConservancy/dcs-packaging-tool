@@ -2,8 +2,8 @@
 
 # This graph has two root resources that define 'local' graphs 
 # consisting of connected blank nodes
-<http://example.org/RdfUtilTest/Directory1> a A:Directory ;
-  A:hasFile <http://example.org/RdfUtilTest/File1> ;
+<http://example.org/TestDomainObject/Directory1> a A:Directory ;
+  A:hasFile <http://example.org/TestDomainObject/File1> ;
   A:acl [
       A:fileName "Music" ;
       A:acl [

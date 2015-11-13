@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,7 +120,11 @@ class RdfUtil {
         return blankNodes;
     }
 
-    private static String bare(String uri) {
+    /**
+     * Get a bare (non-hashed) version of a URI, by stripping off any hash
+     * portion.
+     */
+    public static String bare(String uri) {
         String s = uri.toString() + "#";
         return s.substring(0, s.indexOf('#'));
     }
