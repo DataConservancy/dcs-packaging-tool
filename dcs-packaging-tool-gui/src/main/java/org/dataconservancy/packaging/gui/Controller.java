@@ -157,6 +157,7 @@ public class Controller {
         rootArtifactDir = null;
         packageState = new PackageState(this.toolVersion);
         packageStateFile = null;
+        packageStateFileChooser.setInitialFileName(packageStateFileExtension);
 
         if (clear) {
             clearPresenters();
