@@ -26,8 +26,8 @@ public interface CssConstants {
     public static final String VIEW_FOOTER_CLASS = "ViewFooter";
     public static final String VIEW_LOCATION_CLASS = "ViewLocationBar";
     public static final String PACKAGE_GENERATION_VIEW_CLASS = "PackageGenerationView";
-    public static final String PACKAGE_DESCRIPTION_VIEW_CLASS = "PackageDescriptionView";
-    public static final String PACKAGE_ARTIFACT_POPUP = "PackageArtifactPopup";
+    public static final String EDIT_PACKAGE_CONTENTS_VIEW_CLASS = "EditPackageContentsView";
+    public static final String NODE_PROPERTY_WINDOW_CLASS = "NodePropertyWindow";
     public static final String ARROWS_IMAGE = "PackageDescriptionViewArrowsImage";
     public static final String PAGE_ONE_SELECTED = "PageOneSelected";
     public static final String PAGE_ONE_UNSELECTED = "PageOneUnselected";

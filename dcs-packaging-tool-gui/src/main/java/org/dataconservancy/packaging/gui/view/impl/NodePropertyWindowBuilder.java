@@ -60,7 +60,7 @@ import java.util.Map;
 
 public class NodePropertyWindowBuilder implements CssConstants {
 
-    private BorderPane artifactDetailsLayout;
+    private BorderPane nodePropertiesWindow;
 
     //Controls that are displayed in the package artifact popup.
     private Hyperlink cancelPopupLink;
@@ -97,19 +97,19 @@ public class NodePropertyWindowBuilder implements CssConstants {
         nodePropertyBoxes = new ArrayList<>();
         userDefinedProperties = new ArrayList<>();
 
-        artifactDetailsLayout = new BorderPane();
-        artifactDetailsLayout.setMinHeight(500);
-        artifactDetailsLayout.setMinWidth(540);
+        nodePropertiesWindow = new BorderPane();
+        nodePropertiesWindow.setMinHeight(500);
+        nodePropertiesWindow.setMinWidth(540);
 
-        artifactDetailsLayout.getStylesheets().add("/css/app.css");
-        artifactDetailsLayout.getStyleClass().add(PACKAGE_TOOL_POPUP_CLASS);
+        nodePropertiesWindow.getStylesheets().add("/css/app.css");
+        nodePropertiesWindow.getStyleClass().add(PACKAGE_TOOL_POPUP_CLASS);
 
         this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
         this.profileService = profileService;
 
         createNodePropertiesView(node, userDefinedPropertyValues);
 
-        return artifactDetailsLayout;
+        return nodePropertiesWindow;
     }
 
     public List<ProfilePropertyBox> getNodePropertyBoxes() {
@@ -153,7 +153,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         relationshipTab.setContent(relationshipPane);
         propertiesPopup.getTabs().add(relationshipTab);
 
-        artifactDetailsLayout.setCenter(propertiesPopup);
+        nodePropertiesWindow.setCenter(propertiesPopup);
 
         HBox popupControls = new HBox(24);
         popupControls.setAlignment(Pos.CENTER_RIGHT);
@@ -165,7 +165,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         popupControls.getChildren().add(applyPopupButton);
 
-        artifactDetailsLayout.setBottom(popupControls);
+        nodePropertiesWindow.setBottom(popupControls);
     }
 
     private Tab createNodeTypeTab(Node node, NodeType nodeType) {

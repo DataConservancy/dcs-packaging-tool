@@ -145,7 +145,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         getSaveButton().setVisible(true);
         VBox content = new VBox();
 
-        content.getStyleClass().add(PACKAGE_DESCRIPTION_VIEW_CLASS);
+        content.getStyleClass().add(EDIT_PACKAGE_CONTENTS_VIEW_CLASS);
         setCenter(content);
 
         if (Platform.isFxApplicationThread()) {
@@ -403,7 +403,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         itemList.add(propertiesItem);
         propertiesItem.setOnAction(actionEvent -> {
             VBox detailsBox = new VBox();
-            detailsBox.getStyleClass().add(PACKAGE_ARTIFACT_POPUP);
+            detailsBox.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
             showNodePropertiesWindow(packageNode, label);
             artifactTree.getSelectionModel().select(treeItem);
         });

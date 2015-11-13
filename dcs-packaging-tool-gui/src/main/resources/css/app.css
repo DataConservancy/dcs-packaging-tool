@@ -19,6 +19,26 @@
    -fx-text-fill: #06070b;
 }
 
+.View .button {
+	-fx-background-color: #168176;
+	-fx-text-fill: #ffffff;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+	10, 0.0, 4, 4);
+	-fx-cursor: hand;
+}
+
+.View .button:hover {
+	-fx-background-color: #2F8D83;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+    	5, 0.0, 2, 2);
+}
+
+.View .button:pressed {
+	-fx-background-color: #2F8D83;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+    	1, 0.0, 1, 1);
+}
+
 .View .ViewFooter {
 	-fx-background-color: #f2f2f2;
 	-fx-border-width: 1px 0px 0px 0px;
@@ -49,32 +69,14 @@
 }
 
 .ViewFooter .button {
-	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
-	-fx-border-radius: 6px;
-	-fx-border-width: 1;
-	-fx-border-color: #008330;
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-                1, 0.0, 1, 1);
 	-fx-cursor: hand;
-}
-
-.ViewFooter .button:hover {
-	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
 }
 
 .PackageCreateView {
     -fx-background-image: url("../images/pattern.png");
-}
-
-.PackageDescriptionValidateView {
-    -fx-background-image: url("../images/pattern.png");
-}
-
-.PackageDescriptionValidateView .ViewContent {
-    -fx-spacing: 10px;
 }
 
 .ViewText {
@@ -109,19 +111,27 @@
 }
 
 .PackageToolPopup .button {
-	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
-	-fx-border-radius: 6px;
-	-fx-border-width: 1;
-	-fx-border-color: #008330;
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-                1, 0.0, 1, 1);
+    -fx-background-color: #168176;
+    -fx-effect: dropshadow( one-pass-box , #005048,
+    10, 0.0, 4, 4);
+    -fx-cursor: hand;
 }
 
 .PackageToolPopup .button:hover {
-	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+	-fx-background-color: #2F8D83;
+    -fx-pref-height: 26px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+    	5, 0.0, 2, 2);
+}
+
+.PackageToolPopup .button:pressed {
+	-fx-background-color: #2F8D83;
+    -fx-pref-height: 24px;
+	-fx-effect: dropshadow( one-pass-box , #005048,
+    	1, 0.0, 1, 1);
 }
 
 .PackageToolPopup .hyperlink {
@@ -182,19 +192,17 @@
 }
 
 .PackageToolPopup .ViewFooter .button {
-	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
-	-fx-border-radius: 6px;
-	-fx-border-width: 1;
-	-fx-border-color: #008330;
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 28px;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-                1, 0.0, 1, 1);
 }
 
 .PackgeToolPopup .ViewFooter .button:hover {
-	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+	-fx-pref-height: 26px;
+}
+
+.PackgeToolPopup .ViewFooter .button:pressed {
+	-fx-pref-height: 24px;
 }
 
 .PackageToolPopup .PropertyPopup .tab-pane .tab-header-area .tab-header-background {
@@ -302,46 +310,46 @@
   -fx-border-color: black;
 }
 
-.PackageDescriptionView {
+.EditPackageContentsView {
 	-fx-padding: 8 20 8 20;
 	-fx-spacing: 12px;
 }
 
-.PackageDescriptionView .tree-table-row-cell {
+.EditPackageContentsView .tree-table-row-cell {
     -fx-border-color: #B0B0B0;
     -fx-border-width: 0 0 1 0;
     -fx-cell-size: 24;
 }
 
-.PackageDescriptionView .tree-table-row-cell:selected {
+.EditPackageContentsView .tree-table-row-cell:selected {
     -fx-background-color: #48a79c;
 }
 
-.PackageDescriptionView .tree-table-row-cell:hover {
+.EditPackageContentsView .tree-table-row-cell:hover {
     -fx-background-color: #E0E0E0;
 }
 
-.PackageDescriptionView .tree-table-row-cell:hover:selected {
+.EditPackageContentsView .tree-table-row-cell:hover:selected {
      -fx-background-color: #00766c;
 }
 
-.PackageDescriptionView .tree-view {
+.EditPackageContentsView .tree-view {
     -fx-background-color: #E0E0E0;
 }
 
-.PackageDescriptionView .column-header .label{
+.EditPackageContentsView .column-header .label{
 	-fx-alignment: center-left;
 }
 
-.PackageDescriptionView .InheritanceControls {
+.EditPackageContentsView .InheritanceControls {
     -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 2;
     -fx-border-radius: 3 3 3 3;
     -fx-padding: 4px;
 }
 
-.PackageDescriptionView .button {
-	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
+.EditPackageContentsView .button {
+	-fx-background-color: #168176;
 	-fx-border-radius: 6px;
 	-fx-border-width: 1;
 	-fx-border-color: #008330;
@@ -352,11 +360,11 @@
                 1, 0.0, 1, 1);
 }
 
-.PackageDescriptionView .button:hover {
+.EditPackageContentsView .button:hover {
 	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
 }
 
-.PackageDescriptionViewArrowsImage {
+.EditPackageContentsViewArrowsImage {
     -fx-image: url("../images/gray-arrows.png");
 }
 
@@ -368,20 +376,20 @@
     -fx-image: url("../images/x.png");
 }
 
-.PackageArtifactPopup {
+.NodePropertyWindow {
     -fx-background-color: white;
     -fx-padding: 24;
     -fx-border-color: black;
     -fx-border-width: 2;
 }
 
-.PackageArtifactPopup .PopupHeader {
+.NodePropertyWindow .PopupHeader {
 	-fx-font-size: 16;
 	-fx-text-fill: gray;
 	-fx-padding: 12 0 0 0;
 }
 
-.PackageArtifactPopup .PopupText {
+.NodePropertyWindow .PopupText {
 	-fx-font-size: 12;
 }
 
@@ -420,15 +428,15 @@
     -fx-font-weight: bold;
 }
 
-.PackageDescriptionView-IgnoreRow {
+.EditPackageContentsView-IgnoreRow {
   -fx-background-color: #FFD9BE;
 }
 
-.PackageDescriptionView-IgnoreRow .text {
+.EditPackageContentsView-IgnoreRow .text {
   -fx-strikethrough: true;
 }
 
-.PackageDescriptionView-IgnoreRow .selected .text{
+.EditPackageContentsView-IgnoreRow .selected .text{
 	-fx-strikethrough: false;
 }
 
@@ -451,22 +459,22 @@
 }
 
 .HomepageView .button {
-	-fx-background-color: linear-gradient(#48a79c 5%, #00766c);
-	-fx-border-radius: 6px;
-	-fx-border-width: 1;
-	-fx-border-color: #008330;
 	-fx-font-weight: bold;
 	-fx-font-size: 22px;
 	-fx-text-fill: #ffffff;
-	-fx-pref-height: 50px;
-	-fx-pref-width: 400px;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-	1, 0.0, 1, 1);
+	-fx-pref-height: 55px;
+	-fx-pref-width: 405px;
 	-fx-cursor: hand;
 }
 
 .HomepageView .button:hover {
-	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
+    -fx-pref-height: 50px;
+    -fx-pref-width: 400px;
+}
+
+.HomepageView .button:pressed {
+    -fx-pref-height: 45px;
+    -fx-pref-width: 395px;
 }
 
 .Clickable {
