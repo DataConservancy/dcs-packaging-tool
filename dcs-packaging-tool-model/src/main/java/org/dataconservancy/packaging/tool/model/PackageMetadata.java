@@ -84,7 +84,7 @@ public class PackageMetadata {
 
     /**
      * Returns the (display) label of the metadata field
-     * @return
+     * @return label
      */
     public String getLabel() { return label; }
 
