@@ -48,7 +48,7 @@ public class ProfilePropertyBox extends VBox {
         setSpacing(6);
 
         HBox propertyLabelAndValueBox = new HBox(12);
-
+        propertyLabelAndValueBox.setAlignment(Pos.CENTER_LEFT);
         Label propertyNameLabel = new Label(propertyConstraint.getPropertyType().getLabel());
         propertyNameLabel.setPrefWidth(100);
         propertyNameLabel.setWrapText(true);

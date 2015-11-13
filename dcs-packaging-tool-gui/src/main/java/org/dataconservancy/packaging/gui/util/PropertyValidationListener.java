@@ -119,6 +119,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
             //This listener doesn't validate if a property is required or not so an empty value is considered valid
             //If user has deleted all contents of a validating field, reset the property box to its initial state
             validationImageLabel.setVisible(false);
+            validationImageLabel.setGraphic(null);
             textPropertyBox.getChildren().remove(validationLabel);
 
         }
