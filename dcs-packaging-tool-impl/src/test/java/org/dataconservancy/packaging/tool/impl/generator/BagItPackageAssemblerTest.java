@@ -136,7 +136,7 @@ public class BagItPackageAssemblerTest {
     public void testReserveURIForMetadataFile() {
         String filePath = "myProject/dataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        String expectedURI = "file:///" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/"
                 + filePath;
         assertTrue(expectedURI.equals(result.toString()));
     }
@@ -145,7 +145,7 @@ public class BagItPackageAssemblerTest {
     public void testReserveURIForMultipleDataFiles() {
         String filePath1 = "myProject/dataFile1.txt";
         URI result1 = underTest.reserveResource(filePath1, PackageResourceType.DATA);
-        String expectedURI1 = "file:///" + packageName + "/"
+        String expectedURI1 = "bag://" + packageName + "/"
                 +  "data" + "/" + filePath1;
         log.debug("URI expected: " + expectedURI1);
         log.debug("URI result: " + result1.toString());
@@ -153,7 +153,7 @@ public class BagItPackageAssemblerTest {
 
         String filePath2 = "myProject/dataFile2.txt";
         URI result2 = underTest.reserveResource(filePath2, PackageResourceType.DATA);
-        String expectedURI2 = "file:///" + packageName + "/"
+        String expectedURI2 = "bag://" + packageName + "/"
                 +  "data" + "/" + filePath2;
         assertTrue(expectedURI2.equals(result2.toString()));
     }
@@ -162,7 +162,7 @@ public class BagItPackageAssemblerTest {
     public void testReserveURIForDataFile() {
         String filePath = "myProject/myTextFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
-        String expectedURI = "file:///" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/"
                 +  "data" + "/" + filePath ;
         assertTrue(expectedURI.equals(result.toString()));
     }
@@ -172,7 +172,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI
         String filePath = "metadataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        String expectedURI = "file:///" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/"
                 + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
@@ -198,7 +198,7 @@ public class BagItPackageAssemblerTest {
         URL df1URL = this.getClass().getResource("/TestContent/ProjectOne/Collection One/DataItem One/Data File One.txt");
         URI result = underTest.createResource("/ProjectOne/Collection One/DataItem One/Data File One.txt", PackageResourceType.DATA, df1IS);
         // Verify that the URI is as expected
-        String expectedURI = "file:///" + packageName + "/data/" + contentLocationURI.relativize(df1URL.toURI()).toString();
+        String expectedURI = "bag://" + packageName + "/data/" + contentLocationURI.relativize(df1URL.toURI()).toString();
         assertTrue(expectedURI.equals(result.toString()));
 
         // Verify the content of the URI is as expected
@@ -222,11 +222,11 @@ public class BagItPackageAssemblerTest {
         URI resultb = underTest.createResource("/ProjectOne/CollectionTwo/DataItemTwo/DataFileOne.txt", PackageResourceType.DATA, df1ISb);
 
         // Verify that the URI is as expected
-        String expectedURIa = "file:///" + packageName + "/data/" + contentLocationURI.relativize(df1URLa.toURI()).toString();
+        String expectedURIa = "bag://" + packageName + "/data/" + contentLocationURI.relativize(df1URLa.toURI()).toString();
         assertTrue(expectedURIa.equals(resulta.toString()));
 
         // Verify that the URI is as expected
-        String expectedURIb = "file:///" + packageName + "/data/" + contentLocationURI.relativize(df1URLb.toURI()).toString();
+        String expectedURIb = "bag://" + packageName + "/data/" + contentLocationURI.relativize(df1URLb.toURI()).toString();
         assertTrue(expectedURIb.equals(resultb.toString()));
 
         // Verify the content of the URI is as expected
@@ -262,7 +262,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for data file
         String filePath = "myProject/" + dataFileName;
         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
-        String expectedURI = "file:///" + packageName + "/" + "data"
+        String expectedURI = "bag://" + packageName + "/" + "data"
                 + "/"  + filePath;
         log.debug("URI expected: " + expectedURI);
         log.debug("URI result: " + result.toString());
@@ -275,7 +275,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "file:///" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -352,7 +352,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for data file
         String filePath = "myProject/dataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
-        String expectedURI = "file:///" + packageName + "/" + "data"
+        String expectedURI = "bag://" + packageName + "/" + "data"
                 + "/"  + filePath;
         log.debug("URI expected: " + expectedURI);
         log.debug("URI result: " + result.toString());
@@ -365,7 +365,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "file:///" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -421,7 +421,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for data file
         String filePath = "myProject/dataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
-        String expectedURI = "file:///" + packageName + "/" + "data"
+        String expectedURI = "bag://" + packageName + "/" + "data"
                 + "/"  + filePath;
         log.debug("URI expected: " + expectedURI);
         log.debug("URI result: " + result.toString());
@@ -434,7 +434,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "file:///" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI

@@ -316,7 +316,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             }
 
             //Remove the package location directory and the slash trailing it.
-            URI relativeURI = UriUtility.makeFileUriString(newFile, packageLocationDir);
+            URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
 
             fileURIMap.put(relativeURI, newFile.toURI());
             if (type.equals(PackageResourceType.DATA)) {
