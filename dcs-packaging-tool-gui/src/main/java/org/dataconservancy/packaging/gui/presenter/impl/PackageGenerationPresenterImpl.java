@@ -45,6 +45,7 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.ParametersBuildException;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -291,14 +292,21 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         */
         view.getErrorLabel().setVisible(false);
         if (Platform.isFxApplicationThread()) {
+            try {
+                controller.savePackageStateFile();
+            } catch (IOException | RDFTransformException e) {
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                view.getErrorLabel().setVisible(true);
+            }
             view.getProgressPopup().show();
         }
         backgroundService.setOverwriteFile(false);
         backgroundService.execute();
+
+
     }
 
     /*
-    TODO: update this code to use updated Package Generation service
      * Generates and saves the package to a file if an error occurs the error message is returned so it can be properly
      * handled.
      */

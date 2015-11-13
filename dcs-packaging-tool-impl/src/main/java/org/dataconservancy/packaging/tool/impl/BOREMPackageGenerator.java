@@ -31,10 +31,10 @@ import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
 /**
  * <p>Bagit + ORE ReM package generator.</p>
  *
- * <p>Returns a {@code Package} who's content what described in the {@code PackageDescription}, which is passed in.
+ * <p>Returns a {@code Package} Object containing the custodial binary content, as well as the metadata added to describe
+ * that content.
  * The content is organized and described according to BagIt specification (specific version is determined by the
- * implementation of the {@code PackageAssembler} issued by the {@code PackageAssemblerFactory}.) The ontology
- * specific description of the content is expressed in ORE-ReM specification.</p>
+ * implementation of the {@code PackageAssembler} issued by the {@code PackageAssemblerFactory}.)</p>
  *
  */
 public class BOREMPackageGenerator implements PackageGenerator {
@@ -62,7 +62,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
      *            parameters are required and which are optional depends on the implementations of the
      *            {@code PackageModelBuilder} and {@code PackageAssembler} used. {@code BOREMPackageAssembler} itself
      *            only require the "{@code package-format-id}" parameter to be passed in.
-     * @return {@code Package} object containing the information described in {@code PackageDescription} in the format
+     * @return {@code Package} object containing the information described in {@code PackageState} in the format
      * specified in the {@code PackageGenerationParameters}. If the archiving format is "exploded," the returned package
      * will be null.
      */
@@ -95,7 +95,6 @@ public class BOREMPackageGenerator implements PackageGenerator {
             }
 
             builder.buildModel(packageState, assembler);
-
 
             //To support the cancelling of package creation we check here to see if the thread has been interrupted.
             if (Thread.currentThread().isInterrupted()) {

@@ -53,10 +53,6 @@ import org.dataconservancy.packaging.tool.model.PackageToolException;
  */
 public class BasicPackageGenerationService implements PackageGenerationService {
 
-	/*
-	 * XXX TODO: This should be defined in PackageGenerationPreferences, but the
-	 * model has not been implemented yet
-	 */
 	private final PackagingFormat DEFAULT_FORMAT = PackagingFormat.BOREM;
 
 	private Map<PackagingFormat, PackageGenerator> generatorMap;
@@ -79,15 +75,7 @@ public class BasicPackageGenerationService implements PackageGenerationService {
 		} else {
 			generator = getGenerator(DEFAULT_FORMAT);
 		}
-
-		/* TODO:  Is there a means of validating PackageState? */
-        if (params != null) {
-            params.getParam(
-                    GeneralParameterNames.VALIDATE_PACKAGE_DESCRIPTION, 0);
-        }
-
-
-		/* TODO:  Is there a means of validating PackageState? */
+		//TODO: currently there is no mechanism for validating package state.
 
 		return generator.generatePackage(packageState, params);
 	}
