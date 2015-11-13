@@ -18,6 +18,7 @@
 
 package org.dataconservancy.packaging.tool.impl;
 
+import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.packaging.tool.model.PackageState;
@@ -99,5 +100,30 @@ public class SerializeEqualsTesterTest {
         } catch (AssertionError e) {
             // expected
         }
+    }
+
+    /**
+     * Scratch test to insure that the {@link SerializeEqualsTester#assertModelEquals(Model, Model)} is doing the
+     * right thing with blank nodes.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testScratchBlankNodeEquality() throws Exception {
+        Model one = ModelFactory.createDefaultModel();
+        Model two = ModelFactory.createDefaultModel();
+
+        one.add(one.createResource(AnonId.create()), one.createProperty("foo", "bar"),
+                one.createResource("http://foo.bar.baz/"));
+
+        two.add(two.createResource(AnonId.create()), two.createProperty("foo", "bar"),
+                two.createResource("http://foo.bar.baz/"));
+
+//        Statement sOne = one.listStatements().nextStatement();
+//        Statement sTwo = two.listStatements().nextStatement();
+//        System.err.println(sOne);
+//        System.err.println(sTwo);
+
+        SerializeEqualsTester.assertModelEquals(one, two);
     }
 }

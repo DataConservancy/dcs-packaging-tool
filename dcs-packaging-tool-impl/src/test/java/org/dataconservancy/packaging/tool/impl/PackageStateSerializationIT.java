@@ -158,28 +158,4 @@ public class PackageStateSerializationIT {
         SerializeEqualsTester.serializeEquals(state, deserializedState);
     }
 
-    /**
-     * Scratch test to insure that the {@link SerializeEqualsTester#assertModelEquals(Model, Model)} is doing the
-     * right thing with blank nodes.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testScratchBlankNodeEquality() throws Exception {
-        Model one = ModelFactory.createDefaultModel();
-        Model two = ModelFactory.createDefaultModel();
-
-        one.add(one.createResource(AnonId.create()), one.createProperty("foo", "bar"),
-                one.createResource("http://foo.bar.baz/"));
-
-        two.add(two.createResource(AnonId.create()), two.createProperty("foo", "bar"),
-                two.createResource("http://foo.bar.baz/"));
-
-//        Statement sOne = one.listStatements().nextStatement();
-//        Statement sTwo = two.listStatements().nextStatement();
-//        System.err.println(sOne);
-//        System.err.println(sTwo);
-
-        SerializeEqualsTester.assertModelEquals(one, two);
-    }
 }
