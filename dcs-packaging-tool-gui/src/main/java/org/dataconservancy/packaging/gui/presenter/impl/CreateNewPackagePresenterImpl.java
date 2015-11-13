@@ -58,7 +58,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     }
 
     private void bind() {
-
         //Handles the user pressing the button to choose a base directory to create a package from.
         view.getChooseContentDirectoryButton()
                 .setOnAction(event -> {
@@ -142,11 +141,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     }
 
     public javafx.scene.Node display() {
-        //Setup help content and then rebind the base class to this view.
-        view.setupHelp();
-        setView(view);
-        super.bindBaseElements();
-        
         return view.asNode();
     }
 

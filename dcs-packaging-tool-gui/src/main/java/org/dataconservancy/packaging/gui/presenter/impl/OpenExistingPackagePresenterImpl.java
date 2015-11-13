@@ -59,8 +59,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
     }
     
     private void bind() {
-        bindBaseElements();
-        
         // User selects a package state file
         view.getChooseInProgressPackageFileButton().setOnAction(event -> {
             File file = controller.showOpenFileDialog(fileChooser);
@@ -145,11 +143,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
 
     @Override
     public Node display() {
-        // Setup help content and then rebind the base class to this view.        
-        // TODO What is this doing? 
-        view.setupHelp();
-        setView(view);
-
         clear();
         
         return view.asNode();

@@ -69,8 +69,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
 
         factory.setController(controller);
 
-        view = new HomepageViewImpl();
-        view.setHelp(help);
+        view = new HomepageViewImpl(help);
         header = new HeaderViewImpl();
         view.setHeaderView(header);
         presenter = new HomepagePresenterImpl(view);
@@ -99,7 +98,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
         // Setup controller to handle going to the next page.
         controller.getCreateNewPackagePagesStack().clear();
         controller.getCreateNewPackagePagesStack().push(Page.CREATE_NEW_PACKAGE);
-        CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl();
+        CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(help);
         createNewPackageView.setHeaderView(header);
         factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
 
@@ -119,7 +118,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
         // Setup controller to handle going to the next page.
         controller.getOpenExistingPackagePagesStack().clear();
         controller.getOpenExistingPackagePagesStack().push(Page.OPEN_EXISTING_PACKAGE);
-        OpenExistingPackageView openExistingPackageView = new OpenExistingPackageViewImpl();
+        OpenExistingPackageView openExistingPackageView = new OpenExistingPackageViewImpl(help);
         openExistingPackageView.setHeaderView(header);
         factory.setOpenExistingPackagePresenter(new OpenExistingPackagePresenterImpl(openExistingPackageView));
 

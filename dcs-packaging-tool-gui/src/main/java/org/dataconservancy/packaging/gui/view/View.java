@@ -18,7 +18,6 @@ package org.dataconservancy.packaging.gui.view;
 
 import javafx.scene.Node;
 
-import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 
 import javafx.scene.control.Label;
@@ -110,18 +109,9 @@ public interface View<T extends Presenter> {
      */
     public void setHeaderView(HeaderView headerView);
     
-    public void setupHelp();
-    
-    /**
-     * Sets the help object to use for the presenter.
-     * Help is a helper class that loads help file paths from a property files and then loads the help text from that file.
-     * @param help the help object to use for the presenter
-     */
-    public void setHelp(Help help);
-
-    /**
+     /**
      * Returns the error label to report problems back to the user
-     * @return
+     * @return label
      */
     Label getErrorLabel();
 

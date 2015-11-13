@@ -33,10 +33,7 @@ import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
-import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -51,13 +48,10 @@ import java.util.Map;
  * Implementation for the screen that will handle package metadata.
  */
 public class PackageMetadataPresenterImpl extends BasePresenterImpl implements PackageMetadataPresenter {
-    private static final Logger LOG = LoggerFactory.getLogger(PackageMetadataPresenterImpl.class);
-
     private PackageMetadataView view;
     private PackageMetadataService packageMetadataService;
     private DomainProfileStore domainProfileStore;
     private Map<String,URI> domainProfileIdMap = new HashMap<>();
-    private PackageStateSerializer packageStateSerializer;
 
     public PackageMetadataPresenterImpl(PackageMetadataView view) {
         super(view);
@@ -72,13 +66,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     }
 
     public Node display() {
-        //Setup help content and then rebind the base class to this view.
-        view.setupHelp();
-        view.getErrorLabel().setVisible(false);
+        // TODO: Must move bind() to constructor which will require putting domainProfileStore as constructor arg.
         bind();
-        setView(view);
-        super.bindBaseElements();
-
+        
         return view.asNode();
     }
 

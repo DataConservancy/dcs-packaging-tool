@@ -31,8 +31,9 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+
+import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -75,7 +76,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private FileChooser packageStateFileChooser;
     private Set<String> failedValidation;
 
-    public PackageMetadataViewImpl() {
+    public PackageMetadataViewImpl(Help help) {
         super();
         
         allDynamicFields = new ArrayList<>();
@@ -146,7 +147,8 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         bottomContent = new VBox(5);
 
         content.getChildren().add(bottomContent);
-
+        
+        setHelpPopupContent(help.get(HelpKey.PACKAGE_METADATA_HELP));
     }
 
     @Override
@@ -162,15 +164,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     @Override
     public void scrollToTop() {
         contentScrollPane.setVvalue(0);
-    }
-
-    @Override
-    public void setupHelp() {
-        Label helpText = new Label(help.get(HelpKey.PACKAGE_METADATA_HELP));
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-        setHelpPopupContent(helpText);
     }
 
     @Override

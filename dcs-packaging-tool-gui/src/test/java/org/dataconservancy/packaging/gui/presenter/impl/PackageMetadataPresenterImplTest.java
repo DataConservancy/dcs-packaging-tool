@@ -95,8 +95,8 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
             };
 
-            view = new PackageMetadataViewImpl();
-            view.setHelp(help);
+            view = new PackageMetadataViewImpl(help);
+
             HeaderView header = new HeaderViewImpl();
             view.setHeaderView(header);
             presenter = new PackageMetadataPresenterImpl(view);
@@ -110,7 +110,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             controller.setCreateNewPackage(true);
             controller.getCreateNewPackagePagesStack().clear();
             controller.getCreateNewPackagePagesStack().push(Page.CREATE_NEW_PACKAGE);
-            CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl();
+            CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(help);
             createNewPackageView.setHeaderView(header);
             factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
 

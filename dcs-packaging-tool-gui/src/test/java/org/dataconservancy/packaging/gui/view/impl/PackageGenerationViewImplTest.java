@@ -30,7 +30,7 @@ public class PackageGenerationViewImplTest extends BaseGuiTest {
 
     @Before
     public void setup() {
-        view = new PackageGenerationViewImpl();
+        view = new PackageGenerationViewImpl(help);
     }
     
     /**
