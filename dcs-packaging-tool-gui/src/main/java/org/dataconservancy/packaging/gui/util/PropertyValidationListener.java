@@ -67,6 +67,8 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
             textPropertyBox.getChildren().add(0, validationLabel);
         }
 
+        validationLabel.prefWidthProperty().bind(textPropertyBox.getPropertyInput().widthProperty());
+
         HBox propertyInputBox = (HBox) textPropertyBox.getChildren().get(1);
         propertyInputBox.setAlignment(Pos.CENTER);
         validationImageLabel = (Label) propertyInputBox.getChildren().get(1);
