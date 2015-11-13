@@ -58,7 +58,8 @@ import static org.junit.Assert.fail;
 
 /**
  * Tests the PackageStateSerializer using <em>production</em> configuration settings (i.e. it does not use test
- * Spring configuration files).
+ * Spring configuration files).  This test class <em>does</em> use test objects from the {@code dcs-packaging-tool-ser}
+ * module to populate instances of {@code PackageState}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml", "classpath:/applicationContext.xml"})
