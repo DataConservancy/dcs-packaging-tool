@@ -76,6 +76,7 @@ import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.T
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainProfileUris;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageMetadata;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageTreeRDF;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.APPLICATION_VERSION_1;
 import static org.junit.Assert.assertEquals;
@@ -150,13 +151,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
             final JenaModelSerializer serializer = new JenaModelSerializer(new DefaultModelFactory());
             serializer.setLang("TTL");
 
-            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
-                {
-                    setStreamId(StreamId.PACKAGE_TREE);
-                    setMarshaller(serializer);
-                    setUnmarshaller(serializer);
-                }
-            });
+//            put(StreamId.PACKAGE_TREE, new StreamMarshaller() {
+//                {
+//                    setStreamId(StreamId.PACKAGE_TREE);
+//                    setMarshaller(serializer);
+//                    setUnmarshaller(serializer);
+//                }
+//            });
             put(StreamId.DOMAIN_PROFILE_LIST, new StreamMarshaller() {
                 {
                     setStreamId(StreamId.DOMAIN_PROFILE_LIST);
@@ -400,6 +401,12 @@ public class AnnotationDrivenPackageStateSerializerTest {
                     case USER_SPECIFIED_PROPERTIES:
                         verify(streamMarshaller.getMarshaller())
                                 .marshal(eq(userProperties), isNotNull(Result.class));
+                        verifiedStreamCount.incrementAndGet();
+                        break;
+
+                    case PACKAGE_TREE:
+                        verify(streamMarshaller.getMarshaller())
+                                .marshal(eq(packageTreeRDF), isNotNull(Result.class));
                         verifiedStreamCount.incrementAndGet();
                         break;
                 }
