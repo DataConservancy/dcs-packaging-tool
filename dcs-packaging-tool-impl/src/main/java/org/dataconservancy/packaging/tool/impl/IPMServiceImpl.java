@@ -4,6 +4,8 @@ import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +21,8 @@ import java.util.Set;
 public class IPMServiceImpl implements IPMService {
     private Set<Path> visitedFiles = new HashSet<>();
     private final URIGenerator uriGenerator;
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public IPMServiceImpl(URIGenerator uriGenerator) {
         this.uriGenerator = uriGenerator;
@@ -61,6 +65,7 @@ public class IPMServiceImpl implements IPMService {
                 visitedFiles.add(path.toRealPath());
             }
         } catch (IOException e) {
+            log.error("Error getting path for file", e);
             throw new IOException(
                 "Error determining canonical path of " + path.toFile(), e);
         }
@@ -70,7 +75,7 @@ public class IPMServiceImpl implements IPMService {
         if (path.toRealPath().toFile().exists()) {
             node = new Node(uriGenerator.generateNodeURI());
 
-            FileInfo info = new FileInfo(path);
+            FileInfo info = new FileInfo(path.toRealPath());
             node.setFileInfo(info);
 
             //If it's not the root set the parent child information.
@@ -87,13 +92,13 @@ public class IPMServiceImpl implements IPMService {
 
             //If the file is hidden or starts with a "." set it to ignored.
             //The "." semantics are carried over from the old rules based approach.
-            if (Files.isHidden(path) || path.getFileName().toString().startsWith(".")) {
+            if (Files.isHidden(path.toRealPath()) || path.toRealPath().getFileName().toString().startsWith(".")) {
                 node.setIgnored(true);
             }
 
             //If the path represents a directory loop through all children and add them to the tree.
-            if (Files.isDirectory(path)) {
-                DirectoryStream<Path> stream = Files.newDirectoryStream(path);
+            if (Files.isDirectory(path.toRealPath())) {
+                DirectoryStream<Path> stream = Files.newDirectoryStream(path.toRealPath());
                 for (Path childPath : stream) {
                     if (Thread.currentThread().isInterrupted()) {
                         break;
