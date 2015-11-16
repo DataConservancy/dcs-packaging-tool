@@ -59,5 +59,7 @@ public interface CssConstants {
     String PROPERTY = "Property";
     String SUB_PROPERTY = "SubProperty";
     String PACKAGE_TOOL_POPUP_PROPERTY_TAB = "PropertyTabContent";
-
+    String ADDED_ROW = "AddedRow";
+    String DELETED_ROW = "DeletedRow";
+    String UPDATED_ROW = "UpdatedRow";
 }

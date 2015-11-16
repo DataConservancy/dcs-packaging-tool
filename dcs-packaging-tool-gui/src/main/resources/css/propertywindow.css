@@ -137,3 +137,7 @@
     -fx-font-size: 18;
 }
 
+.text-area .scroll-bar:vertical:disabled {
+    -fx-opacity: 0;
+}
+

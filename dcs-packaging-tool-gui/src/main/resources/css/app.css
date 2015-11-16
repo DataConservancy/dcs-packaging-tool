@@ -304,6 +304,18 @@
 	-fx-alignment: center-left;
 }
 
+.AddedRow {
+    -fx-background-color: #8BC060;
+}
+
+.DeletedRow {
+    -fx-background-color: #C6605D;
+}
+
+.UpdatedRow {
+    -fx-background-color: #EEE669;
+}
+
 .EditPackageContentsView .button {
 	-fx-background-color: #168176;
 	-fx-border-radius: 6px;
@@ -466,5 +478,9 @@
 
 .ExclamationImage {
 	-fx-image: url("../images/orange_exclamation.png");
+}
+
+.text-area .scroll-bar:vertical:disabled {
+    -fx-opacity: 0;
 }
 

@@ -34,6 +34,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
@@ -761,6 +762,32 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         refreshSummary.setWrapText(true);
 
         TableView<ComparisonResult> resultTable = new TableView<>();
+
+        resultTable.setRowFactory(new Callback<TableView<ComparisonResult>, TableRow<ComparisonResult>>() {
+            @Override
+            public TableRow<ComparisonResult> call(
+                TableView<ComparisonResult> param) {
+                return new TableRow<ComparisonResult>() {
+                    @Override
+                    protected void updateItem(ComparisonResult result, boolean empty){
+                        super.updateItem(result, empty);
+                        if (result != null) {
+                            switch (result.getComparison()) {
+                                case "ADDED":
+                                    getStyleClass().add(ADDED_ROW);
+                                    break;
+                                case "DELETED":
+                                    getStyleClass().add(DELETED_ROW);
+                                    break;
+                                case "UPDATED":
+                                    getStyleClass().add(UPDATED_ROW);
+                                    break;
+                            }
+                        }
+                    }
+                };
+            }
+        });
         resultTable.setEditable(false);
 
         TableColumn<ComparisonResult, String> statusCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_STATUS_LABEL));
