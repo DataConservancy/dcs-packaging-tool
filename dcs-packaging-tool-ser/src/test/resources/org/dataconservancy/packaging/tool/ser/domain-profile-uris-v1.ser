@@ -1,7 +1,7 @@
 <serialization version="1" converterClass="org.dataconservancy.packaging.tool.ser.DomainProfileUriListConverter" streamId="DOMAIN_PROFILE_LIST">
   <domainProfileUris>
-    <uri></uri>
-    <uri></uri>
-    <uri></uri>
+    <uri>http://example.org/domain/v1</uri>
+    <uri>http://example.org/properties/v1</uri>
+    <uri>http://other.org/properties</uri>
   </domainProfileUris>
 </serialization>

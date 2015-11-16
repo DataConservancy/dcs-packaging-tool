@@ -19,11 +19,6 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.jena.rdf.model.AnonId;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
@@ -31,6 +26,7 @@ import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +40,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Map;
 
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.applicationVersion;
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainObjectsRDF;
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.domainProfileUris;
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageMetadata;
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageTreeRDF;
-import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
+import static org.dataconservancy.packaging.tool.impl.TestPackageState.V1.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -114,13 +104,13 @@ public class PackageStateSerializationIT {
         // TODO is there a way we can do this with annotation?
         PackageState state = new PackageState();
 
-        state.setCreationToolVersion(applicationVersion);
-        state.setDomainProfileIdList(domainProfileUris);
-        state.setUserSpecifiedProperties(userProperties);
-        state.setDomainObjectRDF(domainObjectsRDF);
-        state.setPackageMetadataList(packageMetadata);
-        state.setPackageName(packageName);
-        state.setPackageTree(packageTreeRDF);
+        state.setCreationToolVersion(Objects.appVersion);
+        state.setDomainProfileIdList(Objects.profiles);
+        state.setUserSpecifiedProperties(Objects.userProps);
+        state.setDomainObjectRDF(Objects.objects);
+        state.setPackageMetadataList(Objects.metadata);
+        state.setPackageName(Objects.name);
+        state.setPackageTree(Objects.tree);
 
         return state;
     }
@@ -159,4 +149,57 @@ public class PackageStateSerializationIT {
         SerializeEqualsTester.serializeEquals(state, deserializedState);
     }
 
+    /**
+     * Attempt to deserialize version 1 serializations with the production PackageStateSerializer.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testV1SerializationCompatibility() throws Exception {
+        PackageState deserializedState = new PackageState();
+
+        underTest.deserialize(deserializedState, StreamId.DOMAIN_OBJECTS, Resources.DOMAIN_OBJECTS.getInputStream());
+        assertTrue(Objects.objects.isIsomorphicWith(deserializedState.getDomainObjectRDF()));
+        assertTrue(deserializedState.getDomainObjectRDF().isIsomorphicWith(Objects.objects));
+
+        underTest.deserialize(deserializedState, StreamId.APPLICATION_VERSION, Resources.APPLICATION_VERSION.getInputStream());
+        assertEquals(Objects.appVersion, deserializedState.getCreationToolVersion());
+
+        underTest.deserialize(deserializedState, StreamId.DOMAIN_PROFILE_LIST, Resources.DOMAIN_PROFILES.getInputStream());
+        assertEquals(Objects.profiles, deserializedState.getDomainProfileIdList());
+
+        underTest.deserialize(deserializedState, StreamId.PACKAGE_METADATA, Resources.PACKAGE_METADATA.getInputStream());
+        assertEquals(Objects.metadata, deserializedState.getPackageMetadataList());
+
+        underTest.deserialize(deserializedState, StreamId.PACKAGE_NAME, Resources.PACKAGE_NAME.getInputStream());
+        assertEquals(Objects.name, deserializedState.getPackageName());
+
+        underTest.deserialize(deserializedState, StreamId.PACKAGE_TREE, Resources.PACKAGE_TREE.getInputStream());
+        assertTrue(Objects.tree.isIsomorphicWith(deserializedState.getPackageTree()));
+        assertTrue(deserializedState.getPackageTree().isIsomorphicWith(Objects.tree));
+
+        underTest.deserialize(deserializedState, StreamId.USER_SPECIFIED_PROPERTIES, Resources.USER_PROPS.getInputStream());
+        assertEquals(Objects.userProps, deserializedState.getUserSpecifiedProperties());
+
+        deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, Resources.FULL_STATE.getInputStream());
+        SerializeEqualsTester.serializeEquals(state, deserializedState);
+    }
+
+    @Test
+    @Ignore("Used to generate version 1 serializations for integration tests.")
+    public void testScratchProduceV1Serializations() throws Exception {
+        File baseDir = new File("/Users/esm/dc-workspace/dc-gh-fork/dcs-packaging-tool/dcs-packaging-tool-impl/src/test/resources/org/dataconservancy/packaging/tool/impl");
+
+        // Using our production configuration, single streams will still be zipped. (e.g. the 'archive' flag is 'true')
+        underTest.serialize(state, StreamId.APPLICATION_VERSION, new FileOutputStream(new File(baseDir, "appver-v1.ser")));
+        underTest.serialize(state, StreamId.DOMAIN_OBJECTS, new FileOutputStream(new File(baseDir, "objects-v1.ser")));
+        underTest.serialize(state, StreamId.DOMAIN_PROFILE_LIST, new FileOutputStream(new File(baseDir, "profiles-v1.ser")));
+        underTest.serialize(state, StreamId.PACKAGE_METADATA, new FileOutputStream(new File(baseDir, "metadata-v1.ser")));
+        underTest.serialize(state, StreamId.PACKAGE_NAME, new FileOutputStream(new File(baseDir, "name-v1.ser")));
+        underTest.serialize(state, StreamId.PACKAGE_TREE, new FileOutputStream(new File(baseDir, "tree-v1.ser")));
+        underTest.serialize(state, StreamId.USER_SPECIFIED_PROPERTIES, new FileOutputStream(new File(baseDir, "userprops-v1.ser")));
+
+        underTest.serialize(state, new FileOutputStream(new File(baseDir, "fullstate-v1.ser")));
+    }
 }

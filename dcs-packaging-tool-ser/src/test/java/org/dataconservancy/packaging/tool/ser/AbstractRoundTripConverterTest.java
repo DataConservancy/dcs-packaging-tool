@@ -20,6 +20,7 @@ package org.dataconservancy.packaging.tool.ser;
 
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.XppReader;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -124,4 +125,21 @@ public abstract class AbstractRoundTripConverterTest extends AbstractConverterTe
         assertEquals(firstWriter.getBuffer().toString(), secondWriter.getBuffer().toString());
     }
 
+    /**
+     * Sanity check insuring that the supplied serialization and the supplied object are equal.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testAssertSerializationAndObjectEqual() throws Exception {
+        AbstractPackageToolConverter underTest = getUnderTest();
+        StringWriter writer = new StringWriter();
+
+        assertEquals(getSerializationObject(), underTest.unmarshal(
+                new XppReader(
+                        new InputStreamReader(
+                                getSerializationInputStream(), "UTF-8"), getPullParser()), getUnmarshallingContext()));
+        underTest.marshal(getSerializationObject(), new PrettyPrintWriter(writer), getMarshalingContext());
+        assertEquals(IOUtils.toString(getSerializationInputStream()), writer.toString());
+    }
 }

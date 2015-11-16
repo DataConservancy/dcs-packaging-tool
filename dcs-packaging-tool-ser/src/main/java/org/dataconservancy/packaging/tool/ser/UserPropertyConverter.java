@@ -13,9 +13,9 @@ import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static org.dataconservancy.packaging.tool.ser.XstreamUtil.hasAttribute;
 
@@ -62,12 +62,12 @@ public class UserPropertyConverter extends AbstractPackageToolConverter {
             writer.endNode();
         });
 
-        writer.endNode(); // E_PACKAGE_METADATA
+        writer.endNode(); // E_USER_PROPERTY
     }
 
     @Override
     public Object unmarshalInternal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        HashMap<URI, List<Property>> result = new HashMap<>();
+        TreeMap<URI, List<Property>> result = new TreeMap<>();
 
         if (!E_USER_PROPERTY.equals(reader.getNodeName())) {
             throw new ConversionException(
@@ -131,7 +131,7 @@ public class UserPropertyConverter extends AbstractPackageToolConverter {
 
     @Override
     public boolean canConvert(Class type) {
-        if (HashMap.class.isAssignableFrom(type)) {
+        if (Map.class.isAssignableFrom(type)) {
             return true;
         }
 

@@ -1,0 +1,22 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:j.0="premis:"
+    xmlns:j.1="org:"
+    xmlns:j.2="farm:" >
+  <rdf:Description rdf:about="urn:uuid:67a05440-164f-4b7f-a216-320b3d044ea6">
+    <j.2:hasData rdf:resource="urn:uuid:053df8c1-cfdd-47d9-81c5-5ea4ba173d10"/>
+    <j.2:hasData rdf:resource="urn:uuid:065f02d1-4d5b-4e1f-ab23-b0f6dfb93734"/>
+    <rdf:type rdf:resource="org:Organization"/>
+    <rdf:type rdf:resource="farm:Farm"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="urn:uuid:065f02d1-4d5b-4e1f-ab23-b0f6dfb93734">
+    <j.2:isDataFor rdf:resource="urn:uuid:67a05440-164f-4b7f-a216-320b3d044ea6"/>
+    <j.0:fileSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">120032</j.0:fileSize>
+    <rdf:type rdf:resource="farm:Media"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="urn:uuid:053df8c1-cfdd-47d9-81c5-5ea4ba173d10">
+    <j.2:isDataFor rdf:resource="urn:uuid:67a05440-164f-4b7f-a216-320b3d044ea6"/>
+    <j.0:fileSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">120032</j.0:fileSize>
+    <rdf:type rdf:resource="farm:Media"/>
+  </rdf:Description>
+</rdf:RDF>

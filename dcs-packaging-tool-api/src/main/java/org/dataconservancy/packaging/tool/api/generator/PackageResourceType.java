@@ -17,12 +17,23 @@
 package org.dataconservancy.packaging.tool.api.generator;
 
 /**
- * Describes the type of resource being included in a package.
+ * Describes the type of resource being included in a package. The intended use of this is to
+ * support the assigning of locations withing the package to resources of different types.
  */
 public enum PackageResourceType {
     /** Package data files/content */
     DATA,
 
-    /** Package-related metadata (e.g. ReMs, business objects, etc) */
-    METADATA;
+    /** The type for an ORE-ReM file */
+    ORE_REM,
+
+    /** Ontologies used in building the package */
+    ONTOLOGY,
+
+    /** Other package-related metadata (e.g.business objects, etc) */
+    METADATA,
+
+    /** The Package State file */
+    PACKAGE_STATE;
+
 }

@@ -22,13 +22,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class UserPropertyConverterTest extends AbstractRoundTripConverterTest {
-    private HashMap<URI, List<Property>> testMap = new HashMap<URI, List<Property>>() {
+    private TreeMap<URI, List<Property>> testMap = new TreeMap<URI, List<Property>>() {
         {
             try {
                 PropertyType typeOne = new PropertyType();
