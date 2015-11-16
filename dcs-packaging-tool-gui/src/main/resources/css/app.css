@@ -487,16 +487,38 @@
 }
 
 .check-box .box {
+     -fx-background-color: #D06C23;
+ }
+
+ .check-box:hover .box {
+     -fx-background-color: #E28C4C;
+ }
+
+ .check-box:selected .mark {
+     -fx-background-color: #ffffff;
+     -fx-mark-highlight-color: #ffffff;
+     -fx-mark-color: #ffffff;
+ }
+
+.radio-button .radio {
     -fx-background-color: #D06C23;
 }
 
-.check-box:hover .box {
+.radio-button:hover .radio {
     -fx-background-color: #E28C4C;
 }
 
-.check-box:selected .mark {
-    -fx-background-color: #ffffff;
+.radio-button:selected .dot {
     -fx-mark-highlight-color: #ffffff;
     -fx-mark-color: #ffffff;
 }
+
+.combo-box {
+    -fx-background-color: #FFD17D;
+}
+
+.combo-box:hover {
+    -fx-background-color: #FFDFA3;
+}
+
 

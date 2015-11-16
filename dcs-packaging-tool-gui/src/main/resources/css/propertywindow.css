@@ -63,6 +63,22 @@
     -fx-mark-color: #ffffff;
 }
 
+.combo-box {
+    -fx-background-color: #FFD17D;
+}
+
+.combo-box:editable {
+    -fx-background-color: #C3C3C3;
+}
+
+.combo-box:editable:hover {
+    -fx-background-color: #C3C3C3;
+}
+
+.combo-box:hover {
+    -fx-background-color: #FFDFA3;
+}
+
 .PackageToolPopup .hyperlink {
    	-fx-text-fill: #316a93;
    	-fx-border-width: 0;
