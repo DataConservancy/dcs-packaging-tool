@@ -276,6 +276,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         directorySelectionBox.getChildren().add(directoryBox);
         HBox.setHgrow(directoryBox, Priority.ALWAYS);
         selectOutputDirectoryButton = new Button(TextFactory.getText(LabelKey.BROWSEDIR_BUTTON));
+        selectOutputDirectoryButton.setMinWidth(150);
         directorySelectionBox.getChildren().add(selectOutputDirectoryButton);
 
         outputDirectoryBox.getChildren().add(directorySelectionBox);

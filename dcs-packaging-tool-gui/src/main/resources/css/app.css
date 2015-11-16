@@ -261,7 +261,9 @@
 }
 
 .PackageGenerationView .button {
+    -fx-font-weight: bold;
 	-fx-font-size: 12;
+	-fx-translate-y: -2px;
 }
 
 .PackageGenerationView .SectionLabel {
@@ -482,5 +484,19 @@
 
 .text-area .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
+}
+
+.check-box .box {
+    -fx-background-color: #D06C23;
+}
+
+.check-box:hover .box {
+    -fx-background-color: #E28C4C;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #ffffff;
+    -fx-mark-highlight-color: #ffffff;
+    -fx-mark-color: #ffffff;
 }
 
