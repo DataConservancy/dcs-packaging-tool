@@ -56,7 +56,7 @@ import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputS
  * @author apb
  * @version $Id$
  */
-class DomainObjectResourceSerializer
+class DomainObjectResourceBuilder
         implements NodeVisitor {
 
     PackageStateSerializer serializer;

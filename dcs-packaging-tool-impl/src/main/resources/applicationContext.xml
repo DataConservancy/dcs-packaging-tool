@@ -36,7 +36,7 @@
     </property>
     <property name="arguments">
       <map key-type="java.lang.String" value-type="java.lang.Class">
-        <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value="org.dataconservancy.packaging.tool.impl.generator.BagOreRemPackageModelBuilder"/>
+        <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl"/>
       </map>
     </property>
   </bean>

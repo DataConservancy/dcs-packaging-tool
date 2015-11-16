@@ -51,7 +51,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-public class DomainObjectResourceSerializerTest {
+public class DomainObjectResourceBuilderTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -72,8 +72,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         /* Domain object URIs are not file URIs */
         state.domainObjects
@@ -115,8 +115,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
         serializer.init(state);
@@ -150,8 +150,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         /* This should work OK */
         serializer.init(state);
@@ -184,8 +184,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
         serializer.init(state);
@@ -259,8 +259,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
         serializer.init(state);
@@ -313,8 +313,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
         serializer.init(state);
@@ -347,8 +347,8 @@ public class DomainObjectResourceSerializerTest {
 
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
 
-        DomainObjectResourceSerializer serializer =
-                new DomainObjectResourceSerializer();
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
 
         Node fileNode = state.tree.getChildren().get(0);
         fileNode.setIgnored(true);

@@ -35,7 +35,7 @@ import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputS
  * @author apb
  * @version $Id$
  */
-public class OreReMSerializer
+public class OreReMBuilder
         implements NodeVisitor {
 
     @Override

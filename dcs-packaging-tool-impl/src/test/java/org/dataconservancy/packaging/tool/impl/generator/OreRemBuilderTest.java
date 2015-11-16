@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
 
-public class OreRemSerializerTest {
+public class OreRemBuilderTest {
 
     private URIGenerator uriGen = new SimpleURIGenerator();
 
@@ -73,7 +73,7 @@ public class OreRemSerializerTest {
 
         List<URI> uris = new ArrayList<>();
 
-        OreReMSerializer serializer = new OreReMSerializer();
+        OreReMBuilder serializer = new OreReMBuilder();
 
         PackageModelBuilderState state = new PackageModelBuilderState();
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
@@ -123,7 +123,7 @@ public class OreRemSerializerTest {
 
         List<URI> uris = new ArrayList<>();
 
-        OreReMSerializer serializer = new OreReMSerializer();
+        OreReMBuilder serializer = new OreReMBuilder();
 
         PackageModelBuilderState state = new PackageModelBuilderState();
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
