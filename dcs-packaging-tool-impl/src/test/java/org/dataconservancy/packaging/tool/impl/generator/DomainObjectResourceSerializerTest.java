@@ -288,7 +288,7 @@ public class DomainObjectResourceSerializerTest {
                                     .getResource("/TestDomainObjects/2/file.txt")
                                     .toURI().toString(),
                             linkedFileURI);
-            
+
             /* Make sure that the content link URI resolves to the content */
             try (InputStream fc = new URL(linkedFileURI).openStream()) {
                 String content = IOUtils.toString(fc);
@@ -299,7 +299,6 @@ public class DomainObjectResourceSerializerTest {
 
                 assertEquals(knownContent, content);
             }
-
 
         }
     }
@@ -336,6 +335,42 @@ public class DomainObjectResourceSerializerTest {
         }
 
         assertEquals(COUNT, deserialized.listStatements().toSet().size());
+
+    }
+
+    @Test
+    public void ignoreTest() throws Exception {
+        PackageModelBuilderState state = bootstrap2();
+
+        int COUNT = state.domainObjects.listStatements().toSet().size();
+
+        state.assembler = new FunctionalAssemblerMock(folder.getRoot());
+
+        DomainObjectResourceSerializer serializer =
+                new DomainObjectResourceSerializer();
+
+        Node fileNode = state.tree.getChildren().get(0);
+        fileNode.setIgnored(true);
+
+        /* Init and walk the tree */
+        serializer.init(state);
+        state.tree.walk(node -> serializer.visitNode(node, state));
+        serializer.finish(state);
+
+        Model deserialized = ModelFactory.createDefaultModel();
+
+        try (InputStream in = state.tree.getIdentifier().toURL().openStream()) {
+            String content = IOUtils.toString(in);
+            deserialized.read(IOUtils.toInputStream(content), state.tree
+                    .getIdentifier().toString(), "TURTLE");
+
+            deserialized.write(System.err, "TURTLE");
+
+            assertTrue(deserialized.listStatements().toSet().size() < COUNT);
+
+            /* Make sure no references to the file (which is ignored) */
+            assertFalse(content.contains(".txt"));
+        }
 
     }
 

@@ -93,6 +93,24 @@ class DomainObjectResourceSerializer
 
         state.tree
                 .walk(node -> {
+
+                    /* Skip over removed nodes */
+                    if (node.isIgnored()) {
+                        /* Remove the domain object graph */
+                        Model ignored =
+                                cut(state.domainObjects,
+                                    selectLocal(state.domainObjects
+                                            .getResource(node.getDomainObject()
+                                                    .toString())));
+
+                        /* Remove triples that involve a subject defined in it */
+                        ignored.listSubjects()
+                                .filterKeep(r -> r.isURIResource())
+                                .forEachRemaining(r -> state.domainObjects
+                                        .removeAll(null, null, r));;
+                        return;
+                    }
+
                     /* Get the former domain object URI */
                     URI originalDomainObjectURI = node.getDomainObject();
 
@@ -163,6 +181,10 @@ class DomainObjectResourceSerializer
     /* Serialize the domain object, and save the binary content */
     @Override
     public void visitNode(Node node, PackageModelBuilderState state) {
+
+        if (node.isIgnored()) {
+            return;
+        }
 
         Resource primaryDomainObject =
                 state.domainObjects.getResource(node.getDomainObject()
