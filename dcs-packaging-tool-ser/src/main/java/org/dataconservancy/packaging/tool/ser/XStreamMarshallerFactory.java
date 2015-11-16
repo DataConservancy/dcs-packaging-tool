@@ -43,10 +43,7 @@ public class XStreamMarshallerFactory {
      * @return a new instance
      */
     public XStreamMarshaller newInstance() {
-        XStreamMarshaller marshaller = new XStreamMarshaller();
-        XStream x = marshaller.getXStream();
-        registerLocalConverters(x);
-        return marshaller;
+        return new ConfiguredXStreamMarshaller();
     }
 
     /**
@@ -65,6 +62,15 @@ public class XStreamMarshallerFactory {
 
     public void setLocalConverters(List<LocalConverterHolder> localConverters) {
         this.localConverters = localConverters;
+    }
+
+    public class ConfiguredXStreamMarshaller extends XStreamMarshaller {
+        @Override
+        protected void customizeXStream(XStream xstream) {
+            super.customizeXStream(xstream);
+            registerLocalConverters(xstream);
+            xstream.setMode(XStream.NO_REFERENCES);
+        }
     }
 
     /**
