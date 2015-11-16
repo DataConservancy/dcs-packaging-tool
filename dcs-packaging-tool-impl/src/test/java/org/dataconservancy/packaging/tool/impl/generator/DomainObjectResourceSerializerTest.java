@@ -24,6 +24,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -364,8 +365,6 @@ public class DomainObjectResourceSerializerTest {
             deserialized.read(IOUtils.toInputStream(content), state.tree
                     .getIdentifier().toString(), "TURTLE");
 
-            deserialized.write(System.err, "TURTLE");
-
             assertTrue(deserialized.listStatements().toSet().size() < COUNT);
 
             /* Make sure no references to the file (which is ignored) */
@@ -400,6 +399,7 @@ public class DomainObjectResourceSerializerTest {
                         .getGraph());
         state.tree = treeNode;
         state.pkgState = pkgState;
+        state.renamedResources = new HashMap<>();
 
         return state;
     }
@@ -443,6 +443,7 @@ public class DomainObjectResourceSerializerTest {
                         .getGraph());
         state.tree = treeNode;
         state.pkgState = pkgState;
+        state.renamedResources = new HashMap<>();
 
         return state;
     }

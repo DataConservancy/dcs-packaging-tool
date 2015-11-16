@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.jena.rdf.model.ModelFactory;
@@ -76,6 +77,7 @@ public class PackageModelBuilderImpl
         builderState.assembler = assembler;
         builderState.params = params;
         builderState.manifest = ModelFactory.createDefaultModel();
+        builderState.renamedResources = new HashMap<>();
 
         try {
 

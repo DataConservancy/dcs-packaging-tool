@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import java.util.Map;
+
 import org.apache.jena.rdf.model.Model;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
@@ -36,6 +38,15 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 public class PackageModelBuilderState {
 
     public PackageState pkgState;
+
+    /**
+     * Anything that renames a resource in the domain object graph MUST put it
+     * here.
+     * <p>
+     * This is a map of old URI to new URU.
+     * </p>
+     */
+    public Map<String, String> renamedResources;
 
     /**
      * RDF manifest associated with this package.

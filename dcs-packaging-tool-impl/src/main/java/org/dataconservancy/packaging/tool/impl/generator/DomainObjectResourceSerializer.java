@@ -104,7 +104,7 @@ class DomainObjectResourceSerializer
                         ignored.listSubjects()
                                 .filterKeep(r -> r.isURIResource())
                                 .forEachRemaining(r -> state.domainObjects
-                                        .removeAll(null, null, r));;
+                                        .removeAll(null, null, r));
                         return;
                     }
 
@@ -151,7 +151,8 @@ class DomainObjectResourceSerializer
                                       bare(node.getFileInfo().getLocation()
                                               .toString()),
                                       binaryURI.toString(),
-                                      originalResources);
+                                      originalResources,
+                                      state.renamedResources);
 
                             }
 
@@ -170,7 +171,8 @@ class DomainObjectResourceSerializer
                     remap(state.domainObjects,
                           bare(originalDomainObjectURI.toString()),
                           node.getDomainObject().toString(),
-                          originalResources);
+                          originalResources,
+                          state.renamedResources);
 
                 });
     }
@@ -232,7 +234,8 @@ class DomainObjectResourceSerializer
     private static void remap(Model model,
                               String oldBaseURI,
                               String newBaseURI,
-                              TreeMap<String, Resource> resources) {
+                              TreeMap<String, Resource> resources,
+                              Map<String, String> renameMap) {
 
         Map<String, Resource> toReplace = new HashMap<>();
 
@@ -242,11 +245,10 @@ class DomainObjectResourceSerializer
                 + Character.MAX_VALUE));
 
         /* Swap out the base URI for each matching resource */
-        toReplace
-                .entrySet()
-                .forEach(res -> ResourceUtils.renameResource(res.getValue(),
-                                                             res.getKey()
-                                                                     .replaceFirst(oldBaseURI,
-                                                                                   newBaseURI)));
+        toReplace.entrySet().forEach(res -> {
+            String newURI = res.getKey().replaceFirst(oldBaseURI, newBaseURI);
+            renameMap.put(res.getValue().toString(), newURI);
+            ResourceUtils.renameResource(res.getValue(), newURI);
+        });
     }
 }
