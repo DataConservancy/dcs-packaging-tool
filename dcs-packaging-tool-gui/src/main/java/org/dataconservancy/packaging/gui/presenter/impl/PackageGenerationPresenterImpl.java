@@ -30,7 +30,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.atlas.test.Gen;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
