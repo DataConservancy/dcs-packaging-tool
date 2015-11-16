@@ -30,7 +30,7 @@ public interface Ontologies {
 
     public static final String NS_DCS_PKGTOOL_PROFILE_BOM =
             "http://dataconservancy.org/ptg-profiles/dcs-bo-1.0#";
-    
+
     public static final String NS_DCS_PKGTOOL_PROFILE_PCDM =
             "http://dataconservancy.org/ptg-profiles/PCDM-1.0#";
 
@@ -40,8 +40,14 @@ public interface Ontologies {
     public static final String NS_DCTERMS = "http://purl.org/dc/terms/";
 
     public static final String NS_FOAF = "http://xmlns.com/foaf/0.1/";
-    
+
     public static final String NS_PCDM = "http://pcdm.org/models#";
+
+    public static final String NS_ORE =
+            "http://www.openarchives.org/ore/terms/";
+
+    public static final String NS_RDF =
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
     public static final String NS_RDFS =
             "http://www.w3.org/2000/01/rdf-schema#";
@@ -65,6 +71,7 @@ public interface Ontologies {
                     put("dcterms", NS_DCTERMS);
                     put("dcs", NS_DCS_TYPES);
                     put("foaf", NS_FOAF);
+                    put("ore", NS_ORE);
                     put("pcdm", NS_PCDM);
                     put("prof", NS_DCS_PKGTOOL_PROFILE);
                 }

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.dataconservancy.packaging.tool.model.ipm.Node;
-
 
 public class PackageStateSerializer
         implements NodeVisitor {
@@ -35,7 +35,6 @@ public class PackageStateSerializer
 
     @Override
     public void finish(PackageModelBuilderState state) {
-        // TODO Auto-generated method stub
 
     }
 

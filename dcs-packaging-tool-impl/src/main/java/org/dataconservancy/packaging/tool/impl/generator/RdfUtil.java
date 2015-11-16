@@ -16,12 +16,20 @@
 
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections.MapUtils;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -30,6 +38,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.system.PrefixMapFactory;
+
+import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 
 /**
  * Collection of RDF slicing and dicing utilities.
@@ -38,6 +51,10 @@ import org.apache.jena.rdf.model.Statement;
  * @version $Id$
  */
 class RdfUtil {
+
+    @SuppressWarnings("unchecked")
+    private static final Map<String, String> PREFIX_MAP = MapUtils
+            .invertMap(Ontologies.PREFIX_MAP);
 
     /**
      * Select all triples that are "local" to the given subject.
@@ -102,7 +119,7 @@ class RdfUtil {
 
         return excised;
     }
-    
+
     public static Model copy(Model from, Selector selector) {
         Model extracted = ModelFactory.createDefaultModel();
 
@@ -137,5 +154,32 @@ class RdfUtil {
     public static String bare(String uri) {
         String s = uri.toString() + "#";
         return s.substring(0, s.indexOf('#'));
+    }
+
+    public static InputStream toInputStream(Model model, RDFFormat format) {
+        /*
+         * Maintain a local prefix map containing only prefixes/namespaces we
+         * actually use
+         */
+        Map<String, String> prefixes = new HashMap<>();
+        model.listStatements()
+                .mapWith(stmt -> stmt.getPredicate().getNameSpace())
+                .filterKeep(ns -> PREFIX_MAP.containsKey(ns)).toSet()
+                .forEach(ns -> prefixes.put(PREFIX_MAP.get(ns), ns));
+
+        /*
+         * Now serialize the domain object. Note that PackageAssembler wants an
+         * InputStream
+         */
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        RDFDataMgr.createGraphWriter(format).write(out,
+                                                   model.getGraph(),
+                                                   PrefixMapFactory
+                                                           .create(prefixes),
+                                                   null,
+                                                   null);
+
+        return new ByteArrayInputStream(out.toByteArray());
     }
 }

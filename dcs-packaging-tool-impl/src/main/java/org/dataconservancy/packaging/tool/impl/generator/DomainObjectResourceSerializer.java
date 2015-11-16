@@ -16,9 +16,7 @@
 
 package org.dataconservancy.packaging.tool.impl.generator;
 
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.InputStream;
 
 import java.net.URI;
 
@@ -32,9 +30,7 @@ import org.apache.commons.collections.MapUtils;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.util.ResourceUtils;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
@@ -46,6 +42,7 @@ import static org.dataconservancy.packaging.tool.impl.generator.IPMUtil.path;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.bare;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputStream;
 
 /**
  * Serializes domain object graphs into individual resources in a bag.
@@ -211,50 +208,13 @@ class DomainObjectResourceSerializer
                                                                                            "")));
         }
 
-        /*
-         * Maintain a local prefix map containing only prefixes/namespaces we
-         * actually use
-         */
-        Map<String, String> prefixes = new HashMap<>();
-        domainObjectGraph.listStatements()
-                .mapWith(stmt -> stmt.getPredicate().getNameSpace())
-                .filterKeep(ns -> PREFIX_MAP.containsKey(ns)).toSet()
-                .forEach(ns -> prefixes.put(PREFIX_MAP.get(ns), ns));
-
-        /*
-         * Now serialize the domain object. Note that PackageAssembler wants an
-         * InputStream
-         */
-        try (PipedInputStream sink = new PipedInputStream();
-                PipedOutputStream src = new PipedOutputStream()) {
-
-            src.connect(sink);
-
-            exe.execute(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    RDFDataMgr.createGraphWriter(RDFFormat.TURTLE)
-                            .write(src,
-                                   domainObjectGraph.getGraph(),
-                                   PrefixMapFactory.create(prefixes),
-                                   null,
-                                   null);
-
-                    try {
-                        src.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
-            });
-
-            state.assembler.putResource(node.getIdentifier(), sink);
-        } catch (IOException e) {
+        try (InputStream stream =
+                toInputStream(domainObjectGraph, RDFFormat.TURTLE)) {
+            state.assembler.putResource(node.getIdentifier(), stream);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
     }
 
     /*

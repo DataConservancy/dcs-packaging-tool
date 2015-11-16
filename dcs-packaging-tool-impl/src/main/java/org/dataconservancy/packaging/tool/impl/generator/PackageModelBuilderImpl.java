@@ -19,6 +19,8 @@ package org.dataconservancy.packaging.tool.impl.generator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jena.rdf.model.ModelFactory;
+
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
@@ -73,6 +75,7 @@ public class PackageModelBuilderImpl
         builderState.domainObjects = pstate.getDomainObjectRDF();
         builderState.assembler = assembler;
         builderState.params = params;
+        builderState.manifest = ModelFactory.createDefaultModel();
 
         try {
 
