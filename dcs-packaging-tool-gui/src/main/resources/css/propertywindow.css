@@ -49,12 +49,12 @@
      	1, 0.0, 0, 0);
  }
 
-.PackageToolPopup .check-box .box {
-    -fx-background-color: #168176;
+.check-box .box {
+    -fx-background-color: #D06C23;
 }
 
-.PackageToolPopup check-box:hover .box {
-    -fx-background-color: #2F8D83;
+.check-box:hover .box {
+    -fx-background-color: #E28C4C;
 }
 
 .check-box:selected .mark {
