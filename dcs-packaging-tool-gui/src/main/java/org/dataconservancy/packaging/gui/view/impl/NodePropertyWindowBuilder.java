@@ -101,7 +101,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         nodePropertiesWindow.setMinHeight(500);
         nodePropertiesWindow.setMinWidth(540);
 
-        nodePropertiesWindow.getStylesheets().add("/css/app.css");
+        nodePropertiesWindow.getStylesheets().add("/css/propertywindow.css");
         nodePropertiesWindow.getStyleClass().add(PACKAGE_TOOL_POPUP_CLASS);
 
         this.metadataInheritanceButtonMap = metadataInheritanceButtonMap;
@@ -174,13 +174,13 @@ public class NodePropertyWindowBuilder implements CssConstants {
         propertiesTab.setClosable(false);
         propertiesTab.setText(nodeType.getLabel());
         ScrollPane propertiesPane = new ScrollPane();
-        propertiesPane.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
         propertiesPane.setHvalue(500);
         propertiesPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         propertiesPane.setMinWidth(500);
         propertiesPane.setFitToWidth(true);
 
         VBox propertyContent = new VBox(8);
+        propertyContent.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
         propertiesPane.setContent(propertyContent);
         propertiesTab.setContent(propertiesPane);
 

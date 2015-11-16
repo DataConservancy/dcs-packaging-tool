@@ -74,6 +74,15 @@
 	-fx-pref-height: 28px;
 }
 
+.ViewFooter .button .hover {
+	-fx-pref-height: 26px;
+
+}
+
+.ViewFooter .button .pressed {
+    -fx-pref-height: 24px;
+}
+
 .PackageToolPopup {
     -fx-border-color: #C8C8C8 #E0E0E0 #E0E0E0 #C8C8C8;
     -fx-border-width: 1, 3, 3, 1;
@@ -323,38 +332,6 @@
     -fx-image: url("../images/x.png");
 }
 
-.GroupTitle {
-    -fx-font-size: 18;
-}
-
-.PackageToolPopup .NodePropertyWindow {
-    -fx-padding: 12px 12px 12px 12px;
-}
-
-.PackageToolPopup .NodePropertyWindow .PropertyTabContent {
-
-}
-
-.PackageToolPopup .NodePropertyWindow .PropertyTabContent .combo-box:disabled {
-  -fx-text-fill: #000000;
-  -fx-prompt-text-fill: #000000;
-  -fx-opacity: 1.0;
-  -fx-background-color: white;
-}
-
-.PackageToolPopup .NodePropertyWindow .PropertyTabContent .Property {
-    -fx-translate-x: 12px;
-}
-
-.PackageToolPopup .NodePropertyWindow .PropertyTabContent .SubProperty {
-    -fx-translate-x: 18px;
-}
-
-.PackageToolPopup .NodePropertyWindow .InheritanceControls {
-    -fx-background-color: #E7E7E7;
-    -fx-padding 14px;
-}
-
 .CreateNewPackage {
 	-fx-padding: 30 40 0 40;
 }
@@ -375,22 +352,24 @@
 }
 
 .DirectoryBox .button {
-    -fx-background-color: #168176;
+    -fx-background-color: #408F87;
 	-fx-font-size: 12;
     -fx-effect: dropshadow( one-pass-box , #005048,
     2, 0.0, 2, 2);
+    -fx-translate-y: -2px;
 }
 
 .DirectoryBox .button:hover {
-	-fx-background-color: #2F8D83;
+	-fx-background-color: #30A195;
 	-fx-effect: dropshadow( one-pass-box , #005048,
     	3, 0.0, 3, 3);
 }
 
 .DirectoryBox .button:pressed {
-    -fx-background-color: #168176;
+    -fx-background-color: #408F87;
 	-fx-effect: dropshadow( one-pass-box , #005048,
     	1, 0.0, 1, 1);
+    -fx-translate-y: 0px;
 }
 
 .DirectoryBox .InvisibleTextField {
