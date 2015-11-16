@@ -19,6 +19,11 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
@@ -46,13 +51,15 @@ import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.T
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageName;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.packageTreeRDF;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestObjects.userProperties;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
  * Tests the PackageStateSerializer using <em>production</em> configuration settings (i.e. it does not use test
- * Spring configuration files).
+ * Spring configuration files).  This test class <em>does</em> use test objects from the {@code dcs-packaging-tool-ser}
+ * module to populate instances of {@code PackageState}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml", "classpath:/applicationContext.xml"})
@@ -120,7 +127,7 @@ public class PackageStateSerializationIT {
 
     /**
      * Serializes the entire PackageState object to a zip file, then re-reads the zip file and initializes a fresh
-     * PackageState object.
+     * PackageState object.  The two state objects are compared for equality.
      *
      * @throws Exception
      */
@@ -141,10 +148,15 @@ public class PackageStateSerializationIT {
         // Verify the non-nullity of each @Serialize field in PackageState
         annotatedPackageStateFields.forEach((streamId, descriptor) -> {
             try {
-                assertNotNull(descriptor.getReadMethod().invoke(deserializedState));
+                assertNotNull(
+                        "Expected non-null value for field " + descriptor.getName() + " on deserialized PackageState",
+                        descriptor.getReadMethod().invoke(deserializedState));
             } catch (Exception e) {
                 fail(e.getMessage());
             }
         });
+
+        SerializeEqualsTester.serializeEquals(state, deserializedState);
     }
+
 }
