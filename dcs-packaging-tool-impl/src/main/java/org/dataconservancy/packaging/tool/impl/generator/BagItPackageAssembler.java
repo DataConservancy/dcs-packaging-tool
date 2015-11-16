@@ -107,7 +107,6 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File bagBaseDir = null;
     private File payloadDir = null;
     private File packageLocationDir = null;
-    private File structureDir = null;
     private File ontologyDir = null;
     private File stateDir = null;
     private File remDir = null;
@@ -282,7 +281,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the structure directory
-        structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-DESC");
+        File structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-DESC");
         if (!structureDir.exists()) {
             log.info("Creating package structure dir :" + structureDir.getPath());
             boolean isDirCreated = structureDir.mkdirs();
@@ -374,11 +373,24 @@ public class BagItPackageAssembler implements PackageAssembler {
             URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
 
             fileURIMap.put(relativeURI, newFile.toURI());
-            if (type.equals(PackageResourceType.DATA)) {
+            switch(type){
+                case DATA:
+                    dataFiles.add(newFile);
+                    break;
+                case ORE_REM:
+                     params.addParam(BagItParameterNames.PACKAGE_MANIFEST, relativeURI.toString());
+                case ONTOLOGY:
+                case METADATA:
+                case PACKAGE_STATE:
+                default:
+                    tagFiles.add(newFile);
+                    break;
+            }
+            /*if (type.equals(PackageResourceType.DATA)) {
                 dataFiles.add(newFile);
             } else {
                 tagFiles.add(newFile);
-            }
+            } */
             return relativeURI;
 
         } catch (DecoderException | URISyntaxException e) {
@@ -771,6 +783,10 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         if (!paramNames.contains(BagItParameterNames.BAGIT_PROFILE_ID)) {
             missingParams.add(BagItParameterNames.BAGIT_PROFILE_ID);
+        }
+
+        if(!paramNames.contains(BagItParameterNames.PACKAGE_MANIFEST)) {
+            missingParams.add(BagItParameterNames.PACKAGE_MANIFEST);
         }
 
         if (params.getParam(BagItParameterNames.PACKAGE_FORMAT_ID, 0).equals(PackagingFormat.BOREM.toString())

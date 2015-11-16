@@ -85,6 +85,7 @@ public class BagItPackageAssemblerTest {
     String stateDir = "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE";
     String remDir = "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM";
     String ontologyDir = "META-INF/org.dataconservancy.bagit/ONT";
+    String RemURI;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -102,6 +103,7 @@ public class BagItPackageAssemblerTest {
         contactEmail = "Willy.Bean@Bushs.com";
         contactPhone = "0000000000";
         checksumAlg = "md5";
+        RemURI = "bag://" + remDir + "remFile.ttl";
 
         contentLocation = this.getClass().getResource("/TestContent/").getPath();
         contentLocationFile = new File(contentLocation);
@@ -834,6 +836,7 @@ public class BagItPackageAssemblerTest {
         params.addParam(BagItParameterNames.CONTACT_PHONE, contactPhone);
         params.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
         params.addParam(BagItParameterNames.PKG_BAG_DIR, packageName);
+        params.addParam(BagItParameterNames.PACKAGE_MANIFEST, RemURI);
     }
 
     private void cleanupDirectory(File directory) {
