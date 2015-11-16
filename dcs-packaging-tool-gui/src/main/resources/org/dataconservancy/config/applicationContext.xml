@@ -90,7 +90,7 @@
     <property name="creatorPropertiesByString" value="${ontology.creatorProperties}"/>
   </bean>
 
-  <bean id="phoneNumberValidator" class="org.dataconservancy.packaging.gui.util.PhoneNumberValidator">
+  <bean id="phoneNumberValidator" class="org.dataconservancy.packaging.tool.impl.support.PhoneNumberValidator">
     <property name="localCountryCode" value="${localCountryCode}"/>
   </bean>
 

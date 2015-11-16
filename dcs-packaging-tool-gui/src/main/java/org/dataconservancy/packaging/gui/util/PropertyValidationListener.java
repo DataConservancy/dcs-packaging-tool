@@ -25,6 +25,8 @@ import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
+import org.dataconservancy.packaging.tool.impl.support.Validator;
+import org.dataconservancy.packaging.tool.impl.support.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 /**

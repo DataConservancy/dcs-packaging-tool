@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.packaging.gui.util;
+package org.dataconservancy.packaging.tool.impl.support;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -38,6 +38,8 @@ import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.UserDefinedPropertyVocabulary;
+import org.dataconservancy.packaging.tool.impl.support.Validator;
+import org.dataconservancy.packaging.tool.impl.support.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;

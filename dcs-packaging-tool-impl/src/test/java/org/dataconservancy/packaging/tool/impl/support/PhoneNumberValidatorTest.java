@@ -15,9 +15,8 @@
  */
 
 
-package org.dataconservancy.packaging.gui;
+package org.dataconservancy.packaging.tool.impl.support;
 
-import org.dataconservancy.packaging.gui.util.PhoneNumberValidator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dataconservancy.packaging.gui.util;
 
-import org.dataconservancy.dcs.util.UriUtility;
+package org.dataconservancy.packaging.tool.impl.support;
 
 /**
- * Class which provide convenient method to validate a string for an RDF URI
+ * An interface for validators
  */
-public class UrlValidator implements Validator{
+public interface Validator {
 
-    @Override
-    public boolean isValid(String uriString) {
-        return UriUtility.isHttpUrl(uriString);
-    }
-
+     boolean isValid(String string);
 }

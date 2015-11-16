@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.packaging.gui.util;
+package org.dataconservancy.packaging.tool.impl.support;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;

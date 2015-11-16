@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.packaging.gui;
+package org.dataconservancy.packaging.tool.impl.support;
 
-import org.dataconservancy.packaging.gui.util.Validator;
-import org.dataconservancy.packaging.gui.util.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.junit.Assert;
 import org.junit.Test;

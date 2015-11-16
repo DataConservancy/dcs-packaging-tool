@@ -1,4 +1,4 @@
-package org.dataconservancy.packaging.gui.util;
+package org.dataconservancy.packaging.tool.impl.support;
 
 import java.net.URI;
 import java.net.URISyntaxException;

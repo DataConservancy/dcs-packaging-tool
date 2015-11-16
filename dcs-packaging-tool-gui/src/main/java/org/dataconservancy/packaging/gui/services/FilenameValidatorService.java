@@ -16,7 +16,7 @@
 
 package org.dataconservancy.packaging.gui.services;
 
-import org.dataconservancy.packaging.gui.util.FilenameValidator;
+import org.dataconservancy.packaging.tool.impl.support.FilenameValidator;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;

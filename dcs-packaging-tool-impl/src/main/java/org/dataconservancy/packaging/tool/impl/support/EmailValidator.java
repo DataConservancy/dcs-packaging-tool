@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.packaging.gui.util;
+package org.dataconservancy.packaging.tool.impl.support;
 
 import java.util.regex.Pattern;
 
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * email address could look like an email address but not really be real.
  *
  */
-public class EmailValidator implements Validator{
+public class EmailValidator implements Validator {
 
     private final static Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$");
 

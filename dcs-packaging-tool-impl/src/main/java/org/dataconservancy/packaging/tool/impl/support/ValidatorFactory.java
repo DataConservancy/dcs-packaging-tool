@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.packaging.gui.util;
+package org.dataconservancy.packaging.tool.impl.support;
 
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 

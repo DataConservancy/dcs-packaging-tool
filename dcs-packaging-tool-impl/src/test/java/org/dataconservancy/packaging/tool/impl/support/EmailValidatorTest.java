@@ -15,15 +15,11 @@
  */
 
 
-package org.dataconservancy.packaging.gui;
+package org.dataconservancy.packaging.tool.impl.support;
 
-import org.dataconservancy.packaging.gui.util.Validator;
-import org.dataconservancy.packaging.gui.util.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
+import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test class for EmailValidator
@@ -36,13 +32,13 @@ public class EmailValidatorTest {
 
     @Test
     public void testValidEmails() {
-        assertTrue(ev.isValid("blah@blah.com"));
+        Assert.assertTrue(ev.isValid("blah@blah.com"));
     }
 
     @Test
     public void testInvalidEmails() {
-        assertFalse(ev.isValid("jack.com"));
-        assertFalse(ev.isValid("@jack.com"));
+        Assert.assertFalse(ev.isValid("jack.com"));
+        Assert.assertFalse(ev.isValid("@jack.com"));
     }
 
 }
