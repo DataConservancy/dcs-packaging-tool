@@ -102,6 +102,16 @@ class RdfUtil {
 
         return excised;
     }
+    
+    public static Model copy(Model from, Selector selector) {
+        Model extracted = ModelFactory.createDefaultModel();
+
+        from.listStatements(selector).forEachRemaining(s -> {
+            extracted.add(s);
+        });
+
+        return extracted;
+    }
 
     static Collection<Resource> blankNodesReachableFrom(Resource subject) {
         Set<Resource> blankNodes = new HashSet<>();

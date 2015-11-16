@@ -83,13 +83,13 @@ public class RdfUtilTest {
         int triple_count_2b = 0;
 
         try (InputStream in =
-                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2a/2a.ttl")) {
+                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2/2.ttl")) {
             orig.read(in, null, "TTL");
             triple_count_2a = orig.listStatements().toSet().size();
         }
 
         try (InputStream in =
-                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2a/2b/2b.ttl")) {
+                RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2/file.txt.ttl")) {
             orig.read(in, null, "TTL");
             triple_count_2b =
                     orig.listStatements().toSet().size() - triple_count_2a;

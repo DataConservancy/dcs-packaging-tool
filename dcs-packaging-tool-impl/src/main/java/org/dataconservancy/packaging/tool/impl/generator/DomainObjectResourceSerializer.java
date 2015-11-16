@@ -22,14 +22,18 @@ import java.io.PipedOutputStream;
 
 import java.net.URI;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.apache.commons.collections.MapUtils;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.util.ResourceUtils;
 
@@ -62,7 +66,8 @@ class DomainObjectResourceSerializer
 
     ExecutorService exe = Executors.newCachedThreadPool();
 
-    PrefixMap PREFIX_MAP = PrefixMapFactory.create(Ontologies.PREFIX_MAP);
+    @SuppressWarnings("unchecked")
+    Map<String, String> PREFIX_MAP = MapUtils.invertMap(Ontologies.PREFIX_MAP);
 
     public void setPackageStateSerializer(PackageStateSerializer ser) {
         this.serializer = ser;
@@ -72,18 +77,90 @@ class DomainObjectResourceSerializer
     @Override
     public void init(PackageModelBuilderState state) {
 
-        state.tree.walk(node -> {
-            URI former = node.getDomainObject();
-            node.setDomainObject(state.assembler
-                    .reserveResource(path(node, ".ttl"),
-                                     PackageResourceType.DATA));
+        /*
+         * First, build a sorted map of all resources in the model. We'll be
+         * doing URI swapping/remapping to be consistent with resources and
+         * linking in the bag.
+         */
+        TreeMap<String, Resource> originalResources = new TreeMap<>();
+        state.domainObjects.listSubjects()
+                .forEachRemaining(s -> originalResources.put(s.toString(), s));
+        state.domainObjects
+                .listObjects()
+                .filterKeep(o -> o.isResource() && !o.isAnon())
+                .forEachRemaining(o -> originalResources.put(o.toString(),
+                                                             o.asResource()));
 
-            ResourceUtils.renameResource(state.domainObjects.getResource(former
-                    .toString()), node.getDomainObject().toString());
-        });
+        state.tree
+                .walk(node -> {
+                    /* Get the former domain object URI */
+                    URI originalDomainObjectURI = node.getDomainObject();
+
+                    /* This is where the domain object will be serialized */
+                    node.setIdentifier(state.assembler
+                            .reserveResource(path(node, ".ttl"),
+                                             PackageResourceType.DATA));
+
+                    URI newDomainObjectURI = node.getIdentifier();
+
+                    if (node.getFileInfo().isFile()) {
+                        try {
+                            URI binaryURI =
+                                    state.assembler
+                                            .createResource(path(node, ""),
+                                                            PackageResourceType.DATA,
+                                                            node.getFileInfo()
+                                                                    .getLocation()
+                                                                    .toURL()
+                                                                    .openStream());
+
+                            URI originalFileLocation =
+                                    node.getFileInfo().getLocation();
+                            if (!state.domainObjects
+                                    .containsResource(state.domainObjects
+                                            .getResource(originalFileLocation
+                                                    .toString()))) {
+
+                                /*
+                                 * If the file content location is not linked
+                                 * to, then the domain object URI *is* the
+                                 * binary URI
+                                 */
+                                newDomainObjectURI = binaryURI;
+                            } else {
+                                /*
+                                 * We replace references to file location with
+                                 * the binary URI
+                                 */
+                                remap(state.domainObjects,
+                                      bare(node.getFileInfo().getLocation()
+                                              .toString()),
+                                      binaryURI.toString(),
+                                      originalResources);
+
+                            }
+
+                            node.getFileInfo().setLocation(binaryURI);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    node.setDomainObject(newDomainObjectURI);
+
+                    /*
+                     * Rebase all URIs and hash URIs to the assembler-provided
+                     * URI
+                     */
+                    remap(state.domainObjects,
+                          bare(originalDomainObjectURI.toString()),
+                          node.getDomainObject().toString(),
+                          originalResources);
+
+                });
     }
 
-    /* Serialize the domain object */
+    /* Serialize the domain object, and save the binary content */
     @Override
     public void visitNode(Node node, PackageModelBuilderState state) {
 
@@ -95,38 +172,64 @@ class DomainObjectResourceSerializer
         Model domainObjectGraph =
                 cut(state.domainObjects, selectLocal(primaryDomainObject));
 
-        /* Give it the null relative URI */
-        String baseURI = bare(primaryDomainObject.getURI());
-        domainObjectGraph
-                .listSubjects()
-                .toSet()
-                .stream()
-                .filter(subject -> subject.toString().contains(baseURI))
-                .forEach(subject -> ResourceUtils.renameResource(subject,
-                                                                 subject.toString()
-                                                                         .replaceFirst(baseURI,
-                                                                                       "")));
-        /* Now serialize. Note that PackageAssembler wants an InputStream */
-        try (PipedOutputStream src = new PipedOutputStream();
-                PipedInputStream sink = new PipedInputStream()) {
+        /*
+         * If the domain object is not at the binary URI, give it the null
+         * relative URI for serialization.
+         */
+        if (node.getDomainObject().equals(node.getIdentifier())) {
+            String baseURI = bare(primaryDomainObject.getURI());
+            domainObjectGraph
+                    .listSubjects()
+                    .toSet()
+                    .stream()
+                    .filter(subject -> subject.toString().contains(baseURI))
+                    .forEach(subject -> ResourceUtils.renameResource(subject,
+                                                                     subject.toString()
+                                                                             .replaceFirst(baseURI,
+                                                                                           "")));
+        }
 
-            sink.connect(src);
+        /*
+         * Maintain a local prefix map containing only prefixes/namespaces we
+         * actually use
+         */
+        Map<String, String> prefixes = new HashMap<>();
+        domainObjectGraph.listStatements()
+                .mapWith(stmt -> stmt.getPredicate().getNameSpace())
+                .filterKeep(ns -> PREFIX_MAP.containsKey(ns)).toSet()
+                .forEach(ns -> prefixes.put(PREFIX_MAP.get(ns), ns));
+
+        /*
+         * Now serialize the domain object. Note that PackageAssembler wants an
+         * InputStream
+         */
+        try (PipedInputStream sink = new PipedInputStream();
+                PipedOutputStream src = new PipedOutputStream()) {
+
+            src.connect(sink);
 
             exe.execute(new Runnable() {
 
                 @Override
                 public void run() {
 
-                    RDFDataMgr.createGraphWriter(RDFFormat.TURTLE_PRETTY)
+                    RDFDataMgr.createGraphWriter(RDFFormat.TURTLE)
                             .write(src,
                                    domainObjectGraph.getGraph(),
-                                   PREFIX_MAP,
-                                   "",
+                                   PrefixMapFactory.create(prefixes),
+                                   null,
                                    null);
+
+                    try {
+                        src.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                 }
             });
 
-            state.assembler.putResource(node.getDomainObject(), sink);
+            state.assembler.putResource(node.getIdentifier(), sink);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -144,4 +247,24 @@ class DomainObjectResourceSerializer
         }
     }
 
+    private static void remap(Model model,
+                              String oldBaseURI,
+                              String newBaseURI,
+                              TreeMap<String, Resource> resources) {
+
+        Map<String, Resource> toReplace = new HashMap<>();
+
+        /* Consider the the URI plus any hash fragments */
+        toReplace.putAll(resources.subMap(oldBaseURI, true, oldBaseURI, true));
+        toReplace.putAll(resources.subMap(oldBaseURI + "#", oldBaseURI + "#"
+                + Character.MAX_VALUE));
+
+        /* Swap out the base URI for each matching resource */
+        toReplace
+                .entrySet()
+                .forEach(res -> ResourceUtils.renameResource(res.getValue(),
+                                                             res.getKey()
+                                                                     .replaceFirst(oldBaseURI,
+                                                                                   newBaseURI)));
+    }
 }

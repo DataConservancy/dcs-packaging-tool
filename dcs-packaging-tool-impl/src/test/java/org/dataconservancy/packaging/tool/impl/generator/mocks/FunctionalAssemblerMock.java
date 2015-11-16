@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.dataconservancy.packaging.tool.impl.generator.mocks;
 
 import static org.junit.Assert.assertTrue;
@@ -33,11 +34,10 @@ public class FunctionalAssemblerMock
         implements PackageAssembler {
 
     private Map<URI, File> files = new HashMap<URI, File>();
-    
+
     private String pathPart = "FunctionalAssemblerMock/";
 
     final File dir;
-
 
     public FunctionalAssemblerMock(File dir) {
         this.dir = new File(dir, pathPart);
@@ -52,9 +52,9 @@ public class FunctionalAssemblerMock
     @Override
     public URI reserveResource(String path, PackageResourceType type) {
         try {
-            File reserved = File.createTempFile("resource-", ".xml", dir);
+            File reserved = new File(dir, path);
             reserved.deleteOnExit();
-            URI uri = URI.create("file://" + pathPart + reserved.getName());
+            URI uri = reserved.toURI();
             files.put(uri, reserved);
             return uri;
         } catch (Exception e) {
@@ -64,13 +64,12 @@ public class FunctionalAssemblerMock
 
     @Override
     public void putResource(URI uri, InputStream content) {
-        try {
+        File file = files.get(uri);
+        file.getParentFile().mkdirs();
+        try (FileOutputStream out = new FileOutputStream(file)) {
             assertTrue(files.containsKey(uri));
-            FileOutputStream out = new FileOutputStream(files.get(uri));
+
             IOUtils.copy(content, out);
-            
-            
-            out.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
