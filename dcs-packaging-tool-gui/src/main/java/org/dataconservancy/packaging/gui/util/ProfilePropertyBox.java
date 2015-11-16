@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -30,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ProfilePropertyBox extends VBox {
+public class ProfilePropertyBox extends VBox implements CssConstants {
     PropertyConstraint propertyConstraint;
     List<PropertyBox> propertyBoxes;
     List<ProfilePropertyBox> subPropertyBoxes;
@@ -106,6 +107,7 @@ public class ProfilePropertyBox extends VBox {
                         value = formatService.formatPropertyValue(property);
                     }
                     PropertyBox propertyBox = generatePropertyBox(value, editable, property.getPropertyType());
+
                     propertyBox.getPropertyInput().setPrefWidth(prefWidth);
 
                     propertyBoxes.add(propertyBox);
@@ -185,6 +187,7 @@ public class ProfilePropertyBox extends VBox {
 
         for (PropertyConstraint subConstraint : sortedProperties) {
             ProfilePropertyBox subProfilePropertyBox = new ProfilePropertyBox(subConstraint, node, profileService, disciplineLoadingService);
+            subProfilePropertyBox.getStyleClass().add(SUB_PROPERTY);
             nodePropertyBoxes.add(subProfilePropertyBox);
             propertyValueBox.getChildren().add(subProfilePropertyBox);
             addChangeListenerToProfileBox(subProfilePropertyBox, listener);

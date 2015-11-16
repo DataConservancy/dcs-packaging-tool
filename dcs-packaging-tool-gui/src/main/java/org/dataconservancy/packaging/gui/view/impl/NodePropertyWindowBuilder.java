@@ -145,6 +145,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         relationshipTab.setClosable(false);
         relationshipTab.setText(TextFactory.getText(Labels.LabelKey.USER_PROPERTIES_LABEL));
         ScrollPane relationshipPane = new ScrollPane();
+        relationshipPane.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         relationshipPane.setContent(createUserDefinedPropertiesTab(userDefinedProperties));
@@ -173,7 +174,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         propertiesTab.setClosable(false);
         propertiesTab.setText(nodeType.getLabel());
         ScrollPane propertiesPane = new ScrollPane();
-        propertiesPane.getStyleClass().add(PROPERTIES_POPUP_CLASS);
+        propertiesPane.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
         propertiesPane.setHvalue(500);
         propertiesPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         propertiesPane.setMinWidth(500);
@@ -229,9 +230,12 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         final VBox inheritanceBox = new VBox(12);
         if (node.getNodeType().getInheritableProperties() != null) {
-            inheritanceBox.getChildren().add(new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_LABEL)));
+            Label inheritanceTitle = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_LABEL));
+            inheritanceTitle.getStyleClass().add(GROUP_TITLE);
 
-            inheritanceBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
+            inheritanceBox.getChildren().add(inheritanceTitle);
+
+            inheritanceBox.getStyleClass().add(INHERITANCE_CONTROLS);
 
             //create label to explain what this tab is about.
             Label inheritanceTabIntroLabel = new Label(TextFactory.getText(Labels.LabelKey.INHERITANCE_TAB_INTRO));
@@ -292,8 +296,6 @@ public class NodePropertyWindowBuilder implements CssConstants {
         final VBox relationshipsBox = new VBox(38);
 
         final double addNewButtonMaxWidth = 200;
-
-        relationshipsBox.getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
 
         //Create the button for adding new relationships this will add a new set of relationship controls.
         final Button addNewUserDefinedPropertyButton = new Button(TextFactory.getText(Labels.LabelKey.ADD_NEW_PROPERTY_BUTTON));
@@ -432,6 +434,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
             setSpacing(10);
             getStyleClass().add(PACKAGE_TOOL_POPUP_PROPERTY_TAB);
             Label titleLabel = new Label();
+            titleLabel.getStyleClass().add(GROUP_TITLE);
             titleLabel.setText(title);
 
             getChildren().add(titleLabel);
@@ -439,6 +442,8 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         void addProperty(PropertyConstraint constraint, Node node) {
             ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService, disciplineLoadingService);
+            profilePropertyBox.getStyleClass().add(PROPERTY);
+
             nodePropertyBoxes.add(profilePropertyBox);
             getChildren().add(profilePropertyBox);
         }

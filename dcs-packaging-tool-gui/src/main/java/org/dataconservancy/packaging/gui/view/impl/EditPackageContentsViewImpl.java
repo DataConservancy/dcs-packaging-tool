@@ -404,8 +404,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         MenuItem propertiesItem = new MenuItem(TextFactory.getText(LabelKey.PROPERTIES_LABEL));
         itemList.add(propertiesItem);
         propertiesItem.setOnAction(actionEvent -> {
-            VBox detailsBox = new VBox();
-            detailsBox.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
             showNodePropertiesWindow(packageNode, label);
             artifactTree.getSelectionModel().select(treeItem);
         });
