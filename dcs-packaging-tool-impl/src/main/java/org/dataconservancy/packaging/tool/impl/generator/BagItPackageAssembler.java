@@ -92,10 +92,10 @@ public class BagItPackageAssembler implements PackageAssembler {
 
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-    private final static String requiredParametersMessage =  "These following parameters are required for the " +
-            "operation of this Assembler: " +   BagItParameterNames.PACKAGE_NAME + ", " +
-                                                BagItParameterNames.PACKAGE_LOCATION + ", " +
-                                                BagItParameterNames.BAGIT_PROFILE_ID;
+    private final static String requiredParametersMessage = "These following parameters are required for the " +
+            "operation of this Assembler: " + BagItParameterNames.PACKAGE_NAME + ", " +
+            BagItParameterNames.PACKAGE_LOCATION + ", " +
+            BagItParameterNames.BAGIT_PROFILE_ID;
 
     private final static String ENCODING = "UTF-8";
     private final static String VERSION = "0.97";
@@ -107,6 +107,10 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File bagBaseDir = null;
     private File payloadDir = null;
     private File packageLocationDir = null;
+    private File structureDir = null;
+    private File ontologyDir = null;
+    private File stateDir = null;
+    private File remDir = null;
 
     private boolean isExploded = false;
 
@@ -143,31 +147,32 @@ public class BagItPackageAssembler implements PackageAssembler {
     /**
      * Initializes the Assembler. Operations include:
      * <ul>
-     *     <li>Checking for required parameters</li>
-     *     <li>Creating a base directory for the bag</li>
-     *     <li>Creating a payload directory</li>
+     * <li>Checking for required parameters</li>
+     * <li>Creating a base directory for the bag</li>
+     * <li>Creating a payload directory</li>
      * </ul>
-     *
+     * <p>
      * Required parameters for this kind of Assembler include:
      * <ul>
-     *     <li>package-name</li>
-     *     <li>Bag-It-Profile-Identifier</li>
-     *     <li>Contact-Name</li>
-     *     <li>Contact-Phone</li>
-     *     <li>Contact-Email</li>
+     * <li>package-name</li>
+     * <li>Bag-It-Profile-Identifier</li>
+     * <li>Contact-Name</li>
+     * <li>Contact-Phone</li>
+     * <li>Contact-Email</li>
      * </ul>
-     *
+     * <p>
      * Optional with defaults parameters:
      * <ul>
-     *     <li> archiving-format: when not set, is defaulted to ".tar" </li>
-     *     <li> compression-format: when not set, no compression will be performed on the serialized content. </li>
-     *     <li> checksum-algs: when not set, is defaulted to "md5" </li>
+     * <li> archiving-format: when not set, is defaulted to ".tar" </li>
+     * <li> compression-format: when not set, no compression will be performed on the serialized content. </li>
+     * <li> checksum-algs: when not set, is defaulted to "md5" </li>
      * </ul>
-     *
+     * <p>
      * NOTE: If this is called a second time, the first initialization will still take effect unless parameters are
      * specifically overridden in the second call.  It's probably not a good idea to call this more than once in most
      * cases; if you just need to add parameters after initialization, use the
      * {@link #addParameter(String, String) addParameter} method.
+     *
      * @param params The parameters object containing whatever is needed for the assembler.
      */
     @Override
@@ -197,7 +202,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             validateArchivingFormat();
         }
 
-        if(archivingFormat.equals("exploded")){
+        if (archivingFormat.equals("exploded")) {
             isExploded = true;
         }
 
@@ -213,9 +218,9 @@ public class BagItPackageAssembler implements PackageAssembler {
         //This will help prevent deleting data if a user tries to create a package in place.
         String packageStagingLocationName = System.getProperty("user.home") + File.separator + "DCS-PackageToolStaging";
         String packageStagingLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, 0);
-        String packageLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_LOCATION,0);
+        String packageLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
 
-        if(isExploded) {
+        if (isExploded) {
             if (packageLocationParameterValue != null && !packageLocationParameterValue.isEmpty()) {
                 packageStagingLocationName = packageLocationParameterValue;
             }
@@ -272,11 +277,55 @@ public class BagItPackageAssembler implements PackageAssembler {
             boolean isDirCreated = payloadDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
-                        "Attempt to create a payload directory for bag at " + payloadDir.getPath()+ " failed.");
+                        "Attempt to create a payload directory for bag at " + payloadDir.getPath() + " failed.");
             }
         }
 
+        //Creating the structure directory
+        structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-DESC");
+        if (!structureDir.exists()) {
+            log.info("Creating package structure dir :" + structureDir.getPath());
+            boolean isDirCreated = structureDir.mkdirs();
+            if (!isDirCreated) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
+                        "Attempt to create a package structure directory for bag at " + structureDir.getPath() + " failed.");
+            }
+        }
+
+        //Creating the ontology directory
+        ontologyDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/ONT");
+        if (!ontologyDir.exists()) {
+            log.info("Creating ontology dir :" + ontologyDir.getPath());
+            boolean isDirCreated = ontologyDir.mkdirs();
+            if (!isDirCreated) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
+                        "Attempt to create an ontology directory for bag at " + ontologyDir.getPath() + " failed.");
+            }
+        }
+
+        //Creating the ORE-ReM directory
+        remDir = new File(structureDir, "ORE-REM");
+        if (!remDir.exists()) {
+            log.info("Creating ORE-ReM dir :" + remDir.getPath());
+            boolean isDirCreated = remDir.mkdirs();
+            if (!isDirCreated) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
+                        "Attempt to create the ORE-ReM directory for bag at " + remDir.getPath() + " failed.");
+            }
+        }
+
+        //Creating the package state directory
+        stateDir = new File(structureDir, "STATE");
+        if (!stateDir.exists()) {
+            log.info("Creating Package State dir :" + stateDir.getPath());
+            boolean isDirCreated = stateDir.mkdirs();
+            if (!isDirCreated) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
+                        "Attempt to create the Package State directory for bag at " + stateDir.getPath() + " failed.");
+            }
+        }
     }
+
 
 
     /**
@@ -300,6 +349,12 @@ public class BagItPackageAssembler implements PackageAssembler {
                 containingDirectory = payloadDir;
             } else if (type.equals(PackageResourceType.METADATA)) {
                 containingDirectory = bagBaseDir;
+            } else if(type.equals(PackageResourceType.ONTOLOGY)) {
+                containingDirectory = ontologyDir;
+            } else if(type.equals(PackageResourceType.PACKAGE_STATE)) {
+                containingDirectory = stateDir;
+            } else if(type.equals(PackageResourceType.ORE_REM)) {
+                containingDirectory = remDir;
             }
 
             log.debug("Containing dir: " + containingDirectory);

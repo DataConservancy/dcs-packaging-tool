@@ -82,6 +82,10 @@ public class BagItPackageAssemblerTest {
     String contactPhone;
     String checksumAlg;
 
+    String stateDir = "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE";
+    String remDir = "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM";
+    String ontologyDir = "META-INF/org.dataconservancy.bagit/ONT";
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Rule
@@ -164,6 +168,30 @@ public class BagItPackageAssemblerTest {
         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
         String expectedURI = "bag://" + packageName + "/"
                 +  "data" + "/" + filePath ;
+        assertTrue(expectedURI.equals(result.toString()));
+    }
+
+    @Test
+    public void testReserveURIForPackageStateFile() {
+        String filePath = "packageStateFile.zip";
+        URI result = underTest.reserveResource(filePath, PackageResourceType.PACKAGE_STATE);
+        String expectedURI = "bag://" + packageName + "/" + stateDir +"/" + filePath;
+        assertTrue(expectedURI.equals(result.toString()));
+    }
+
+    @Test
+    public void testReserveURIForRemFile() {
+        String filePath = "ORE-ReMFile";
+        URI result = underTest.reserveResource(filePath, PackageResourceType.ORE_REM);
+        String expectedURI = "bag://" + packageName + "/" + remDir +"/" + filePath;
+        assertTrue(expectedURI.equals(result.toString()));
+    }
+
+    @Test
+    public void testReserveURIForOntologyFile() {
+        String filePath = "ontology.xml";
+        URI result = underTest.reserveResource(filePath, PackageResourceType.ONTOLOGY);
+        String expectedURI = "bag://" + packageName + "/" + ontologyDir +"/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
     }
 
@@ -300,7 +328,8 @@ public class BagItPackageAssemblerTest {
 
         // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
         // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
-        assertEquals(10, files.size());
+        // and the directory structure under META-INF
+        assertEquals(16, files.size());
 
         // make sure that expected files are in there
         String pathSep = "/";
@@ -311,6 +340,12 @@ public class BagItPackageAssemblerTest {
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
     }
 
     /**
@@ -390,7 +425,8 @@ public class BagItPackageAssemblerTest {
 
         // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
         // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
-        assertEquals(10, files.size());
+        // and the directory structure under META-INF
+        assertEquals(16, files.size());
 
         // make sure that expected files are in there
         String pathSep = "/";
@@ -401,6 +437,12 @@ public class BagItPackageAssemblerTest {
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
     }
 
     /**
@@ -458,7 +500,7 @@ public class BagItPackageAssemblerTest {
 
         // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
         // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
-        assertEquals(10, files.size());
+        assertEquals(16, files.size());
 
         // make sure that expected files are in there
         String pathSep = "/";
@@ -469,6 +511,12 @@ public class BagItPackageAssemblerTest {
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC"+ pathSep ));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
     }
 
     /**
