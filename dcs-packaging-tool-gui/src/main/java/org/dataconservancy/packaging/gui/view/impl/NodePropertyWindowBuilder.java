@@ -31,6 +31,7 @@ import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
+import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.model.UserDefinedPropertyVocabulary;
 import org.dataconservancy.packaging.gui.model.UserDefinedPropertyGroupJSONBuilder;
@@ -184,7 +185,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         propertiesPane.setContent(propertyContent);
         propertiesTab.setContent(propertiesPane);
 
-        PropertyCategoryBox generalPropertyBox = new PropertyCategoryBox(nodeType.getLabel());
+        PropertyCategoryBox generalPropertyBox = new PropertyCategoryBox(TextFactory.format(Messages.MessageKey.TYPE_PROPERTY_LABEL, nodeType.getLabel()));
         propertyContent.getChildren().add(generalPropertyBox);
 
         List<PropertyConstraint> sortedProperties = new ArrayList<>();

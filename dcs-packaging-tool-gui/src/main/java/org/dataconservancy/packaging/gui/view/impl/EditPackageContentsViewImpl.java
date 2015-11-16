@@ -445,7 +445,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             });
         }
 
-        //If backing file
+        //If backing file is accessible allow the user to refresh
         if (packageNode.getFileInfo() != null && ipmService.checkFileInfoIsAccessible(packageNode)) {
             MenuItem refreshItem = new MenuItem(TextFactory.getText(LabelKey.REFRESH_ITEM_LABEL));
             itemList.add(refreshItem);
