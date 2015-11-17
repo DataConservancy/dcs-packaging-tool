@@ -60,8 +60,8 @@ import java.util.ListIterator;
 public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
     private List<UserDefinedPropertyVocabulary> availableVocabularies;
-    private RelationshipGroupCellFactory vocabularyCellFactory;
-    private RelationshipCellFactory propertyPredicateCellFactory;
+    private VocabularyCellFactory vocabularyCellFactory;
+    private PropertyPredicateCellFactory propertyPredicateCellFactory;
     private BooleanProperty requiresUri;
     private BooleanProperty requiresDisabled;
     private StringProperty targetType;
@@ -72,8 +72,8 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
     public UserDefinedPropertyBox(PropertyType userDefinedPropertyType, List<String> userDefinedPropertyValues, List<UserDefinedPropertyVocabulary> availableVocabularies,
                                   EmptyFieldButtonDisableListener addNewPropertyListener) {
         this.availableVocabularies = availableVocabularies;
-        vocabularyCellFactory = new RelationshipGroupCellFactory();
-        propertyPredicateCellFactory = new RelationshipCellFactory();
+        vocabularyCellFactory = new VocabularyCellFactory();
+        propertyPredicateCellFactory = new PropertyPredicateCellFactory();
         this.userDefinedPropertyValues = new ArrayList<>();
 
         UserDefinedPropertyVocabulary startingGroup = null;
@@ -173,29 +173,29 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
             @Override
             public String toString(PropertyType propertyType) {
                 if (propertyType != null) {
-                    return propertyType.getDomainPredicate().toString();
+                    return propertyType.getLabel();
                 }
                 return "";
             }
 
             @Override
             public PropertyType fromString(String s) {
-                PropertyType propertyType = null;
-                try {
-                    propertyType = findPropertyTypeInGroup(new URI(s), vocabularyComboBox.getValue());
-                } catch (URISyntaxException e) {
-                   //If the string isn't a uri then it must be a user entered property type
-                }
+                PropertyType propertyType = findPropertyTypeInGroup(s, vocabularyComboBox.getValue());
 
+                //If we didn't find it in the provided vocabularies treat it as user entered value
                 if (propertyType == null) {
+                    propertyTypeComboBox.getItems().clear();
                     Validator uriValidator = ValidatorFactory.getValidator(PropertyValueHint.URI);
+                    propertyType = new PropertyType();
+                    propertyType.setLabel(s);
+                    propertyType.setDescription(s);
+
                     if (uriValidator != null && uriValidator.isValid(s)) {
-                        propertyType = new PropertyType();
-                        propertyType.setLabel(s);
-                        propertyType.setDescription(s);
 
                         try {
                             propertyType.setDomainPredicate(new URI(s));
+                            requiresDisabled.setValue(false);
+                            requiresURILabel.setVisible(false);
                         } catch (URISyntaxException e) {
                             requiresDisabled.setValue(true);
                             requiresURILabel.setVisible(true);
@@ -204,9 +204,6 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                         requiresDisabled.setValue(true);
                         requiresURILabel.setVisible(true);
                     }
-
-                    requiresDisabled.setValue(false);
-                    requiresURILabel.setVisible(false);
                 }
 
                 return propertyType;
@@ -235,7 +232,6 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                     requiresUri.setValue(newPropertyType.getPropertyValueType() != null && newPropertyType.getPropertyValueType().equals(PropertyValueType.URI));
                     requiresURILabel.setVisible(false);
                 } else {
-                    requiresDisabled.setValue(false);
 
                     //Set the vocabulary to empty since it wasn't selected from a vocabulary.
                     vocabularyComboBox.setValue(new UserDefinedPropertyVocabulary("", "", "", new ArrayList<>()));
@@ -379,9 +375,9 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         return propertyValueBox;
     }
     /*
-     * Cell factor for the Namespace selection box, basically we just display the label of the the relationship group, in the drop down list.
+     * Cell factor for the Namespace selection box, basically we just display the label of the the vocabulary, in the drop down list.
      */
-    private class RelationshipGroupCellFactory implements Callback<ListView<UserDefinedPropertyVocabulary>, ListCell<UserDefinedPropertyVocabulary>> {
+    private class VocabularyCellFactory implements Callback<ListView<UserDefinedPropertyVocabulary>, ListCell<UserDefinedPropertyVocabulary>> {
 
         @Override
         public ListCell<UserDefinedPropertyVocabulary> call(ListView<UserDefinedPropertyVocabulary> relationshipGroupListView) {
@@ -400,10 +396,10 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
     }
 
     /*
-     * Cell factor for the Relationship box, we show the label for the relationship, important to note this is different from the converter,
+     * Cell factor for the Predicate box, we show the label for the predicate, important to note this is different from the converter,
       * which shows the relationship uri in the box when it's selected.
      */
-    private class RelationshipCellFactory implements Callback<ListView<PropertyType>, ListCell<PropertyType>> {
+    private class PropertyPredicateCellFactory implements Callback<ListView<PropertyType>, ListCell<PropertyType>> {
 
         @Override
         public ListCell<PropertyType> call(ListView<PropertyType> relationshipListView) {
@@ -442,11 +438,11 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
     }
 
     //Function to check to see if the property type is from the selected group, this is used to determine if the user has typed in a domain predicate.
-    private PropertyType findPropertyTypeInGroup(URI domainPredicate, UserDefinedPropertyVocabulary group) {
+    private PropertyType findPropertyTypeInGroup(String propertyTypeLabel, UserDefinedPropertyVocabulary group) {
         PropertyType propertyType = null;
         if (group != null) {
             for (PropertyType possiblePropertyType : group.getPropertyTypes()) {
-                if(possiblePropertyType.getDomainPredicate().equals(domainPredicate)) {
+                if(possiblePropertyType.getLabel().equalsIgnoreCase(propertyTypeLabel)) {
                     propertyType = possiblePropertyType;
                     break;
                 }
