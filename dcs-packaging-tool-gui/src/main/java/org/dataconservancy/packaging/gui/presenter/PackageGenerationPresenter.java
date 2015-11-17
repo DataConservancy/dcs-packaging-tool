@@ -16,20 +16,12 @@
 package org.dataconservancy.packaging.gui.presenter;
 
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 
 /**
  * Handles the screen related to generating a package. Allows the user to select packaging options and an output directory to save to.
  */
 public interface PackageGenerationPresenter extends Presenter {
-
-    /**
-     * Sets the service that will generate package descriptions to refresh after building a new package
-     * @param packageDescriptionBuilder  the  PackageDescriptionBuilder
-     */
-    //public void setPackageDescriptionBuilder(PackageDescriptionBuilder packageDescriptionBuilder);
-    
     /**
      * Sets the service that will be used for generating a package from the previously created package description, and the defined package parameters.
      * @param packageGenerationService  the  PackageGenerationService

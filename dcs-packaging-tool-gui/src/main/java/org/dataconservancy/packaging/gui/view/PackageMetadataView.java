@@ -16,19 +16,17 @@
 
 package org.dataconservancy.packaging.gui.view;
 
+import java.util.List;
+
+import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
+import org.dataconservancy.packaging.gui.util.WarningPopup;
+import org.dataconservancy.packaging.tool.model.PackageMetadata;
+
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
-import org.dataconservancy.packaging.gui.util.WarningPopup;
-import org.dataconservancy.packaging.gui.view.impl.BaseViewImpl;
-import org.dataconservancy.packaging.tool.model.PackageMetadata;
-
-import java.util.List;
 
 /**
  * The view that shows the package metadata screen. In this view, the user will be able to select a name for the package,

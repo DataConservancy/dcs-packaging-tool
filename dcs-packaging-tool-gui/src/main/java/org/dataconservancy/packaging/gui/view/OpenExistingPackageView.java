@@ -15,10 +15,10 @@
  */
 package org.dataconservancy.packaging.gui.view;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
+
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 /**
  * This view is an intermediary step in the workflow. If the user selects to open an existing package description this view is shown for them to supply a content directory.
