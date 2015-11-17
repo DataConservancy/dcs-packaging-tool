@@ -82,6 +82,7 @@ public class BagItPackageAssemblerTest {
     String checksumAlg;
 
     String stateDir = "META-INF/org.dataconservancy.bagit/STATE";
+    String structureDir = "META-INF/org.dataconservancy.bagit/PKG-INFO";
     String remDir = "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM";
     String ontologyDir = "META-INF/org.dataconservancy.bagit/ONT";
     String RemURI;
@@ -141,7 +142,7 @@ public class BagItPackageAssemblerTest {
     public void testReserveURIForMetadataFile() {
         String filePath = "myProject/dataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        String expectedURI = "bag://" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/" + structureDir + "/"
                 + filePath;
         assertTrue(expectedURI.equals(result.toString()));
     }
@@ -243,7 +244,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI
         String filePath = "metadataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        String expectedURI = "bag://" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/" + structureDir + "/"
                 + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
@@ -346,7 +347,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "bag://" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + structureDir + "/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -379,7 +380,7 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
@@ -443,7 +444,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "bag://" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/" + structureDir + "/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -476,7 +477,7 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
@@ -519,7 +520,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "bag://" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + structureDir + "/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -550,7 +551,7 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep +"org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep +"metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));

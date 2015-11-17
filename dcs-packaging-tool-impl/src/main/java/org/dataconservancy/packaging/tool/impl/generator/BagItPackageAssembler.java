@@ -110,6 +110,7 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File ontologyDir = null;
     private File stateDir = null;
     private File remDir = null;
+    private File structureDir = null;
 
     private FilenameValidator filenameValidator = new FilenameValidator();
 
@@ -283,7 +284,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the structure directory
-        File structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
+        structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
         if (!structureDir.exists()) {
             log.info("Creating package structure dir :" + structureDir.getPath());
             boolean isDirCreated = structureDir.mkdirs();
@@ -358,7 +359,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             if (type.equals(PackageResourceType.DATA)) {
                 containingDirectory = payloadDir;
             } else if (type.equals(PackageResourceType.METADATA)) {
-                containingDirectory = bagBaseDir;
+                containingDirectory = structureDir;
             } else if(type.equals(PackageResourceType.ONTOLOGY)) {
                 containingDirectory = ontologyDir;
             } else if(type.equals(PackageResourceType.PACKAGE_STATE)) {
