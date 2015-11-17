@@ -16,20 +16,16 @@
 
 package org.dataconservancy.packaging.gui.view;
 
-import javafx.beans.property.StringProperty;
-import javafx.scene.control.Button;
-
-import javafx.scene.control.RadioButton;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
+import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Hyperlink;
 import javafx.stage.DirectoryChooser;
-import javafx.scene.control.Label;
-import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 
 /**
  * The view that shows the package generation screen. This screen allows the user to select package creation options,

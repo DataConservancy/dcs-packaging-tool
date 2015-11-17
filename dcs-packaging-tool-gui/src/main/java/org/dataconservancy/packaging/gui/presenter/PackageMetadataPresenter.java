@@ -17,10 +17,6 @@ package org.dataconservancy.packaging.gui.presenter;
 
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
-import org.dataconservancy.packaging.tool.api.PackageGenerationService;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
-import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
-import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 
 /**
  * Handles the screen related to package metadata.

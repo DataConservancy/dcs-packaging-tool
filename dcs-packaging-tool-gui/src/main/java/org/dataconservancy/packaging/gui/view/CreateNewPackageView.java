@@ -16,15 +16,10 @@
 
 package org.dataconservancy.packaging.gui.view;
 
-import java.util.Map;
-
-import javafx.scene.control.Button;
-
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
-import org.dataconservancy.packaging.tool.api.support.RulePropertiesManager;
 
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 /**

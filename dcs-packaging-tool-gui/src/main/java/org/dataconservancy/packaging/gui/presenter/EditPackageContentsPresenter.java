@@ -16,11 +16,9 @@
 package org.dataconservancy.packaging.gui.presenter;
 
 import javafx.scene.control.TreeItem;
-import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
-import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -28,7 +26,6 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This presenter controls the display of the package description view. 
