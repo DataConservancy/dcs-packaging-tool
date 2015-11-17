@@ -2,6 +2,7 @@ package org.dataconservancy.packaging.tool.impl;
 
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
+import org.dataconservancy.packaging.tool.impl.support.FilenameValidatorService;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
@@ -15,21 +16,42 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class IPMServiceImpl implements IPMService {
     private Set<Path> visitedFiles = new HashSet<>();
     private final URIGenerator uriGenerator;
-
+    private FilenameValidatorService validatorService;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public IPMServiceImpl(URIGenerator uriGenerator) {
         this.uriGenerator = uriGenerator;
+        this.validatorService = new FilenameValidatorService();
     }
 
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
+
+        try {
+            List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
+            if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
+                String invalidNames = "";
+                for (int i = 0; i < invalidNamesList.size(); i++) {
+                    invalidNames += invalidNamesList.get(i);
+
+                    if (i + 1 < invalidNamesList.size()) {
+                        invalidNames += ", ";
+                    }
+                }
+
+                throw new IOException("Error creating package tree the follow names were invalid: " + invalidNames);
+            }
+        } catch (InterruptedException e) {
+            throw new IOException("Error creating package tree. " + e.getMessage());
+        }
+
         visitedFiles.clear();
         Node root;
         root = createTree(null, path);
