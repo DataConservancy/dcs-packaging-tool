@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * A node in the PTG tree which the user views and manipulates. The tree is a
@@ -234,6 +235,33 @@ public class Node {
         if (children != null) {
             children.forEach(child -> child.walk(consumer));
         }
+    }
+
+    /**
+     * Answers a {@code Stream} of {@code Node} as a pre-order tree traversal.
+     *
+     * @return {@code Stream} of {@code Node}
+     */
+    public Stream<Node> stream() {
+        NodeStreamBuilder builder = new NodeStreamBuilder();
+        return buildStream(builder, this).build();
+    }
+
+    /**
+     * Recursively invoked to build the {@code Stream}.  The caller will have to transition
+     * the state of the builder by calling {@link Stream.Builder#build()}.
+     *
+     * @param builder the {@code Stream.Builder}
+     * @param n the {@code Node}
+     * @return the {@code Stream.Builder} with all the {@code Node} instances
+     */
+    private Stream.Builder<Node> buildStream(Stream.Builder<Node> builder, Node n) {
+        builder.add(n);
+        if (children != null) {
+            children.forEach(child -> child.buildStream(builder, child));
+        }
+
+        return builder;
     }
     
     /**
