@@ -49,10 +49,11 @@ public enum PackagingToolReturnInfo {
     PKG_ASSEMBLER_PARAMS_NOT_INITIALIZED_EXP (402, "This assembler has not been initialized with required package " +
             "generation parameters."),
     PKG_ASSEMBLER_ARCHIVE_EXP (404, "Exception occurred during package serialization. "),
-    PKG_ASSEMBLER_COMPRESSION_EXP (405, "Exception occurred when compressing package's serialization. "),
-    PKG_ASSEMBLER_INVALID_PARAMS (406, "One or more initial parameters for package assembler was invalid "),
-    PKG_ASSEMBLER_STRAY_FILE (407, "One or more of the files provided to package assembler do not reside under the specified" +
+    PKG_ASSEMBLER_COMPRESSION_EXP (405, "Exception occurred when compressing the package's serialization. "),
+    PKG_ASSEMBLER_INVALID_PARAMS (406, "One or more initial parameters for the package assembler was invalid "),
+    PKG_ASSEMBLER_STRAY_FILE (407, "One or more of the files provided to the package assembler do not reside under the specified" +
             " content root location"),
+    PKG_ASSEMBLER_INVALID_FILENAME (408, "One or more of the files provided to the package assembler has an invalid file name."),
 
     /* exception relating to Package Generator */
     PKG_UNEXPECTED_PACKAGING_FORMAT ( 501, "Package format provided was not as expected."),
