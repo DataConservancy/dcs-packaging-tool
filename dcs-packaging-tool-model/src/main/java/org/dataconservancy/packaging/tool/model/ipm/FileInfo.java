@@ -121,6 +121,13 @@ public class FileInfo {
     }
 
     /**
+     * @param location the location of a file or directory.
+     */
+    public void setLocation(URI location) {
+        this.location = location;
+    }
+
+    /**
      * @param algorithm The algorithm of the checksum either MD5 or SHA1
      * @return Checksum in known format of the file or null if directory.
      */
