@@ -32,7 +32,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import org.dataconservancy.dcs.util.FilePathUtil;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.dcs.model.Checksum;
 import org.dataconservancy.packaging.tool.api.PackageChecksumService;
@@ -41,6 +40,7 @@ import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.impl.PackageChecksumServiceImpl;
+import org.dataconservancy.packaging.tool.impl.support.FilenameValidator;
 import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
@@ -110,6 +110,8 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File ontologyDir = null;
     private File stateDir = null;
     private File remDir = null;
+
+    private FilenameValidator filenameValidator = new FilenameValidator();
 
     private boolean isExploded = false;
 
@@ -325,8 +327,6 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
     }
 
-
-
     /**
      * @param path
      *        Logical file path (including filename) of the resource relative to
@@ -340,9 +340,19 @@ public class BagItPackageAssembler implements PackageAssembler {
         try {
             decodedPath = new String(URLCodec.decodeUrl(path.getBytes()));
 
+            log.info("validating path: " + decodedPath);
+
+            if(isValidPathString(decodedPath) == false){
+                log.info("Invalid path string:" + decodedPath);
+                try {
+                    FileUtils.cleanDirectory(bagBaseDir);
+                } catch (IOException e) {
+                    log.warn("Exception thrown when cleaning existing directory: " + e.getMessage());
+                }
+            }
+
             log.info(("Reserving " + path));
 
-            String fileName = FilePathUtil.sanitizePath(decodedPath);
             File containingDirectory =  null;
             if (type.equals(PackageResourceType.DATA)) {
                 containingDirectory = payloadDir;
@@ -358,7 +368,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
             log.debug("Containing dir: " + containingDirectory);
             //Create file from given path
-            File newFile = new File(containingDirectory, fileName);
+            File newFile = new File(containingDirectory, decodedPath);
 
             //Create folders in the path
             if (!newFile.getParentFile().exists()) {
@@ -369,7 +379,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 }
             }
 
-            //Remove the package location directory and the slash trailing it.
+            //Remove the package location directory and the slash trailing it.                                            s
             URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
 
             fileURIMap.put(relativeURI, newFile.toURI());
@@ -638,7 +648,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         }
 
-      //return file.getPath();
+       //return file.getPath();
         return string;
     }
 
@@ -800,6 +810,23 @@ public class BagItPackageAssembler implements PackageAssembler {
                             + requiredParametersMessage);
         }
 
+    }
+
+    /**
+     * These satisfy the requirements of the DC Bafit Profile for filename validity
+     * @param pathString
+     * @return  whether the file name is valid
+     */
+    private boolean isValidPathString(String pathString){
+        for(String component : pathString.split("/")){
+            if(component.length() > 256 || !filenameValidator.isValid(component)){
+                return false;
+            }
+        }
+        if (pathString.length() > 1024){
+            return false;
+        }
+        return true;
     }
 
     private void validateArchivingFormat() {

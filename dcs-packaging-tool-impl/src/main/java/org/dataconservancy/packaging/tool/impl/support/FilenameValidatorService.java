@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.dataconservancy.packaging.gui.services;
-
-import org.dataconservancy.packaging.tool.impl.support.FilenameValidator;
+package org.dataconservancy.packaging.tool.impl.support;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
