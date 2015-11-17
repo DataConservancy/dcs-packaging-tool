@@ -35,14 +35,12 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
     PropertyConstraint propertyConstraint;
     List<PropertyBox> propertyBoxes;
     List<ProfilePropertyBox> subPropertyBoxes;
-    private double addNewButtonMaxWidth = 200;
-    private PropertyFormatService formatService;
     private final int prefWidth = 250;
     private DisciplineLoadingService disciplineLoadingService;
 
     public ProfilePropertyBox(PropertyConstraint propertyConstraint, Node node,
                               DomainProfileService profileService, DisciplineLoadingService disciplineLoadingService) {
-        formatService = new PropertyFormatServiceImpl();
+        PropertyFormatService formatService = new PropertyFormatServiceImpl();
 
         this.propertyConstraint = propertyConstraint;
         this.disciplineLoadingService = disciplineLoadingService;
@@ -62,6 +60,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
 
         final Button addNewButton = new Button(
            TextFactory.getText(Labels.LabelKey.ADD_NEW_BUTTON));
+        double addNewButtonMaxWidth = 200;
         addNewButton.setMaxWidth(addNewButtonMaxWidth);
         addNewButton.setDisable(true);
 

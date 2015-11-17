@@ -23,13 +23,11 @@ import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.dataconservancy.packaging.tool.profile.util.DcBoIpmFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -262,35 +260,5 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
 
         //Item should not be ignored
         assertFalse(dataFile.isIgnored());
-    }
-
-    @Ignore
-    @Test
-    public void testAddFile() {
-        // TODO: test that adding files works
-    }
-
-    @Ignore
-    @Test
-    public void testAddFolder() {
-        // TODO: test that adding files works
-    }
-
-    @Ignore
-    @Test
-    public void testRefresh() {
-        // TODO: test that refresh works
-    }
-
-    @Ignore
-    @Test
-    public void testRemapFile() {
-        // TODO: test that remap file works
-    }
-
-    @Ignore
-    @Test
-    public void testRemapFolder() {
-        // TODO: test that remap folder works
     }
 }

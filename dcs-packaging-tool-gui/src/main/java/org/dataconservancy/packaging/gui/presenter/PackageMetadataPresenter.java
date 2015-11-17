@@ -27,16 +27,16 @@ public interface PackageMetadataPresenter extends Presenter {
      * Sets the package metadata service to be used to handle package metadata properties
      * @param packageMetadataService the PackageMetadataService
      */
-    public void setPackageMetadataService(PackageMetadataService packageMetadataService);
+    void setPackageMetadataService(PackageMetadataService packageMetadataService);
 
     /**
      * Sets the existing values on the form's fields if they can be retrieved from the PackageState
      */
-    public void setExistingValues();
+    void setExistingValues();
 
     /**
      * Sets the DomainProfileStore to be used to retrieve the available DomainProfiles
-     * @param domainProfileStore
+     * @param domainProfileStore The domain profile store that will be used to retrieve the domain profiles.
      */
-    public void setDomainProfileStore(DomainProfileStore domainProfileStore);
+    void setDomainProfileStore(DomainProfileStore domainProfileStore);
 }

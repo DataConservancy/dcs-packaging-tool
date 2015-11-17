@@ -28,12 +28,12 @@ public interface HomepageView extends View<HomepagePresenter> {
      * Button that takes the user to the create new package page.
      * @return button
      */
-    public Button getCreateNewPackageButton();
+    Button getCreateNewPackageButton();
 
     /**
      * Button that takes the user to the page to open an existing package.
      * @return button
      */
-    public Button getOpenExistingPackageButton();
+    Button getOpenExistingPackageButton();
 
 }

@@ -46,7 +46,7 @@ public class Help {
 
         private String property;
 
-        private HelpKey(String property) {
+        HelpKey(String property) {
             this.property = property;
         }
 
@@ -91,7 +91,7 @@ public class Help {
         String filePath = bundle.getString(property);
         
         // Read the help text from the specified file. 
-        File helpFile = null;
+        File helpFile;
         
         try {
             if (filePath.startsWith("classpath:")) {
@@ -106,11 +106,9 @@ public class Help {
                 }
             } else {
                 helpFile = new File(filePath);
-                
-                if (helpFile != null) {
-                    FileInputStream fis = new FileInputStream(helpFile);
-                    helpText = IOUtils.toString(fis, "UTF-8");
-                }
+
+                FileInputStream fis = new FileInputStream(helpFile);
+                helpText = IOUtils.toString(fis, "UTF-8");
             }
         } catch (IOException e) {
             log.error("Error reading help file. " + e.getMessage());

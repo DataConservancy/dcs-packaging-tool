@@ -27,17 +27,17 @@ public interface HeaderView {
      * Highlights the correct segment of the location bar in the header.
      * @param page The next page to be highlighted, will automatically remove old highlights
      */
-    public void highlightNextPage(Page page);
+    void highlightNextPage(Page page);
     
     /**
      * Gets the hyperlink that will show a popup containing help information when pressed.
      * @return The hyperlink for displaying help text.
      */
-    public Hyperlink getHelpLink();
+    Hyperlink getHelpLink();
     
     /**
      * Gets the hyperlink that will show a popup containing information describing the screen when pressed.
      * @return The hyperlink for the displaying the about text.
      */
-    public Hyperlink getAboutLink();
+    Hyperlink getAboutLink();
 }

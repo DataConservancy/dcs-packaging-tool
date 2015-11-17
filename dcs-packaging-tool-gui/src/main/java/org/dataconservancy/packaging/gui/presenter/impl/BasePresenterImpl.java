@@ -95,7 +95,7 @@ public abstract class BasePresenterImpl implements Presenter {
     /**
      * Display an error message in red using the view error label.
      * 
-     * @param msg
+     * @param msg The message to display to the user.
      */
     public void showError(String msg) {
         Label label = view.getErrorLabel(); 

@@ -118,9 +118,8 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                 }
 
                 @Override
-                public EditPackageContentsPresenter showEditPackageContents() {
+                public void showEditPackageContents() {
                     showNextPage = true;
-                    return packageDescriptionPresenter;
                 }
 
                 @Override

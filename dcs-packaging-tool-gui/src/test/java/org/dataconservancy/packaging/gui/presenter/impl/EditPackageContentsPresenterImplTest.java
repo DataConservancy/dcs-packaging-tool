@@ -33,12 +33,9 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.profile.util.DcBoIpmFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -77,26 +74,20 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
     @Qualifier("domainProfileObjectStore")
     private DomainProfileObjectStore domainProfileObjectStore;
 
-    private Controller controller;
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
-    private Node project;
     private Node collection;
-    private Node dataItem;
     private Node dataFile;
 
     @Before
     public void setup() throws IOException {
         DcBoIpmFactory boFactory = new DcBoIpmFactory();
-        project = boFactory.createSmallLinearTree();
+        Node project = boFactory.createSmallLinearTree();
 
         collection = project.getChildren().get(0);
 
-        dataItem = collection.getChildren().get(0);
+        Node dataItem = collection.getChildren().get(0);
 
         dataFile = dataItem.getChildren().get(0);
 
@@ -114,7 +105,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
 
         PackageState state = new PackageState();
 
-        controller = new Controller() {
+        Controller controller = new Controller() {
 
             @Override
             public File showSaveFileDialog(FileChooser chooser) {
@@ -188,136 +179,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         assertEquals(1, view.getRoot().getChildren().size());
 
         view.getRoot().setExpanded(true);
-    }
-
-
-    /*
-     * Tests that description field is inherited properly from collection subCollection.
-     */
-    @Test
-    @Ignore
-    public void testInheritance_AmongstCollections() throws InterruptedException {
-        /*
-        collection1.addSimplePropertyValue(DcsBoPackageOntology.DESCRIPTION, "Best moos of all time.");
-        
-        presenter.rebuildTreeView();
-
-        view.setPopupNode(collection1);
-        view.getInheritMetadataCheckBoxMap().put(DcsBoPackageOntology.DESCRIPTION, new CheckBox());
-
-        assertTrue(collection3.getPropertyNames().isEmpty());
-        assertTrue(collection4.getPropertyNames().isEmpty());
-        
-        view.getInheritMetadataCheckBoxMap().get(DcsBoPackageOntology.DESCRIPTION).fire();
-        
-        presenter.applyMetadataInheritance();
-        
-        assertEquals(1, collection3.getPropertyNames().size());
-        assertEquals(1, collection4.getPropertyNames().size());
-        assertEquals(collection1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION),
-                collection3.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(collection1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION),
-                collection4.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-                */
-    }
-
-    /*
-     * Tests that publisher field is inherited properly from project to collection
-     */
-    @Test
-    @Ignore
-    public void testInheritance_ProjectCollection() throws InterruptedException {
-        /*
-        project.addSimplePropertyValue(DcsBoPackageOntology.PUBLISHER, "Manure Inc.");
-        
-        presenter.rebuildTreeView();
-
-        view.setPopupNode(project);
-        view.getInheritMetadataCheckBoxMap().put(DcsBoPackageOntology.PUBLISHER, new CheckBox());
-
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.PUBLISHER).equals(collection1.getSimplePropertyValues(DcsBoPackageOntology.PUBLISHER)));
-
-        view.getInheritMetadataCheckBoxMap().get(DcsBoPackageOntology.PUBLISHER).fire();
-
-        presenter.applyMetadataInheritance();
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.PUBLISHER), collection1.getSimplePropertyValues(DcsBoPackageOntology.PUBLISHER)); */
-
-    }
-
-    /*
-     * Tests that description field is inherited properly from project to file
-     */
-    @Test
-    @Ignore
-    public void testInheritance_ProjectFiles() throws InterruptedException {
-        /*
-        project.addSimplePropertyValue(DcsBoPackageOntology.DESCRIPTION, "A fine pasture with tasty clover.");
-        
-        presenter.rebuildTreeView();
-
-        view.setPopupNode(project);
-        view.getInheritMetadataCheckBoxMap().put(DcsBoPackageOntology.DESCRIPTION, new CheckBox());
-
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(collection1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(collection3.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(datafile1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(datafile2a.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(dataitem1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(dataitem2.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(metadatafile1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-        assertFalse(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION).equals(metadatafile2.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)));
-
-        view.getInheritMetadataCheckBoxMap().get(DcsBoPackageOntology.DESCRIPTION).fire();
-
-        presenter.applyMetadataInheritance();
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), collection1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), collection3.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), dataitem1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), dataitem2.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), datafile2a.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), datafile1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), metadatafile1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION));
-        assertEquals(project.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION), metadatafile1.getSimplePropertyValues(DcsBoPackageOntology.DESCRIPTION)); */
-
-    }
-
-    /*
-     * Tests that complex field is inherited properly from collection to collection and data item
-     */
-    @Test
-    @Ignore
-    public void testInheritance_ComplexProperty() throws InterruptedException {
-        /*
-        PropertyValueGroup creatorGroup = new PropertyValueGroup();
-        creatorGroup.addSubPropertyValue(DcsBoPackageOntology.EMAIL, "farmerbob@example.com");
-        creatorGroup.addSubPropertyValue(DcsBoPackageOntology.NAME, "Bob Blahblah");
-        creatorGroup.addSubPropertyValue(DcsBoPackageOntology.PHONE, "1234567890");
-        creatorGroup.addSubPropertyValue(DcsBoPackageOntology.PAGE, "http://example.com/farm");
-
-        collection1.addPropertyValueGroup(DcsBoPackageOntology.CREATOR, creatorGroup);
-        
-        presenter.rebuildTreeView();
-
-        view.setPopupNode(collection1);
-        view.getInheritMetadataCheckBoxMap().put(DcsBoPackageOntology.CREATOR, new CheckBox());
-
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(collection3.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(collection4.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(dataitem1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(dataitem2.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(dataitem3.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(dataitem4.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-
-        view.getInheritMetadataCheckBoxMap().get(DcsBoPackageOntology.CREATOR).fire();
-        presenter.applyMetadataInheritance();
-        
-        assertEquals(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR), collection3.getPropertyValueGroups(DcsBoPackageOntology.CREATOR));
-        assertEquals(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR), collection4.getPropertyValueGroups(DcsBoPackageOntology.CREATOR));
-        assertEquals(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR), dataitem1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR));
-        assertEquals(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR), dataitem2.getPropertyValueGroups(DcsBoPackageOntology.CREATOR));
-        assertEquals(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR), dataitem4.getPropertyValueGroups(DcsBoPackageOntology.CREATOR));
-        assertFalse(collection1.getPropertyValueGroups(DcsBoPackageOntology.CREATOR).equals(dataitem3.getPropertyValueGroups(DcsBoPackageOntology.CREATOR)));
-        */
     }
 
     /**

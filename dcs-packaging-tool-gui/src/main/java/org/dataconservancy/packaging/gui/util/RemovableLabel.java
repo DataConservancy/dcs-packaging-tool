@@ -23,13 +23,9 @@ public class RemovableLabel extends HBox implements CssConstants {
         ImageView removeImage = new ImageView();
         removeImage.getStyleClass().add(TRASH_IMAGE);
         removeImage.getStyleClass().add(CLICKABLE);
-        removeImage.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent event) {
-                parentElement.getChildren().remove(RemovableLabel.this);
-                event.consume();
-            }
+        removeImage.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            parentElement.getChildren().remove(RemovableLabel.this);
+            event.consume();
         });
 
         label = new Label(labelName);

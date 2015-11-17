@@ -49,6 +49,7 @@ public class SimplePropertyChangeListener implements ChangeListener<String> {
      *
      * @return true if at least one property value is empty, false if none (or if there are no values at all)
      */
+    @SuppressWarnings("unchecked")
     private boolean anyPropertiesEmpty() {
         for (Node n : propertyValueBoxes) {
             if (n instanceof TextField) {

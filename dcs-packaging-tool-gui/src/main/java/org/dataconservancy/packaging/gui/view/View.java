@@ -49,65 +49,65 @@ public interface View<T extends Presenter> {
      * Allow view access to the continue button that appears in the footer.
      * @return the continue button that appears in the footer
      */
-    public Button getContinueButton();
+    Button getContinueButton();
     
     /**
      * Allows views access to the cancel link that appears in the footer.
      * @return the cancel link that appears in the footer
      */
-    public Hyperlink getCancelLink();
+    Hyperlink getCancelLink();
     
     /**
      * Allows views access to the package name label that shows up in the footer
      * @return the package name label that shows up in the footer
      */
-    public Label getPackageNameLabel();
+    Label getPackageNameLabel();
     
     /**
      * Allows view access to the save button that appears in the footer.
      * @return The button that allows the user to save.
      */
-    public Button getSaveButton();
+    Button getSaveButton();
     
     /**
      * Shows the help popup linked to in the header. 
      */
-    public void showHelpPopup();
+    void showHelpPopup();
     
     /**
      * Shows the about popup linked to in the header.
      */
-    public void showAboutPopup();
+    void showAboutPopup();
     
     /**
      * Allows for customizing the help popup contents
      * @param content A node representing the contents the help popup should display.
      */
-    public void setHelpPopupContent(Node content);
+    void setHelpPopupContent(Node content);
     
     /**
      * Allows for customizing the about popup content
      * @param content A node representing the contents the about popup should display.
      */
-    public void setAboutPopupContent(Node content);
+    void setAboutPopupContent(Node content);
     
     /**
      * Gets the about hyperlink that's displayed in the header.
      * @return the about hyperlink that's displayed in the header
      */
-    public Hyperlink getHeaderViewAboutLink();
+    Hyperlink getHeaderViewAboutLink();
     
     /**
      * Gets the help hyperlink that's displayed in the header.
      * @return  the help hyperlink that's displayed in the header
      */
-    public Hyperlink getHeaderViewHelpLink();
+    Hyperlink getHeaderViewHelpLink();
     
     /**
      * Sets the header view that the view should display popups for, this <em>must</em> be the same view held by the controller.
      * @param headerView the HeaderView
      */
-    public void setHeaderView(HeaderView headerView);
+    void setHeaderView(HeaderView headerView);
     
      /**
      * Returns the error label to report problems back to the user

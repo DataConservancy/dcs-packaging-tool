@@ -81,20 +81,20 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.getDomainProfilesComboBox().setValue(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
             view.getDomainProfilesComboBox().setDisable(true);
 
-            for (Node node : view.getAllDynamicFields()) {
-                if (getController().getPackageState().getPackageMetadataValues(node.getId()) != null) {
-                    if (node instanceof TextField) {
-                        ((TextField) node).setText(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
-                    } else if (node instanceof VBox) {
-                        for (String value : getController().getPackageState().getPackageMetadataValues(node.getId())) {
-                            ((VBox) node).getChildren().add(new RemovableLabel(value, (VBox) node));
-                        }
-                    } else if (node instanceof DatePicker) {
-                        LocalDate localDate = ((DatePicker) node).getConverter().fromString(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
-                        ((DatePicker) node).setValue(localDate);
+            view.getAllDynamicFields().stream().filter(node ->
+                                                           getController().getPackageState().getPackageMetadataValues(node.getId()) !=
+                                                               null).forEach(node -> {
+                if (node instanceof TextField) {
+                    ((TextField) node).setText(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
+                } else if (node instanceof VBox) {
+                    for (String value : getController().getPackageState().getPackageMetadataValues(node.getId())) {
+                        ((VBox) node).getChildren().add(new RemovableLabel(value, (VBox) node));
                     }
+                } else if (node instanceof DatePicker) {
+                    LocalDate localDate = ((DatePicker) node).getConverter().fromString(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
+                    ((DatePicker) node).setValue(localDate);
                 }
-            }
+            });
         }
     }
 

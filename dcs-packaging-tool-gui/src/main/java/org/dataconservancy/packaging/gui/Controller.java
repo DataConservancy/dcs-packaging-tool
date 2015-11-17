@@ -236,10 +236,8 @@ public class Controller {
         show(factory.getPackageGenerationPresenter());
     }
 
-    public EditPackageContentsPresenter showEditPackageContents() {
-        EditPackageContentsPresenter presenter = factory.getEditPackageContentsPresenter();
-        show(presenter);
-        return presenter;
+    public void showEditPackageContents() {
+        show(factory.getEditPackageContentsPresenter());
     }
 
     /**

@@ -535,7 +535,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             Node newTree = buildComparisonTree(node);
             resultMap = ipmService.compareTree(node, newTree);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            view.getErrorLabel().setText(
+                TextFactory.getText(ErrorKey.REFRESH_ERROR) +
+                    e.getMessage());
+            view.getErrorLabel().setVisible(true);
         }
 
         return resultMap;

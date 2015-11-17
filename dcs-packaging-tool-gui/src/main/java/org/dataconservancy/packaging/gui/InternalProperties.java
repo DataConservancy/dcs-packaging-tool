@@ -28,7 +28,7 @@ public class InternalProperties {
 
         private String property;
 
-        private InternalPropertyKey(String property) {
+        InternalPropertyKey(String property) {
             this.property = property;
         }
 

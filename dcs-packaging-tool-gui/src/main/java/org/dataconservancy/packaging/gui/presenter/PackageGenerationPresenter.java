@@ -26,11 +26,11 @@ public interface PackageGenerationPresenter extends Presenter {
      * Sets the service that will be used for generating a package from the previously created package description, and the defined package parameters.
      * @param packageGenerationService  the  PackageGenerationService
      */
-    public void setPackageGenerationService(PackageGenerationService packageGenerationService);
+    void setPackageGenerationService(PackageGenerationService packageGenerationService);
     
     /**
      * Sets the package parameters builder that will be used for deserializing package parameters from a file. Note currently this is not used. 
      * @param packageParamsBuilder the PackageGenerationParametersBuilder
      */
-    public void setPackageGenerationParametersBuilder(PackageGenerationParametersBuilder packageParamsBuilder);
+    void setPackageGenerationParametersBuilder(PackageGenerationParametersBuilder packageParamsBuilder);
 }
