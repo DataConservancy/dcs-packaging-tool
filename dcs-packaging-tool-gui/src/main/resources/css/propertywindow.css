@@ -65,10 +65,14 @@
 
 .combo-box {
     -fx-background-color: #FFD17D;
+    -fx-effect: dropshadow( one-pass-box , #BD892A,
+        10, 0.0, 2, 2);
 }
 
 .combo-box:editable {
     -fx-background-color: #C3C3C3;
+    -fx-effect: dropshadow( one-pass-box , #989898,
+        10, 0.0, 2, 2);
 }
 
 .combo-box:editable:hover {
@@ -106,15 +110,6 @@
 .PackageToolPopup .ViewFooter .button {
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
-	-fx-pref-height: 28px;
-}
-
-.PackgeToolPopup .ViewFooter .button:hover {
-	-fx-pref-height: 26px;
-}
-
-.PackgeToolPopup .ViewFooter .button:pressed {
-	-fx-pref-height: 24px;
 }
 
 .PackageToolPopup .PropertyPopup .tab-pane .tab-header-area .tab-header-background {

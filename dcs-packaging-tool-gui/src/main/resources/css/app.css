@@ -22,21 +22,21 @@
 .View .button {
 	-fx-background-color: #168176;
 	-fx-text-fill: #ffffff;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-	10, 0.0, 4, 4);
+    -fx-effect: dropshadow( one-pass-box , #005048,
+        2, 0.0, 2, 2);
 	-fx-cursor: hand;
 }
 
 .View .button:hover {
 	-fx-background-color: #2F8D83;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-    	5, 0.0, 2, 2);
+    -fx-effect: dropshadow( one-pass-box , #005048,
+            3, 0.0, 3, 3);
 }
 
 .View .button:pressed {
 	-fx-background-color: #2F8D83;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-    	1, 0.0, 1, 1);
+ 	-fx-effect: dropshadow( one-pass-box , #005048,
+     	1, 0.0, 1, 1);
 }
 
 .View .ViewFooter {
@@ -75,12 +75,12 @@
 }
 
 .ViewFooter .button .hover {
-	-fx-pref-height: 26px;
+	-fx-pref-height: 30px;
 
 }
 
 .ViewFooter .button .pressed {
-    -fx-pref-height: 24px;
+    -fx-pref-height: 26px;
 }
 
 .PackageToolPopup {
@@ -177,11 +177,11 @@
 .PackageToolPopup .ViewFooter .button {
 	-fx-font-weight: bold;
 	-fx-text-fill: #ffffff;
-	-fx-pref-height: 28px;
+    -fx-pref-height: 26px;
 }
 
 .PackgeToolPopup .ViewFooter .button:hover {
-	-fx-pref-height: 26px;
+	-fx-pref-height: 28px;
 }
 
 .PackgeToolPopup .ViewFooter .button:pressed {
@@ -318,22 +318,6 @@
     -fx-background-color: #EEE669;
 }
 
-.EditPackageContentsView .button {
-	-fx-background-color: #168176;
-	-fx-border-radius: 6px;
-	-fx-border-width: 1;
-	-fx-border-color: #008330;
-	-fx-font-weight: bold;
-	-fx-text-fill: #ffffff;
-	-fx-pref-height: 28px;
-	-fx-effect: dropshadow( one-pass-box , #005048,
-                1, 0.0, 1, 1);
-}
-
-.EditPackageContentsView .button:hover {
-	-fx-background-color: linear-gradient(#00766c 5%, #48a79c);
-}
-
 .EditPackageContentsViewArrowsImage {
     -fx-image: url("../images/gray-arrows.png");
 }
@@ -438,16 +422,22 @@
 	-fx-text-fill: #ffffff;
 	-fx-pref-height: 50px;
 	-fx-pref-width: 400px;
+    -fx-effect: dropshadow( one-pass-box , #005048,
+        5, 0.0, 2, 2);
 }
 
 .HomepageView .button:hover {
     -fx-pref-height: 55px;
     -fx-pref-width: 405px;
+    -fx-effect: dropshadow( one-pass-box , #005048,
+        	10, 0.0, 4, 4);
 }
 
 .HomepageView .button:pressed {
     -fx-pref-height: 45px;
     -fx-pref-width: 395px;
+    -fx-effect: dropshadow( one-pass-box , #005048,
+        	1, 0.0, 1, 1);
 }
 
 .Clickable {
@@ -515,6 +505,8 @@
 
 .combo-box {
     -fx-background-color: #FFD17D;
+    -fx-effect: dropshadow( one-pass-box , #BD892A,
+    	10, 0.0, 2, 2);
 }
 
 .combo-box:hover {
