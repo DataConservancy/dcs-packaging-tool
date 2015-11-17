@@ -37,6 +37,7 @@ import java.util.List;
 
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.DOMAINOBJECTS_RDF_1;
 import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.PACKAGE_TREE_RDF_1;
+import static org.dataconservancy.packaging.tool.ser.AbstractSerializationTest.TestResources.PACKAGE_TREE_RDF_WITH_BAGURIS_1;
 
 /**
  * Base test class of all serialization tests.
@@ -76,6 +77,8 @@ public abstract class AbstractSerializationTest {
 
         public static Model packageTreeRDF;
 
+        public static Model packageTreeRDFWithBagUris;
+
         public static HashMap<URI, List<Property>> userProperties = new HashMap<URI, List<Property>>() {
             {
                 try {
@@ -111,6 +114,7 @@ public abstract class AbstractSerializationTest {
             try {
                 domainObjectsRDF = ModelFactory.createDefaultModel().read(DOMAINOBJECTS_RDF_1.getInputStream(), null);
                 packageTreeRDF = ModelFactory.createDefaultModel().read(PACKAGE_TREE_RDF_1.getInputStream(), null);
+                packageTreeRDFWithBagUris = ModelFactory.createDefaultModel().read(PACKAGE_TREE_RDF_WITH_BAGURIS_1.getInputStream(), null);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -142,6 +146,9 @@ public abstract class AbstractSerializationTest {
 
         public static ClassPathResource PACKAGE_TREE_RDF_1 =
                 new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-tree-rdf-v1.ser");
+
+        public static ClassPathResource PACKAGE_TREE_RDF_WITH_BAGURIS_1 =
+                new ClassPathResource("org/dataconservancy/packaging/tool/ser/package-tree-rdf-withbaguris-v1.ser");
 
     }
 }
