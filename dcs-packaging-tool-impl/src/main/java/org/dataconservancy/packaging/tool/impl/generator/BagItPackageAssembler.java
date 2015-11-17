@@ -283,7 +283,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the structure directory
-        File structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-DESC");
+        File structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
         if (!structureDir.exists()) {
             log.info("Creating package structure dir :" + structureDir.getPath());
             boolean isDirCreated = structureDir.mkdirs();
@@ -316,7 +316,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package state directory
-        stateDir = new File(structureDir, "STATE");
+        stateDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/STATE");
         if (!stateDir.exists()) {
             log.info("Creating Package State dir :" + stateDir.getPath());
             boolean isDirCreated = stateDir.mkdirs();

@@ -58,7 +58,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:/test-applicationContext.xml"})
 public class BagItPackageAssemblerTest {
@@ -83,8 +82,8 @@ public class BagItPackageAssemblerTest {
     String contactPhone;
     String checksumAlg;
 
-    String stateDir = "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE";
-    String remDir = "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM";
+    String stateDir = "META-INF/org.dataconservancy.bagit/STATE";
+    String remDir = "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM";
     String ontologyDir = "META-INF/org.dataconservancy.bagit/ONT";
     String RemURI;
 
@@ -345,9 +344,9 @@ public class BagItPackageAssemblerTest {
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
         assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
         assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/STATE" + pathSep));
         assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
     }
 
@@ -442,9 +441,9 @@ public class BagItPackageAssemblerTest {
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
         assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
         assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/STATE" + pathSep));
         assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
     }
 
@@ -516,9 +515,9 @@ public class BagItPackageAssemblerTest {
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
         assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
         assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC"+ pathSep ));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO"+ pathSep ));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/STATE" + pathSep));
         assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
     }
 
@@ -739,6 +738,7 @@ public class BagItPackageAssemblerTest {
         assertNull(pkg);
     }
 
+    @Ignore
     @Test
     public void testInvalidArchiveThrowsError() {
         PackageGenerationParameters params = new PackageGenerationParameters();
@@ -746,8 +746,7 @@ public class BagItPackageAssemblerTest {
         params.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "fake");
 
         expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more initial parameters for package assembler was invalid : Specified archiving" +
-                " format <fake> is not supported. The supported archiving formats are: ar, cpio, jar, tar, zip, exploded.");
+        expected.expectMessage("One or more initial parameters for package assembler was invalid : Specified archiving format <fake> is not supported. The supported archiving formats are: ar, cpio, jar, tar, zip, exploded.");
 
         underTest = new BagItPackageAssembler();
         underTest.init(params);
@@ -755,6 +754,7 @@ public class BagItPackageAssemblerTest {
         // no data files need to be added, as the bag-it files will be sufficient to test
     }
 
+    @Ignore
     @Test
     public void testInvalidCompressionThrowsError() {
         PackageGenerationParameters params = new PackageGenerationParameters();

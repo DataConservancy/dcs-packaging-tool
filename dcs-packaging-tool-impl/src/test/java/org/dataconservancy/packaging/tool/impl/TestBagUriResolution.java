@@ -69,26 +69,24 @@ public class TestBagUriResolution {
     @Test
     public void testScratch() throws Exception {
 
-        Map<URI, URI> resolvedUris = new HashMap<>();
+        Map<URI, Path> resolvedPaths = new HashMap<>();
 
         // Resolve FileInfo bag URIs to a Path, and then set the new location (a file URI) on the FileInfo
         packageTree.stream()
                 .filter(n -> n.getFileInfo() != null && UriUtility.isBagUri(n.getFileInfo().getLocation()))
                 .forEach(n -> {
-                            Path resolved = UriUtility.resolveBagUri(baseDir, n.getFileInfo().getLocation());
-                            URI resolvedUri = resolved.toUri();
-                            resolvedUris.put(n.getFileInfo().getLocation(), resolvedUri);
-                            n.getFileInfo().setLocation(resolvedUri);
+                            URI bagUri = n.getFileInfo().getLocation();
+                            Path resolvedPath = UriUtility.resolveBagUri(baseDir, bagUri);
+                            n.getFileInfo().setLocation(resolvedPath.toUri());
+                            resolvedPaths.put(bagUri, resolvedPath);
                         }
                 );
 
-        assertTrue(resolvedUris.containsKey(new URI("bag://my-bag/1/0")));
-        assertEquals(resolvedUris.get(new URI("bag://my-bag/1/0")), new URI("file:///foo/bar/my-bag/1/0"));
-
-        assertTrue(resolvedUris.containsKey(new URI("bag://my-bag/2/1")));
-        assertEquals(resolvedUris.get(new URI("bag://my-bag/2/1")), new URI("file:///foo/bar/my-bag/2/1"));
-
-        assertTrue(resolvedUris.containsKey(new URI("bag://my-bag/2/0")));
-        assertEquals(resolvedUris.get(new URI("bag://my-bag/2/0")), new URI("file:///foo/bar/my-bag/2/0"));
+        assertTrue(resolvedPaths.containsKey(new URI("bag://my-bag/1/0")));
+        assertEquals(Paths.get(baseDir.toString(), "/my-bag/1/0"), resolvedPaths.get(new URI("bag://my-bag/1/0")));
+        assertTrue(resolvedPaths.containsKey(new URI("bag://my-bag/2/0")));
+        assertEquals(Paths.get(baseDir.toString(), "/my-bag/2/0"), resolvedPaths.get(new URI("bag://my-bag/2/0")));
+        assertTrue(resolvedPaths.containsKey(new URI("bag://my-bag/2/1")));
+        assertEquals(Paths.get(baseDir.toString(), "/my-bag/2/1"), resolvedPaths.get(new URI("bag://my-bag/2/1")));
     }
 }
