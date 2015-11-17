@@ -15,13 +15,19 @@
  */
 package org.dataconservancy.dcs.util;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 
 public class UriUtilityTest {
@@ -183,4 +189,75 @@ public class UriUtilityTest {
         assertEquals("bag://some/fake/dir/fake.file", UriUtility.makeBagUriString(f, d).toString());
     }
 
+    @Test
+    public void testResolveBagUriSimple() throws Exception {
+        Path baseDir = Paths.get("base");
+        String uriAuthority = "my-bag";
+        URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, uriAuthority, "/data/file.txt", null);
+
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+    }
+
+    @Test
+    public void testResolveBagUriNormalize() throws Exception {
+        // bag://my-bag/data/file.txt
+        URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null);
+        assertEquals("bag://my-bag/data/file.txt", bagUri.toString());
+
+        Path baseDir = Paths.get("base/foo/..");
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+
+        baseDir = Paths.get("base/foo/../");
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+
+        baseDir = Paths.get("base/.");
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+
+        baseDir = Paths.get("base/./");
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+
+        baseDir = Paths.get("base/../base");
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+
+        baseDir = Paths.get("base/../base/");
+        assertEquals(Paths.get("base/my-bag/data/file.txt"), UriUtility.resolveBagUri(baseDir, bagUri));
+    }
+
+    @Test
+    public void testResolveBagUriPlatformSpecific() throws Exception {
+        File baseDir = File.createTempFile("UriUtilityTest-", "ResolveBagUriPlatformSpecific");
+        assertTrue(FileUtils.deleteQuietly(baseDir));
+        assertTrue(baseDir.mkdir());
+        assertTrue(baseDir.isDirectory());
+
+        // bag://my-bag/data/file.txt
+        URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null);
+
+        assertEquals(Paths.get(baseDir.toString(), "my-bag/data/file.txt"),
+                UriUtility.resolveBagUri(baseDir.toPath(), bagUri));
+    }
+
+    @Test
+    public void testResolveBagUriExceptions() throws Exception {
+        try {
+            UriUtility.resolveBagUri(null, new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null));
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        try {
+            UriUtility.resolveBagUri(Paths.get("foo"), null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+
+        try {
+            UriUtility.resolveBagUri(Paths.get("foo"), new URI("file", "my-bag", "/data/file.txt", null));
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 }
