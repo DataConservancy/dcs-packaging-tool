@@ -81,6 +81,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -735,7 +736,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         refreshPopup.setTitleText(TextFactory.getText(LabelKey.DETECTED_CHANGES_LABEL));
 
         VBox content = new VBox(16);
-        content.setPrefWidth(500);
+        content.setPrefWidth(600);
 
         int addCount = 0;
         int deleteCount = 0;
@@ -763,15 +764,18 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         TableView<ComparisonResult> resultTable = new TableView<>();
 
+        final List<String> rowStyleClasses = Arrays.asList(ADDED_ROW, DELETED_ROW, UPDATED_ROW);
         resultTable.setRowFactory(new Callback<TableView<ComparisonResult>, TableRow<ComparisonResult>>() {
             @Override
             public TableRow<ComparisonResult> call(
                 TableView<ComparisonResult> param) {
+
                 return new TableRow<ComparisonResult>() {
                     @Override
                     protected void updateItem(ComparisonResult result, boolean empty){
                         super.updateItem(result, empty);
                         if (result != null) {
+                            getStyleClass().removeAll(rowStyleClasses);
                             switch (result.getComparison()) {
                                 case "ADDED":
                                     getStyleClass().add(ADDED_ROW);
@@ -793,6 +797,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         TableColumn<ComparisonResult, String> statusCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_STATUS_LABEL));
         statusCol.setCellValueFactory(new PropertyValueFactory<>("comparison"));
         statusCol.setPrefWidth(75);
+        statusCol.setResizable(false);
 
         TableColumn<ComparisonResult, String> locationCol = new TableColumn<>(TextFactory.getText(LabelKey.REFRESH_LOCATION_LABEL));
         locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));

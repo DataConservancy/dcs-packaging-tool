@@ -307,15 +307,18 @@
 }
 
 .AddedRow {
-    -fx-background-color: #8BC060;
+    -fx-background-color: #B8E395;
+    -fx-text-background-color: #000000;
 }
 
 .DeletedRow {
-    -fx-background-color: #C6605D;
+    -fx-background-color: #EF9896;
+    -fx-text-background-color: #000000;
 }
 
 .UpdatedRow {
-    -fx-background-color: #EEE669;
+    -fx-background-color: #FFF996;
+    -fx-text-background-color: #000000;
 }
 
 .EditPackageContentsViewArrowsImage {
