@@ -349,6 +349,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 } catch (IOException e) {
                     log.warn("Exception thrown when cleaning existing directory: " + e.getMessage());
                 }
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_INVALID_FILENAME);
             }
 
             log.info(("Reserving " + path));
@@ -383,6 +384,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
 
             fileURIMap.put(relativeURI, newFile.toURI());
+
             switch(type){
                 case DATA:
                     dataFiles.add(newFile);
@@ -392,15 +394,12 @@ public class BagItPackageAssembler implements PackageAssembler {
                 case ONTOLOGY:
                 case METADATA:
                 case PACKAGE_STATE:
-                default:
                     tagFiles.add(newFile);
                     break;
+                default:
+                    break;
             }
-            /*if (type.equals(PackageResourceType.DATA)) {
-                dataFiles.add(newFile);
-            } else {
-                tagFiles.add(newFile);
-            } */
+
             return relativeURI;
 
         } catch (DecoderException | URISyntaxException e) {

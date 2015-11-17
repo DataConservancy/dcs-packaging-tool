@@ -197,6 +197,48 @@ public class BagItPackageAssemblerTest {
     }
 
     @Test
+    public void testReserveURIFailsForBadDataFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadMetadataDataFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadReMFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.ORE_REM);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadOntologyFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.ONTOLOGY);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadStateFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.PACKAGE_STATE);
+    }
+
+
+
+    @Test
     public void testPutResource() throws IOException {
         //Reserve a URI
         String filePath = "metadataFile.txt";
