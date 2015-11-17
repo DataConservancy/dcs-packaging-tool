@@ -34,8 +34,7 @@ import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Before;;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -738,7 +737,6 @@ public class BagItPackageAssemblerTest {
         assertNull(pkg);
     }
 
-    @Ignore
     @Test
     public void testInvalidArchiveThrowsError() {
         PackageGenerationParameters params = new PackageGenerationParameters();
@@ -746,7 +744,7 @@ public class BagItPackageAssemblerTest {
         params.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "fake");
 
         expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more initial parameters for package assembler was invalid : Specified archiving format <fake> is not supported. The supported archiving formats are: ar, cpio, jar, tar, zip, exploded.");
+        expected.expectMessage("One or more initial parameters for the package assembler was invalid : Specified archiving format <fake> is not supported. The supported archiving formats are: ar, cpio, jar, tar, zip, exploded.");
 
         underTest = new BagItPackageAssembler();
         underTest.init(params);
@@ -754,7 +752,6 @@ public class BagItPackageAssemblerTest {
         // no data files need to be added, as the bag-it files will be sufficient to test
     }
 
-    @Ignore
     @Test
     public void testInvalidCompressionThrowsError() {
         PackageGenerationParameters params = new PackageGenerationParameters();
@@ -764,7 +761,7 @@ public class BagItPackageAssemblerTest {
         // no data files need to be added, as the bag-it files will be sufficient to test
 
         expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more initial parameters for package assembler was invalid : " +
+        expected.expectMessage("One or more initial parameters for the package assembler was invalid : " +
                 "Specified compression format fake is not supported. The supported compression formats are: " +
                 "gz (or gzip), bzip2, pack200, none.");
 
