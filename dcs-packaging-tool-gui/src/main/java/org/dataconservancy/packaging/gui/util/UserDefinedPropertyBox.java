@@ -316,7 +316,6 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         //If there aren't any values already just create an empty box to specify one.
         if (values == null || values.isEmpty()) {
             PropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
-
             propertyValuesBox.getChildren().add(propertyValueBox.getView());
         } else {
             empty = false;
@@ -324,7 +323,6 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
             for (String value : values) {
                 PropertyBox propertyValueBox = createPropertyValueBox(value, emptyPropertyValueListener, addNewPropertyListener);
-
                 if (((TextInputControl)propertyValueBox.getPropertyInput()).getText().isEmpty()) {
                     empty = true;
                 }
@@ -341,7 +339,6 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         addNewButton.setOnAction(arg0 -> {
 
             PropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
-
             propertyValuesBox.getChildren().add(propertyValueBox.getView());
             addNewButton.setDisable(true);
             propertyValueBox.getPropertyInput().requestFocus();
@@ -353,15 +350,19 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         if (requiresUri.getValue()) {
             propertyValueBox = new TextPropertyBox(value, true, PropertyValueHint.URI, "");
         } else {
-            propertyValueBox = new TextPropertyBox(value, true, PropertyValueHint.TEXT, "");
+            propertyValueBox = new TextPropertyBox(value, true, PropertyValueHint.MULTI_LINE_TEXT, "");
         }
 
         requiresUri.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                propertyValueBox.changePropertyValidationType(PropertyValueHint.URI);
+                propertyValueBox.updateInputControl(propertyValueBox.getValue(), true, PropertyValueHint.URI, "");
             } else {
-                propertyValueBox.changePropertyValidationType(PropertyValueHint.TEXT);
+                propertyValueBox.updateInputControl(propertyValueBox.getValue(), true, PropertyValueHint.MULTI_LINE_TEXT, "");
             }
+
+            propertyValueBox.getPropertyInput().setPrefWidth(250);
+            ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyValueListener);
+            ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyListener);
         });
 
         userDefinedPropertyValues.add(propertyValueBox);
