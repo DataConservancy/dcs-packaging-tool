@@ -41,7 +41,7 @@ public class UserDefinedPropertyTypeJSONBuilder {
         try {
             relationshipObject.put(LABEL, propertyType.getLabel());
             relationshipObject.put(DESCRIPTON, propertyType.getDescription());
-            relationshipObject.put(PREDICATE, propertyType.getDomainPredicate());
+            relationshipObject.put(PREDICATE, propertyType.getDomainPredicate().toString());
             if (propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
                 relationshipObject.put(REQUIRES_URI, true);
             } else {
