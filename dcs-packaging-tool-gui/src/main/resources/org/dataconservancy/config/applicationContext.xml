@@ -86,10 +86,6 @@
   </bean>
   -->
 
-  <bean id="packageOntologyService" class="org.dataconservancy.packaging.tool.impl.DcsBoPackageOntologyServiceImpl">
-    <property name="creatorPropertiesByString" value="${ontology.creatorProperties}"/>
-  </bean>
-
   <bean id="phoneNumberValidator" class="org.dataconservancy.packaging.tool.impl.support.PhoneNumberValidator">
     <property name="localCountryCode" value="${localCountryCode}"/>
   </bean>
