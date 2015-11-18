@@ -110,7 +110,7 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File ontologyDir = null;
     private File stateDir = null;
     private File remDir = null;
-    private File structureDir = null;
+    private File pkgInfoDir = null;
 
     private FilenameValidator filenameValidator = new FilenameValidator();
 
@@ -283,14 +283,14 @@ public class BagItPackageAssembler implements PackageAssembler {
             }
         }
 
-        //Creating the structure directory
-        structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
-        if (!structureDir.exists()) {
-            log.info("Creating package structure dir :" + structureDir.getPath());
-            boolean isDirCreated = structureDir.mkdirs();
+        //Creating the package info directory
+        pkgInfoDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
+        if (!pkgInfoDir.exists()) {
+            log.info("Creating package structure dir :" + pkgInfoDir.getPath());
+            boolean isDirCreated = pkgInfoDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
-                        "Attempt to create a package structure directory for bag at " + structureDir.getPath() + " failed.");
+                        "Attempt to create a package structure directory for bag at " + pkgInfoDir.getPath() + " failed.");
             }
         }
 
@@ -306,7 +306,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the ORE-ReM directory
-        remDir = new File(structureDir, "ORE-REM");
+        remDir = new File(pkgInfoDir, "ORE-REM");
         if (!remDir.exists()) {
             log.info("Creating ORE-ReM dir :" + remDir.getPath());
             boolean isDirCreated = remDir.mkdirs();
@@ -343,7 +343,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
             log.info("validating path: " + decodedPath);
 
-            if(isValidPathString(decodedPath) == false){
+            if(!isValidPathString(decodedPath)){
                 log.info("Invalid path string:" + decodedPath);
                 try {
                     FileUtils.cleanDirectory(bagBaseDir);
@@ -359,7 +359,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             if (type.equals(PackageResourceType.DATA)) {
                 containingDirectory = payloadDir;
             } else if (type.equals(PackageResourceType.METADATA)) {
-                containingDirectory = structureDir;
+                containingDirectory = pkgInfoDir;
             } else if(type.equals(PackageResourceType.ONTOLOGY)) {
                 containingDirectory = ontologyDir;
             } else if(type.equals(PackageResourceType.PACKAGE_STATE)) {
@@ -507,7 +507,6 @@ public class BagItPackageAssembler implements PackageAssembler {
                 } else {
                    finalFile = archivedBag;
                 }
-
 
                 String contentType;
 
@@ -814,12 +813,12 @@ public class BagItPackageAssembler implements PackageAssembler {
 
     /**
      * These satisfy the requirements of the DC Bafit Profile for filename validity
-     * @param pathString
+     * @param pathString the string representation of the relative file path
      * @return  whether the file name is valid
      */
     private boolean isValidPathString(String pathString){
         for(String component : pathString.split("/")){
-            if(component.length() > 256 || !filenameValidator.isValid(component)){
+            if(!filenameValidator.isValid(component)){
                 return false;
             }
         }
