@@ -20,6 +20,7 @@ package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -29,11 +30,14 @@ import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.dataconservancy.packaging.tool.ser.SerializationAnnotationUtil;
 import org.dataconservancy.packaging.tool.ser.StreamMarshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.oxm.Marshaller;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.beans.PropertyDescriptor;
+import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,6 +124,8 @@ import java.util.zip.CRC32;
  */
 public class AnnotationDrivenPackageStateSerializer implements PackageStateSerializer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationDrivenPackageStateSerializer.class);
+
     /**
      * Placeholders: requested stream id, PackageState class name, list of possible stream ids from the PackageState
      * class (obtained at runtime)
@@ -172,6 +178,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * Placeholders: streamId, error message
      */
     private static final String ERR_UNMARSHALLING_STREAM = "Error unmarshalling streamId '%s': %s";
+
+    /**
+     * Placeholders: streamid, expected crc, actual crc
+     */
+    private static final String WARN_CRC_MISMATCH = "CRC for stream %s did not match.  Expected: %s Actual: %s";
 
     /**
      * Whether or not we are serializing streams into an archive (zip or tar)
@@ -300,7 +311,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         StreamResult result = new StreamResult(crc);
         serializeToResult(state, streamId, result);
         ArchiveEntry arxEntry = arxStreamFactory
-                .newArchiveEntry(streamId.name(), baos.size(), now, now, 0644, crc.reset());
+                .newArchiveEntry(streamId.name(), baos.size(), now, now, 0644, crc.resetCrc());
 
         try {
             aos.putArchiveEntry(arxEntry);
@@ -414,7 +425,15 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                     if (!hasUnmarshaller(streamId)) {
                         throw new NullPointerException(String.format(ERR_MISSING_SPRINGMARSHALLER, streamId, streamId));
                     }
-                    deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(in));
+                    CRC32CalculatingInputStream crcIn = new CRC32CalculatingInputStream(in);
+                    long expectedCrc = ((ZipArchiveEntry) entry).getCrc();
+                    deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(crcIn));
+
+                    long actualCrc = crcIn.resetCrc();
+                    if (actualCrc != expectedCrc) {
+                        LOG.warn(String.format(WARN_CRC_MISMATCH,
+                                streamId, Long.toHexString(expectedCrc), Long.toHexString(actualCrc)));
+                    }
 
                     propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
                 }
@@ -574,7 +593,71 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
          *
          * @return the checksum value for the bytes written thus far
          */
-        long reset() {
+        long resetCrc() {
+            long crc = crc32.getValue();
+            crc32.reset();
+            return crc;
+        }
+
+    }
+
+    /**
+     * Calculates a CRC32 checksum as bytes are written to the wrapped {@code OutputStream}
+     */
+    private class CRC32CalculatingInputStream extends FilterInputStream {
+
+        private CRC32 crc32 = new CRC32();
+
+        public CRC32CalculatingInputStream(InputStream in) {
+            super(in);
+        }
+
+
+        @Override
+        public boolean markSupported() {
+            return false;
+        }
+
+        @Override
+        public int read() throws IOException {
+            int read = in.read();
+            if (read >= 0) {
+                crc32.update(read);
+            }
+
+            return read;
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return read(b, 0, b.length);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            int read = in.read(b, off, len);
+            if (read >= 0) {
+                crc32.update(b, off, read);
+            }
+            return read;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            // Can't skip, we have to hash everything to verify the checksum
+            if (read() >= 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        /**
+         * Resets the checksum calculation and returns its value.
+         *
+         * @return the checksum value for the bytes written thus far
+         */
+        long resetCrc() {
             long crc = crc32.getValue();
             crc32.reset();
             return crc;
