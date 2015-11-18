@@ -34,8 +34,7 @@ import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Before;;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -83,6 +82,7 @@ public class BagItPackageAssemblerTest {
     String checksumAlg;
 
     String stateDir = "META-INF/org.dataconservancy.bagit/STATE";
+    String structureDir = "META-INF/org.dataconservancy.bagit/PKG-INFO";
     String remDir = "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM";
     String ontologyDir = "META-INF/org.dataconservancy.bagit/ONT";
     String RemURI;
@@ -142,7 +142,7 @@ public class BagItPackageAssemblerTest {
     public void testReserveURIForMetadataFile() {
         String filePath = "myProject/dataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        String expectedURI = "bag://" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/" + structureDir + "/"
                 + filePath;
         assertTrue(expectedURI.equals(result.toString()));
     }
@@ -198,11 +198,53 @@ public class BagItPackageAssemblerTest {
     }
 
     @Test
+    public void testReserveURIFailsForBadDataFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadMetadataDataFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadReMFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.ORE_REM);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadOntologyFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.ONTOLOGY);
+    }
+
+    @Test
+    public void testReserveURIFailsForBadStateFile(){
+        String filePath = "bad~file:name";
+        expected.expect(PackageToolException.class);
+        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
+        URI result = underTest.reserveResource(filePath, PackageResourceType.PACKAGE_STATE);
+    }
+
+
+
+    @Test
     public void testPutResource() throws IOException {
         //Reserve a URI
         String filePath = "metadataFile.txt";
         URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        String expectedURI = "bag://" + packageName + "/"
+        String expectedURI = "bag://" + packageName + "/" + structureDir + "/"
                 + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
@@ -305,7 +347,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "bag://" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + structureDir + "/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -338,7 +380,7 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
@@ -402,7 +444,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "bag://" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/" + structureDir + "/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -435,7 +477,7 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
@@ -478,7 +520,7 @@ public class BagItPackageAssemblerTest {
         //Reserve a URI for metadata file
         filePath = "metadataFile.txt";
         result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
-        expectedURI = "bag://" + packageName + "/"  + filePath;
+        expectedURI = "bag://" + packageName + "/"  + structureDir + "/" + filePath;
         assertTrue(expectedURI.equals(result.toString()));
 
         //Put content into the space specified by the URI
@@ -509,7 +551,7 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep +"org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep +"metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
@@ -738,7 +780,6 @@ public class BagItPackageAssemblerTest {
         assertNull(pkg);
     }
 
-    @Ignore
     @Test
     public void testInvalidArchiveThrowsError() {
         PackageGenerationParameters params = new PackageGenerationParameters();
@@ -746,7 +787,7 @@ public class BagItPackageAssemblerTest {
         params.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "fake");
 
         expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more initial parameters for package assembler was invalid : Specified archiving format <fake> is not supported. The supported archiving formats are: ar, cpio, jar, tar, zip, exploded.");
+        expected.expectMessage("One or more initial parameters for the package assembler was invalid : Specified archiving format <fake> is not supported. The supported archiving formats are: ar, cpio, jar, tar, zip, exploded.");
 
         underTest = new BagItPackageAssembler();
         underTest.init(params);
@@ -754,7 +795,6 @@ public class BagItPackageAssemblerTest {
         // no data files need to be added, as the bag-it files will be sufficient to test
     }
 
-    @Ignore
     @Test
     public void testInvalidCompressionThrowsError() {
         PackageGenerationParameters params = new PackageGenerationParameters();
@@ -764,7 +804,7 @@ public class BagItPackageAssemblerTest {
         // no data files need to be added, as the bag-it files will be sufficient to test
 
         expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more initial parameters for package assembler was invalid : " +
+        expected.expectMessage("One or more initial parameters for the package assembler was invalid : " +
                 "Specified compression format fake is not supported. The supported compression formats are: " +
                 "gz (or gzip), bzip2, pack200, none.");
 

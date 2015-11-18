@@ -110,6 +110,7 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File ontologyDir = null;
     private File stateDir = null;
     private File remDir = null;
+    private File structureDir = null;
 
     private FilenameValidator filenameValidator = new FilenameValidator();
 
@@ -283,7 +284,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the structure directory
-        File structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
+        structureDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
         if (!structureDir.exists()) {
             log.info("Creating package structure dir :" + structureDir.getPath());
             boolean isDirCreated = structureDir.mkdirs();
@@ -349,6 +350,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 } catch (IOException e) {
                     log.warn("Exception thrown when cleaning existing directory: " + e.getMessage());
                 }
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_INVALID_FILENAME);
             }
 
             log.info(("Reserving " + path));
@@ -357,7 +359,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             if (type.equals(PackageResourceType.DATA)) {
                 containingDirectory = payloadDir;
             } else if (type.equals(PackageResourceType.METADATA)) {
-                containingDirectory = bagBaseDir;
+                containingDirectory = structureDir;
             } else if(type.equals(PackageResourceType.ONTOLOGY)) {
                 containingDirectory = ontologyDir;
             } else if(type.equals(PackageResourceType.PACKAGE_STATE)) {
@@ -383,6 +385,7 @@ public class BagItPackageAssembler implements PackageAssembler {
             URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
 
             fileURIMap.put(relativeURI, newFile.toURI());
+
             switch(type){
                 case DATA:
                     dataFiles.add(newFile);
@@ -392,15 +395,12 @@ public class BagItPackageAssembler implements PackageAssembler {
                 case ONTOLOGY:
                 case METADATA:
                 case PACKAGE_STATE:
-                default:
                     tagFiles.add(newFile);
                     break;
+                default:
+                    break;
             }
-            /*if (type.equals(PackageResourceType.DATA)) {
-                dataFiles.add(newFile);
-            } else {
-                tagFiles.add(newFile);
-            } */
+
             return relativeURI;
 
         } catch (DecoderException | URISyntaxException e) {
