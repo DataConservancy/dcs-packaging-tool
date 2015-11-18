@@ -146,7 +146,6 @@ public class NodePropertyWindowBuilder implements CssConstants {
         relationshipTab.setClosable(false);
         relationshipTab.setText(TextFactory.getText(Labels.LabelKey.USER_PROPERTIES_LABEL));
         ScrollPane relationshipPane = new ScrollPane();
-        relationshipPane.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
         relationshipPane.setHvalue(500);
         relationshipPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         relationshipPane.setContent(createUserDefinedPropertiesTab(userDefinedProperties));
@@ -295,6 +294,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
      */
     private VBox createUserDefinedPropertiesTab(List<Property> userDefinedPropertyValues) {
         final VBox relationshipsBox = new VBox(38);
+        relationshipsBox.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
 
         final double addNewButtonMaxWidth = 200;
 

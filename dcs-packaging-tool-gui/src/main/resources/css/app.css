@@ -403,10 +403,23 @@
 
 .PropertyTextArea .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 .PropertyTextArea .scroll-bar:horizontal:disabled {
     -fx-opacity: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.PropertyTextArea .scroll-bar:horizontal:disabled .track-background ,
+.PropertyTextArea .scroll-bar:vertical:disabled .track-background {
+     -fx-background-color: transparent;
+	 -fx-border-color: transparent;
+	 -fx-border-width: 0;
+	 -fx-background-radius: 0em;
+	 -fx-opacity: 0;
 }
 
 .UneditablePropertyValue {

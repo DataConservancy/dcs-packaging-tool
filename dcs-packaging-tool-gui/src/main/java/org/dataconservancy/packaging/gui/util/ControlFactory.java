@@ -12,17 +12,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.App;
+import org.dataconservancy.packaging.gui.CssConstants;
 import org.joda.time.DateTime;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 /**
  * A class to create Control objects for the Package Tool GUI. The main purpose of this is to provide resizing and tooltip
  * functionality for various input controls.
  */
-public class ControlFactory {
+public class ControlFactory implements CssConstants {
 
     public static double textPrefWidth = 1600; //make this big enough so that text input controls will widen when widening
     // the window. this property is public so it can be used in other classes.
@@ -72,6 +72,8 @@ public class ControlFactory {
                 control.setPrefWidth(textPrefWidth);
                 ((TextArea)control).setPrefRowCount(5);
                 ((TextArea)control).setWrapText(true);
+                control.setPrefHeight(startingTextHeight);
+                control.getStyleClass().add(PROPERTY_TEXT_AREA);
                 //The following code handles the growing of the text area to fit the text. It starts as 5 rows of text and is locked to never go below that size.
                 //This code only handles changes when the box is already visible for handling when the box is first visible see above.
                 ((TextArea)control).textProperty().addListener((observableValue, s, newValue) -> {
