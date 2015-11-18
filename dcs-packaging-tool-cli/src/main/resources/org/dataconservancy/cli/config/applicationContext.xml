@@ -16,13 +16,11 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-                      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-  <context:annotation-config />
-
+<!-- <context:annotation-config/>  -->
   <bean id="propertyPlaceholderConfigurer"
     class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="ignoreResourceNotFound" value="true" />
@@ -50,8 +48,10 @@
     class="org.dataconservancy.packaging.tool.impl.TestPackageGenerator"></bean>
 
   <bean id="packageGenerationParametersBuilder"
-    class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder"></bean>
+    class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder">
+  </bean>
 
+<!--
   <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
     <property name="staticMethod">
       <value>org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory.setAssemblers</value>
@@ -73,11 +73,11 @@
       </map>
     </property>
   </bean>
-  
+  -->
+ <!--
   <bean id="packageModelBuilder_BOREM" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl">
     <property name="nodeVisitors">
       <list>
-        <bean class="org.dataconservancy.packaging.tool.impl.generator.OreReMBuilder" />
         <bean class="org.dataconservancy.packaging.tool.impl.generator.PackageStateBuilder">
           <property name="packageStateSerializer" ref="packageStateSerializer"/> 
         </bean>
@@ -86,11 +86,11 @@
     </property>
   </bean>
   
-    <!-- (DE)SERIALIZATION -->
+    (DE)SERIALIZATION
   <bean id="packageStateSerializer"
         class="org.dataconservancy.packaging.tool.impl.AnnotationDrivenPackageStateSerializer">
     <property name="marshallerMap" ref="marshallerMap"/>
     <property name="archive" value="true"/>
-  </bean>
+  </bean>      -->
 </beans>
 
