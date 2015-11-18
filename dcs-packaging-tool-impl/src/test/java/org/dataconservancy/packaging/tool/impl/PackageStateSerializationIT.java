@@ -30,6 +30,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -146,6 +148,15 @@ public class PackageStateSerializationIT {
             }
         });
 
+        SerializeEqualsTester.serializeEquals(state, deserializedState);
+    }
+
+    @Test
+    public void testDeserializeCorruptCrc32Stream() throws Exception {
+        Resource corruptStream = new ClassPathResource("/stateWithCorruptStream.zip");
+        PackageState deserializedState = new PackageState();
+        // this should emit a message at WARN level about a corrupt stream (if SLF4J has an impl hooked up)
+        underTest.deserialize(deserializedState, new BufferedInputStream(corruptStream.getInputStream()));
         SerializeEqualsTester.serializeEquals(state, deserializedState);
     }
 

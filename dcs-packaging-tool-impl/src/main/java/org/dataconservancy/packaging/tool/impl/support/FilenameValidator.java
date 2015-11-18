@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 
 /**
  * This validator checks for validity of file path components as defined by the Data Conservancy BagIt Provile Version 1.0
+ * To check a path for validity, a caller should apply this to each component in the path.
+ *
  */
 public class FilenameValidator implements Validator {
 
@@ -56,7 +58,7 @@ public class FilenameValidator implements Validator {
             char c = fileName.charAt(i);
             int j = (int) c;
             if (((Integer.parseInt("00", 16) <= j) && (j <= Integer.parseInt("1f", 16))) ||
-                    (j >= Integer.parseInt("7f", 16))) {
+                    (j >= Integer.parseInt("7f", 16))) { //0x7f is Delete
                 return true;
             }
         }

@@ -86,6 +86,12 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <!-- concrete loggers should be configured
+        as close to packaging/distribution time
+        as possible, so we don't force people onto
+        a concrete logging impl, or force them
+        to add exclusions -->
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
