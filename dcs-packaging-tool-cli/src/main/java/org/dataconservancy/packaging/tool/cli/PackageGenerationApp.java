@@ -26,7 +26,15 @@ import org.apache.commons.lang.StringUtils;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
-import org.dataconservancy.packaging.tool.model.*;
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
+import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
+import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
+import org.dataconservancy.packaging.tool.model.ParametersBuildException;
+import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -126,7 +134,8 @@ public class PackageGenerationApp {
 
 	public PackageGenerationApp() {
 		appContext = new ClassPathXmlApplicationContext(
-                         new String[]{"classpath*:org/dataconservancy/config/applicationContext.xml",
+                         new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
+                                 "classpath*:org/dataconservancy/config/applicationContext.xml",
                                       "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
                                       "classpath*:applicationContext.xml"});
     }
@@ -313,9 +322,9 @@ public class PackageGenerationApp {
 	 * too (through the value '-' rather than file path).
 	 */
 	private PackageState getPackageState() {
-        PackageState packageState;
+        PackageState packageState = new PackageState();
 
-        PackageStateBuilder packageStateBuilder = appContext.getBean("packageStateBuilder", PackageStateBuilder.class);
+        PackageStateSerializer packageStateSerializer = appContext.getBean("packageStateSerializer", PackageStateSerializer.class);
 
         if (location == null || location.isEmpty()) {
             try {
@@ -323,7 +332,7 @@ public class PackageGenerationApp {
                 if (debug) {
                     log.debug("Loading state file from stdin.");
                 }
-                packageState = packageStateBuilder.deserialize(System.in);
+                packageStateSerializer.deserialize(packageState, System.in);
             } catch (Exception e) {
                 throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_INPUT_ERROR, e);
             }
@@ -333,7 +342,7 @@ public class PackageGenerationApp {
                     log.debug("Loading package state file: " + location);
                 }
                 FileInputStream fis = new FileInputStream(location);
-                packageState = packageStateBuilder.deserialize(fis);
+                packageStateSerializer.deserialize(packageState, fis);
            } catch (FileNotFoundException e) {
                 throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
            }
