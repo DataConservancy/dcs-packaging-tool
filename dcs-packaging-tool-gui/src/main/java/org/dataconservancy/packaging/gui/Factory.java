@@ -28,7 +28,6 @@ import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator;
-import org.dataconservancy.packaging.tool.impl.PackageDescriptionValidator;
 import org.dataconservancy.packaging.tool.impl.TestPackageGenerator;
 import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl;
@@ -47,7 +46,6 @@ public class Factory {
     private HomepagePresenter homepagePresenter;
     private CreateNewPackageView createNewPackageView;
     private CreateNewPackagePresenter createNewPackagePresenter;
-    private PackageDescriptionValidator packageDescriptionValidator;
     private PackageGenerationService pkgGenerationService;
     private PackageGenerationParametersBuilder pkgGenParamsBuilder;
     private BOREMPackageGenerator boremPkgGenerator;
@@ -114,9 +112,6 @@ public class Factory {
 
     public EditPackageContentsPresenter getEditPackageContentsPresenter() { return editPackageContentsPresenter; }
     public void setEditPackageContentsPresenter(EditPackageContentsPresenter presenter) { this.editPackageContentsPresenter = presenter; }
-
-    public PackageDescriptionValidator getPackageDescriptionValidator() { return packageDescriptionValidator; }
-    public void setPackageDescriptionValidator(PackageDescriptionValidator validator ) { this.packageDescriptionValidator = validator; }
 
     public PackageGenerationService getPackageGenerationService() { return pkgGenerationService; }
     public void setPackageGenerationService(PackageGenerationService service) { this.pkgGenerationService = service; }
