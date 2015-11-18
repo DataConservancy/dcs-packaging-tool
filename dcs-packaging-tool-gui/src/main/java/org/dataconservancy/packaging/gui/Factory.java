@@ -75,9 +75,10 @@ public class Factory {
         assemblers.put("BOREM",  BagItPackageAssembler.class);
         PackageAssemblerFactory.setAssemblers(assemblers);
         
-        Map<String, Class<? extends PackageModelBuilder>> builders = new HashMap<>();
-        builders.put("http://dataconservancy.org/spec/dcs-pkg-desc-BOREM", PackageModelBuilderImpl.class);
-        PackageModelBuilderFactory.setBuilders(builders);
+        /* TODO:  XXX:  This MUST be set via Spring!!!!!! */
+        //Map<String, Class<? extends PackageModelBuilder>> builders = new HashMap<>();
+        //builders.put("http://dataconservancy.org/spec/dcs-pkg-desc-BOREM", PackageModelBuilderImpl.class);
+        //PackageModelBuilderFactory.setBuilders(builders);
     }
 
 

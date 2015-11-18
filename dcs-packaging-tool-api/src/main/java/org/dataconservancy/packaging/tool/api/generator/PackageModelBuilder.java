@@ -31,10 +31,10 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 public interface PackageModelBuilder {
 
     /**
-     * Initialize a builder based on the specified parameters.
+     * Produce an initializsed builder based on the specified parameters.
      * @param params The parameters used to initialize a specific instance of the builder object
      */
-    public void init(PackageGenerationParameters params);
+    public PackageModelBuilder newInstance(PackageGenerationParameters params);
 
     /**
      * Create the resources that instantiate a package in a particular model.

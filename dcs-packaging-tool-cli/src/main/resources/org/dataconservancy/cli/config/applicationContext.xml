@@ -64,14 +64,33 @@
   </bean>
 
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="staticMethod">
-            <value>org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory.setBuilders</value>
-        </property>
-        <property name="arguments">
-            <map key-type="java.lang.String" value-type="java.lang.Class">
-                <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl"/>
-            </map>
-        </property>
-    </bean>
+    <property name="staticMethod">
+      <value>org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory.setBuilders</value>
+    </property>
+    <property name="arguments">
+      <map key-type="java.lang.String" value-type="org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder">
+        <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value-ref="packageModelBuilder_BOREM"/>
+      </map>
+    </property>
+  </bean>
+  
+  <bean id="packageModelBuilder_BOREM" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl">
+    <property name="nodeVisitors">
+      <list>
+        <bean class="org.dataconservancy.packaging.tool.impl.generator.OreReMBuilder" />
+        <bean class="org.dataconservancy.packaging.tool.impl.generator.PackageStateBuilder">
+          <property name="packageStateSerializer" ref="packageStateSerializer"/> 
+        </bean>
+        <bean class="org.dataconservancy.packaging.tool.impl.generator.DomainObjectResourceBuilder" />               
+      </list>
+    </property>
+  </bean>
+  
+    <!-- (DE)SERIALIZATION -->
+  <bean id="packageStateSerializer"
+        class="org.dataconservancy.packaging.tool.impl.AnnotationDrivenPackageStateSerializer">
+    <property name="marshallerMap" ref="marshallerMap"/>
+    <property name="archive" value="true"/>
+  </bean>
 </beans>
 

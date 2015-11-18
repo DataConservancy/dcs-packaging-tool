@@ -21,10 +21,13 @@ import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
 
-/** For testing with Spring.  This does nothing, but has to exist */
-public class MockPackageModelBuilder implements PackageModelBuilder {
+/** For testing with Spring. This does nothing, but has to exist */
+public class MockPackageModelBuilder
+        implements PackageModelBuilder {
+
     @Override
-    public void init(PackageGenerationParameters params) {
+    public PackageModelBuilder newInstance(PackageGenerationParameters params) {
+        return this;
     }
 
     @Override

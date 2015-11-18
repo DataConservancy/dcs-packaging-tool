@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class PackageModelBuilderFactory {
 
-    private static Map<String, Class<? extends PackageModelBuilder>> builders;
+    private static Map<String, PackageModelBuilder> builders;
 
     /**
      * Provides an instance of {@link PackageModelBuilder} for assembling
@@ -59,16 +59,13 @@ public class PackageModelBuilderFactory {
         }
 
         if (builders.containsKey(formatId)) {
-            Class<? extends PackageModelBuilder> builderClass = builders.get(formatId);
-            PackageModelBuilder builder = builderClass.newInstance();
-            builder.init(params);
-            return builder;
+            return builders.get(formatId).newInstance(params);
         }
 
         return null;
     }
 
-    public static void setBuilders(Map<String, Class<? extends PackageModelBuilder>> builders) {
+    public static void setBuilders(Map<String, PackageModelBuilder> builders) {
         if (builders == null || builders.size() == 0) {
             throw new IllegalArgumentException("At least one builder must be provided");
         }

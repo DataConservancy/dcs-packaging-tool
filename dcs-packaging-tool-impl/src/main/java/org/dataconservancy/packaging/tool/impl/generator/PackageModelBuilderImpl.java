@@ -17,7 +17,6 @@
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,17 +64,13 @@ public class PackageModelBuilderImpl
         this.visitors = visitors;
     }
 
-    public PackageModelBuilderImpl() {
-
-        /* TODO:  Reasonable defaults for the lack of Spring wiring */
-        visitors =
-                Arrays.asList(new OreReMBuilder(),
-                              new DomainObjectResourceBuilder());
-    }
-
     @Override
-    public void init(PackageGenerationParameters params) {
-        this.params = params;
+    public PackageModelBuilder newInstance(PackageGenerationParameters params) {
+        PackageModelBuilderImpl builder = new PackageModelBuilderImpl();
+        builder.setNodeVisitors(visitors);
+        builder.params = params;
+        
+        return builder;
     }
 
     @Override
