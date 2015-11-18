@@ -36,21 +36,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * Application for generating packages from package descriptions.
+ * Application for generating packages from package state.
  * <p>
  * The most specific commandline arguments (i.e. <tt>-f format</tt>) override
  * less specific (format specified in params file indicated by by
  * <tt>-p param_file</tt>).
  * </p>
  * <p>
- * Required arguments are the file/directory containing PackageDescriptions, and
- * output file/directory that will contain the generated package. Ideally, the
- * application will support STDIN/STDOUT in addition to physical files. In an
- * ideal world, it would also support URLs too, at least for input
- * PackageDescriptions.
+ * Required arguments are the file/directory containing package states, and
+ * output file/directory that will contain the generated package.
  * </p>
- * 
- * @author apb18@cornell.edu
  * 
  */
 public class PackageGenerationApp {
@@ -120,10 +115,6 @@ public class PackageGenerationApp {
     @Option(name = "--stage", aliases = { "--staging", "--staging-location", "--package-staging-location"}, metaVar = "<path>", usage = "The directory to which the package will be staged before building.  Will override value in Package Generation Parameters file.")
     public String packageStagingLocation;
 
-    /** Package External-Id **/
-    @Option(name = "--eid", aliases = { "--external-project-id"}, metaVar = "<URI>", usage = "The URI used as the external ID relating to the package.")
-    public String externalProjectId;
-
     /** Force overwrite of target file **/
     @Option(name = "--overwrite", aliases = { "--force" }, usage = "If specified, will overwrite if the destination package file already exists without prompting.")
     public boolean overwriteIfExists = false;
@@ -135,8 +126,10 @@ public class PackageGenerationApp {
 
 	public PackageGenerationApp() {
 		appContext = new ClassPathXmlApplicationContext(
-				new String[] { "classpath*:org/dataconservancy/cli/config/applicationContext.xml" });
-	}
+                         new String[]{"classpath*:org/dataconservancy/config/applicationContext.xml",
+                                      "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
+                                      "classpath*:applicationContext.xml"});
+    }
 
 	public static void main(String[] args) {
 
@@ -184,7 +177,7 @@ public class PackageGenerationApp {
         PackageGenerationParametersBuilder parametersBuilder = appContext.getBean("packageGenerationParametersBuilder",
                 PackageGenerationParametersBuilder.class);
 
-        // Load parameters first from default, then override with home directory .packageToolParams, then with
+        // Load parameters first from default, then override with home directory .packageGenerationParameters, then with
         // specified params file (if given).
         PackageGenerationParameters packageParams;
 
@@ -255,7 +248,7 @@ public class PackageGenerationApp {
         // Get and load the Package State file, use it to get the content root location
         // This will be overridden always as it needs to match what's on disk, so shouldn't really
         // be provided in the params files anyway
-        PackageState desc = getPackageState();
+        PackageState packageState = getPackageState();
 
         // Print package generation parameters, if desired
         if (info) {
@@ -273,7 +266,7 @@ public class PackageGenerationApp {
 
         
         Package pkg = generationService
-                .generatePackage(desc, packageParams);
+                .generatePackage(packageState, packageParams);
                 
 
         // Write to the destination. do not write a package file if we have an exploded package
@@ -313,15 +306,40 @@ public class PackageGenerationApp {
     }
 
 	/*
-	 * Fetch the PackageDescription(s) based on the location specified in the
+	 * Fetch the package state files(s) based on the location specified in the
 	 * user. This will be the first value in the this.locations list (well,
 	 * technically "all except the last value", if multiple input
 	 * PackageDescription files are specified. It would be nice to handle STDIN
 	 * too (through the value '-' rather than file path).
 	 */
 	private PackageState getPackageState() {
-        /* TODO:  Implement */
-	    throw new UnsupportedOperationException();
+        PackageState packageState;
+
+        PackageStateBuilder packageStateBuilder = appContext.getBean("packageStateBuilder", PackageStateBuilder.class);
+
+        if (location == null || location.isEmpty()) {
+            try {
+                System.err.println("Reading Package State file from STDIN...");
+                if (debug) {
+                    log.debug("Loading state file from stdin.");
+                }
+                packageState = packageStateBuilder.deserialize(System.in);
+            } catch (Exception e) {
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_INPUT_ERROR, e);
+            }
+        } else {
+           try {
+                if (debug) {
+                    log.debug("Loading package state file: " + location);
+                }
+                FileInputStream fis = new FileInputStream(location);
+                packageState = packageStateBuilder.deserialize(fis);
+           } catch (FileNotFoundException e) {
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
+           }
+        }
+
+		return packageState;
 	}
 
 
@@ -340,7 +358,6 @@ public class PackageGenerationApp {
         }
         if (packageLocation != null) {params.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation);}
         if (packageStagingLocation != null) {params.addParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, packageStagingLocation);}
-        if (externalProjectId != null) {params.addParam(GeneralParameterNames.EXTERNAL_PROJECT_ID, externalProjectId);}
 
         if (checksums != null && !checksums.isEmpty()) {
             params.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksums);
