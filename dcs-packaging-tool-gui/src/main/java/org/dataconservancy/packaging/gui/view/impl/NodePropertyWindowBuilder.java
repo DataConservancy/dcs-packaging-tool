@@ -193,8 +193,24 @@ public class NodePropertyWindowBuilder implements CssConstants {
         sortedProperties.addAll(nodeType.getPropertyConstraints());
         sortProperties(sortedProperties);
 
+        Label requiredLabel = new Label();
+        requiredLabel.getStyleClass().add(CATEGORY_SUB_TITLE);
+        requiredLabel.setText(TextFactory.getText(Labels.LabelKey.REQUIRED_FIELDS_LABEL));
+        generalPropertyBox.getChildren().add(requiredLabel);
+
+        Label optionalLabel = new Label();
+        optionalLabel.getStyleClass().add(CATEGORY_SUB_TITLE);
+        optionalLabel.setText(TextFactory.getText(Labels.LabelKey.OPTIONAL_FIELDS_LABEL));
+
+        boolean shownOptionalLabel = false;
+
         //To get the properties on a node we loop through the constraints on the type
         for (PropertyConstraint propertyConstraint : sortedProperties) {
+            if (propertyConstraint.getMinimum() == 0 && !shownOptionalLabel) {
+                generalPropertyBox.getChildren().add(optionalLabel);
+                shownOptionalLabel = true;
+            }
+
             PropertyType type = propertyConstraint.getPropertyType();
             if (type.getPropertyCategory() != null) {
                 if (categoryMap.containsKey(type.getPropertyCategory())) {

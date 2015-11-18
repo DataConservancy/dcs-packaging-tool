@@ -148,6 +148,10 @@
     -fx-font-size: 18;
 }
 
+.CategorySubTitle {
+    -fx-font-size: 16;
+}
+
 .PropertyTextArea .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
     -fx-border-color: transparent;

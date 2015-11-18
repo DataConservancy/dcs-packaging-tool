@@ -63,4 +63,5 @@ public interface CssConstants {
     String DELETED_ROW = "DeletedRow";
     String UPDATED_ROW = "UpdatedRow";
     String PROPERTY_TEXT_AREA = "PropertyTextArea";
+    String CATEGORY_SUB_TITLE = "CategorySubTitle";
 }
