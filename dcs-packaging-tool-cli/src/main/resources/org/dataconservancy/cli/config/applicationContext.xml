@@ -27,9 +27,6 @@
     <property name="ignoreUnresolvablePlaceholders" value="true" />
   </bean>
 
-  <bean id="packageDescriptionBuilder"
-    class="org.dataconservancy.packaging.tool.model.builder.json.JSONPackageDescriptionBuilder" />
-
   <bean id="packageGenerationService"
     class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
     <property name="generatorMap">

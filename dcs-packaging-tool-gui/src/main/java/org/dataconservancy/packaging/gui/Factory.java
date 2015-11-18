@@ -34,7 +34,6 @@ import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl;
 import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory;
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory;
-import org.dataconservancy.packaging.tool.model.PackageDescriptionBuilder;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 
 /**
@@ -49,7 +48,6 @@ public class Factory {
     private CreateNewPackageView createNewPackageView;
     private CreateNewPackagePresenter createNewPackagePresenter;
     private PackageDescriptionValidator packageDescriptionValidator;
-    private PackageDescriptionBuilder packageDescriptionBuilder;
     private PackageGenerationService pkgGenerationService;
     private PackageGenerationParametersBuilder pkgGenParamsBuilder;
     private BOREMPackageGenerator boremPkgGenerator;
@@ -120,9 +118,6 @@ public class Factory {
     public PackageDescriptionValidator getPackageDescriptionValidator() { return packageDescriptionValidator; }
     public void setPackageDescriptionValidator(PackageDescriptionValidator validator ) { this.packageDescriptionValidator = validator; }
 
-    public PackageDescriptionBuilder getPackageDescriptionBuilder() { return packageDescriptionBuilder; }
-    public void setPackageDescriptionBuilder(PackageDescriptionBuilder builder) { this.packageDescriptionBuilder = builder; }
-    
     public PackageGenerationService getPackageGenerationService() { return pkgGenerationService; }
     public void setPackageGenerationService(PackageGenerationService service) { this.pkgGenerationService = service; }
     
