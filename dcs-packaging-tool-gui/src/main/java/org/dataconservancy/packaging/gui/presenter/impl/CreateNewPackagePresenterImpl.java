@@ -155,7 +155,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
     /**
      * A {@link javafx.concurrent.Service} which executes the {@link javafx.concurrent.Task} of obtaining a
-     * {@link org.dataconservancy.packaging.tool.model.PackageDescription} given a package ontology identifier and
+     * {@link org.dataconservancy.packaging.tool.model.ipm.Node} given a package ontology identifier and
      * a content directory
      */
     private class PackageIpmBuilderService extends Service<Node> {

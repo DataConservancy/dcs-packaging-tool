@@ -15,7 +15,6 @@
  */
 package org.dataconservancy.packaging.tool.api;
 
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.PackageToolException;

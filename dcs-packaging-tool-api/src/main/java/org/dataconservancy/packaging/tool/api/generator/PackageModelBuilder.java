@@ -16,14 +16,13 @@
 
 package org.dataconservancy.packaging.tool.api.generator;
 
-import org.dataconservancy.packaging.tool.model.PackageDescription;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
 
 /**
  * Creates resources to be packaged in accordance with some packaging model.
  * <p>
- * Takes a {@link PackageDescription}, transforms it into some other packaging
+ * Takes a {@link PackageState}, transforms it into some other packaging
  * model, instantiates it into physical resources by serializing and invoking
  * {@link PackageAssembler}
  * </p>
