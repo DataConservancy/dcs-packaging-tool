@@ -101,7 +101,7 @@ public class SerializeEqualsTester {
                     Model.class.isAssignableFrom(fieldTwo.getClass())) {
                 assertModelEquals((Model) fieldOne, (Model) fieldTwo);
             } else {
-                assertEquals(fieldOne, fieldTwo);
+                assertEquals("Error with field " + pd.getName(), fieldOne, fieldTwo);
             }
         });
 

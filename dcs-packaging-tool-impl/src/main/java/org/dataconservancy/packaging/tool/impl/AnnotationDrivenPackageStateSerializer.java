@@ -111,6 +111,9 @@ import java.util.zip.CRC32;
  * When this flag is false, other archive-related properties are not consulted.</dd>
  * <dt>arxStreamFactory</dt>
  * <dd>This is the abstraction used to create {@link ArchiveOutputStream} and {@link ArchiveEntry} objects</dd>
+ * <dt>failOnChecksumMismatch</dt>
+ * <dd>Flag used during deserialization, controlling whether or not an {@link StreamChecksumMismatch exception} is
+ * thrown when encountering an invalid checksum when reading streams from a package state</dd>
  * </dl>
  * <p>
  * <strong>Marshalling-related configuration:</strong>
@@ -185,6 +188,11 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     private static final String WARN_CRC_MISMATCH = "CRC for stream %s did not match.  Expected: %s Actual: %s";
 
     /**
+     * Placeholders: streamid
+     */
+    private static final String WARN_UNKNOWN_STREAM = "Encountered unknown stream identifer '%s'.  Skipping it.";
+
+    /**
      * Whether or not we are serializing streams into an archive (zip or tar)
      */
     private boolean archive = true;
@@ -210,6 +218,27 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     private Map<StreamId, PropertyDescriptor> propertyDescriptors =
             SerializationAnnotationUtil.getStreamDescriptors(PackageState.class);
 
+    /**
+     * A flag controlling whether or not an exception will be thrown when a stream's calculated checksum does
+     * not match its actual checksum.
+     */
+    private boolean failOnChecksumMismatch = false;
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Behaves as
+     * </p>
+     * <pre>
+     * deserialize(state, null, in)
+     * </pre>
+     *
+     * @param state {@inheritDoc}
+     * @param in {@inheritDoc}
+     * @throws RuntimeException when there are errors accessing fields of the state using reflection
+     * @throws StreamChecksumMismatch when {@code failOnChecksumMismatch} is {@code true} and a checksum mismatch is
+     *                                encountered
+     */
     @Override
     public void deserialize(PackageState state, InputStream in) {
         deserialize(state, null, in);
@@ -222,7 +251,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * {@code OutputStream}.  It is recommended that when calling this method, the caller also set the {@link
      * #setArchive(boolean) archive flag} to {@code true}.  Because {@code PackageState} contains multiple fields, and
      * because each field is serialized as a distinct stream, this method will result in multiple streams being
-     * serialized to the same {@code OutputStream}.
+     * serialized to the same {@code OutputStream}.  If {@code archive} is {@code true}, each stream will have a
+     * checksum calculated and included in the output.
      * </p>
      *
      * @param state the package state containing the annotated fields to be serialized
@@ -260,7 +290,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * {@inheritDoc}
      * <p>
      * This will serialize the specified field in the {@link PackageState} annotated with {@link Serialize} to the
-     * supplied {@code OutputStream}.
+     * supplied {@code OutputStream}.  If {@code archive} is {@code true}, the stream will have a checksum calculated
+     * and included in the output.
      * </p>
      *
      * @param state    the package state containing the stream identified by {@code streamId}
@@ -374,6 +405,30 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Deserializes the identified stream ({@code streamId}) from the supplied input stream into the package state.
+     * If {@code streamId} is {@code null}, then all streams found in the supplied input stream are deserialized to
+     * {@code state}.
+     * </p>
+     * <p>
+     * If the specified stream is not found, this method will do nothing.  If an unrecognized stream is encountered, it
+     * will be skipped.
+     * </p>
+     * <p>
+     * An unrecognized stream is a Zip entry with a name that is not present in the {@code StreamId enum}.  Unrecognized
+     * streams can be encountered when the supplied {@code streamId} is {@code null}.
+     * </p>
+     *
+     * @param state the package state to be populated
+     * @param streamId the stream to be deserialized, may be {@code null} to specify all streams found in the supplied
+     *                 input stream
+     * @param in the input stream containing the identified {@code streamId}
+     * @throws RuntimeException when there are errors accessing fields of the state using reflection
+     * @throws StreamChecksumMismatch when {@code failOnChecksumMismatch} is {@code true} and a checksum mismatch is
+     *                                encountered
+     */
     @Override
     public void deserialize(PackageState state, StreamId streamId, InputStream in) {
         if (isArchiveStream(in)) {
@@ -400,6 +455,27 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
         }
     }
 
+    /**
+     * Deserializes the identified stream ({@code streamId}) from the supplied input stream into the package state.
+     * If {@code streamId} is {@code null}, then all streams found in the supplied input stream are deserialized to
+     * {@code state}.
+     * <p>
+     * If the specified stream is not found, this method will do nothing.  If an unrecognized stream is encountered, it
+     * will be skipped.
+     * </p>
+     * <p>
+     * An unrecognized stream is a Zip entry with a name that is not present in the {@code StreamId enum}.  Unrecognized
+     * streams can be encountered when the supplied {@code streamId} is {@code null}.
+     * </p>
+     *
+     * @param state the package state to be populated
+     * @param streamId the stream to be deserialized, may be {@code null} to specify all streams found in the supplied
+     *                 input stream
+     * @param in the input stream containing the identified {@code streamId}
+     * @throws RuntimeException when there are errors accessing fields of the state using reflection
+     * @throws StreamChecksumMismatch when {@code failOnChecksumMismatch} is {@code true} and a checksum mismatch is
+     *                                encountered
+     */
     void deserialize(PackageState state, StreamId streamId, ZipArchiveInputStream in) {
         ArchiveEntry entry = null;
         Object deserializedStream = null;
@@ -416,7 +492,12 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                 }
                 if (all || streamId.name().equals(entry.getName())) {
                     if (all) {
-                        streamId = StreamId.valueOf(entry.getName().toUpperCase());
+                        try {
+                            streamId = StreamId.valueOf(entry.getName().toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            LOG.warn(String.format(WARN_UNKNOWN_STREAM, entry.getName().toUpperCase()));
+                            continue;
+                        }
                     }
 
                     if (!hasPropertyDescription(streamId)) {
@@ -425,19 +506,29 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                     if (!hasUnmarshaller(streamId)) {
                         throw new NullPointerException(String.format(ERR_MISSING_SPRINGMARSHALLER, streamId, streamId));
                     }
+
                     CRC32CalculatingInputStream crcIn = new CRC32CalculatingInputStream(in);
                     long expectedCrc = ((ZipArchiveEntry) entry).getCrc();
+
                     deserializedStream = marshallerMap.get(streamId).getUnmarshaller().unmarshal(new StreamSource(crcIn));
 
                     long actualCrc = crcIn.resetCrc();
                     if (actualCrc != expectedCrc) {
-                        LOG.warn(String.format(WARN_CRC_MISMATCH,
+                        if (failOnChecksumMismatch) {
+                            throw new StreamChecksumMismatch(
+                                    String.format(
+                                            WARN_CRC_MISMATCH,
+                                            streamId, Long.toHexString(expectedCrc), Long.toHexString(actualCrc)));
+                        } else {
+                            LOG.warn(String.format(WARN_CRC_MISMATCH,
                                 streamId, Long.toHexString(expectedCrc), Long.toHexString(actualCrc)));
+                        }
                     }
-
                     propertyDescriptors.get(streamId).getWriteMethod().invoke(state, deserializedStream);
                 }
             }
+        } catch (StreamChecksumMismatch e) {
+            throw e; // don't wrap this exception, throw it as-is per Javadoc
         } catch (Exception e) {
             if (streamId == null) {
                 throw new RuntimeException(String.format(ERR_UNMARSHALLING_ARCHIVE, e.getMessage()), e);
@@ -525,6 +616,27 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      */
     public void setArchive(boolean archive) {
         this.archive = archive;
+    }
+
+    /**
+     * A flag controlling if an exception will be thrown when a stream's actual checksum does not match its
+     * expected checksum.
+     *
+     * @return when true, a {@code StreamChecksumMismatch} will be thrown when checksums do not match
+     */
+    public boolean isFailOnChecksumMismatch() {
+        return failOnChecksumMismatch;
+    }
+
+    /**
+     * A flag controlling if an exception will be thrown when a stream's actual checksum does not match its
+     * expected checksum.
+     *
+     * @param failOnChecksumMismatch when true, a {@code StreamChecksumMismatch} will be thrown when checksums do not
+     *                               match
+     */
+    public void setFailOnChecksumMismatch(boolean failOnChecksumMismatch) {
+        this.failOnChecksumMismatch = failOnChecksumMismatch;
     }
 
     private boolean hasPropertyDescription(StreamId streamId) {

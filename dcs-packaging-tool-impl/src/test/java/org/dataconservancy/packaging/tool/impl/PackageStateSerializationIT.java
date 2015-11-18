@@ -42,7 +42,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Map;
 
-import static org.dataconservancy.packaging.tool.impl.TestPackageState.V1.*;
+import static org.dataconservancy.packaging.tool.impl.TestPackageState.V1.Objects;
+import static org.dataconservancy.packaging.tool.impl.TestPackageState.V1.Resources;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -153,10 +154,38 @@ public class PackageStateSerializationIT {
 
     @Test
     public void testDeserializeCorruptCrc32Stream() throws Exception {
+
         Resource corruptStream = new ClassPathResource("/stateWithCorruptStream.zip");
         PackageState deserializedState = new PackageState();
         // this should emit a message at WARN level about a corrupt stream (if SLF4J has an impl hooked up)
         underTest.deserialize(deserializedState, new BufferedInputStream(corruptStream.getInputStream()));
+        SerializeEqualsTester.serializeEquals(state, deserializedState);
+
+        if (underTest instanceof AnnotationDrivenPackageStateSerializer) {
+            ((AnnotationDrivenPackageStateSerializer)underTest).setFailOnChecksumMismatch(true);
+            try {
+                underTest.deserialize(deserializedState, new BufferedInputStream(corruptStream.getInputStream()));
+                fail("Expected a StreamChecksumMismatch to be thrown.");
+            } catch (StreamChecksumMismatch e) {
+                // expected
+            }
+        } else {
+            fail("Cannot test the failOnChecksumMismatch flag of AnnotationDrivenPackageStateSerializer.  This " +
+                    "portion of the test should probably be in a unit test, or the flag should be moved to the" +
+                    "PackageStateSerializer interface.");
+        }
+
+    }
+
+    @Test
+    public void testDeserializeUnknownStream() throws Exception {
+        // Has an additional stream named 'unknown_stream' which cannot be made into an instance of StreamId.
+        // Despite this, serialization should proceed without a problem.
+        Resource unknownStream = new ClassPathResource("/stateWithUnknownStream.zip");
+        PackageState deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, new BufferedInputStream(unknownStream.getInputStream()));
+
+        // Assert that the expected state and the deserialized state are equal
         SerializeEqualsTester.serializeEquals(state, deserializedState);
     }
 
