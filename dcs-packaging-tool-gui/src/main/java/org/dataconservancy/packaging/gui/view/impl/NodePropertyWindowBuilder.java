@@ -195,12 +195,12 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         Label requiredLabel = new Label();
         requiredLabel.getStyleClass().add(CATEGORY_SUB_TITLE);
-        requiredLabel.setText(TextFactory.getText(Labels.LabelKey.REQUIRED_FIELDS_LABEL));
+        requiredLabel.setText(TextFactory.getText(Labels.LabelKey.REQUIRED_PROPERTIES_LABEL));
         generalPropertyBox.getChildren().add(requiredLabel);
 
         Label optionalLabel = new Label();
         optionalLabel.getStyleClass().add(CATEGORY_SUB_TITLE);
-        optionalLabel.setText(TextFactory.getText(Labels.LabelKey.OPTIONAL_FIELDS_LABEL));
+        optionalLabel.setText(TextFactory.getText(Labels.LabelKey.OPTIONAL_PROPERTIES_LABEL));
 
         boolean shownOptionalLabel = false;
 

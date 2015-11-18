@@ -128,7 +128,9 @@ public class Labels {
         REFRESH_STATUS_LABEL("refreshstatus.label"),
         REFRESH_LOCATION_LABEL("refreshlocation.label"),
         NO_BACKING_FILE_LABEL("nobackingfile.label"),
-        UNASSIGNED_LABEL("unassigned.label");
+        UNASSIGNED_LABEL("unassigned.label"),
+        OPTIONAL_PROPERTIES_LABEL("optionalproperties.label"),
+        REQUIRED_PROPERTIES_LABEL("requiredproperties.label");
 
         private String property;
 
