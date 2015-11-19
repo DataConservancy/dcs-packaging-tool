@@ -26,7 +26,6 @@ import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
 import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,12 +144,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     }
 
     protected void displayExceptionMessage(Throwable throwable) {
-        String errorMessage = throwable.getMessage();
-        if (throwable instanceof PackageDescriptionCreatorException
-                && ((PackageDescriptionCreatorException) throwable).hasDetail()) {
-            errorMessage = errorMessage + "\n" + ((PackageDescriptionCreatorException) throwable).getDetail();
-        }
-        view.getErrorLabel().setText(errorMessage);
+        view.getErrorLabel().setText(throwable.getMessage());
         view.getErrorLabel().setVisible(true);
     }
 
