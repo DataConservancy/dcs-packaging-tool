@@ -196,7 +196,7 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Runtime Dependencies ===================================== -->

@@ -58,18 +58,20 @@
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-model</artifactId>
       <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.dataconservancy.shared</groupId>
+          <artifactId>dcs-shared-util</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.jena</groupId>
-      <artifactId>apache-jena-libs</artifactId>
-      <type>pom</type>
+      <artifactId>jena-core</artifactId>
+      <scope>compile</scope>
     </dependency>
 
-    <dependency>
-      <groupId>gov.loc</groupId>
-      <artifactId>bagit</artifactId>
-    </dependency>
     <!-- This is a compile time dependency of jena libs code used in this module. It's excluded in project pom -->
     <dependency>
       <groupId>xerces</groupId>
