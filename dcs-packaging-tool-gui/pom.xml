@@ -139,16 +139,6 @@
       <artifactId>dcs-packaging-tool-model-builder-properties</artifactId>
     </dependency>
 
-      <dependency>
-      <groupId>org.dataconservancy.pkgtool</groupId>
-      <artifactId>dcs-packaging-tool-model-builder-xstream</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.dataconservancy.pkgtool</groupId>
-      <artifactId>dcs-packaging-tool-model-builder-json</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-profile-dcs</artifactId>

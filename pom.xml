@@ -217,18 +217,6 @@
 
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>
-        <artifactId>dcs-packaging-tool-model-builder-json</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.dataconservancy.pkgtool</groupId>
-        <artifactId>dcs-packaging-tool-model-builder-xstream</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.dataconservancy.pkgtool</groupId>
         <artifactId>dcs-packaging-tool-ser</artifactId>
         <version>${project.version}</version>
       </dependency>
