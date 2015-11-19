@@ -13,8 +13,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.vocabulary.RDF;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
@@ -467,7 +465,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
         result.append("\n\n");
 
-        RDFDataMgr.write(result, model, RDFFormat.TURTLE_PRETTY);
+        model.write(result, "TTL");
 
         return result.toString();
     }
