@@ -332,7 +332,8 @@ public class PackageGenerationApp {
                 if (debug) {
                     log.debug("Loading state file from stdin.");
                 }
-                packageStateSerializer.deserialize(packageState, System.in);
+                BufferedInputStream bio = new BufferedInputStream(System.in);
+                packageStateSerializer.deserialize(packageState, bio);
             } catch (Exception e) {
                 throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_INPUT_ERROR, e);
             }
@@ -342,7 +343,8 @@ public class PackageGenerationApp {
                     log.debug("Loading package state file: " + location);
                 }
                 FileInputStream fis = new FileInputStream(location);
-                packageStateSerializer.deserialize(packageState, fis);
+                BufferedInputStream  bio = new BufferedInputStream(fis);
+                packageStateSerializer.deserialize(packageState, bio);
            } catch (FileNotFoundException e) {
                 throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
            }

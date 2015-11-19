@@ -265,12 +265,6 @@
         <artifactId>dcs-packaging-tool-ontologies</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
-      <dependency>
-        <groupId>org.dataconservancy.pkgtool</groupId>
-        <artifactId>dcs-packaging-tool-ontologies</artifactId>
-        <version>${project.version}</version>
-      </dependency>
 
       <!-- Support dependencies -->
       <dependency>
