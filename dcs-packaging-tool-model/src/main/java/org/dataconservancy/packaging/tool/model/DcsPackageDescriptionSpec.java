@@ -30,15 +30,7 @@ import java.util.Map;
  */
 public interface DcsPackageDescriptionSpec {
 
-    public String SPECIFICATION_ID =
-            "http://dataconservancy.org/spec/dcs-pkg-desc";
-
-    public enum ArtifactType {
-        DataFile, MetadataFile, DataItem, Collection, Project
-    }
-
     public enum Property {
-        /* Project.numbers NOT IN ORE - what the heck is this? */
 
         /* Project.id */
         PROJECT_IDENTIFIER("Project.id"),
@@ -48,22 +40,9 @@ public interface DcsPackageDescriptionSpec {
 
         /** Project.description */
         PROJECT_DESCRIPTION("Project.description"),
-
-        /* Project.publisher NOT IN ORE */
-
-        /* Project.startDate NOT IN ORE */
-
-        /* Project.endDate NOT IN ORE */
-
-        /* Project.fundingEntity NOT IN ORE */
-
-        /* Project.pis NOT IN ORE */
         
         /** Collection.id */
         COLLECTION_ID("Collection.id"),
-
-        //** Collection.alternateIds NOT IN ORE */
-        //COLLECTION_ALTERNATEID("Collection.alternateId"),
 
         /** Collection.title */
         COLLECTION_TITLE("Collection.title"),
@@ -86,9 +65,6 @@ public interface DcsPackageDescriptionSpec {
         /**Collection.discipline*/
         COLLECTION_DISCIPLINE("Collection.discipline"),
 
-        //** Collection.citableLocator NOT IN ORE */
-        //COLLECTION_CITABLE_LOCATOR("Collection.citableLocator"),,
-
         /** Collection.contactInfo.name */
         COLLECTION_CREATOR_NAME("Collection.creator.name"),
         
@@ -98,15 +74,6 @@ public interface DcsPackageDescriptionSpec {
         /** Collection.contactInfo.phone */
         COLLECTION_CREATOR_PHONE("Collection.creator.phone"),
 
-        //** Collection.publicationDate */
-        //COLLECTION_PUBLICATION_DATE("Collection.publicationDate"),
-
-        //** Collection.depositDate */
-        //COLLECTION_DEPOSIT_DATE("Collection.depositDate"),
-
-        //** Collection.depositorId */
-        //COLELCTION_DEPOSITOR_ID("Collection.depositorId"),
-        
         /** DataItem.id */
         DATA_ITEM_ID("DataItem.id"),
         
@@ -116,28 +83,14 @@ public interface DcsPackageDescriptionSpec {
         /** DataItem.description */
         DATA_ITEM_DESCRIPTION("DataItem.description"),
 
-        //** DataItem.depositorId */
-        //DATA_ITEM_DEPOSITOR_ID("DataItem.depositorId"),
-        
-        //XXX org.dataconservancy.packaging.model.Metadata has creator/contact info for
-        //DataItems, but org.dataconservancy.ui.model.DataItem does not
-        // DATA_ITEM_CREATOR_NAME
-        // DATA_ITEM_CREATOR_EMAIL
-        // DATA_ITEM_CREATOR_PHONE
-
         /** DataFile.name: Simple name of the file */
         FILE_NAME("File.name"),
 
         /** DataFile.format: File format identifier */
         FILE_FORMAT("File.format"),
 
-        /* DataFile.source, is implicit in artifactRef */
-
         /** DataFile.path: Logical file path, relative to package, e.g. /path/to/file.jpg */
         FILE_PATH("File.path"),
-
-        ///** DataFile.size */
-        //FILE_SIZE("File.size"),
 
         /** MetadataFile.formatId: Identifier of the metadata format used in a metadata file. */
         FILE_METADATA_FORMAT_ID("MetadataFile.formatId");
@@ -171,8 +124,7 @@ public interface DcsPackageDescriptionSpec {
     public enum Relationship {
         COLLECTION_AGGREGATED_BY_PROJECT("Collection-aggregatedBy-Project"),
         COLLECTION_IS_PART_OF_COLLECTION("Collection-isPartOf-Collection"),
-        /* XXX: This is not supported */
-        //DATA_ITEM_IS_VERSION_OF_DATA_ITEM("DataItem-isVersionOf-DataItem"),
+
         DATA_ITEM_IS_MEMBER_OF_COLLECTION("DataItem-isMemberOf-Collection"),
         METADATA_FILE_IS_METADATA_FOR_BUSINESS_OBJECT(
                 "MetadataFile-isMetadataFor-BusinessObject"),
