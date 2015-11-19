@@ -27,14 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.dataconservancy.dcs.model.Attribute;
 import org.dataconservancy.dcs.model.AttributeSet;
 import org.dataconservancy.dcs.model.AttributeSetName;
 import org.dataconservancy.dcs.model.AttributeValueType;
 import org.dataconservancy.dcs.model.Metadata;
 import org.dataconservancy.packaging.shared.PackageException;
-import org.dataconservancy.packaging.tool.support.ResourceMapConstants;
-import org.dataconservancy.packaging.tool.support.ResourceMapUtil;
 import org.dataconservancy.packaging.validation.PackageValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +48,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.RDFReader;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
@@ -61,6 +59,16 @@ import org.apache.jena.vocabulary.RDF;
 public class ResourceMapExtractor implements ResourceMapConstants {
 
     final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    // So we don't have to import from org.apache.jena.sparql.vocabulary and add a dependency on the jena-arq module
+    private static class FOAF {
+        private static final String NS = "http://xmlns.com/foaf/0.1/";
+
+        private static final Property name = ResourceFactory.createProperty(NS, "name");
+        private static final Property mbox = ResourceFactory.createProperty(NS, "mbox");
+        private static final Property phone = ResourceFactory.createProperty(NS, "phone");
+        private static final Property page = ResourceFactory.createProperty(NS, "page");
+    }
 
     public Map<String, AttributeSet> execute(File baseDir, URI packageUri)
             throws PackageValidationException {
