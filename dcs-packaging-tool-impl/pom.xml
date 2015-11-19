@@ -73,6 +73,16 @@
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-ser</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-arq</artifactId>
+    </dependency>
   
     <dependency>
       <groupId>org.ogce</groupId>
