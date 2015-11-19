@@ -22,7 +22,6 @@ import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Page;
-import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.gui.view.HeaderView;
@@ -31,7 +30,6 @@ import org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.PackageDescriptionCreatorException;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
@@ -183,12 +181,10 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     @Test
     public void testDisplayPDCreationErrorMessages() {
         String exceptionMsg = "test message";
-        String exceptionDetails = "test details";
-        PackageDescriptionCreatorException exception = new PackageDescriptionCreatorException(exceptionMsg, exceptionDetails);
+        IOException exception = new IOException(exceptionMsg);
         presenter.displayExceptionMessage(exception);
         assertFalse(showNextPage);
         assertTrue(view.getErrorLabel().getText().contains(exceptionMsg));
-        assertTrue(view.getErrorLabel().getText().contains(exceptionDetails));
     }
 
     private class ExecuteContinueRule implements TestRule {
