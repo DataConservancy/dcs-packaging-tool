@@ -136,15 +136,13 @@
   
   <dependencies>
     
-    <!-- POM Dependencies  ======================================== -->
-    
-    <dependency>
-      <groupId>org.apache.jena</groupId>
-      <artifactId>apache-jena-libs</artifactId>
-      <type>pom</type>
-    </dependency>
-    
     <!-- Compile Dependencies ===================================== -->
+
+    <!--dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-core</artifactId>
+      <scope>compile</scope>
+    </dependency-->
 
     <dependency>
       <groupId>commons-codec</groupId>
