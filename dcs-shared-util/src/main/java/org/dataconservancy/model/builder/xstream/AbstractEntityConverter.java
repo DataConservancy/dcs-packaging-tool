@@ -15,15 +15,14 @@
  */
 package org.dataconservancy.model.builder.xstream;
 
-import javax.xml.namespace.QName;
-
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;import java.lang.*;import java.lang.Class;import java.lang.IllegalArgumentException;import java.lang.Object;import java.lang.Override;import java.lang.String;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.namespace.QName;
 
 /**
  * Abstract XStream converter for the DCS object model.  Encapsulates common logic for XStream {@link Converter converters}
@@ -45,6 +44,7 @@ public abstract class AbstractEntityConverter implements Converter {
 
     /**
      * Ensures {@code source} is not {@code null}.
+     *
      * @throws IllegalArgumentException if {@code source} is {@code null}
      */
     @Override
@@ -58,7 +58,7 @@ public abstract class AbstractEntityConverter implements Converter {
 
     /**
      * Returns the current element name.
-     *
+     * <p/>
      * If {@code reader} implements {@link NsAwareStream},
      * {@link NsAwareStream#getQname()} is called, and the local part of the {@link javax.xml.namespace.QName}
      * is returned. Otherwise, {@link com.thoughtworks.xstream.io.HierarchicalStreamReader#getNodeName()} is returned.
@@ -82,7 +82,7 @@ public abstract class AbstractEntityConverter implements Converter {
 
     /**
      * Returns the current element as a {@link javax.xml.namespace.QName}.
-     *
+     * <p/>
      * If {@code reader} implements {@link NsAwareStream},
      * {@link NsAwareStream#getQname()} is returned. Otherwise, a new {@code QName} is constructed using
      * {@link com.thoughtworks.xstream.io.HierarchicalStreamReader#getNodeName()}.
@@ -102,6 +102,6 @@ public abstract class AbstractEntityConverter implements Converter {
             name = new QName(reader.getNodeName());
         }
         return name;
-    }    
+    }
 
 }
