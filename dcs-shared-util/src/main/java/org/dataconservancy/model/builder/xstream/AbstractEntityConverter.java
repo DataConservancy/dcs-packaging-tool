@@ -58,10 +58,11 @@ public abstract class AbstractEntityConverter implements Converter {
 
     /**
      * Returns the current element name.
-     * <p/>
+     * <p>
      * If {@code reader} implements {@link NsAwareStream},
      * {@link NsAwareStream#getQname()} is called, and the local part of the {@link javax.xml.namespace.QName}
      * is returned. Otherwise, {@link com.thoughtworks.xstream.io.HierarchicalStreamReader#getNodeName()} is returned.
+     * </p>
      *
      * @param reader the reader instance
      * @return the current element name
