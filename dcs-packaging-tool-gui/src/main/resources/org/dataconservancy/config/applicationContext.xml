@@ -134,7 +134,7 @@
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
     <constructor-arg ref="internalProperties"/>
-    <constructor-arg value="${defaultRelationships.file}"/>
+    <constructor-arg value="classpath:/userProperties.json"/>
     <constructor-arg ref="help"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
     <property name="ipmService" ref="ipmService"/>

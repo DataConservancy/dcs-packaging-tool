@@ -96,10 +96,8 @@ public class App extends Application {
 
          //Check if a user defined properties file was found in the user config directory.
         //If not, use the default user properties file.
-        System.err.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@2 MOOOOOO");
          if (!getParameters().getRaw().contains("-u") && !getParameters().getRaw().contains("--user-props")) {
              configFile = config.getUserPropertiesFile();
-             System.err.println("&&&&&&&&&&&&&&&&&&&&&&&& " + configFile);
              config.setUserProperties(config.resolveConfigurationFile(configFile));
          }
 
