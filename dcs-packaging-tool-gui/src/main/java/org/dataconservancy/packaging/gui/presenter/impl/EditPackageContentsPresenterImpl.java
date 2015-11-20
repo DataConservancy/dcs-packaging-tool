@@ -444,15 +444,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         //To aid in being able to unignore multiple items at once we just check the entire tree for validity and then walk the tree to find types that need to be changed.
         if (!ignored && !getController().getDomainProfileService().validateTree(controller.getPackageTree())) {
-
-            //Update any unassigned nodes that are now no longer ignored.
-            if (!updateUnassignedNode(controller.getPackageTree())) {
-                for (TreeItem<Node> nodeToIgnore : nodesToIgnore) {
-                    ipmService.ignoreNode(nodeToIgnore.getValue(), true);
-                }
-                view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
-                view.getErrorLabel().setVisible(true);
-            }
+            updateUnassignedNode(controller.getPackageTree());
         }
 
         //If the tree still isn't valid, try reassigning types to all nodes we changes.
@@ -475,17 +467,19 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     private boolean updateUnassignedNode(Node node) {
-        if (!node.isIgnored() && node.getNodeType() == null) {
-            if (getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), node)) {
-                if (node.getChildren() != null) {
-                    for (Node child : node.getChildren()) {
-                        if (!updateUnassignedNode(child)) {
-                            return false;
-                        }
+        if (!node.isIgnored()) {
+            if (node.getNodeType() == null) {
+                if (!getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), node)) {
+                    return false;
+                }
+            }
+
+            if (node.getChildren() != null) {
+                for (Node child : node.getChildren()) {
+                    if (!updateUnassignedNode(child)) {
+                        return false;
                     }
                 }
-            } else {
-                return false;
             }
         }
 
