@@ -556,6 +556,71 @@ public class IPMServiceTest {
         assertTrue(childNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(returnedNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1)));
     }
 
+    /**
+     * Tests that a node can be remapped (i.e. have it's file info updated) and that all children that have corresponding files will update.
+     */
+    @Test
+    public void testRemapNode() throws IOException {
+        File mainDir = tmpfolder.newFolder("remapFarm");
+        File mainDirFile = new File(mainDir, "pig.txt");
+        Files.createFile(mainDirFile.toPath());
+
+        File subDir = new File(mainDir, "moo");
+        subDir.mkdir();
+
+        File subDirFile = new File(subDir, "cow.jpg");
+        Files.createFile(subDirFile.toPath());
+
+        File subDirFileTwo = new File(subDir, "chicken.txt");
+        Files.createFile(subDirFileTwo.toPath());
+
+        File subDirB = new File(subDir, ".steak");
+        subDirB.mkdirs();
+
+        File subDirBFile = new File(subDirB, "eggs.png");
+        Files.createFile(subDirBFile.toPath());
+
+        Node root = underTest.createTreeFromFileSystem(mainDir.toPath());
+        assertNotNull(root);
+
+        File newMainDir = tmpfolder.newFolder("newFarm");
+        File newMainDirFile = new File(newMainDir, "pig.txt");
+        Files.createFile(newMainDirFile.toPath());
+
+        File newSubDir = new File(newMainDir, "moo");
+        newSubDir.mkdir();
+
+        File newSubDirFile = new File(newSubDir, "cow.jpg");
+        Files.createFile(newSubDirFile.toPath());
+
+        File newSubDirFileTwo = new File(newSubDir, "chicken.txt");
+        Files.createFile(newSubDirFileTwo.toPath());
+
+        underTest.remapNode(root, newMainDir.toPath());
+
+        final boolean[] foundUnmappedDir = {false};
+        for (Node child : root.getChildren()) {
+            switch (child.getFileInfo().getName()) {
+                case "pig.txt":
+                    assertEquals(newMainDirFile.toURI(), child.getFileInfo().getLocation());
+                    break;
+                case "moo":
+                    assertEquals(3, child.getChildren().size());
+                    //Check that the "." directory and it's children still have the same path
+                    child.getChildren().stream().filter(subChild -> subChild.getFileInfo().getName().equalsIgnoreCase(".steak")).forEach(subChild -> {
+                        foundUnmappedDir[0] = true;
+                        assertEquals(subChild.getFileInfo().getLocation(), subDirB.toURI());
+                        assertEquals(1, subChild.getChildren().size());
+                        assertEquals(subDirBFile.toURI(), subChild.getChildren().get(0).getFileInfo().getLocation());
+                    });
+
+                    break;
+            }
+        }
+
+        assertTrue(foundUnmappedDir[0]);
+
+    }
     //Used to update node ids of the FarmIpmTree so it's a different tree from the original
     private void updateNodeId(Node node) {
         node.setIdentifier(uriGenerator.generateNodeURI());

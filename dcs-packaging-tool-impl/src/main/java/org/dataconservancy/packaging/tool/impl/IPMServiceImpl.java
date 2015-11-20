@@ -349,4 +349,25 @@ public class IPMServiceImpl implements IPMService {
         return accessible;
     }
 
+    @Override
+    public void remapNode(Node node, Path newPath) {
+        Path oldPath = Paths.get(node.getFileInfo().getLocation());
+        node.setFileInfo(new FileInfo(newPath));
+
+        if (node.getChildren() != null) {
+            //If this path can't be relativized we won't automatically remap
+            node.getChildren().stream().filter(child -> child.getFileInfo() !=
+                null).forEach(child -> {
+                try {
+                    Path oldRelativePath = oldPath.relativize(Paths.get(child.getFileInfo().getLocation()));
+                    Path newChildPath = newPath.resolve(oldRelativePath);
+                    if (newChildPath.toFile().exists()) {
+                        remapNode(child, newChildPath);
+                    }
+                } catch (IllegalArgumentException e) {
+                    //If this path can't be relativized we won't automatically remap
+                }
+            });
+        }
+    }
 }

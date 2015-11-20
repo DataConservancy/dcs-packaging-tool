@@ -57,4 +57,12 @@ public interface IPMService {
      * @return true if the file is accessible false otherwise.
      */
     boolean checkFileInfoIsAccessible(Node node);
+
+    /**
+     * Remaps a node to the new path, will attempt to remap children under the provided path is possible,
+     * will leave them unchanged if there is no match under the new path.
+     * @param node The node to remap.
+     * @param newPath The new path to assign to the node.
+    */
+    void remapNode(Node node, Path newPath);
 }
