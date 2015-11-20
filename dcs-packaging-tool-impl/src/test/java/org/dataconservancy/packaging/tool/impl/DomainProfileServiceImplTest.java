@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
@@ -265,7 +266,7 @@ public class DomainProfileServiceImplTest {
         Property name1 = new Property(profile.getNamePropertyType());
         name1.setStringValue("Farmer Jim");
 
-        person1.setComplexValue(Arrays.asList(name1));
+        person1.setComplexValue(Collections.singletonList(name1));
 
         service.addProperty(node, person1);
 
@@ -335,7 +336,7 @@ public class DomainProfileServiceImplTest {
         // Any other nodes may be ignored
         root.setIgnored(false);
         cow.setIgnored(true);
-        barn.setIgnored(true);;
+        barn.setIgnored(true);
         cow.setIgnored(true);
         media.setIgnored(true);
         
@@ -414,6 +415,27 @@ public class DomainProfileServiceImplTest {
         result = service.getNodeTransforms(barn);
         assertEquals(1, result.size());
         assertEquals(profile.getBarnMediaChildToFarmTransform(), result.get(0));
+    }
+
+    @Test
+    public void testNodeTransformsWithMultipleNodes() {
+        Node root = ipmfact.createSimpleTree();
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+
+        root.walk(store::updateObject);
+
+        // One transform returned for the same node types
+        List<NodeTransform> result = service.getNodeTransforms(Arrays.asList(cow, cow));
+
+        assertEquals(1, result.size());
+        assertEquals(profile.getMoveMediaFromCowToBarnTransform(), result.get(0));
+
+        // Zero transforms returned for different node types
+        result = service.getNodeTransforms(Arrays.asList(cow, media));
+
+        assertEquals(0, result.size());
     }
     
     @Test
@@ -591,7 +613,7 @@ public class DomainProfileServiceImplTest {
         Property person = new Property(profile.getFarmerPropertyType());
         Property name = new Property(profile.getNamePropertyType());
         name.setStringValue("Farmer Jim");
-        person.setComplexValue(Arrays.asList(name));
+        person.setComplexValue(Collections.singletonList(name));
 
         service.addProperty(root, person);
         

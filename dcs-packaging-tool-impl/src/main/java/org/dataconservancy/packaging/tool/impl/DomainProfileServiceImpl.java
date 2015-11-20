@@ -1,6 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
@@ -202,10 +203,12 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     // Runs the child transforms on the passed in child node. Applies the first
     // applicable transform in the list.
     private void transformChildren(Node child, List<NodeTransform> childTransforms) {
-        for (NodeTransform child_tr : childTransforms) {
-            if (can_transform(child, child_tr)) {
-                transformNode(child, child_tr);
-                break;
+        if (!child.isIgnored()) {
+            for (NodeTransform child_tr : childTransforms) {
+                if (can_transform(child, child_tr)) {
+                    transformNode(child, child_tr);
+                    break;
+                }
             }
         }
     }
@@ -235,9 +238,31 @@ public class DomainProfileServiceImpl implements DomainProfileService {
         return result;
     }
 
+    @Override
+    public List<NodeTransform> getNodeTransforms(List<Node> nodes) {
+        List<NodeTransform> possibleTransforms = new ArrayList<>();
+
+        if (nodes != null && !nodes.isEmpty()) {
+            possibleTransforms = getNodeTransforms(nodes.get(0));
+
+            for (int i = 1; i < nodes.size(); i++) {
+                List<NodeTransform> nodeTransforms = getNodeTransforms(nodes.get(i));
+                Iterator<NodeTransform> it = possibleTransforms.iterator();
+                while (it.hasNext()) {
+                    if (!nodeTransforms.contains(it.next())) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        return possibleTransforms;
+
+    }
+
     private boolean can_transform(Node node, NodeTransform tr) {
-        if (tr.getSourceNodeType() != null
-                && !node.getNodeType().getIdentifier().equals(tr.getSourceNodeType().getIdentifier())) {
+        if (node == null || node.getNodeType() == null || (tr.getSourceNodeType() != null
+                && !node.getNodeType().getIdentifier().equals(tr.getSourceNodeType().getIdentifier()))) {
             return false;
         }
 

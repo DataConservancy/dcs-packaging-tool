@@ -107,6 +107,14 @@ public interface DomainProfileService {
     List<NodeTransform> getNodeTransforms(Node node);
 
     /**
+     * Retrieves a list of node transforms that are valid for all provided nodes.
+     * @param nodes The list of nodes to get the available transforms for.
+     * @return The list of node transforms that are common between all provided nodes.
+     */
+    List<NodeTransform> getNodeTransforms(List<Node> nodes);
+
+
+    /**
      * Check if a tree satisfies all its node constraints. Such a tree must also
      * have domain objects with the correct relations. A tree is invalid if the
      * root is an ignored node. Otherwise ignored nodes are not considered when
