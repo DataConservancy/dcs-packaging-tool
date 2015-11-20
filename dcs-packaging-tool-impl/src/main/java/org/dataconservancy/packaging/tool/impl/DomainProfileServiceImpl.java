@@ -203,12 +203,11 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     // Runs the child transforms on the passed in child node. Applies the first
     // applicable transform in the list.
     private void transformChildren(Node child, List<NodeTransform> childTransforms) {
-        if (!child.isIgnored()) {
-            for (NodeTransform child_tr : childTransforms) {
-                if (can_transform(child, child_tr)) {
-                    transformNode(child, child_tr);
-                    break;
-                }
+
+        for (NodeTransform child_tr : childTransforms) {
+            if (can_transform(child, child_tr)) {
+                transformNode(child, child_tr);
+                break;
             }
         }
     }
