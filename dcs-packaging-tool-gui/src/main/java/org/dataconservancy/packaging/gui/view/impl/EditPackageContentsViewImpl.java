@@ -352,7 +352,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                                         selectedNodes.add(selectedNode.getValue());
                                     }
 
-                                    List<NodeTransform> possibleTransforms = presenter.getController().getDomainProfileService().getNodeTransforms(selectedNodes);
+                                    List<NodeTransform> possibleTransforms = new ArrayList<>();
+                                    if (!hasIgnored) {
+                                        possibleTransforms = presenter.getController().getDomainProfileService().getNodeTransforms(selectedNodes);
+                                    }
 
                                     //If all items are ignored we give the option to unignore otherwise we give the option to ignore
                                     if (allIgnored) {
@@ -592,6 +595,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     private MenuItem createIgnoreMenuItem(final ObservableList<TreeItem<Node>> treeItems, boolean ignore) {
         final CheckMenuItem ignoreCheck = new CheckMenuItem(TextFactory.getText(LabelKey.IGNORE_CHECKBOX));
+        ignoreCheck.getStyleClass().add(EDIT_PACKAGE_TREE_MENU);
 
         ignoreCheck.setSelected(ignore);
         ignoreCheck.setOnAction(event -> presenter.toggleItemIgnore(treeItems, ignoreCheck.isSelected()));
