@@ -46,8 +46,6 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -79,16 +77,12 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
-import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -517,7 +511,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     }
                     if (file != null) {
                         //Remap the node to the new file and check all it's descendants to see if they can be remapped also.
-                        remapNode(packageNode, file.toPath());
+                        ipmService.remapNode(packageNode, file.toPath());
 
                         //Redisplay the tree to update the warnings
                         presenter.displayPackageTree();
@@ -596,55 +590,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return invalidPropertyString;
     }
 
-    private void remapNode(Node node, Path newPath) {
-        Path oldPath = Paths.get(node.getFileInfo().getLocation());
-        node.setFileInfo(new FileInfo(newPath));
-
-        if (node.getChildren() != null) {
-            //If this path can't be relativized we won't automatically remap
-            node.getChildren().stream().filter(child -> child.getFileInfo() !=
-                null).forEach(child -> {
-                try {
-                    Path oldRelativePath = Paths.get(child.getFileInfo().getLocation()).relativize(oldPath);
-                    Path newChildPath = newPath.resolve(oldRelativePath);
-                    if (newChildPath.toFile().exists()) {
-                        remapNode(child, newChildPath);
-                    }
-                } catch (IllegalArgumentException e) {
-                    //If this path can't be relativized we won't automatically remap
-                }
-            });
-        }
-    }
-
     private MenuItem createIgnoreMenuItem(final ObservableList<TreeItem<Node>> treeItems, boolean ignore) {
         final CheckMenuItem ignoreCheck = new CheckMenuItem(TextFactory.getText(LabelKey.IGNORE_CHECKBOX));
 
         ignoreCheck.setSelected(ignore);
-        ignoreCheck.setOnAction(event -> toggleItemIgnore(treeItems, ignoreCheck.isSelected()));
+        ignoreCheck.setOnAction(event -> presenter.toggleItemIgnore(treeItems, ignoreCheck.isSelected()));
 
         return ignoreCheck;
-    }
-
-    //Note this code is broken out into a protected method so that it can be executed by the test
-    protected void toggleItemIgnore(final ObservableList<TreeItem<Node>> nodesToIgnore, boolean ignored) {
-        for (TreeItem<Node> nodeToIgnore : nodesToIgnore) {
-            ipmService.ignoreNode(nodeToIgnore.getValue(), ignored);
-
-            errorLabel.setVisible(false);
-
-            if (!ignored && !presenter.getController().getDomainProfileService().validateTree(nodeToIgnore.getValue())) {
-                if (!presenter.getController().getDomainProfileService().assignNodeTypes(presenter.getController().getPrimaryDomainProfile(), nodeToIgnore.getValue())) {
-                    ipmService.ignoreNode(nodeToIgnore.getValue(), true);
-                    errorLabel.setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
-                    errorLabel.setVisible(true);
-                }
-            }
-        }
-        // Rebuild the entire TreeView and reselect the current PackageArtifact
-
-        presenter.rebuildTreeView();
-        //artifactTree.getSelectionModel().select(presenter.findItem(node.getValue()));
     }
 
     @Override

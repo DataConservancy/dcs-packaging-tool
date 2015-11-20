@@ -56,6 +56,7 @@ import static org.junit.Assert.assertTrue;
  * the tree is generated correctly, and inheritance works correctly. 
  * Note currently the popup code is not being tested. 
  */
+@SuppressWarnings("unchecked")
 public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
 
     private EditPackageContentsPresenterImpl presenter;
@@ -78,17 +79,19 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
+    private Node project;
     private Node collection;
+    private Node dataItem;
     private Node dataFile;
 
     @Before
     public void setup() throws IOException {
         DcBoIpmFactory boFactory = new DcBoIpmFactory();
-        Node project = boFactory.createSmallLinearTree();
+        project = boFactory.createSmallLinearTree();
 
         collection = project.getChildren().get(0);
 
-        Node dataItem = collection.getChildren().get(0);
+        dataItem = collection.getChildren().get(0);
 
         dataFile = dataItem.getChildren().get(0);
 
@@ -147,6 +150,8 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         presenter = new EditPackageContentsPresenterImpl(view);
         presenter.setController(controller);
         presenter.setInternalProperties(internalProperties);
+        presenter.setIpmService(ipmService);
+
         view.setPresenter(presenter);
         // Setup controller to handle going to the next page.
         controller.setCreateNewPackage(true);
@@ -256,6 +261,141 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         assertNotNull(findChild(view.getRoot(),collection.getIdentifier()));
     }
 
+    @Test
+    public void testIgnoreCollection() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
+
+        assertTrue(collection.isIgnored());
+        assertTrue(dataItem.isIgnored());
+        assertTrue(dataFile.isIgnored());
+    }
+
+    @Test
+    public void testUnignoreCollection() {
+        presenter.rebuildTreeView();
+
+        //First ignore the collection
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
+
+        assertTrue(collection.isIgnored());
+        assertTrue(dataFile.isIgnored());
+        assertTrue(dataItem.isIgnored());
+
+        //Now unignore the collection and check that all children are also unignored.
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), false);
+
+        assertFalse(dataItem.isIgnored());
+        assertFalse(dataFile.isIgnored());
+    }
+
+    @Test
+    public void testIgnoreDataItem() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), true);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+
+        //Item and it's children should be ignored
+        assertTrue(dataFile.isIgnored());
+        assertTrue(dataItem.isIgnored());
+    }
+
+    @Test
+    public void testUnIgnoreDataItem() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), true);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+
+        //Item and it's children should be ignored
+        assertTrue(dataItem.isIgnored());
+        assertTrue(dataFile.isIgnored());
+
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), false);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+
+        //Item and it's children should be ignored
+        assertFalse(dataFile.isIgnored());
+        assertFalse(dataItem.isIgnored());
+    }
+
+    @Test
+    public void testUnignoreDataItemUnignoresParent() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
+
+        assertTrue(collection.isIgnored());
+        assertTrue(dataItem.isIgnored());
+        assertTrue(dataFile.isIgnored());
+
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), false);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+
+        //Item and it's children should not be ignored
+        assertFalse(dataItem.isIgnored());
+        assertFalse(dataFile.isIgnored());
+    }
+
+    @Test
+    public void testIgnoreDataFile() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), true);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+        assertFalse(dataItem.isIgnored());
+
+        //Item should be ignored
+        assertTrue(dataFile.isIgnored());
+    }
+
+    @Test
+    public void testUnIgnoreDataFile() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), true);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+        assertFalse(dataItem.isIgnored());
+
+        //Item should be ignored
+        assertTrue(dataFile.isIgnored());
+
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), false);
+
+        //Parent should not be ignored
+        assertFalse(collection.isIgnored());
+        assertFalse(dataItem.isIgnored());
+
+        //Item should not be ignored
+        assertFalse(dataFile.isIgnored());
+    }
+
+    @Test
+    public void testUnIgnoreDataFileUnIgnoresParents() {
+        presenter.rebuildTreeView();
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
+
+        assertTrue(collection.isIgnored());
+        assertTrue(dataItem.isIgnored());
+        assertTrue(dataFile.isIgnored());
+
+        presenter.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), false);
+
+        //Parents should not be ignored
+        assertFalse(collection.isIgnored());
+        assertFalse(dataItem.isIgnored());
+
+        //Item should not be ignored
+        assertFalse(dataFile.isIgnored());
+    }
     /**
      * Helper function for getting a child with a given ID
      * @param parent the parent TreeItem

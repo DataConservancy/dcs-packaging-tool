@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.gui.presenter;
 
+import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
@@ -94,4 +95,9 @@ public interface EditPackageContentsPresenter extends Presenter {
      * @return The map containing the results of the comparison of the tree to the file system.
      */
     Map<Node, NodeComparison> refreshTreeContent(Node node);
+
+    /**
+     * Toggles the ignored state of a list of tree items and their children and redraws the tree.
+     */
+    void toggleItemIgnore(final ObservableList<TreeItem<Node>> nodesToIgnore, boolean ignored);
 }

@@ -434,6 +434,31 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     @Override
+    public void toggleItemIgnore(ObservableList<TreeItem<Node>> nodesToIgnore,
+                                 boolean ignored) {
+        for (TreeItem<Node> nodeToIgnore : nodesToIgnore) {
+            ipmService.ignoreNode(nodeToIgnore.getValue(), ignored);
+
+            view.getErrorLabel().setVisible(false);
+
+            if (!ignored && !getController().getDomainProfileService().validateTree(nodeToIgnore.getValue())) {
+                if (!getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), nodeToIgnore.getValue())) {
+                    ipmService.ignoreNode(nodeToIgnore.getValue(), true);
+                    view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
+                    view.getErrorLabel().setVisible(true);
+                }
+            }
+        }
+
+        // Rebuild the entire TreeView and reselect the previously selected nodes
+        rebuildTreeView();
+
+        for (TreeItem<Node> ignoredNode : nodesToIgnore) {
+            view.getArtifactTreeView().getSelectionModel().select(ignoredNode);
+        }
+    }
+
+    @Override
     public void setIpmService(IPMService ipmService) {
         this.ipmService = ipmService;
     }
