@@ -104,9 +104,6 @@ public class PackageModelBuilderImpl
         } catch (Exception e) {
             throw new RuntimeException("Error deserializing package tree", e);
         }
-
-        assembler.assemblePackage();
-
     }
 
 }
