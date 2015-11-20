@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class PackageModelBuilderFactory {
 
-    private static Map<String, PackageModelBuilder> builders;
+    private Map<String, PackageModelBuilder> builders;
 
     /**
      * Provides an instance of {@link PackageModelBuilder} for assembling
@@ -43,7 +43,7 @@ public class PackageModelBuilderFactory {
      * @throws IllegalAccessException if no builders have been set on the factory
      * @throws InstantiationException if the params don't contain the package format id
      */
-    public static PackageModelBuilder newBuilder(PackageState desc, PackageGenerationParameters params)
+    public PackageModelBuilder newBuilder(PackageState desc, PackageGenerationParameters params)
             throws IllegalAccessException, InstantiationException {
 
         if (builders == null || builders.size() == 0) {
@@ -65,12 +65,12 @@ public class PackageModelBuilderFactory {
         return null;
     }
 
-    public static void setBuilders(Map<String, PackageModelBuilder> builders) {
+    public void setBuilders(Map<String, PackageModelBuilder> builders) {
         if (builders == null || builders.size() == 0) {
             throw new IllegalArgumentException("At least one builder must be provided");
         }
 
-        PackageModelBuilderFactory.builders = builders;
+        this.builders = builders;
     }
 
 }
