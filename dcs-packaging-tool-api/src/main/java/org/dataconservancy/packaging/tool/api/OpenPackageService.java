@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
-import org.dataconservancy.packaging.tool.model.PackageState;
 
 /**
- * A service to open a package at various points in its life-cycle.
+ * A service to open a package at various points in its life-cycle. The package
+ * tree which is returned along with the package state is modified as needed so
+ * that the nodes refer to files in the opened package.
+ * 
  */
 public interface OpenPackageService {
     /**
@@ -15,10 +17,10 @@ public interface OpenPackageService {
      * 
      * @param file
      *            Package state file
-     * @return State of the package.
+     * @return Opened package with base directory set to null.
      * @throws IOException
      */
-    PackageState openPackageState(File file) throws IOException;
+    OpenedPackage openPackageState(File file) throws IOException;
 
     /**
      * Open a serialized package in a staging directory.
@@ -27,7 +29,7 @@ public interface OpenPackageService {
      *            Directory to uncompress the package.
      * @param file
      *            Serialized package.
-     * @return State of the package.
+     * @return Opened package.
      * @throws IOException
      */
     OpenedPackage openPackage(File staging_dir, File file) throws IOException;
@@ -37,7 +39,7 @@ public interface OpenPackageService {
      * 
      * @param dir
      *            Directory of the uncompressed package
-     * @return State of of the package.
+     * @return Opened package.
      * @throws IOException
      */
     OpenedPackage openExplodedPackage(File dir) throws IOException;
