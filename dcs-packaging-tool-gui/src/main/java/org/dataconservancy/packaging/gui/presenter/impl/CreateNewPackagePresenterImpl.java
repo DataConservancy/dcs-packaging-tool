@@ -177,7 +177,6 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                     if (Thread.currentThread().isInterrupted()) {
                         return null;
                     }
-                    controller.initializeDomainStoreAndServices(null);
 
                     if (Thread.currentThread().isInterrupted()) {
                         return null;

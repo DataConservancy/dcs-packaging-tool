@@ -440,14 +440,30 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             ipmService.ignoreNode(nodeToIgnore.getValue(), ignored);
 
             view.getErrorLabel().setVisible(false);
+        }
 
-            if (!ignored && !getController().getDomainProfileService().validateTree(nodeToIgnore.getValue())) {
-                if (!getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), nodeToIgnore.getValue())) {
+        //To aid in being able to unignore multiple items at once we just check the entire tree for validity and then walk the tree to find types that need to be changed.
+        if (!ignored && !getController().getDomainProfileService().validateTree(controller.getPackageTree())) {
+
+            //Update any unassigned nodes that are now no longer ignored.
+            if (!updateUnassignedNode(controller.getPackageTree())) {
+                for (TreeItem<Node> nodeToIgnore : nodesToIgnore) {
                     ipmService.ignoreNode(nodeToIgnore.getValue(), true);
-                    view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
-                    view.getErrorLabel().setVisible(true);
                 }
+                view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
+                view.getErrorLabel().setVisible(true);
             }
+        }
+
+        //If the tree still isn't valid, try reassigning types to all nodes we changes.
+        //This is almost guaranteed to never happen but is here as an ultimate safety check to ensure we always have a valid tree.
+        if (!ignored && !getController().getDomainProfileService().validateTree(controller.getPackageTree())) {
+
+            nodesToIgnore.stream().filter(nodeToIgnore -> !getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), nodeToIgnore.getValue())).forEach(nodeToIgnore -> {
+                ipmService.ignoreNode(nodeToIgnore.getValue(), true);
+                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.UNIGNORE_ERROR));
+                view.getErrorLabel().setVisible(true);
+            });
         }
 
         // Rebuild the entire TreeView and reselect the previously selected nodes
@@ -456,6 +472,24 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         for (TreeItem<Node> ignoredNode : nodesToIgnore) {
             view.getArtifactTreeView().getSelectionModel().select(ignoredNode);
         }
+    }
+
+    private boolean updateUnassignedNode(Node node) {
+        if (!node.isIgnored() && node.getNodeType() == null) {
+            if (getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), node)) {
+                if (node.getChildren() != null) {
+                    for (Node child : node.getChildren()) {
+                        if (!updateUnassignedNode(child)) {
+                            return false;
+                        }
+                    }
+                }
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

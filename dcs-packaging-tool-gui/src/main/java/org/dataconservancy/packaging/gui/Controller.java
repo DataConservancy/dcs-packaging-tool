@@ -396,6 +396,7 @@ public class Controller {
 
     public void setPackageState(PackageState packageState) {
         this.packageState = packageState;
+        initializeDomainStoreAndServices();
     }
 
     public PackageToolPopup getCrossPageProgressIndicatorPopUp() {
@@ -454,18 +455,16 @@ public class Controller {
     /**
      * Initializes the DomainProfileObjectStore and the DomainProfileService.
      * Note: DomainProfileService is not set until this method is called.
-     * @param existingModel The existing model to use for the object store, if null a new one will be created.
      */
-    public void initializeDomainStoreAndServices(Model existingModel) {
+    private void initializeDomainStoreAndServices() {
         DomainProfileObjectStore store;
 
-        if (existingModel == null) {
+        if (packageState.getDomainObjectRDF() == null) {
             Model objectModel = ModelFactory.createDefaultModel();
             store = new DomainProfileObjectStoreImpl(objectModel, uriGenerator);
             packageState.setDomainObjectRDF(objectModel);
         } else {
-            store = new DomainProfileObjectStoreImpl(existingModel, uriGenerator);
-            packageState.setDomainObjectRDF(existingModel);
+            store = new DomainProfileObjectStoreImpl(packageState.getDomainObjectRDF(), uriGenerator);
         }
 
         domainProfileService = new DomainProfileServiceImpl(store, uriGenerator);

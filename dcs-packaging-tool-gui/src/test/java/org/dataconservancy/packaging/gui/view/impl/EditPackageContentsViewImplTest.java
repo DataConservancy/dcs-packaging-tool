@@ -96,7 +96,6 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
 
         controller.setDomainProfileStore(domainProfileStore);
         controller.setPackageState(state);
-        controller.initializeDomainStoreAndServices(null);
 
         controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), project);
 
