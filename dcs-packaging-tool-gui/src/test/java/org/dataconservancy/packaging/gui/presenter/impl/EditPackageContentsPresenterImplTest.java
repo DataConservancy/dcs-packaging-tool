@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import javafx.collections.FXCollections;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
@@ -209,7 +210,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         view.getRoot().setExpanded(true);
         view.getRoot().getChildren().get(0).setExpanded(true);
         TreeItem before = view.getRoot();
-        presenter.changeType(dataFile, profileService.getNodeTransforms(dataFile).get(0));
+        presenter.changeType(FXCollections.observableArrayList(dataFile), profileService.getNodeTransforms(dataFile).get(0));
 
         assertTrue(view.getRoot().isExpanded());
         assertTrue(view.getRoot().getChildren().get(0).isExpanded());

@@ -46,11 +46,11 @@ public interface EditPackageContentsPresenter extends Presenter {
     void setPropertyFormatService(PropertyFormatService propertyFormatService);
 
     /**
-     * Changes the type of the provided node to the provided type.
-     * @param node The node to change the type of.
+     * Changes the type of the provided nodes using the provided transform
+     * @param nodes The nodes to transform.
      * @param transform The transform to perform on the node.
      */
-    void changeType(Node node, NodeTransform transform);
+    void changeType(List<Node> nodes, NodeTransform transform);
 
     /**
      * Rerun the ontology service on the PackageDescription and redisplay the resulting PackageTree.

@@ -414,9 +414,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     @Override
-    public void changeType(Node node, NodeTransform transform) {
-        if (node != null && transform != null) {
-            controller.getDomainProfileService().transformNode(node, transform);
+    public void changeType(List<Node> nodes, NodeTransform transform) {
+        if (nodes != null && !nodes.isEmpty() && transform != null) {
+            for (Node node : nodes) {
+                controller.getDomainProfileService().transformNode(node, transform);
+            }
 
             displayPackageTree();
 

@@ -27,22 +27,27 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -83,6 +88,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
@@ -206,6 +212,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         //The main element of the view a tree of all the package artifacts.
         artifactTree = new TreeTableView<>();
+        artifactTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //disable column sorting in the view
         artifactTree.setSortPolicy(treeTableView -> false);
@@ -295,36 +302,81 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
-        optionsColumn.setCellValueFactory(p -> {
+        optionsColumn.setCellFactory(new Callback<TreeTableColumn<Node, Label>, TreeTableCell<Node, Label>>() {
+            @Override
+            public TreeTableCell<Node, Label> call(TreeTableColumn<Node, Label> param) {
+                return new TreeTableCell<Node, Label>() {
 
-            Node packageNode = p.getValue().getValue();
-            Label optionsLabel = new Label();
-            final ContextMenu contextMenu = new ContextMenu();
-            TreeItem<Node> treeItem = p.getValue();
-            ImageView image = new ImageView();
-            image.setFitHeight(20);
-            image.setFitWidth(20);
-            image.getStyleClass().add(ARROWS_IMAGE);
-            optionsLabel.setGraphic(image);
-            //make sure the current artifact type is valid - this status may have changed if its
-            //parent's type has changed
-            if (packageNode.isIgnored()) {
-                contextMenu.getItems().add(createIgnoreMenuItem(treeItem));
-            } else {
-                List<NodeTransform> nodeTransforms = presenter.getController().getDomainProfileService().getNodeTransforms(packageNode);
+                    @Override
+                    public void updateItem(Label item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setText(null);
+                            setGraphic(null);
+                        } else {
+                            Button optionsLabel = new Button();
+                            optionsLabel.getStyleClass().clear();
+                            optionsLabel.getStyleClass().add(EDIT_PACKAGE_TREE_BUTTON);
+                            ImageView image = new ImageView();
+                            image.setFitHeight(20);
+                            image.setFitWidth(20);
+                            image.getStyleClass().add(ARROWS_IMAGE);
+                            optionsLabel.setGraphic(image);
 
-                contextMenu.getItems().addAll(createMenuItemList(treeItem, nodeTransforms, optionsLabel));
-                optionsLabel.setContextMenu(contextMenu);
+                            //When the options label is clicked show the context menu.
+                            optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
+                                if (e.getButton() == MouseButton.PRIMARY) {
+                                    //artifactTree.getSelectionModel().s
+                                    errorLabel.setVisible(false);
+                                    final ContextMenu contextMenu = new ContextMenu();
+
+                                    ObservableList<TreeItem<Node>> selectedItems = artifactTree.getSelectionModel().getSelectedItems();
+
+                                    //If no rows are selected or the current row isn't selected add the current row to the selection
+                                    //This is to help keep behavior consistent
+                                    if (selectedItems == null || selectedItems.isEmpty() || !selectedItems.contains(artifactTree.getTreeItem(getIndex()))) {
+                                        //If ctrl is pressed add the row otherwise, replace selection
+                                        if (e.isControlDown()) {
+                                            artifactTree.getSelectionModel().select(getIndex());
+                                        } else {
+                                            artifactTree.getSelectionModel().clearAndSelect(getIndex());
+                                        }
+
+                                        selectedItems = artifactTree.getSelectionModel().getSelectedItems();
+                                    }
+
+                                    //Loop through the selected nodes and determine if they're all ignored, and the possible available node transforms.
+                                    boolean allIgnored = true;
+                                    boolean hasIgnored = false;
+                                    List<Node> selectedNodes = new ArrayList<>();
+                                    for (TreeItem<Node> selectedNode : selectedItems) {
+                                        if (!selectedNode.getValue().isIgnored()) {
+                                            allIgnored = false;
+                                        } else {
+                                            hasIgnored = true;
+                                        }
+                                        selectedNodes.add(selectedNode.getValue());
+                                    }
+
+                                    List<NodeTransform> possibleTransforms = presenter.getController().getDomainProfileService().getNodeTransforms(selectedNodes);
+
+                                    //If all items are ignored we give the option to unignore otherwise we give the option to ignore
+                                    if (allIgnored) {
+                                        contextMenu.getItems().add(createIgnoreMenuItem(selectedItems, true));
+                                    } else {
+                                        contextMenu.getItems().addAll(createMenuItemList(selectedItems, possibleTransforms, optionsLabel, hasIgnored));
+                                        //optionsLabel.setContextMenu(contextMenu);
+                                    }
+
+                                    contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
+                                }
+                            });
+                            setGraphic(optionsLabel);
+                            setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        }
+                    }
+                };
             }
-
-            //When the options label is clicked show the context menu.
-            optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
-                if (e.getButton() == MouseButton.PRIMARY) {
-                    errorLabel.setVisible(false);
-                    contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
-                }
-            });
-            return new ReadOnlyObjectWrapper<>(optionsLabel);
         });
 
         artifactTree.getColumns().add(artifactColumn);
@@ -390,106 +442,104 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         return fullPath;
     }
 
-    /*
-     * Create the menu items for a package artifact.
-     * @param packageArtifact
-     * @param validTypes
-     * @param label
-     * @return
-     */
-    private List<MenuItem> createMenuItemList(final TreeItem<Node> treeItem, List<NodeTransform> nodeTransforms, final Label label){
+    //Create the menu items for the selected rows in the tree view.
+    private List<MenuItem> createMenuItemList(final ObservableList<TreeItem<Node>> selectedItems, List<NodeTransform> nodeTransforms, final Button label, boolean hasIgnored){
         List<MenuItem> itemList = new ArrayList<>();
 
-        final Node packageNode = treeItem.getValue();
+        //If there is only one item selected we display the properties, add, refresh and remap options
+        if (selectedItems.size() == 1) {
+            final Node packageNode = selectedItems.get(0).getValue();
 
-        //Create a menu item that will show the package artifacts popup.
-        MenuItem propertiesItem = new MenuItem(TextFactory.getText(LabelKey.PROPERTIES_LABEL));
-        itemList.add(propertiesItem);
-        propertiesItem.setOnAction(actionEvent -> {
-            showNodePropertiesWindow(packageNode, label);
-            artifactTree.getSelectionModel().select(treeItem);
-        });
-
-        List<NodeType> childNodeTypes = presenter.getPossibleChildTypes(packageNode);
-
-        boolean canHaveFileChild = false;
-        boolean canHaveDirectoryChild = false;
-
-        for (NodeType childNodeType : childNodeTypes) {
-            if (childNodeType.getFileAssociation() == FileAssociation.DIRECTORY) {
-                canHaveDirectoryChild = true;
-            } else {
-                canHaveFileChild = true;
-            }
-
-            if (canHaveDirectoryChild && canHaveFileChild) {
-                break;
-            }
-        }
-
-        if (canHaveFileChild) {
-            //Create a menu item that will allow the user to pick a file.
-            MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FILE_ITEM_LABEL));
-            itemList.add(addFileItem);
-            addFileItem.setOnAction(event -> {
-                File file = presenter.getController().showOpenFileDialog(new FileChooser());
-                presenter.addToTree(packageNode, file.toPath());
+            //Create a menu item that will show the package artifacts popup.
+            MenuItem propertiesItem = new MenuItem(TextFactory.getText(LabelKey.PROPERTIES_LABEL));
+            itemList.add(propertiesItem);
+            propertiesItem.setOnAction(actionEvent -> {
+                showNodePropertiesWindow(packageNode, label);
+                artifactTree.getSelectionModel().select(selectedItems.get(0));
             });
-        }
+            List<NodeType> childNodeTypes = presenter.getPossibleChildTypes(packageNode);
 
-        if (canHaveDirectoryChild) {
-            //Create a menu item that will allow the user to pick a folder.
-            MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FOLDER_ITEM_LABEL));
-            itemList.add(addDirItem);
-            addDirItem.setOnAction(event -> {
-                File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
-                presenter.addToTree(packageNode, file.toPath());
-            });
-        }
+            boolean canHaveFileChild = false;
+            boolean canHaveDirectoryChild = false;
 
-        //If backing file is accessible allow the user to refresh
-        if (packageNode.getFileInfo() != null && ipmService.checkFileInfoIsAccessible(packageNode)) {
-            MenuItem refreshItem = new MenuItem(TextFactory.getText(LabelKey.REFRESH_ITEM_LABEL));
-            itemList.add(refreshItem);
-            refreshItem.setOnAction(event -> {
-                refreshResult = presenter.refreshTreeContent(packageNode);
-                showRefreshResultsPopup();
-            });
-        }
-
-        //If the backing file system entity is not available give the option to remap
-        if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
-            MenuItem remapFileItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
-            itemList.add(remapFileItem);
-            remapFileItem.setOnAction(event -> {
-                File file = null;
-                if (packageNode.getFileInfo().isFile()) {
-                    file = presenter.getController().showOpenFileDialog(new FileChooser());
+            for (NodeType childNodeType : childNodeTypes) {
+                if (childNodeType.getFileAssociation() == FileAssociation.DIRECTORY) {
+                    canHaveDirectoryChild = true;
                 } else {
-                    file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
-                }
-                if (file != null) {
-                    //Remap the node to the new file and check all it's descendants to see if they can be remapped also.
-                    remapNode(packageNode, file.toPath());
-
-                    //Redisplay the tree to update the warnings
-                    presenter.displayPackageTree();
+                    canHaveFileChild = true;
                 }
 
-            });
-        }
+                if (canHaveDirectoryChild && canHaveFileChild) {
+                    break;
+                }
+            }
 
-        //Create a menu item for each available artifact type.
-        if (nodeTransforms != null && nodeTransforms.size() > 0) {
+            if (canHaveFileChild) {
+                //Create a menu item that will allow the user to pick a file.
+                MenuItem addFileItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FILE_ITEM_LABEL));
+                itemList.add(addFileItem);
+                addFileItem.setOnAction(event -> {
+                    File file = presenter.getController().showOpenFileDialog(new FileChooser());
+                    presenter.addToTree(packageNode, file.toPath());
+                });
+            }
+
+            if (canHaveDirectoryChild) {
+                //Create a menu item that will allow the user to pick a folder.
+                MenuItem addDirItem = new MenuItem(TextFactory.getText(LabelKey.ADD_FOLDER_ITEM_LABEL));
+                itemList.add(addDirItem);
+                addDirItem.setOnAction(event -> {
+                    File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+                    presenter.addToTree(packageNode, file.toPath());
+                });
+            }
+
+            //If backing file is accessible allow the user to refresh
+            if (packageNode.getFileInfo() != null && ipmService.checkFileInfoIsAccessible(packageNode)) {
+                MenuItem refreshItem = new MenuItem(TextFactory.getText(LabelKey.REFRESH_ITEM_LABEL));
+                itemList.add(refreshItem);
+                refreshItem.setOnAction(event -> {
+                    refreshResult = presenter.refreshTreeContent(packageNode);
+                    showRefreshResultsPopup();
+                });
+            }
+
+            //If the backing file system entity is not available give the option to remap
+            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
+                MenuItem remapFileItem = new MenuItem(TextFactory.getText(LabelKey.REMAP_ITEM_LABEL));
+                itemList.add(remapFileItem);
+                remapFileItem.setOnAction(event -> {
+                    File file = null;
+                    if (packageNode.getFileInfo().isFile()) {
+                        file = presenter.getController().showOpenFileDialog(new FileChooser());
+                    } else {
+                        file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
+                    }
+                    if (file != null) {
+                        //Remap the node to the new file and check all it's descendants to see if they can be remapped also.
+                        remapNode(packageNode, file.toPath());
+
+                        //Redisplay the tree to update the warnings
+                        presenter.displayPackageTree();
+                    }
+
+                });
+            }
+
             SeparatorMenuItem separator =  new SeparatorMenuItem();
             separator.setStyle("-fx-color: #FFFFFF");
             itemList.add(separator);
+        }
+
+
+        //Create a menu item for each available node transform
+        if (!hasIgnored && nodeTransforms != null && nodeTransforms.size() > 0) {
 
             for (final NodeTransform transform : nodeTransforms) {
                 final List<PropertyType> invalidProperties = new ArrayList<>();
 
                 List<PropertyType> newTypeProperties = transform.getResultNodeType().getPropertyConstraints().stream().map(PropertyConstraint::getPropertyType).collect(Collectors.toList());
-                invalidProperties.addAll(packageNode.getNodeType().getPropertyConstraints().stream().filter(newTypeConstraint -> !newTypeProperties.contains(newTypeConstraint.getPropertyType())).map(PropertyConstraint::getPropertyType).collect(Collectors.toList()));
+                invalidProperties.addAll(selectedItems.get(0).getValue().getNodeType().getPropertyConstraints().stream().filter(newTypeConstraint -> !newTypeProperties.contains(newTypeConstraint.getPropertyType())).map(PropertyConstraint::getPropertyType).collect(Collectors.toList()));
 
                 MenuItem item = new MenuItem(transform.getLabel());
                 itemList.add(item);
@@ -504,6 +554,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 item.setOnAction(actionEvent -> {
                     boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
+                    List<Node> selectedNodes = selectedItems.stream().map(TreeItem::getValue).collect(Collectors.toList());
 
                     if (!invalidProperties.isEmpty() && !hideWarningPopup) {
 
@@ -515,22 +566,21 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
                         getWarningPopupPositiveButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
-                            presenter.changeType(packageNode, transform);
+                            presenter.changeType(selectedNodes, transform);
                             preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
                         });
                     } else {
-                        presenter.changeType(packageNode, transform);
+                        presenter.changeType(selectedNodes, transform);
                     }
 
                 });
             }
+            SeparatorMenuItem separator =  new SeparatorMenuItem();
+            separator.setStyle("-fx-color: #FFFFFF");
+            itemList.add(separator);
         }
 
-        SeparatorMenuItem separator =  new SeparatorMenuItem();
-        separator.setStyle("-fx-color: #FFFFFF");
-        itemList.add(separator);
-
-        itemList.add(createIgnoreMenuItem(treeItem));
+        itemList.add(createIgnoreMenuItem(selectedItems, false));
 
        return itemList;
     }
@@ -567,33 +617,34 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         }
     }
 
-    private MenuItem createIgnoreMenuItem(final TreeItem<Node> treeItem) {
+    private MenuItem createIgnoreMenuItem(final ObservableList<TreeItem<Node>> treeItems, boolean ignore) {
         final CheckMenuItem ignoreCheck = new CheckMenuItem(TextFactory.getText(LabelKey.IGNORE_CHECKBOX));
-        ignoreCheck.setSelected(treeItem.getValue().isIgnored());
 
-        ignoreCheck.setOnAction(event -> toggleItemIgnore(treeItem, ignoreCheck.isSelected()));
+        ignoreCheck.setSelected(ignore);
+        ignoreCheck.setOnAction(event -> toggleItemIgnore(treeItems, ignoreCheck.isSelected()));
 
         return ignoreCheck;
     }
 
     //Note this code is broken out into a protected method so that it can be executed by the test
-    protected void toggleItemIgnore(TreeItem<Node> node, boolean ignored) {
-        ipmService.ignoreNode(node.getValue(), ignored);
+    protected void toggleItemIgnore(final ObservableList<TreeItem<Node>> nodesToIgnore, boolean ignored) {
+        for (TreeItem<Node> nodeToIgnore : nodesToIgnore) {
+            ipmService.ignoreNode(nodeToIgnore.getValue(), ignored);
 
-        errorLabel.setVisible(false);
+            errorLabel.setVisible(false);
 
-        if (!ignored && !presenter.getController().getDomainProfileService().validateTree(node.getValue())) {
-            if (!presenter.getController().getDomainProfileService().assignNodeTypes(presenter.getController().getPrimaryDomainProfile(), node.getValue())) {
-                ipmService.ignoreNode(node.getValue(), true);
-                errorLabel.setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
-                errorLabel.setVisible(true);
+            if (!ignored && !presenter.getController().getDomainProfileService().validateTree(nodeToIgnore.getValue())) {
+                if (!presenter.getController().getDomainProfileService().assignNodeTypes(presenter.getController().getPrimaryDomainProfile(), nodeToIgnore.getValue())) {
+                    ipmService.ignoreNode(nodeToIgnore.getValue(), true);
+                    errorLabel.setText(TextFactory.getText(Errors.ErrorKey.UNIGNORE_ERROR));
+                    errorLabel.setVisible(true);
+                }
             }
         }
-
         // Rebuild the entire TreeView and reselect the current PackageArtifact
 
         presenter.rebuildTreeView();
-        artifactTree.getSelectionModel().select(presenter.findItem(node.getValue()));
+        //artifactTree.getSelectionModel().select(presenter.findItem(node.getValue()));
     }
 
     @Override

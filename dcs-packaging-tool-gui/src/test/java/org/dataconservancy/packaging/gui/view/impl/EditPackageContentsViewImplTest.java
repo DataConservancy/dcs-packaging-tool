@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.collections.FXCollections;
 import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
@@ -42,6 +43,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Tests that the package description view imple initializes all fields correctly. 
  */
+@SuppressWarnings("unchecked")
 public class EditPackageContentsViewImplTest extends BaseGuiTest {
     private EditPackageContentsViewImpl view;
 
@@ -129,7 +131,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testIgnoreCollection() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(collection), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
 
         assertTrue(collection.isIgnored());
         assertTrue(dataItem.isIgnored());
@@ -141,14 +143,14 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         presenter.rebuildTreeView();
 
         //First ignore the collection
-        view.toggleItemIgnore(presenter.findItem(collection), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
 
         assertTrue(collection.isIgnored());
         assertTrue(dataFile.isIgnored());
         assertTrue(dataItem.isIgnored());
 
         //Now unignore the collection and check that all children are also unignored.
-        view.toggleItemIgnore(presenter.findItem(collection), false);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), false);
 
         assertFalse(dataItem.isIgnored());
         assertFalse(dataFile.isIgnored());
@@ -157,7 +159,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testIgnoreDataItem() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(dataItem), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), true);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -170,7 +172,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testUnIgnoreDataItem() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(dataItem), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), true);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -179,7 +181,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         assertTrue(dataItem.isIgnored());
         assertTrue(dataFile.isIgnored());
 
-        view.toggleItemIgnore(presenter.findItem(dataItem), false);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), false);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -192,13 +194,13 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testUnignoreDataItemUnignoresParent() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(collection), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
 
         assertTrue(collection.isIgnored());
         assertTrue(dataItem.isIgnored());
         assertTrue(dataFile.isIgnored());
 
-        view.toggleItemIgnore(presenter.findItem(dataItem), false);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataItem)), false);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -211,7 +213,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testIgnoreDataFile() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(dataFile), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), true);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -224,7 +226,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testUnIgnoreDataFile() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(dataFile), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), true);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -233,7 +235,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         //Item should be ignored
         assertTrue(dataFile.isIgnored());
 
-        view.toggleItemIgnore(presenter.findItem(dataFile), false);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), false);
 
         //Parent should not be ignored
         assertFalse(collection.isIgnored());
@@ -246,13 +248,13 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
     @Test
     public void testUnIgnoreDataFileUnIgnoresParents() {
         presenter.rebuildTreeView();
-        view.toggleItemIgnore(presenter.findItem(collection), true);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(collection)), true);
 
         assertTrue(collection.isIgnored());
         assertTrue(dataItem.isIgnored());
         assertTrue(dataFile.isIgnored());
 
-        view.toggleItemIgnore(presenter.findItem(dataFile), false);
+        view.toggleItemIgnore(FXCollections.observableArrayList(presenter.findItem(dataFile)), false);
 
         //Parents should not be ignored
         assertFalse(collection.isIgnored());
