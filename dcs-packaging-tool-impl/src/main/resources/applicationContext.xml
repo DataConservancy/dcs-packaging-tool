@@ -41,7 +41,7 @@
       </map>
     </property>
   </bean>
-  
+
   <bean id="packageModelBuilder_BOREM" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl">
     <property name="nodeVisitors">
       <list>
