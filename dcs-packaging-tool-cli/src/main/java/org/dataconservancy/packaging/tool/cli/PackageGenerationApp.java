@@ -365,7 +365,7 @@ public class PackageGenerationApp {
         if (compressionFormat != null) {params.addParam(GeneralParameterNames.COMPRESSION_FORMAT, compressionFormat);}
         if (packageName != null) {
             params.addParam(GeneralParameterNames.PACKAGE_NAME, packageName);
-            params.addParam(BagItParameterNames.PKG_BAG_DIR, packageName);
+           // params.addParam(BagItParameterNames.PKG_BAG_DIR, packageName);
         }
         if (packageLocation != null) {params.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation);}
         if (packageStagingLocation != null) {params.addParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, packageStagingLocation);}

@@ -16,7 +16,6 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>  
-  <groupId>org.dataconservancy.pkgtool</groupId>
   <artifactId>dcs-packaging-tool-model</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool Model</name>
@@ -26,36 +25,12 @@
     <artifactId>dcs-packaging-tool</artifactId>
     <version>0.10.1-SNAPSHOT</version>
   </parent>
-
-  <!-- Generated classes have javadoc that doesn't pass doc lint so it's disabled for this module -->
-  <properties>
-    <additionalparam>-Xdoclint:none</additionalparam>
-  </properties>
   
   <!-- Profiles  =================================================== -->
 
   <!-- Build ====================================================== -->
     <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxb2-maven-plugin</artifactId>
-        <dependencies>
-        </dependencies>
-        <executions>
-          <execution>
-            <goals>
-              <goal>xjc</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <packageName>org.dataconservancy.packaging.tool.model.description</packageName>
-          <schemaDirectory>${basedir}/src/main/resources</schemaDirectory>
-          <schemaFiles>rules.xsd</schemaFiles>
-        </configuration>
-      </plugin>
-
+     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

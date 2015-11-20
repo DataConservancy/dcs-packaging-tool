@@ -42,7 +42,6 @@ public class BagItParameterNames extends GeneralParameterNames{
     public static final String BAG_COUNT = "Bag-Count";
     public static final String INTERNAL_SENDER_IDENTIFIER = "Internal-Sender-Identifier";
     public static final String INTERNAL_SENDER_DESCRIPTION = "Internal-Sender-Description";
-    public static final String PKG_BAG_DIR = "PKG-BAG-DIR";
 
     /**
      * Addtional element names

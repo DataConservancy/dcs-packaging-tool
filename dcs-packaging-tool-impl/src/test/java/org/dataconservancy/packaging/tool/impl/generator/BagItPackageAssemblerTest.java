@@ -876,7 +876,6 @@ public class BagItPackageAssemblerTest {
         params.addParam(BagItParameterNames.CONTACT_EMAIL, contactEmail);
         params.addParam(BagItParameterNames.CONTACT_PHONE, contactPhone);
         params.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
-        params.addParam(BagItParameterNames.PKG_BAG_DIR, packageName);
         params.addParam(BagItParameterNames.PACKAGE_MANIFEST, RemURI);
     }
 
