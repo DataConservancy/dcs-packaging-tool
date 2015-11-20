@@ -31,14 +31,16 @@ import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 
 public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackagePresenterImpl> implements OpenExistingPackageView {
 
-    private Button chooseInProgressPackageFileButton;
-    private TextField chooseInProgressFileTextField;
+    private Button choosePackageStateFileButton;
+    private TextField choosePackageStateFileTextField;
 
-    private Button choosePackageDirectoryButton;
-    private TextField choosePackageDirectoryTextField;
+    private Button chooseExplodedPackageDirectoryButton;
+    private TextField chooseExplodedPackageDirectoryTextField;
 
     private Button choosePackageFileButton;
     private TextField choosePackageFileTextField;
+    private Button choosePackageStagingDirectoryButton;
+    private TextField choosePackageStagingDirectoryTextField;
 
     public OpenExistingPackageViewImpl(Help help) {
         super();
@@ -54,6 +56,30 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         content.setAlignment(Pos.TOP_CENTER);
         content.getChildren().add(errorLabel);
 
+        VBox stagingVBox = new VBox(4);
+        stagingVBox.setAlignment(Pos.TOP_LEFT);
+        content.getChildren().add(stagingVBox);
+        
+        HBox stagingHBox = new HBox(6);
+        stagingHBox.getStyleClass().add(DIRECTORY_BOX);
+        stagingHBox.setMaxWidth(420);
+        
+        Label stagingLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_STAGING_DIRECTORY));
+        stagingLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
+        stagingVBox.getChildren().add(stagingLabel);
+        
+        choosePackageStagingDirectoryButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
+        choosePackageStagingDirectoryButton.setMinWidth(60);
+        stagingHBox.getChildren().add(choosePackageStagingDirectoryButton);
+
+        choosePackageStagingDirectoryTextField = new TextField();
+        choosePackageStagingDirectoryTextField.setEditable(false);
+        choosePackageStagingDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
+        choosePackageStagingDirectoryTextField.setPrefWidth(320);
+        
+        stagingHBox.getChildren().add(choosePackageStagingDirectoryTextField);
+        stagingVBox.getChildren().add(stagingHBox);
+        
         VBox infoVBox = new VBox(4);
         Label selectOneOptionLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_ONE_OPTION_LABEL));
         selectOneOptionLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
@@ -72,20 +98,20 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         fileChooserSelector.getStyleClass().add(DIRECTORY_BOX);
         fileChooserSelector.setMaxWidth(420);
 
-        chooseInProgressPackageFileButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
-        chooseInProgressPackageFileButton.setMinWidth(60);
-        fileChooserSelector.getChildren().add(chooseInProgressPackageFileButton);
+        choosePackageStateFileButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
+        choosePackageStateFileButton.setMinWidth(60);
+        fileChooserSelector.getChildren().add(choosePackageStateFileButton);
 
-        chooseInProgressFileTextField = new TextField();
-        chooseInProgressFileTextField.setEditable(false);
-        chooseInProgressFileTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
-        chooseInProgressFileTextField.setPrefWidth(320);
-        fileChooserSelector.getChildren().add(chooseInProgressFileTextField);
+        choosePackageStateFileTextField = new TextField();
+        choosePackageStateFileTextField.setEditable(false);
+        choosePackageStateFileTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
+        choosePackageStateFileTextField.setPrefWidth(320);
+        fileChooserSelector.getChildren().add(choosePackageStateFileTextField);
         chooseFileDirSelectionFields.getChildren().add(fileChooserSelector);
 
         Label choosePackageFileLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_PACKAGE_FILE_LABEL));
         chooseFileDirSelectionFields.getChildren().add(choosePackageFileLabel);
-
+        
         HBox packageFileChooserSelector = new HBox(6);
         packageFileChooserSelector.getStyleClass().add(DIRECTORY_BOX);
         packageFileChooserSelector.setMaxWidth(420);
@@ -99,7 +125,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         choosePackageFileTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
         choosePackageFileTextField.setPrefWidth(320);
         packageFileChooserSelector.getChildren().add(choosePackageFileTextField);
-        chooseFileDirSelectionFields.getChildren().add(packageFileChooserSelector);
+        chooseFileDirSelectionFields.getChildren().add(packageFileChooserSelector);                
 
         Label choosePackageDirectoryLabel = new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_DIRECTORY_LABEL));
         chooseFileDirSelectionFields.getChildren().add(choosePackageDirectoryLabel);
@@ -108,15 +134,15 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);
         baseDirectorySelector.setMaxWidth(420);
 
-        choosePackageDirectoryButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
-        choosePackageDirectoryButton.setMinWidth(60);
-        baseDirectorySelector.getChildren().add(choosePackageDirectoryButton);
+        chooseExplodedPackageDirectoryButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
+        chooseExplodedPackageDirectoryButton.setMinWidth(60);
+        baseDirectorySelector.getChildren().add(chooseExplodedPackageDirectoryButton);
 
-        choosePackageDirectoryTextField = new TextField();
-        choosePackageDirectoryTextField.setEditable(false);
-        choosePackageDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
-        choosePackageDirectoryTextField.setPrefWidth(320);
-        baseDirectorySelector.getChildren().add(choosePackageDirectoryTextField);
+        chooseExplodedPackageDirectoryTextField = new TextField();
+        chooseExplodedPackageDirectoryTextField.setEditable(false);
+        chooseExplodedPackageDirectoryTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
+        chooseExplodedPackageDirectoryTextField.setPrefWidth(320);
+        baseDirectorySelector.getChildren().add(chooseExplodedPackageDirectoryTextField);
         chooseFileDirSelectionFields.getChildren().add(baseDirectorySelector);
 
         content.getChildren().add(chooseFileDirSelectionFields);
@@ -125,23 +151,23 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     }
 
     @Override
-    public Button getChooseInProgressPackageFileButton() {
-        return chooseInProgressPackageFileButton;
+    public Button getChoosePackageStateFileButton() {
+        return choosePackageStateFileButton;
     }
 
     @Override
-    public TextField getChooseInProgressPackageFileTextField() {
-        return chooseInProgressFileTextField;
+    public TextField getChoosePackageStateFileTextField() {
+        return choosePackageStateFileTextField;
     }
 
     @Override
-    public Button getChoosePackageDirectoryButton() {
-        return choosePackageDirectoryButton;
+    public Button getChooseExplodedPackageDirectoryButton() {
+        return chooseExplodedPackageDirectoryButton;
     }
 
     @Override
-    public TextField getChoosePackageDirectoryTextField() {
-        return choosePackageDirectoryTextField;
+    public TextField getChooseExplodedPackageDirectoryTextField() {
+        return chooseExplodedPackageDirectoryTextField;
     }
 
     @Override
@@ -152,5 +178,15 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     @Override
     public TextField getChoosePackageFileTextField() {
         return choosePackageFileTextField;
+    }
+
+    @Override
+    public Button getChoosePackageStagingDirectoryButton() {
+        return choosePackageStagingDirectoryButton;
+    }
+
+    @Override
+    public TextField getChoosePackageStagingDirectoryTextField() {
+        return choosePackageStagingDirectoryTextField;
     }
 }

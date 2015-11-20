@@ -38,12 +38,14 @@ public class OpenExistingPackageViewImplTest extends BaseGuiTest {
      */
     @Test
     public void testComponentsNotNull() {
-        assertNotNull(view.getChooseInProgressPackageFileTextField());
-        assertNotNull(view.getChooseInProgressPackageFileButton());
+        assertNotNull(view.getChoosePackageStateFileTextField());
+        assertNotNull(view.getChoosePackageStateFileButton());
         assertNotNull(view.getChoosePackageFileTextField());
         assertNotNull(view.getChoosePackageFileButton());
-        assertNotNull(view.getChoosePackageDirectoryTextField());
-        assertNotNull(view.getChoosePackageDirectoryButton());
+        assertNotNull(view.getChooseExplodedPackageDirectoryTextField());
+        assertNotNull(view.getChooseExplodedPackageDirectoryButton());
+        assertNotNull(view.getChoosePackageStagingDirectoryButton());
+        assertNotNull(view.getChoosePackageStagingDirectoryTextField());        
         assertNotNull(view.getContinueButton());
         assertNotNull(view.getErrorLabel());
     }

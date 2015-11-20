@@ -21,50 +21,72 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 /**
- * This view is an intermediary step in the workflow. If the user selects to open an existing package description this view is shown for them to supply a content directory.
- * This step was added to make the initial screen less confusing.
+ * If the user selects to open an existing package, this view is shown.
+ * 
+ * Text fields are used to display file paths so a user an scroll the text to
+ * see the entire path. The text field however is not editable.
  */
 public interface OpenExistingPackageView extends View<OpenExistingPackagePresenterImpl> {
 
     /**
-     * The button for choosing an in progress package file.
-     * @return The button for choosing the content directory
+     * The button for choosing an in progress package state file.
+     * 
+     * @return The button for choosing the file.
      */
-    Button getChooseInProgressPackageFileButton();
+    Button getChoosePackageStateFileButton();
 
     /**
-     * A text field that is used for displaying the currently selected file. Note a text field
-     * is used here to allow the user to scroll the text to see the entire path. The text field however is not
-     * editable.
-     * @return The TextField to use for entering the in content directory.
+     * A text field that is used for displaying the currently selected package
+     * state file.
+     * 
+     * 
+     * @return The TextField to display the file.
      */
-    TextField getChooseInProgressPackageFileTextField();
+    TextField getChoosePackageStateFileTextField();
 
     /**
-     * The button for choosing a content directory that is the location of the package contents.
-     * @return The button for choosing the content directory
+     * The button for choosing a content directory that is the location of the
+     * package contents.
+     * 
+     * @return The button for choosing the directory
      */
-    Button getChoosePackageDirectoryButton();
+    Button getChooseExplodedPackageDirectoryButton();
 
     /**
-     * A text field that is used for displaying the currently selected directory. Note a text field
-     * is used here to allow the user to scroll the text to see the entire path. The text field however is not
-     * editable.
-     * @return The TextField to use for entering the in content directory.
+     * A text field that is used for displaying the currently selected directory
+     * of an exploded package.
+     * 
+     * @return The TextField to display the directory.
      */
-    TextField getChoosePackageDirectoryTextField();
+    TextField getChooseExplodedPackageDirectoryTextField();
 
     /**
-     * The button for choosing a package file.
-     * @return The button for choosing the content directory
+     * The button for choosing a serialized package.
+     * 
+     * @return The button for choosing the file
      */
     Button getChoosePackageFileButton();
+    
+    /**
+     * The button for choosing directory a serialized package will be extracted to.
+     * 
+     * @return The button for choosing the directory
+     */
+    Button getChoosePackageStagingDirectoryButton();
+    
+    /**
+     * A text field that is used for displaying the currently selected directory
+     * to stage package files.
+     * 
+     * @return The TextField to display the directory.
+     */
+    TextField getChoosePackageStagingDirectoryTextField();
 
     /**
-     * A text field that is used for displaying the currently selected file. Note a text field
-     * is used here to allow the user to scroll the text to see the entire path. The text field however is not
-     * editable.
-     * @return The TextField to use for entering the in content directory.
+     * A text field that is used for displaying the currently selected package
+     * file.
+     * 
+     * @return The TextField to display the file.
      */
     TextField getChoosePackageFileTextField();
 }

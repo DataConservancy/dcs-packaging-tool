@@ -24,15 +24,13 @@ import javafx.stage.Stage;
 import org.dataconservancy.packaging.gui.presenter.*;
 import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
 import org.dataconservancy.packaging.gui.view.*;
+import org.dataconservancy.packaging.tool.api.OpenPackageService;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
-import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator;
 import org.dataconservancy.packaging.tool.impl.TestPackageGenerator;
 import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
-import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl;
 import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory;
-import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 
 /**
@@ -59,7 +57,8 @@ public class Factory {
     private OpenExistingPackageView openExistingPackageView;
     private PackageMetadataPresenter packageMetadataPresenter;
     private PackageMetadataView packageMetadataView;
-
+    private OpenPackageService openPackageService;
+      
     private Configuration config;
 
     public Factory() {
@@ -149,4 +148,12 @@ public class Factory {
     public void setPackageMetadataView(PackageMetadataView packageMetadataView) {
         this.packageMetadataView = packageMetadataView;
     }
+    
+    public OpenPackageService getOpenPackageService() {
+        return openPackageService;
+    }
+
+    public void setOpenPackageService(OpenPackageService openPackageService) {
+        this.openPackageService = openPackageService;
+    }    
 }
