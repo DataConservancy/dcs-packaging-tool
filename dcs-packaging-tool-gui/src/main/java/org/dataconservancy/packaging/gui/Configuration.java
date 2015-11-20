@@ -37,7 +37,6 @@ import java.io.InputStream;
 public class Configuration {
 
     private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
-    private String ontologyFile;
 
     //the default application configuration directory
     private String configurationDirectory;
@@ -46,73 +45,24 @@ public class Configuration {
     //files placed in the userConfigDirectory
     //these are set in the config_default.properties file
     private String disciplineMapFile;
-    private String availableProjectsFile;
     private String packageGenerationParametersFile;
     private String packageMetadataParametersFile;
+    private String userPropertiesFile;
 
     //the "resolved" configuration files - precedence is
     //command line, then user config directory, and finally the application default
     private String disciplineMap;
-    private String availableProjects;
     private String packageGenerationParameters;
     private String packageMetadataParameters;
+    private String userProperties;
 
-    @Option(name="--ontology", aliases={"-o"}, usage="Sets an ontology file")
-    public void setOntologyFile(String ontologyFile) {
-        this.ontologyFile = ontologyFile;
-    }
-    
-    public String getOntologyFile() {
-        return ontologyFile;
-    }
-
-    @Option(name="--external-projects", aliases={"-xp"}, usage="Sets the external project identifiers file")
-    public void setAvailableProjects(String availableProjects){
-        this.availableProjects = availableProjects;
-    }
-
-    public String getAvailableProjects(){
-        return availableProjects;
-    }
-
-    @Option(name="--disciplines", aliases={"-d"}, usage="Sets the discipline map xml file")
-    public void setDisciplineMap(String disciplineMap){
-        this.disciplineMap = disciplineMap;
-    }
-
-    public String getDisciplineMap() {
-        return disciplineMap;
-    }
-
-    @Option(name="--generation-params", aliases={"-p"}, usage="Sets the package generation parameters file")
-    public void setPackageGenerationParameters(String packageGenerationParameters){
-        this.packageGenerationParameters = packageGenerationParameters;
-    }
-
-    public String getPackageGenerationParameters(){
-        return packageGenerationParameters;
-    }
-
-    public void setPackageMetadataParameters(String packageMetadataParameters){
-        this.packageMetadataParameters = packageMetadataParameters;
-    }
-
-    public String getPackageMetadataParameters(){return packageMetadataParameters; }
-
+    //Setters and getters for the names of the files
     public void setConfigurationDirectory(String dir){
         this.configurationDirectory = dir;
     }
 
     public String getConfigurationDirectory(){
         return configurationDirectory;
-    }
-
-    public void setPackageGenerationParametersFile(String packageGenerationParametersFile) {
-        this.packageGenerationParametersFile = packageGenerationParametersFile;
-    }
-
-    public String getPackageGenerationParametersFile() {
-        return packageGenerationParametersFile;
     }
 
     public void setDisciplineMapFile(String disciplineMapFile){
@@ -123,12 +73,12 @@ public class Configuration {
         return disciplineMapFile;
     }
 
-    public void setAvailableProjectsFile(String availableProjectsFile){
-        this.availableProjectsFile= availableProjectsFile;
+    public void setPackageGenerationParametersFile(String packageGenerationParametersFile) {
+        this.packageGenerationParametersFile = packageGenerationParametersFile;
     }
 
-    public String getAvailableProjectsFile(){
-        return availableProjectsFile;
+    public String getPackageGenerationParametersFile() {
+        return packageGenerationParametersFile;
     }
 
     public void setPackageMetadataParametersFile(String packageMetadataParametersFile){
@@ -138,6 +88,45 @@ public class Configuration {
     public String getPackageMetadataParametersFile(){
         return packageMetadataParametersFile;
     }
+
+    public void setUserPropertiesFile(String userPropertiesFile){
+        this.userPropertiesFile = userPropertiesFile;
+    }
+
+    public String getUserPropertiesFile(){
+        return userPropertiesFile;
+    }
+
+
+    //Setters and getters for the actual file locations we will be using
+
+    @Option(name="--disciplines", aliases={"-d"}, usage="Sets the discipline map xml file")
+    public void setDisciplineMap(String disciplineMap){
+        this.disciplineMap = disciplineMap;
+    }
+
+    public String getDisciplineMap() {return disciplineMap; }
+
+    @Option(name="--generation-params", aliases={"-p"}, usage="Sets the package generation parameters file")
+    public void setPackageGenerationParameters(String packageGenerationParameters){
+        this.packageGenerationParameters = packageGenerationParameters;
+    }
+
+    public String getPackageGenerationParameters(){return packageGenerationParameters;}
+
+    @Option(name="--metadata-params", aliases={"-m"}, usage="Sets the package metadata parameters file")
+    public void setPackageMetadataParameters(String packageMetadataParameters){
+        this.packageMetadataParameters = packageMetadataParameters;
+    }
+
+    public String getPackageMetadataParameters(){return packageMetadataParameters; }
+
+    @Option(name="--user-props", aliases={"-u"}, usage ="Sets the user defined properties file")
+    public void setUserProperties(String userProperties){
+        this.userProperties = userProperties;
+    }
+
+    public String getUserProperties(){ return userProperties; }
 
     /**
      *  This method locates the default configuration with the supplied file name, in the user's configuration directory.

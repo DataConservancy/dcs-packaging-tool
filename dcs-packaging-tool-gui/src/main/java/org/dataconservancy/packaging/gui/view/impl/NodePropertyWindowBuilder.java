@@ -436,12 +436,12 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         //If the file is null attempt to load the built in resource file.
         if (availableUserDefinedPropertyVocabularies.isEmpty()) {
-            InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream("/defaultRelationships");
+            InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream("/userProperties.json");
             if (fileStream != null) {
                 availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
             }
             else {
-                log.error("Error reading default relationships file. Couldn't find classpath file: /defaultRelationships");
+                log.error("Error reading default relationships file. Couldn't find classpath file: /userProperties.json");
             }
         }
     }
