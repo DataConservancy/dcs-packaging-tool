@@ -30,7 +30,7 @@
     <property name="builders">
       <map key-type="java.lang.String"
            value-type="org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder">
-        <entry key="http://dataconservancy.org/spec/dcs-pkg-desc-BOREM" value-ref="packageModelBuilder_BOREM"/>
+        <entry key="BOREM" value-ref="packageModelBuilder_BOREM"/>
       </map>
     </property>
   </bean>
