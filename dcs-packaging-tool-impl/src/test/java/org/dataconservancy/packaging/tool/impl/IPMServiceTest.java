@@ -609,9 +609,17 @@ public class IPMServiceTest {
                     //Check that the "." directory and it's children still have the same path
                     child.getChildren().stream().filter(subChild -> subChild.getFileInfo().getName().equalsIgnoreCase(".steak")).forEach(subChild -> {
                         foundUnmappedDir[0] = true;
-                        assertEquals(subChild.getFileInfo().getLocation(), subDirB.toURI());
+                        try {
+                            assertEquals(subChild.getFileInfo().getLocation(), subDirB.toPath().toRealPath().toUri());
+                        } catch (IOException e) {
+                            assertTrue(e.getMessage(), false);
+                        }
                         assertEquals(1, subChild.getChildren().size());
-                        assertEquals(subDirBFile.toURI(), subChild.getChildren().get(0).getFileInfo().getLocation());
+                        try {
+                            assertEquals(subDirBFile.toPath().toRealPath().toUri(), subChild.getChildren().get(0).getFileInfo().getLocation());
+                        } catch (IOException e) {
+                            assertTrue(e.getMessage(), false);
+                        }
                     });
 
                     break;
