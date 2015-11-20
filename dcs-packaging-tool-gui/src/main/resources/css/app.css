@@ -401,6 +401,12 @@
 	-fx-strikethrough: false;
 }
 
+.EditPackageTreeButton .button {
+    -fx-background-color: rgba(0, 0, 0, 0);
+    -fx-effect: dropshadow( one-pass-box , #005048,
+        0, 0.0, 0, 0);
+}
+
 .PropertyTextArea .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
     -fx-border-color: transparent;

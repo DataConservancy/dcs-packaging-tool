@@ -46,7 +46,7 @@ public interface CssConstants {
     String GOOD_INPUT_IMAGE = "GoodUserInputImage";
     String BAD_INPUT_IMAGE = "BadUserInputImage";
     String BOLD_TEXT_CLASS = "BoldText";
-    String PACKAGE_DESCRIPTION_ROW_IGNORE = "PackageDescriptionView-IgnoreRow";
+    String PACKAGE_DESCRIPTION_ROW_IGNORE = "EditPackageContentsView-IgnoreRow";
     String HOMEPAGE_VIEW_CLASS = "HomepageView";
     String CLICKABLE = "Clickable";
     String VBOX_BORDER = "VBoxBorder";
@@ -64,4 +64,5 @@ public interface CssConstants {
     String UPDATED_ROW = "UpdatedRow";
     String PROPERTY_TEXT_AREA = "PropertyTextArea";
     String CATEGORY_SUB_TITLE = "CategorySubTitle";
+    String EDIT_PACKAGE_TREE_BUTTON = "EditPackageTreeButton";
 }
