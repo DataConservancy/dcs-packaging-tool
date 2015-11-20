@@ -54,7 +54,11 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 public class PackageModelBuilderImpl
         implements PackageModelBuilder {
 
-    IpmRdfTransformService rdf2ipm = new IpmRdfTransformService();
+    IpmRdfTransformService rdf2ipm;
+
+    public void setIpmRdfTransformService(IpmRdfTransformService svc) {
+        this.rdf2ipm = svc;
+    }
 
     List<NodeVisitor> visitors = new ArrayList<>();
 
@@ -69,7 +73,8 @@ public class PackageModelBuilderImpl
         PackageModelBuilderImpl builder = new PackageModelBuilderImpl();
         builder.setNodeVisitors(visitors);
         builder.params = params;
-        
+        builder.rdf2ipm = rdf2ipm;
+
         return builder;
     }
 
@@ -82,6 +87,7 @@ public class PackageModelBuilderImpl
         builderState.params = params;
         builderState.manifest = ModelFactory.createDefaultModel();
         builderState.renamedResources = new HashMap<>();
+        builderState.pkgState = pstate;
 
         try {
 
