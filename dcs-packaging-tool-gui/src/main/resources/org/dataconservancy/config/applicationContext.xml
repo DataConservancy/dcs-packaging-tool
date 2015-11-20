@@ -197,7 +197,8 @@
     <property name="editPackageContentsPresenter" ref="editPackageContentsPresenter" />
     <property name="packageGenerationPresenter" ref="packageGenerationPresenter" />
     <property name="openExistingPackagePresenter" ref="openExistingPackagePresenter" />
-
+    <property name="openPackageService" ref="openPackageService" />
+    
     <property name="controller" ref="controller" />
     
     <property name="headerView" ref="headerView"/>
@@ -214,7 +215,6 @@
     <property name="uriGenerator" ref="uriGenerator"/>
   </bean>
 
-
   <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
     <property name="primaryDomainProfiles">
       <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
@@ -225,6 +225,15 @@
     <property name="secondaryDomainProfiles">
       <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
     </property>
+  </bean>
+
+  <bean id="openPackageService" class="org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl">
+    <constructor-arg ref="packageStateSerializer"/>
+    <constructor-arg ref="ipmRdfTransformService"/>
+  </bean>
+
+  <bean id="ipmRdfTransformService" class="org.dataconservancy.packaging.tool.impl.IpmRdfTransformService">
+    <property name="domainProfileStore" ref="domainProfileStore"/>
   </bean>
 
   <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>

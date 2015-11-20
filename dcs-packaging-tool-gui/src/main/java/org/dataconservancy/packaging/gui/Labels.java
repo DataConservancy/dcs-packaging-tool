@@ -130,7 +130,8 @@ public class Labels {
         NO_BACKING_FILE_LABEL("nobackingfile.label"),
         UNASSIGNED_LABEL("unassigned.label"),
         OPTIONAL_PROPERTIES_LABEL("optionalproperties.label"),
-        REQUIRED_PROPERTIES_LABEL("requiredproperties.label");
+        REQUIRED_PROPERTIES_LABEL("requiredproperties.label"),
+        SELECT_STAGING_DIRECTORY("selectstagingdir.label");
 
         private String property;
 

@@ -56,8 +56,24 @@ public class OpenPackageServiceImpl implements OpenPackageService {
     }
 
     @Override
-    public PackageState openPackageState(File file) throws IOException {
-        return load_package_state(file);
+    public OpenedPackage openPackageState(File file) throws IOException {
+        OpenedPackage result = new OpenedPackage();
+        
+        PackageState state = load_package_state(file);
+        
+        result.setPackageState(state);
+        
+        try {
+            // No bag URIs to rewrite
+            
+            if (state.getPackageTree() != null) {
+                result.setPackageTree(ipm_transform_service.transformToNode(state.getPackageTree()));
+            }
+        } catch (RDFTransformException e) {
+            throw new IOException(e);
+        }
+        
+        return result;
     }
 
     /**
@@ -171,7 +187,7 @@ public class OpenPackageServiceImpl implements OpenPackageService {
 
         PackageState state = load_package_state(new File(dir, path));
 
-        // Load package tree and rewrite bag uris to point to files in dir
+        // Load package tree and rewrite bag URIs to point to files in directory
 
         Node root;
 

@@ -465,6 +465,11 @@ public class BagItPackageAssembler implements PackageAssembler {
     public Package assemblePackage() {
         File finalFile;
         Package pkg = null;
+
+        Set<String> paramNames = params.getKeys();
+        if(!paramNames.contains(BagItParameterNames.PACKAGE_MANIFEST)){
+            throw new PackageToolException(PackagingToolReturnInfo.PKG_FILE_NOT_FOUND_EXCEPTION, "A PackageManifest file was not supplied to the assembler");
+        }
         try {
 
             //Write bag-info.txt
@@ -792,10 +797,6 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         if (!paramNames.contains(BagItParameterNames.BAGIT_PROFILE_ID)) {
             missingParams.add(BagItParameterNames.BAGIT_PROFILE_ID);
-        }
-
-        if(!paramNames.contains(BagItParameterNames.PACKAGE_MANIFEST)) {
-            missingParams.add(BagItParameterNames.PACKAGE_MANIFEST);
         }
 
         if (!missingParams.isEmpty()) {
