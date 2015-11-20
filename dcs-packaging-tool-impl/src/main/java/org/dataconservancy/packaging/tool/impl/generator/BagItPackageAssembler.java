@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.dcs.model.Checksum;
 import org.dataconservancy.packaging.tool.api.PackageChecksumService;
-import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.api.Package;
@@ -577,6 +576,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
     private File writeBagInfoTxt() throws PackageToolException {
         File bagInfoFile = new File(bagBaseDir, "bag-info.txt");
+
         try {
             FileWriter writer = new FileWriter(bagInfoFile);
             String newLine = System.getProperty("line.separator");
@@ -635,24 +635,19 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         String rootLocation = params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0);
 
-        File file;
         if(rootLocation != null) {
             String contentRoot = FilenameUtils.separatorsToUnix(rootLocation);
-            file = new File(contentRoot, string);
-        }
-        else
-        {
-            file = new File(string);
-        }
+            File file = new File(contentRoot, string);
+       
 
-        if(!file.exists()){
+            if(!file.exists()){
                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
                     "Provided file path indicates that that file " + file.getPath() + " does not reside within the " +
                     "specified content root location of: " + params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
 
+            }
         }
 
-       //return file.getPath();
         return string;
     }
 
