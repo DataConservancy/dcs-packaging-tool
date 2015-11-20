@@ -401,6 +401,11 @@
 	-fx-strikethrough: false;
 }
 
+/*#This is to ensure menu items never get strikethrough, even when ignored*/
+.EditPackageContentsView-MenuItem .text {
+    -fx-strikethrough: false;
+}
+
 .EditPackageTreeButton .button {
     -fx-background-color: rgba(0, 0, 0, 0);
     -fx-effect: dropshadow( one-pass-box , #005048,

@@ -65,4 +65,5 @@ public interface CssConstants {
     String PROPERTY_TEXT_AREA = "PropertyTextArea";
     String CATEGORY_SUB_TITLE = "CategorySubTitle";
     String EDIT_PACKAGE_TREE_BUTTON = "EditPackageTreeButton";
+    String EDIT_PACKAGE_TREE_MENU = "EditPackageContentsView-MenuItem";
 }
