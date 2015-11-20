@@ -143,7 +143,7 @@ public class Controller {
         container.setTop((VBox) factory.getHeaderView());
         currentPage = Page.HOMEPAGE;
 
-        packageState = new PackageState(this.toolVersion);
+        setPackageState(new PackageState(this.toolVersion));
         packageStateFile = null;
         packageStateFileChooser.setInitialFileName(packageStateFileExtension);
 
