@@ -798,11 +798,6 @@ public class BagItPackageAssembler implements PackageAssembler {
             missingParams.add(BagItParameterNames.PACKAGE_MANIFEST);
         }
 
-        if (params.getParam(BagItParameterNames.PACKAGE_FORMAT_ID, 0).equals(PackagingFormat.BOREM.toString())
-                && !paramNames.contains(BagItParameterNames.PKG_BAG_DIR)) {
-            missingParams.add(BagItParameterNames.PKG_BAG_DIR);
-        }
-
         if (!missingParams.isEmpty()) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_REQUIRED_PARAMS_MISSING,
                     "Parameter(s) " + missingParams.toString() + " are missing. "
