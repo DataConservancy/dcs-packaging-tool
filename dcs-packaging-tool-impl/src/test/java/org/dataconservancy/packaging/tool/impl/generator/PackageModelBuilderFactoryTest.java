@@ -22,13 +22,11 @@ import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -42,21 +40,13 @@ public class PackageModelBuilderFactoryTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    @Autowired
-    PackageModelBuilderFactory underTest;
-
-    @Before
-    public void setUp() throws Exception {
-        assertNotNull("No PackageModelBuilder instance was autowired!", underTest);
-    }
-
     @Test
     public void testGetNewBuilder() throws InstantiationException, IllegalAccessException {
         PackageState desc = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
         params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, folder.getRoot().getPath());
-        PackageModelBuilder builder = underTest.newBuilder(desc, params);
+        PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(desc, params);
 
         assertNotNull(builder);
     }
@@ -67,7 +57,7 @@ public class PackageModelBuilderFactoryTest {
         PackageState state = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
 
-        underTest.newBuilder(state, params);
+        PackageModelBuilderFactory.newBuilder(state, params);
     }
 
 
@@ -77,7 +67,7 @@ public class PackageModelBuilderFactoryTest {
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "not-a-real-builder");
 
-        PackageModelBuilder builder = underTest.newBuilder(desc ,params);
+        PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(desc ,params);
 
         assertNull(builder);
     }
