@@ -65,6 +65,15 @@
     <constructor-arg value="${dcs.package.tool.test.content}/TestContent" />
   </bean>
 
-    <bean id="props" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    </bean>
+  <bean id="propertyPlaceholderConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreResourceNotFound" value="true" />
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+    <property name="locations">
+      <list>
+        <value>classpath:config_default-test.properties</value>
+      </list>
+    </property>
+  </bean>
+
 </beans>
