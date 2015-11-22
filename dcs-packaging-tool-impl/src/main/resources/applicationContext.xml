@@ -42,6 +42,22 @@
     </property>
   </bean>
 
+  <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
+    <property name="primaryDomainProfiles">
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
+        <ref bean="dcsBoProfile"/>
+        <ref bean="pcdmProfile"/>
+      </list>
+    </property>
+    <property name="secondaryDomainProfiles">
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
+    </property>
+  </bean>
+
+  <bean id="ipmRdfTransformService" class="org.dataconservancy.packaging.tool.impl.IpmRdfTransformService">
+    <property name="domainProfileStore" ref="domainProfileStore"/>
+  </bean>
+
   <bean id="packageModelBuilder_BOREM" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl">
     <property name="nodeVisitors">
       <list>
