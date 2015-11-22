@@ -313,10 +313,10 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             try {
                 createdPackage = packageGenerationService.generatePackage(controller.getPackageState(), generationParams);
             } catch (PackageToolException e) {
-                log.error(e.getMessage());
+                log.error(e.getMessage(), e);
                 return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             } catch (RuntimeException e) {
-                log.error(e.getMessage());
+                log.error(e.getMessage(), e);
                 return TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) + " " + e.getMessage();
             }
 
