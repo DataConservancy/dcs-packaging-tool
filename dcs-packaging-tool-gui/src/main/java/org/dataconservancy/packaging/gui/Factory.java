@@ -61,6 +61,22 @@ public class Factory {
       
     private Configuration config;
 
+    public Factory() {
+        initializeAssemblers();
+    }
+    
+    private void initializeAssemblers() {
+        Map<String, Class<? extends PackageAssembler>> assemblers = new HashMap<>();
+        assemblers.put("BOREM",  BagItPackageAssembler.class);
+        PackageAssemblerFactory.setAssemblers(assemblers);
+        
+        /* TODO:  XXX:  This MUST be set via Spring!!!!!! */
+        //Map<String, Class<? extends PackageModelBuilder>> builders = new HashMap<>();
+        //builders.put("http://dataconservancy.org/spec/dcs-pkg-desc-BOREM", PackageModelBuilderImpl.class);
+        //PackageModelBuilderFactory.setBuilders(builders);
+    }
+
+
     public Stage getStage() { return stage; }
     public void setStage(Stage stage) { this.stage = stage; }
 
