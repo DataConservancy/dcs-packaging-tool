@@ -37,7 +37,7 @@ import java.util.List;
  * Test class for the PackageMetadataService.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath*:/org/dataconservancy/config/applicationContext-test.xml", "classpath*:/test-applicationContext.xml"})
+@ContextConfiguration({"classpath*:/org/dataconservancy/config/applicationContext-test.xml"})
 public class PackageMetadataServiceTest {
 
     @Autowired

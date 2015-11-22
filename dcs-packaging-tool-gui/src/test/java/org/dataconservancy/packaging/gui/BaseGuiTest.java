@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath*:/org/dataconservancy/config/applicationContext-test.xml", "classpath*:/test-applicationContext.xml"})
+@ContextConfiguration({"classpath*:/org/dataconservancy/config/applicationContext-test.xml"})
 /**
  * Base test class that sets common presenter and view elements. 
  */
