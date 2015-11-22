@@ -18,8 +18,8 @@ package org.dataconservancy.packaging.tool.impl;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerator;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
-import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
+import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
 import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory;
 import org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
@@ -39,24 +39,6 @@ import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
  */
 public class BOREMPackageGenerator implements PackageGenerator {
 
-    private PackageModelBuilderFactory modelBuilderFactory;
-
-    private PackageAssemblerFactory assemblerFactory;
-
-    public BOREMPackageGenerator(PackageAssemblerFactory assemblerFactory,
-                                 PackageModelBuilderFactory modelBuilderFactory) {
-
-        if (assemblerFactory == null) {
-            throw new IllegalArgumentException("Assembler factory must not be null.");
-        }
-
-        if (modelBuilderFactory == null) {
-            throw new IllegalArgumentException("Model Builder factory must not be null.");
-        }
-
-        this.assemblerFactory = assemblerFactory;
-        this.modelBuilderFactory = modelBuilderFactory;
-    }
 
     /**
      * <p>
@@ -99,8 +81,8 @@ public class BOREMPackageGenerator implements PackageGenerator {
         }
 
         try {
-            PackageAssembler assembler = assemblerFactory.newAssembler(params);
-            PackageModelBuilder builder = modelBuilderFactory.newBuilder(packageState, params);
+            BagItPackageAssembler assembler = (BagItPackageAssembler)PackageAssemblerFactory.newAssembler(params);
+            PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(packageState, params);
 
             if (assembler == null) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_OBJECT_INSTANTIATION_EXP, "Could not create " +
