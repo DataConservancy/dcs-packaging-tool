@@ -69,6 +69,20 @@
   <!-- Compiles -->
   <dependencies>
 
+    <!-- To get Spring Bean definitions -->
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-profile-pcdm</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- To get Spring Bean definitions -->
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-profile-dcs</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-ser</artifactId>
