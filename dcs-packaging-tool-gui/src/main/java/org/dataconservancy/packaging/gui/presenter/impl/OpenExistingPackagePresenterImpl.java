@@ -36,7 +36,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         // Staging directory is working directory by default.
         // TODO Configurable?
         stagingDir = new File(System.getProperty("user.dir"));
-        view.getChoosePackageStagingDirectoryTextField().setText(stagingDir.getPath());
     }
 
     private void bind() {
@@ -131,7 +130,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         view.getChoosePackageStateFileTextField().setText("");
         view.getChooseExplodedPackageDirectoryTextField().setText("");
         view.getChoosePackageFileTextField().setText("");
-        view.getChoosePackageStagingDirectoryTextField().setText("");
+        view.getChoosePackageStagingDirectoryTextField().setText(stagingDir.getPath());
         view.getContinueButton().setDisable(true);
     }
 
