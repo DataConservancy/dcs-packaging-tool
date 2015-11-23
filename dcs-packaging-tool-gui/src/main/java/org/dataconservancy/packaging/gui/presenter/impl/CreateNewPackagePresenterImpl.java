@@ -84,38 +84,41 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             if (selectedDir != null && selectedDir.exists() &&
                 selectedDir.canRead()) {
 
-                final PackageIpmBuilderService ipmBuilderService = new PackageIpmBuilderService(selectedDir);
+                if (controller.getPackageTree() != null && controller.getPackageTree().getFileInfo().getLocation().equals(selectedDir.toURI())) {
+                    super.onContinuePressed();
+                } else {
+                    final PackageIpmBuilderService ipmBuilderService = new PackageIpmBuilderService(selectedDir);
 
-                view.showProgressIndicatorPopUp();
+                    view.showProgressIndicatorPopUp();
 
-                ((ProgressDialogPopup)view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> ipmBuilderService.cancel());
+                    ((ProgressDialogPopup) view.getProgressIndicatorPopUp()).setCancelEventHandler(event -> ipmBuilderService.cancel());
 
-                controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
+                    controller.setCrossPageProgressIndicatorPopUp(view.getProgressIndicatorPopUp());
 
-                ipmBuilderService.setOnCancelled(event -> {
-                    ipmBuilderService.reset();
-                    controller.getCrossPageProgressIndicatorPopUp().hide();
-                });
+                    ipmBuilderService.setOnCancelled(event -> {
+                        ipmBuilderService.reset();
+                        controller.getCrossPageProgressIndicatorPopUp().hide();
+                    });
 
-                ipmBuilderService.setOnFailed(workerStateEvent -> {
-                    displayExceptionMessage(workerStateEvent.getSource().getException());
-                    view.getErrorLabel().setVisible(true);
-                    ipmBuilderService.reset();
-                    controller.getCrossPageProgressIndicatorPopUp().hide();
-                });
+                    ipmBuilderService.setOnFailed(workerStateEvent -> {
+                        displayExceptionMessage(workerStateEvent.getSource().getException());
+                        view.getErrorLabel().setVisible(true);
+                        ipmBuilderService.reset();
+                        controller.getCrossPageProgressIndicatorPopUp().hide();
+                    });
 
-                ipmBuilderService.setOnSucceeded(workerStateEvent -> {
-                    Node rootNode = (Node) workerStateEvent.getSource().getValue();
-                    ipmBuilderService.reset();
+                    ipmBuilderService.setOnSucceeded(workerStateEvent -> {
+                        Node rootNode = (Node) workerStateEvent.getSource().getValue();
+                        ipmBuilderService.reset();
 
-                    if (rootNode != null) {
-                        controller.setPackageTree(rootNode);
-                        super.onContinuePressed();
-                    }
-                });
+                        if (rootNode != null) {
+                            controller.setPackageTree(rootNode);
+                            super.onContinuePressed();
+                        }
+                    });
 
-                ipmBuilderService.start();
-
+                    ipmBuilderService.start();
+                }
             } else if (selectedDir != null &&
                     (!selectedDir.exists() ||
                          !selectedDir.canRead())) {
