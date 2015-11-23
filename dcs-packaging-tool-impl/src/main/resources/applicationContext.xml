@@ -89,4 +89,8 @@
     <property name="archive" value="true"/>
   </bean>
 
+  <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>
+
+  <bean id="pcdmProfile" class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile"/>
+
 </beans>
