@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.lang.StringUtils;
-import org.dataconservancy.dcs.util.FilePathUtil;
+import org.apache.commons.io.FilenameUtils;
+
 
 public class TarPackageExtractor extends BasePackageExtractor {
 
@@ -51,7 +51,7 @@ public class TarPackageExtractor extends BasePackageExtractor {
             while (entry != null) {
                 //Directories are automatically handled by the base class so we can ignore them in this class.
                 if (!entry.isDirectory()) {
-                    File entryFile = new File(packageDir, FilePathUtil.convertToPlatformSpecificSlash(entry.getName()));
+                    File entryFile = new File(packageDir, FilenameUtils.separatorsToSystem(entry.getName()));
                     List<File> savedFiles = saveExtractedFile(entryFile, tarInStream);
                     files.addAll(savedFiles);
                 }

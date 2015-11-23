@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.dcs.util.extraction;
 
+import org.apache.commons.io.FilenameUtils;
 import org.dataconservancy.dcs.util.FilePathUtil;
 
 import java.io.File;
@@ -53,7 +54,7 @@ public class ZipPackageExtractor extends BasePackageExtractor {
             while (entry != null) {
                 //Directories are automatically handled by the base class so we can ignore them in this class.
                 if (!entry.isDirectory()) {
-                    File entryFile = new File(packageDir, FilePathUtil.convertToPlatformSpecificSlash(entry.getName()));
+                    File entryFile = new File(packageDir, FilenameUtils.separatorsToSystem(entry.getName()));
                     List<File> savedFiles = saveExtractedFile(entryFile, zipInStream);
                     files.addAll(savedFiles);
                 }
@@ -79,7 +80,7 @@ public class ZipPackageExtractor extends BasePackageExtractor {
             ZipEntry entry = zipInStream.getNextEntry();
             //Get next tar entry returns null when there are no more entries
             while (entry != null) {
-                File entryFile = new File(packageDir, FilePathUtil.convertToPlatformSpecificSlash(entry.getName()));
+                File entryFile = new File(packageDir, FilenameUtils.separatorsToSystem(entry.getName()));
                 //Directories are automatically handled by the base class so we can ignore them in this class.
                 if (!entry.isDirectory()) {
                     List<File> savedFiles = saveExtractedFile(entryFile, zipInStream);

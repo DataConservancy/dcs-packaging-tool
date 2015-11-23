@@ -182,7 +182,7 @@ public class UriUtilityTest {
 
     // Check that if a base directory is passed in that isn't part of the file's path, it just uses the files path
     @Test
-    public void fbagUriUsesOwnPathWhenBasedirNotInPath() throws URISyntaxException {
+    public void bagUriUsesOwnPathWhenBasedirNotInPath() throws URISyntaxException {
         File f = new File("/some/fake/dir/fake.file");
         File d = new File("/another");
 
