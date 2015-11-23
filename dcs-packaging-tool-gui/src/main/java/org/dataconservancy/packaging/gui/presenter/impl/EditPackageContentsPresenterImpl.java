@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
@@ -89,8 +90,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     public javafx.scene.Node display() {
-        String disciplinePath = controller.getFactory().getConfiguration().getDisciplineMap();
-        String userPropertiesPath = controller.getFactory().getConfiguration().getUserProperties();
+        String disciplinePath = controller.getFactory().getConfiguration().resolveConfigurationFile(Configuration.ConfigFile.DISCIPLINE_MAP);
+        String userPropertiesPath = controller.getFactory().getConfiguration().resolveConfigurationFile(Configuration.ConfigFile.USER_PROPS);
         view.setupWindowBuilder(disciplinePath, userPropertiesPath);
 
         view.getErrorLabel().setVisible(false);

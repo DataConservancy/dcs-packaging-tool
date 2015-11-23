@@ -99,10 +99,17 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
 
         Configuration configuration = new Configuration() {
             @Override
-            public String getDisciplineMap(){ return "MOO";}
+            public String resolveConfigurationFile(ConfigFile configFile){
+                switch(configFile){
+                    case DISCIPLINE_MAP:
+                        return "MOO";
+                    case USER_PROPS:
+                        return "classpath:/userProperties.json";
+                    default:
+                        return null;
+                }
+            }
 
-            @Override
-            public String getUserProperties(){ return "classpath:/userProperties.json";}
         };
 
         Factory factory = new Factory();

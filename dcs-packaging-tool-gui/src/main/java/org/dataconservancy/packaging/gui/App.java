@@ -71,7 +71,7 @@ public class App extends Application {
             return;
         }
 
-        String configFile;
+        /**String configFile;
 
         //Check if a discipline map file was found in the user config directory.
         //If not, use the default discipline map file.
@@ -99,7 +99,7 @@ public class App extends Application {
          if (!getParameters().getRaw().contains("-u") && !getParameters().getRaw().contains("--user-props")) {
              configFile = config.getUserPropertiesFile();
              config.setUserProperties(config.resolveConfigurationFile(configFile));
-         }
+         }**/
 
         Controller controller = factory.getController();
 

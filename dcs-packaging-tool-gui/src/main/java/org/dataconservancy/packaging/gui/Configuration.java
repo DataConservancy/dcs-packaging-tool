@@ -36,27 +36,71 @@ import java.io.InputStream;
  */
 public class Configuration {
 
-    private String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
+    private static String userConfDirectory = System.getProperty("user.home") + File.separator + ".dataconservancy";
 
     //the default application configuration directory
-    private String configurationDirectory;
+    private static String configurationDirectory;
 
     //file names to be used for application default files or
     //files placed in the userConfigDirectory
     //these are set in the config_default.properties file
-    private String disciplineMapFile;
-    private String packageGenerationParametersFile;
-    private String packageMetadataParametersFile;
-    private String userPropertiesFile;
+    private static String disciplineMapFile;
+    private static String packageGenerationParametersFile;
+    private static String packageMetadataParametersFile;
+    private static String userPropertiesFile;
 
-    //the "resolved" configuration files - precedence is
+    //command line supplied files - precedence is
     //command line, then user config directory, and finally the application default
-    private String disciplineMap;
-    private String packageGenerationParameters;
-    private String packageMetadataParameters;
-    private String userProperties;
+    private static String disciplineMap;
+    private static String packageGenerationParameters;
+    private static String packageMetadataParameters;
+    private static String userProperties;
 
-    //Setters and getters for the names of the files
+    public enum ConfigFile{
+        DISCIPLINE_MAP{
+            //the filename set in the config_default.properties file
+            public String fileName(){
+                return disciplineMapFile;
+            }
+            //the command line file path, if set
+            public String commandLinePath(){
+                return disciplineMap;
+            }
+        },
+        PKG_GEN_PARAMS{
+            //the filename set in the config_default.properties file
+            public String fileName(){
+                return packageGenerationParametersFile;
+            }
+             //the command line file path, if set
+            public String commandLinePath(){
+                return packageGenerationParameters;
+            }
+        },
+        PKG_METADATA_PARAMS{
+            //the filename set in the config_default.properties file
+            public String fileName(){
+                return packageMetadataParametersFile;
+            }
+             //the command line file path, if set
+            public String commandLinePath(){
+                return packageGenerationParameters;
+            }
+        },
+        USER_PROPS{
+            //the filename set in the config_default.properties file
+            public String fileName(){
+                return userPropertiesFile;
+            }
+             //the command line file path, if set
+            public String commandLinePath(){
+                return userProperties;
+            }
+        };
+       abstract String commandLinePath();
+       abstract String fileName();
+    }
+
     public void setConfigurationDirectory(String dir){
         this.configurationDirectory = dir;
     }
@@ -65,6 +109,7 @@ public class Configuration {
         return configurationDirectory;
     }
 
+    //Setters and getters for the names of the files
     public void setDisciplineMapFile(String disciplineMapFile){
         this.disciplineMapFile = disciplineMapFile;
     }
@@ -105,28 +150,28 @@ public class Configuration {
         this.disciplineMap = disciplineMap;
     }
 
-    public String getDisciplineMap() {return disciplineMap; }
+    //public String getDisciplineMap() {return disciplineMap; }
 
     @Option(name="--generation-params", aliases={"-p"}, usage="Sets the package generation parameters file")
     public void setPackageGenerationParameters(String packageGenerationParameters){
         this.packageGenerationParameters = packageGenerationParameters;
     }
 
-    public String getPackageGenerationParameters(){return packageGenerationParameters;}
+    //public String getPackageGenerationParameters(){return packageGenerationParameters;}
 
     @Option(name="--metadata-params", aliases={"-m"}, usage="Sets the package metadata parameters file")
     public void setPackageMetadataParameters(String packageMetadataParameters){
         this.packageMetadataParameters = packageMetadataParameters;
     }
 
-    public String getPackageMetadataParameters(){return packageMetadataParameters; }
+    //public String getPackageMetadataParameters(){return packageMetadataParameters; }
 
     @Option(name="--user-props", aliases={"-u"}, usage ="Sets the user defined properties file")
     public void setUserProperties(String userProperties){
         this.userProperties = userProperties;
     }
 
-    public String getUserProperties(){ return userProperties; }
+    //public String getUserProperties(){ return userProperties; }
 
     /**
      *  This method locates the default configuration with the supplied file name, in the user's configuration directory.
@@ -146,12 +191,12 @@ public class Configuration {
 
     /**
      * This method locates the default configuration with the supplied file name, in the configuration directory.
-     * The configuration directory is specified in the  config_defaults.properties file.
+     * The configuration directory is specified in the config_defaults.properties file.
      * @param fileName the name of the file to be found. These names are specified in the
      *                              config_defaults.properties file and set on the  *File fields.
      * @return the default configuration path
      */
-    public String locateDefaultConfigFile(String fileName) {
+    private String locateDefaultConfigFile(String fileName) {
         if (configurationDirectory.startsWith("classpath:")) {
             if (configurationDirectory.endsWith("/")) {
                 return configurationDirectory + fileName;
@@ -168,32 +213,36 @@ public class Configuration {
      *  This method looks for files with this name in the user's config directory and in the default configuration directory.
      *  The method returns the user's file if found, else it returns the default file.
      *
-     * @param configurationFileName The name of the configuration file to be resolved. These names are specified in the
+     * @param configFile The ConfigFile representing the file to be resolved. These names are specified in the
      *                              config_defaults.properties file and set on the  *File fields.
      *
      * @return  the resolved configuration.file path
      */
-    public String resolveConfigurationFile(String configurationFileName){
-        String userFile = locateUserConfigFile(configurationFileName);
-        String defaultFile = locateDefaultConfigFile(configurationFileName);
-        return (userFile == null ? defaultFile : userFile);
+    public String resolveConfigurationFile(ConfigFile configFile){
+        //look for a file name specified on the command line
+        if(configFile.commandLinePath() != null) {
+            return configFile.commandLinePath();
+        } else {
+            //if that fails, keep going
+            String fileName = configFile.fileName();
+            String userFile = locateUserConfigFile(fileName);
+            String defaultFile = locateDefaultConfigFile(fileName);
+            return (userFile == null ? defaultFile : userFile);
+        }
     }
 
     /**
      * This method gets the InputStream associated with the provided file path string, which
      * may be either a classpath resource or a filesystem path.
-     * @param filePath  the file path
+     * @param configFile the ConfigFile representing the configuration file
      * @return the InputStream associated with the file path
      * @throws IOException if there was an error obtaining the InputStream
      */
-    public InputStream getConfigurationFileInputStream(String filePath) throws IOException{
+    public InputStream getConfigurationFileInputStream(ConfigFile configFile) throws IOException{
         InputStream fileStream = null;
-
+        String filePath = resolveConfigurationFile(configFile);
         if (filePath.startsWith("classpath:")) {
             String path = filePath.substring("classpath:".length());
-            if (!path.startsWith("/")) {
-                path = "/" + path;
-            }
             fileStream = this.getClass().getResourceAsStream(path);
             //this also works:
             // URL url = this.getClass().getResource(path);
