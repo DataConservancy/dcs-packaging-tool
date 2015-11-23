@@ -15,6 +15,8 @@
  */
 package org.dataconservancy.dcs.util;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -88,7 +90,13 @@ public class UriUtility {
             basedir = new File(".");
         }
 
-        String path = FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(basedir.getPath(), file));
+        Path relativePath = file.toPath();
+
+        if (relativePath.startsWith(basedir.toPath())) {
+            relativePath = basedir.toPath().relativize(file.toPath());
+        }
+
+        String path = FilenameUtils.separatorsToUnix(relativePath.toString());
 
         // Remove leading slashes from the path
         path = path.replaceFirst("^\\/*", "");
@@ -109,7 +117,13 @@ public class UriUtility {
             basedir = new File(".");
         }
 
-        String path = FilePathUtil.convertToUnixSlashes(FilePathUtil.relativizePath(basedir.getPath(), file));
+        Path relativePath = file.toPath();
+
+        if (relativePath.startsWith(basedir.toPath())) {
+            relativePath = basedir.toPath().relativize(file.toPath());
+        }
+
+        String path = FilenameUtils.separatorsToUnix(relativePath.toString());
 
         // Remove leading slashes from the path
         path = path.replaceFirst("^\\/*", "");
@@ -145,7 +159,7 @@ public class UriUtility {
     public static Path resolveBagUri(Path baseDir, URI bagUri) {
         if (bagUri == null) {
             throw new IllegalArgumentException(
-                    String.format(ERR_RESOLVE_BAGURI + "bag uri was null.", bagUri, baseDir));
+                    String.format(ERR_RESOLVE_BAGURI + "bag uri was null.", "null", baseDir));
         }
 
         if (!bagUri.getScheme().equals(BAG_URI_SCHEME)) {
@@ -155,7 +169,7 @@ public class UriUtility {
 
         if (baseDir == null) {
             throw new IllegalArgumentException(
-                    String.format(ERR_RESOLVE_BAGURI + "base directory was null", bagUri, baseDir));
+                    String.format(ERR_RESOLVE_BAGURI + "base directory was null", bagUri, "null"));
         }
 
         // normalize the base directory path

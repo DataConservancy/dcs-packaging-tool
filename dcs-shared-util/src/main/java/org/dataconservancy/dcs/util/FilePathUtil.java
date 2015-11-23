@@ -43,55 +43,6 @@ public class FilePathUtil {
     private static final Pattern ABS_PATH_PATTERN = Pattern.compile("^/.*");
 
     /**
-     * This method has been deprecated use Apache FileNameUtils instead.
-     * Takes the file path string and converts all slashes to unix style '/'.
-     * @param filePath The original file path to convert slashes on.
-     * @return The updated file path will all slashes in the form '/', or null if filePath is null.
-     */
-    @Deprecated
-    public static String convertToUnixSlashes(String filePath) {
-        return FilenameUtils.separatorsToUnix(filePath);
-    }
-
-    /**
-     * This method has been deprecated use Apache FileNameUtils instead.
-     * Takes the provided file path and converts all slashes to the platform specific slash.
-     * @param filePath The file path to convert the slashes on.
-     * @return The file path with slash converted to the platform specific slashes, or the original filepath string if
-     * slashes aren't used as the file separator character. Returns null if the file path object is null.
-     */
-    @Deprecated
-    public static String convertToPlatformSpecificSlash(String filePath) {
-        return FilenameUtils.separatorsToSystem(filePath);
-    }
-
-    /**
-     * This method has been deprecated use the Java Path relativize method instead.
-     * Strips the base directory out of a file path to make a relative file path. If the file doesn't contain the base path the original path is returned.
-     * @param basePath The base directory path to remove from the file path.
-     * @param toRelativize The file to be made relative.
-     * @return The relative file path created by removing the base directory. Returns null if the file to relative is null.
-     */
-    @Deprecated
-    public static String relativizePath(String basePath, File toRelativize) {
-
-        if (toRelativize == null) {
-            return null;
-        }
-
-        if (basePath == null
-            || !toRelativize.getPath().startsWith(basePath)) {
-            return toRelativize.getPath();
-        }
-
-        Path path = FileSystems.getDefault().getPath(basePath);
-        Path relativePath = path.relativize(toRelativize.toPath());
-
-
-        return relativePath.toString();
-    }
-
-    /**
      * Takes a file path string and prepends the correct file URI prefix.
      * @param filePath The file path to prepend the correct file URI prefix to.
      * @return The file path with the file uri prefix prepended, or null if the file path is null.
@@ -207,31 +158,6 @@ public class FilePathUtil {
 
         String extension = getLastFileExtension(filePath);
         return filePath.substring(0, filePath.length() - extension.length());
-    }
-
-    /**
-     * This method has been deprecated you should now use Java's Path.resolve method.
-     * Takes a relative file path and makes it absolute by prepending the base path.
-     * If the provided file path is already absolute it's returned without modification.
-     * @param baseFile The base file that will be used to make the file path absolute.
-     * @param toAbsolutize The file to make absolute by adding it to the file base
-     * @return A java File object pointing to the absolute path to the file, or null if the file object, or base file is null.
-     */
-    @Deprecated
-    public static File absolutize(File baseFile, File toAbsolutize) {
-        if (toAbsolutize == null || baseFile == null) {
-            return null;
-        }
-
-        // If the file is already absolute, there's nothing for us to do here.
-        if (toAbsolutize.isAbsolute()) {
-            return toAbsolutize;
-        }
-
-        Path basePath = baseFile.toPath().resolve(toAbsolutize.toPath());
-
-
-        return basePath.toFile();
     }
 
     /**
