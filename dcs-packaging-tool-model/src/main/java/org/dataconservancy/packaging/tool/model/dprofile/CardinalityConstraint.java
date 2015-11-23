@@ -15,7 +15,7 @@ public class CardinalityConstraint {
     }
 
     /**
-     * @param min
+     * @param min The minimum bound of the cardinality constraint.
      */
     public void setMin(int min) {
         this.min = min;
@@ -29,7 +29,7 @@ public class CardinalityConstraint {
     }
 
     /**
-     * @param max
+     * @param max The maximum bound of the cardinality constraint.
      */
     public void setMax(int max) {
         this.max = max;

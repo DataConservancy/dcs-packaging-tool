@@ -39,7 +39,7 @@ public abstract class AbstractDescribedObject implements HasDescription {
     }
 
     /**
-     * @param other 
+     * @param other The other AbstractDescribedObject to compare
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {

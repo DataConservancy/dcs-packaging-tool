@@ -36,20 +36,18 @@ import static org.junit.Assert.assertEquals;
 public class UserDefinedPropertyVocabularyJSONBuilderTest {
 
     private List<UserDefinedPropertyVocabulary> testGroups;
-    private PropertyType propertyTypeOne;
-    private PropertyType propertyTypeTwo;
 
     private String serializedGroup;
 
     @Before
     public void setup() throws URISyntaxException {
-        propertyTypeOne = new PropertyType();
+        PropertyType propertyTypeOne = new PropertyType();
         propertyTypeOne.setLabel("one");
         propertyTypeOne.setDescription("descriptionOne");
         propertyTypeOne.setDomainPredicate(new URI("uri:one"));
         propertyTypeOne.setPropertyValueType(PropertyValueType.URI);
 
-        propertyTypeTwo = new PropertyType();
+        PropertyType propertyTypeTwo = new PropertyType();
         propertyTypeTwo.setLabel("two");
         propertyTypeTwo.setDescription("desciptionTwo");
         propertyTypeTwo.setDomainPredicate(new URI("uri:two"));

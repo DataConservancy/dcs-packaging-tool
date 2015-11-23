@@ -28,9 +28,9 @@ class XstreamUtil {
     /**
      * Returns true if the reader has the named attribute at the current node.
      *
-     * @param attName
-     * @param reader
-     * @return
+     * @param attName The attribute name to look for in the provided node.
+     * @param reader The reader of the node to check for the attribute.
+     * @return True if the node has passed in attribute name, false otherwise.
      */
     static boolean hasAttribute(String attName, HierarchicalStreamReader reader) {
         if (reader.getAttribute(attName) == null) {
@@ -43,10 +43,10 @@ class XstreamUtil {
     /**
      * Returns true if the reader has the named attribute with the specified value at the current node.
      *
-     * @param attName
-     * @param attValue
-     * @param reader
-     * @return
+     * @param attName The attribute name to look for in the provided node.
+     * @param attValue The attribute value to look for in the provided node.
+     * @param reader The reader of the node to check for the attribute.
+     * @return True if node has the attribute name and value, false otherwise.
      */
     static boolean hasAttribute(String attName, String attValue, HierarchicalStreamReader reader) {
         if (attValue.equals(reader.getAttribute(attName))) {

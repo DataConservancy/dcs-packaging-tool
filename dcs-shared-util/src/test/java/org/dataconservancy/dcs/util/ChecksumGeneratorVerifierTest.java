@@ -21,13 +21,15 @@ import java.lang.String;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import junit.framework.Assert;
-
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class ChecksumGeneratorVerifierTest {
 
@@ -60,9 +62,9 @@ public class ChecksumGeneratorVerifierTest {
     @Test
     public void testGenerateMD5checksum() {
         String checksum = ChecksumGeneratorVerifier.generateMD5checksum(file1);
-        Assert.assertEquals(file1MD5checksum, checksum);
+        assertEquals(file1MD5checksum, checksum);
         String modifiedChecksum = ChecksumGeneratorVerifier.generateMD5checksum(modifiedFile1);
-        Assert.assertNotSame("The modified file should not have the same checksum.", file1MD5checksum, modifiedChecksum);
+        assertNotEquals("The modified file should not have the same checksum.", file1MD5checksum, modifiedChecksum);
     }
 
     /**
@@ -71,9 +73,9 @@ public class ChecksumGeneratorVerifierTest {
     @Test
     public void testGenerateSHA1checksum() {
         String checksum = ChecksumGeneratorVerifier.generateSHA1checksum(file1);
-        Assert.assertEquals(file1SHA1checksum, checksum);
+        assertEquals(file1SHA1checksum, checksum);
         String modifiedChecksum = ChecksumGeneratorVerifier.generateSHA1checksum(modifiedFile1);
-        Assert.assertNotSame("The modified file should not have the same checksum.", file1SHA1checksum,
+        assertNotEquals("The modified file should not have the same checksum.", file1SHA1checksum,
                 modifiedChecksum);
     }
 
@@ -83,7 +85,7 @@ public class ChecksumGeneratorVerifierTest {
     @Test
     public void testGenerateMD5checksumBytes() {
         byte[] checksum = ChecksumGeneratorVerifier.generateChecksumAsBytes(ChecksumGeneratorVerifier.ALGORITHM_MD5, file1);
-        Assert.assertTrue(Arrays.equals(file1MD5checksumBytes, checksum));
+        assertTrue(Arrays.equals(file1MD5checksumBytes, checksum));
     }
 
     /**
@@ -92,7 +94,7 @@ public class ChecksumGeneratorVerifierTest {
     @Test
     public void testGenerateSHA1checksumBytes() {
         byte[] checksum = ChecksumGeneratorVerifier.generateChecksumAsBytes(ChecksumGeneratorVerifier.ALGORITHM_SHA1, file1);
-        Assert.assertTrue(Arrays.equals(file1SHA1checksumBytes, checksum));
+        assertTrue(Arrays.equals(file1SHA1checksumBytes, checksum));
     }
 
     /**
@@ -101,7 +103,7 @@ public class ChecksumGeneratorVerifierTest {
     @Test
     public void testGenerateMD5checksumBytesFromByteArray(){
         byte[] checksum = ChecksumGeneratorVerifier.generateChecksumAsBytes("MD5", file1Bytes);
-        Assert.assertTrue(Arrays.equals(file1MD5checksumBytes, checksum));
+        assertTrue(Arrays.equals(file1MD5checksumBytes, checksum));
     }
 
     /**
@@ -111,7 +113,7 @@ public class ChecksumGeneratorVerifierTest {
     @Test
     public void testGenerateSHA1checksumBytesFromByteArray() throws NoSuchAlgorithmException {
         byte[] checksum = ChecksumGeneratorVerifier.generateChecksumAsBytes(ChecksumGeneratorVerifier.ALGORITHM_SHA1, file1Bytes);
-        Assert.assertTrue(Arrays.equals(file1SHA1checksumBytes, checksum));
+        assertTrue(Arrays.equals(file1SHA1checksumBytes, checksum));
     }
 
     /**
@@ -120,7 +122,7 @@ public class ChecksumGeneratorVerifierTest {
      */
     @Test(expected=RuntimeException.class)
     public void testBytesBadAlgorithm() {
-         byte[] checksum = ChecksumGeneratorVerifier.generateChecksumAsBytes("BogusAlgorithm", file1Bytes);
+         ChecksumGeneratorVerifier.generateChecksumAsBytes("BogusAlgorithm", file1Bytes);
     }
 
     /**
@@ -129,7 +131,7 @@ public class ChecksumGeneratorVerifierTest {
      */
     @Test(expected=NoSuchAlgorithmException.class)
     public void testBadAlgorithm() throws NoSuchAlgorithmException {
-         String checksum = ChecksumGeneratorVerifier.generateChecksum("BogusAlgorithm", file1);
+         ChecksumGeneratorVerifier.generateChecksum("BogusAlgorithm", file1);
     }
 
     /**
@@ -138,7 +140,7 @@ public class ChecksumGeneratorVerifierTest {
      */
     @Test
     public void testVerifyMD5checksumWithOneFileAndOneString() throws NoSuchAlgorithmException {
-        Assert.assertTrue("The checksums don't match.",
+        assertTrue("The checksums don't match.",
                 ChecksumGeneratorVerifier.verifyChecksum(file1, ChecksumGeneratorVerifier.ALGORITHM_MD5, file1MD5checksum));
     }
 
@@ -148,7 +150,7 @@ public class ChecksumGeneratorVerifierTest {
      */
     @Test
     public void testVerifySHA1checksumWithOneFileAndOneString() throws NoSuchAlgorithmException {
-        Assert.assertTrue("The checksums don't match.",
+        assertTrue("The checksums don't match.",
                 ChecksumGeneratorVerifier.verifyChecksum(file1, ChecksumGeneratorVerifier.ALGORITHM_SHA1, file1SHA1checksum));
     }
     

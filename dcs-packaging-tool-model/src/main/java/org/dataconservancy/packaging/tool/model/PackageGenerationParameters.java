@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -163,13 +164,7 @@ public class PackageGenerationParameters {
      * @return the trimmed list
      */
     private List<String> getTrimParamValues(List<String> values) {
-        List<String> trimmedValues = new ArrayList<>();
-        for (String value : values) {
-            if (value != null && !value.trim().isEmpty()) {
-                trimmedValues.add(value);
-            }
-        }
-        return trimmedValues;
+        return values.stream().filter(value -> value != null && !value.trim().isEmpty()).collect(Collectors.toList());
     }
 
     @Override

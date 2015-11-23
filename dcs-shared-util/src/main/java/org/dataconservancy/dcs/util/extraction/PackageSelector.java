@@ -35,5 +35,5 @@ public interface PackageSelector {
      * Currently empty or null metadata will result in null being returned.
      * @return The package extractor to use to unpack the supplied package, or null if none can be found.
      */
-    public PackageExtractor selectPackageExtractor(InputStream packageStream, Map<String, String> metadata);
+    PackageExtractor selectPackageExtractor(InputStream packageStream, Map<String, String> metadata);
 }

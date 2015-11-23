@@ -70,12 +70,9 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     @Autowired
     private PackageGenerationParametersBuilder packageGenerationParamsBuilder;
 
-    private boolean outputChooserShown;
-
     private File testFile = null;
     private File outputDirectory = null;
     private Controller controller;
-    private PackageState packageState;
     private PackageGenerationParameters params;
 
     @Rule
@@ -83,8 +80,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
     
     @Before
     public void setup() throws IOException, URISyntaxException {
-
-        outputChooserShown = false;
 
         controller = mock(Controller.class);
         when(controller.showOpenFileDialog(any())).thenReturn(testFile);
@@ -98,7 +93,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         when(packageTree.getFileInfo()).thenReturn(fileInfo);
         when(controller.getPackageTree()).thenReturn(packageTree);
 
-        packageState = mock(PackageState.class);
+        PackageState packageState = mock(PackageState.class);
         when(packageState.getPackageName()).thenReturn("packageName");
 
         when(controller.getPackageState()).thenReturn(packageState);

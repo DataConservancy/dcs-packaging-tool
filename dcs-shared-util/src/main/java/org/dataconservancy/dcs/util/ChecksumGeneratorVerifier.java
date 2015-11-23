@@ -49,9 +49,10 @@ public final class ChecksumGeneratorVerifier {
                 byte[] mdBytes = generateChecksumAsBytes(ALGORITHM_MD5, inputStream);
                 
                 // Converting to hex string.
-                StringBuffer sb = new StringBuffer("");
-                for (int i = 0; i < mdBytes.length; i++) {
-                    sb.append(Integer.toString((mdBytes[i] & 0xff) + 0x100, 16).substring(1));
+                StringBuilder sb = new StringBuilder("");
+                for (byte mdByte : mdBytes) {
+                    sb.append(Integer.toString(
+                        (mdByte & 0xff) + 0x100, 16).substring(1));
                 }
 
                 inputStream.close();
@@ -81,9 +82,10 @@ public final class ChecksumGeneratorVerifier {
                 byte[] mdBytes =  generateChecksumAsBytes(ALGORITHM_SHA1, inputStream);
                 
                 // Converting to hex string.
-                StringBuffer sb = new StringBuffer("");
-                for (int i = 0; i < mdBytes.length; i++) {
-                    sb.append(Integer.toString((mdBytes[i] & 0xff) + 0x100, 16).substring(1));
+                StringBuilder sb = new StringBuilder("");
+                for (byte mdByte : mdBytes) {
+                    sb.append(Integer.toString(
+                        (mdByte & 0xff) + 0x100, 16).substring(1));
                 }
 
                 inputStream.close();
@@ -147,14 +149,14 @@ public final class ChecksumGeneratorVerifier {
      * @return byte[] checksum
      */
     public static byte[] generateChecksumAsBytes(String algorithm, InputStream inputStream) {
-        MessageDigest md = null;
+        MessageDigest md;
         try {
             md = MessageDigest.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        int read = 0;
+        int read;
         int size = 1024;
         byte[] buf = new byte[size];
         try {
@@ -185,7 +187,7 @@ public final class ChecksumGeneratorVerifier {
             throw new IllegalArgumentException("Checksum to be verified must not be null");
         }
 
-        String newChecksum = null;
+        String newChecksum;
         if (algorithm.equalsIgnoreCase(ALGORITHM_MD5)) {
             newChecksum = generateMD5checksum(inputStream);
         }

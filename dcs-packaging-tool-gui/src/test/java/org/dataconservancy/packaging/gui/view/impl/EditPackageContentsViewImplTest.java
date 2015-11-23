@@ -43,8 +43,6 @@ import static org.junit.Assert.assertNotNull;
 public class EditPackageContentsViewImplTest extends BaseGuiTest {
     private EditPackageContentsViewImpl view;
 
-    private EditPackageContentsPresenterImpl presenter;
-
 
     @Autowired
     @Qualifier("profileService")
@@ -99,7 +97,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
 
         controller.getDomainProfileService().assignNodeTypes(controller.getPrimaryDomainProfile(), project);
 
-        presenter = new EditPackageContentsPresenterImpl(view);
+        EditPackageContentsPresenterImpl presenter = new EditPackageContentsPresenterImpl(view);
         presenter.setController(controller);
         presenter.setInternalProperties(internalProperties);
         presenter.setIpmService(ipmService);

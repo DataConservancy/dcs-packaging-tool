@@ -33,19 +33,19 @@ public class PackageGenerationParametersTest {
     @Test
     public void testAddAndGetParams() {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
-        Map<String, List<String>> addedParameters = new HashMap<String, List<String>>();
+        Map<String, List<String>> addedParameters = new HashMap<>();
 
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add("Willard Poopa-doodle");
         parameters.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
         addedParameters.put(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("w.poopadoodle@brownhound.net");
         parameters.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
         addedParameters.put(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parameters.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
         addedParameters.put(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
@@ -66,10 +66,9 @@ public class PackageGenerationParametersTest {
     @Test (expected = IllegalArgumentException.class)
     public void testSetEmptyValuesListOnParams() {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
-        Map<String, List<String>> newParameters = new HashMap<String, List<String>>();
 
         //Test add an empty list values:
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         parameters.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
     }
 
@@ -80,7 +79,6 @@ public class PackageGenerationParametersTest {
     @Test (expected = IllegalArgumentException.class)
     public void testSetNullValuesListOnParams() {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
-        Map<String, List<String>> newParameters = new HashMap<String, List<String>>();
 
         //Test add an empty list values:
         List<String> paramValues = null;
@@ -94,10 +92,9 @@ public class PackageGenerationParametersTest {
     @Test (expected = IllegalArgumentException.class)
     public void testSetListOfEmptyValuesOnParams() {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
-        Map<String, List<String>> newParameters = new HashMap<String, List<String>>();
 
         //Test add an empty list values:
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add("");
         paramValues.add("");
         parameters.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
@@ -110,10 +107,9 @@ public class PackageGenerationParametersTest {
     @Test (expected = IllegalArgumentException.class)
     public void testSetListOfNullValuesOnParams() {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
-        Map<String, List<String>> newParameters = new HashMap<String, List<String>>();
 
         //Test add an empty list values:
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add(null);
         paramValues.add(null);
         parameters.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
@@ -127,7 +123,7 @@ public class PackageGenerationParametersTest {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
 
         //Test add an empty list values:
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add(null);
         paramValues.add("willardandfriends@gangsterhounds.com");
         paramValues.add("alfred@theduck.com");
@@ -147,7 +143,7 @@ public class PackageGenerationParametersTest {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
 
         //Test add an empty list values:
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add(null);
         paramValues.add("willardandfriends@gangsterhounds.com");
         paramValues.add("alfred@theduck.com");
@@ -169,7 +165,7 @@ public class PackageGenerationParametersTest {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
 
         //Test add an empty list values:
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add(null);
         paramValues.add(" ");
         paramValues.add("alfred@theduck.com");
@@ -225,29 +221,29 @@ public class PackageGenerationParametersTest {
     public void testEquals() {
         PackageGenerationParameters parametersOne = new PackageGenerationParameters();
 
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add("Willard Poopa-doodle");
         parametersOne.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("w.poopadoodle@brownhound.net");
         parametersOne.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parametersOne.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
         PackageGenerationParameters parametersTwo = new PackageGenerationParameters();
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("Willard Poopa-doodle");
         parametersTwo.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("w.poopadoodle@brownhound.net");
         parametersTwo.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parametersTwo.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
@@ -259,25 +255,25 @@ public class PackageGenerationParametersTest {
     public void testNotEquals() {
         PackageGenerationParameters parametersOne = new PackageGenerationParameters();
 
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add("Willard Poopa-doodle");
         parametersOne.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("w.poopadoodle@brownhound.net");
         parametersOne.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parametersOne.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
         PackageGenerationParameters parametersTwo = new PackageGenerationParameters();
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("Willard Poopa-doodle");
         parametersTwo.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parametersTwo.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
@@ -285,15 +281,15 @@ public class PackageGenerationParametersTest {
 
         PackageGenerationParameters parametersThree= new PackageGenerationParameters();
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("Willard The Shinny");
         parametersThree.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("w.poopadoodle@brownhound.net");
         parametersThree.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parametersThree.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
@@ -305,15 +301,15 @@ public class PackageGenerationParametersTest {
     public void testRemoveParam() {
         PackageGenerationParameters parametersOne = new PackageGenerationParameters();
 
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add("Willard Poopa-doodle");
         parametersOne.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("w.poopadoodle@brownhound.net");
         parametersOne.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add("org.dataconservancy.packaging.format:borem");
         parametersOne.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
@@ -353,25 +349,25 @@ public class PackageGenerationParametersTest {
 
         String formatId = "org.dataconservancy.packaging.format:borem";
 
-        List<String> paramValues = new ArrayList<String>();
+        List<String> paramValues = new ArrayList<>();
         paramValues.add(contactOne);
         parametersOne.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add(emailOne);
         parametersOne.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add(formatId);
         parametersOne.addParam(BagItParameterNames.PACKAGE_FORMAT_ID, paramValues);
 
         PackageGenerationParameters parametersTwo = new PackageGenerationParameters();
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add(contactTwo);
         parametersTwo.addParam(BagItParameterNames.CONTACT_NAME, paramValues);
 
-        paramValues = new ArrayList<String>();
+        paramValues = new ArrayList<>();
         paramValues.add(emailTwo);
         parametersTwo.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
 

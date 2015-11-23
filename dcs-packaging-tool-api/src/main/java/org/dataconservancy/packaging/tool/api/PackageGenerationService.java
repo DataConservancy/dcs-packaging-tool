@@ -44,6 +44,6 @@ public interface PackageGenerationService extends PackageGenerator {
 	 *             if there is a problem generating the package.
 	 */
 	@Override
-	public Package generatePackage(PackageState packageState,
+	Package generatePackage(PackageState packageState,
 			PackageGenerationParameters params) throws PackageToolException;
 }

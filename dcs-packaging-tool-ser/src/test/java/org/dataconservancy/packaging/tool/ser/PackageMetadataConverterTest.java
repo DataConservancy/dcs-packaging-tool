@@ -144,7 +144,7 @@ public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest
         assertTrue(Map.class.isAssignableFrom(result.getClass()));
 
         @SuppressWarnings("unchecked")
-        Map<String, String> metadata = (Map<String, String>) result;
+        Map<String, List<String>> metadata = (Map<String, List<String>>) result;
 
         assertEquals(testMap, metadata);
     }

@@ -79,7 +79,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
-    private Node project;
     private Node collection;
     private Node dataItem;
     private Node dataFile;
@@ -87,7 +86,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
     @Before
     public void setup() throws IOException {
         DcBoIpmFactory boFactory = new DcBoIpmFactory();
-        project = boFactory.createSmallLinearTree();
+        Node project = boFactory.createSmallLinearTree();
 
         collection = project.getChildren().get(0);
 

@@ -39,6 +39,6 @@ public interface PackageGenerator {
 	 * @throws RuntimeException
 	 *             if there is a problem generating the package.
 	 */
-	public Package generatePackage(PackageState packageState,
+	Package generatePackage(PackageState packageState,
 			PackageGenerationParameters params);
 }

@@ -227,7 +227,7 @@ public class Node {
     /**
      * Do a pre-order tree traversal.
      * 
-     * @param consumer
+     * @param consumer The consumer of the walk.
      */
     public void walk(Consumer<Node> consumer) {
         consumer.accept(this);

@@ -23,7 +23,7 @@ import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;;
+import org.junit.rules.TemporaryFolder;
 
 public class OpenPackageServiceImplTest {
     private static final String PACKAGE_ZIP_RESOURCE = "fakebag.zip";

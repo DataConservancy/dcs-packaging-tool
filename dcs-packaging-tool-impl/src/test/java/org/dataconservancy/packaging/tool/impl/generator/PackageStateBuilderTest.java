@@ -35,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
+import org.apache.jena.rdf.model.Resource;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,17 +73,13 @@ public class PackageStateBuilderTest {
         PackageModelBuilderState state = new PackageModelBuilderState();
 
         PackageStateSerializer serializer = mock(PackageStateSerializer.class);
-        doAnswer(new Answer<Object>() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                ((PackageState) args[0]).getDomainObjectRDF()
-                        .write((OutputStream) args[1], "TURTLE");
-                return null;
-            }
+        doAnswer(invocation -> {
+            Object[] args = invocation.getArguments();
+            ((PackageState) args[0]).getDomainObjectRDF()
+                    .write((OutputStream) args[1], "TURTLE");
+            return null;
         }).when(serializer).serialize(any(PackageState.class),
-                                      any(OutputStream.class));
+                                          any(OutputStream.class));
 
         PackageStateBuilder builder = new PackageStateBuilder();
         builder.setPackageStateSerializer(serializer);
@@ -116,9 +113,9 @@ public class PackageStateBuilderTest {
 
         /* Verify that the model was mutated according to the map */
         assertTrue(serializedModel.listSubjects()
-                .mapWith(res -> res.toString()).toSet().contains(newURI));
+                .mapWith(Resource::toString).toSet().contains(newURI));
         assertFalse(serializedModel.listSubjects()
-                .mapWith(res -> res.toString()).toSet().contains(oldURI));
+                .mapWith(Resource::toString).toSet().contains(oldURI));
     }
 
     private String getPkgStateAsString() throws IOException {
@@ -128,7 +125,7 @@ public class PackageStateBuilderTest {
                         .collect(Collectors.toList());
         assertEquals(1, paths.size());
 
-        String content = null;
+        String content;
         try (InputStream in = new FileInputStream(paths.get(0).toFile())) {
             content = IOUtils.toString(in);
         }

@@ -43,6 +43,7 @@ public class PackageMetadataService {
     private List<PackageMetadata> optional;
     private List<PackageMetadata> all;
 
+    private String packageMetadataParametersFile;
     private String packageMetadataParametersFilePath;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());

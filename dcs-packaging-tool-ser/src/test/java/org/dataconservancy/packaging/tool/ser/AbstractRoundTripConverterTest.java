@@ -52,7 +52,7 @@ public abstract class AbstractRoundTripConverterTest extends AbstractConverterTe
 
     /**
      * Subclasses are expected to return an object that they convert.  The object should be equivalent to the
-     * serialization provided by {@link #getSerializationObject()}.
+     * serialization provided by {@link #getSerializationInputStream()}.
      *
      * @return an Object equivalent to the serialization provided by {@link #getSerializationInputStream()}
      */

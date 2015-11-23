@@ -33,7 +33,7 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 public class FunctionalAssemblerMock
         implements PackageAssembler {
 
-    private Map<URI, File> files = new HashMap<URI, File>();
+    private Map<URI, File> files = new HashMap<>();
 
     private String pathPart = "FunctionalAssemblerMock/";
 

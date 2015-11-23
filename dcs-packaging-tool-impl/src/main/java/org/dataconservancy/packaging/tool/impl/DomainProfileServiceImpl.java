@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.tool.impl;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.model.dprofile.CardinalityConstraint;
@@ -228,11 +229,7 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             return result;
         }
 
-        for (NodeTransform tr : node.getNodeType().getDomainProfile().getNodeTransforms()) {
-            if (can_transform(node, tr)) {
-                result.add(tr);
-            }
-        }
+        result.addAll(node.getNodeType().getDomainProfile().getNodeTransforms().stream().filter(tr -> can_transform(node, tr)).collect(Collectors.toList()));
 
         return result;
     }

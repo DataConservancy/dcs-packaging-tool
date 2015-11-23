@@ -39,7 +39,7 @@ public class PackageSelectorTest {
     public void setup() {
         packageSelector = new PackageSelectorImpl();
         
-        Map<String, PackageExtractor> extractors = new HashMap<String, PackageExtractor>();
+        Map<String, PackageExtractor> extractors = new HashMap<>();
         extractors.put(PackageSelector.ZIP_KEY, new ZipPackageExtractor());
         extractors.put(PackageSelector.GZIP_KEY, new GZipPackageExtractor());
         extractors.put(PackageSelector.TAR_KEY, new TarPackageExtractor());
@@ -52,7 +52,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testZipFileContentDispositionReturnsZipExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment;  filename=\"" + FILES_ONLY_ZIP + "\"");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -65,7 +65,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testGZipFileContentDispositionReturnsGZipExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=\"" + FILE_ONLY_GZIP + "\"");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -78,7 +78,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testTarFileContentDispositionReturnsTarExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=\"" + FILES_ONLY_TAR + "\"");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -91,7 +91,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testTarGZipFileContentDispositionReturnsGZipExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=\"" + TAR_GZIP + "\"");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -104,7 +104,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testNotPackageFileReturnsNullExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=\"" + FILE_ONE + "\"");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -116,7 +116,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testZipMimeTypeReturnsZipExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", "application/zip");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -129,7 +129,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testGZipMimeTypeReturnsGZipExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", "application/x-gzip");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -142,7 +142,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testTarMimeTypeReturnsTarExtractor() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", "application/x-tar");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -155,7 +155,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testApplicationMimeTypeReturnsNull() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", "application/octet-stream");
         
         PackageExtractor extractor = packageSelector.selectPackageExtractor(null, metadata);
@@ -167,7 +167,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testContentDispositionTakesPrecedence() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=" + FILES_ONLY_ZIP);
         metadata.put("Content-Type", "application/octet-stream");
 
@@ -181,7 +181,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testUnknownContentDispositionKnownContentType() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=" + FILE_ONE);
         metadata.put("Content-Type", "application/zip");
 
@@ -195,7 +195,7 @@ public class PackageSelectorTest {
      */
     @Test
     public void testUnknownMismatchDispositionAndType() {
-        Map<String, String> metadata = new HashMap<String, String>();
+        Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Disposition", "attachment; filename=" + FILES_ONLY_TAR);
         metadata.put("Content-Type", "application/zip");
 

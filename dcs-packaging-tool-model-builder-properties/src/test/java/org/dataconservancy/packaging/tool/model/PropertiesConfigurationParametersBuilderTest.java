@@ -41,12 +41,12 @@ public class PropertiesConfigurationParametersBuilderTest {
         parameters = new PackageGenerationParameters();
         underTest = new PropertiesConfigurationParametersBuilder();
 
-        List<String> checksumAlgs = new ArrayList<String>();
+        List<String> checksumAlgs = new ArrayList<>();
         checksumAlgs.add("sha1");
         checksumAlgs.add("md5");
         parameters.addParam(BagItParameterNames.CHECKSUM_ALGORITHMS, checksumAlgs);
 
-        List<String> creatorName = new ArrayList<String>();
+        List<String> creatorName = new ArrayList<>();
         creatorName.add("Alfred Sirk");
         parameters.addParam(BagItParameterNames.CONTACT_NAME, creatorName);
     }
