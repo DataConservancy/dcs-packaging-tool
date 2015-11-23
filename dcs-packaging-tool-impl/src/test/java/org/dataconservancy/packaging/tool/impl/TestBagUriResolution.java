@@ -63,7 +63,7 @@ public class TestBagUriResolution {
     @After
     public void tearDown() throws Exception {
         Model m = transform.transformToRDF(packageTree);
-        m.write(System.out);
+        //m.write(System.out);
     }
 
     @Test
