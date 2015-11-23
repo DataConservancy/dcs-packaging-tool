@@ -68,7 +68,7 @@
         <bean class="org.dataconservancy.packaging.tool.impl.generator.DomainObjectResourceBuilder" />               
       </list>
     </property>
-    <property name="rdf2ipm" ref="ipmRdfTransformService"/>
+    <property name="ipmRdfTransformService" ref="ipmRdfTransformService"/>
   </bean>
 
   <bean id="boremPackageGenerator" class="org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator" />
