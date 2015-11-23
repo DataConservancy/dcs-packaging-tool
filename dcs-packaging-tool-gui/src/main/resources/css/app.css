@@ -412,25 +412,18 @@
         0, 0.0, 0, 0);
 }
 
-.PropertyTextArea .scroll-bar:vertical:disabled {
+.PropertyTextArea .scroll-pane {
+    -fx-vbar-policy: never;
+}
+
+.PropertyTextArea .scroll-bar {
     -fx-opacity: 0;
     -fx-border-color: transparent;
     -fx-border-width: 0;
-}
-
-.PropertyTextArea .scroll-bar:horizontal:disabled {
-    -fx-opacity: 0;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
-}
-
-.PropertyTextArea .scroll-bar:horizontal:disabled .track-background ,
-.PropertyTextArea .scroll-bar:vertical:disabled .track-background {
-     -fx-background-color: transparent;
-	 -fx-border-color: transparent;
-	 -fx-border-width: 0;
-	 -fx-background-radius: 0em;
-	 -fx-opacity: 0;
+    -fx-focus-color: transparent;
+    -fx-background-color: transparent;
+    -fx-effect: dropshadow( one-pass-box , #000000,
+            0, 0.0, 0, 0);
 }
 
 .UneditablePropertyValue {
