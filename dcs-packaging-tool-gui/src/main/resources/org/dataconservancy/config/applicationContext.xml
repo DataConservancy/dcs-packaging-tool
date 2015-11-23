@@ -214,29 +214,9 @@
     <property name="uriGenerator" ref="uriGenerator"/>
   </bean>
 
-  <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
-    <property name="primaryDomainProfiles">
-      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
-        <ref bean="dcsBoProfile"/>
-        <ref bean="pcdmProfile"/>
-      </list>
-    </property>
-    <property name="secondaryDomainProfiles">
-      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
-    </property>
-  </bean>
-
   <bean id="openPackageService" class="org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl">
     <constructor-arg ref="packageStateSerializer"/>
     <constructor-arg ref="ipmRdfTransformService"/>
   </bean>
-
-  <bean id="ipmRdfTransformService" class="org.dataconservancy.packaging.tool.impl.IpmRdfTransformService">
-    <property name="domainProfileStore" ref="domainProfileStore"/>
-  </bean>
-
-  <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>
-
-  <bean id="pcdmProfile" class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile"/>
 
 </beans>

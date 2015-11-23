@@ -16,6 +16,7 @@
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
@@ -23,6 +24,7 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 
 import org.junit.runner.RunWith;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -33,12 +35,21 @@ import static org.junit.Assert.assertNull;
 @ContextConfiguration(locations = {"classpath*:/test-applicationContext.xml"})
 public class PackageAssemblerFactoryTest {
 
+    @Autowired
+    private PackageAssemblerFactory underTest;
+
+    @Before
+    public void setUp() throws Exception {
+        assertNotNull("No PackageAssembler instance was autowired!", underTest);
+
+    }
+
     @Test
     public void testGetNewAssembler() throws InstantiationException, IllegalAccessException {
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "test");
 
-        PackageAssembler assembler = PackageAssemblerFactory.newAssembler(params);
+        PackageAssembler assembler = underTest.newAssembler(params);
 
         assertNotNull(assembler);
     }
@@ -48,7 +59,7 @@ public class PackageAssemblerFactoryTest {
     public void testGetNewAssemblerFailsIfNoFormatIdParameterSet() throws InstantiationException, IllegalAccessException {
         PackageGenerationParameters params = new PackageGenerationParameters();
 
-        PackageAssemblerFactory.newAssembler(params);
+        underTest.newAssembler(params);
     }
 
 
@@ -57,7 +68,7 @@ public class PackageAssemblerFactoryTest {
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "not-a-real-assembler");
 
-        PackageAssembler assembler = PackageAssemblerFactory.newAssembler(params);
+        PackageAssembler assembler = underTest.newAssembler(params);
 
         assertNull(assembler);
     }

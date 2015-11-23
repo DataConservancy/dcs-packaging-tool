@@ -18,24 +18,19 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-    <property name="staticMethod">
-      <value>org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory.setAssemblers</value>
-    </property>
-    <property name="arguments">
+  <bean id="packageAssemblerFactory" class="org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory">
+    <property name="assemblers">
       <map key-type="java.lang.String" value-type="java.lang.Class">
         <entry key="test" value="org.dataconservancy.packaging.tool.impl.generator.mocks.MockPackageAssembler"/>
         <entry key="BOREM" value="org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler"/>
       </map>
     </property>
   </bean>
-  
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-    <property name="staticMethod">
-      <value>org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory.setBuilders</value>
-    </property>
-    <property name="arguments">
-      <map key-type="java.lang.String" value-type="org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder">
+
+  <bean id="packageModelBuilderFactory" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory">
+    <property name="builders">
+      <map key-type="java.lang.String"
+           value-type="org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder">
         <entry key="BOREM" value-ref="packageModelBuilder_BOREM"/>
         <entry key="test" value-ref="testBuilder" />
       </map>
@@ -43,6 +38,7 @@
   </bean>
   
   <bean id="testBuilder" class="org.dataconservancy.packaging.tool.impl.generator.mocks.MockPackageModelBuilder" />
+
   <bean id="packageModelBuilder_BOREM" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl">
     <property name="nodeVisitors">
       <list>
@@ -69,6 +65,15 @@
     <constructor-arg value="${dcs.package.tool.test.content}/TestContent" />
   </bean>
 
-    <bean id="props" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    </bean>
+  <bean id="propertyPlaceholderConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreResourceNotFound" value="true" />
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+    <property name="locations">
+      <list>
+        <value>classpath:config_default-test.properties</value>
+      </list>
+    </property>
+  </bean>
+
 </beans>

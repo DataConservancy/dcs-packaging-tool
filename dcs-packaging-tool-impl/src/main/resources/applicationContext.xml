@@ -16,32 +16,41 @@
   -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-    <property name="staticMethod">
-      <value>org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory.setAssemblers</value>
-    </property>
-    <property name="arguments">
+  <bean id="packageAssemblerFactory" class="org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory">
+    <property name="assemblers">
       <map key-type="java.lang.String" value-type="java.lang.Class">
         <entry key="BOREM" value="org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler"/>
       </map>
     </property>
   </bean>
 
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-    <property name="staticMethod">
-      <value>org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory.setBuilders</value>
-    </property>
-    <property name="arguments">
-      <map key-type="java.lang.String" value-type="org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder">
+  <bean id="packageModelBuilderFactory" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderFactory">
+    <property name="builders">
+      <map key-type="java.lang.String"
+           value-type="org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder">
         <entry key="BOREM" value-ref="packageModelBuilder_BOREM"/>
       </map>
     </property>
   </bean>
-  
+
+  <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
+    <property name="primaryDomainProfiles">
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
+        <ref bean="dcsBoProfile"/>
+        <ref bean="pcdmProfile"/>
+      </list>
+    </property>
+    <property name="secondaryDomainProfiles">
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
+    </property>
+  </bean>
+
+  <bean id="ipmRdfTransformService" class="org.dataconservancy.packaging.tool.impl.IpmRdfTransformService">
+    <property name="domainProfileStore" ref="domainProfileStore"/>
+  </bean>
+
   <bean id="packageModelBuilder_BOREM" class="org.dataconservancy.packaging.tool.impl.generator.PackageModelBuilderImpl">
     <property name="nodeVisitors">
       <list>
@@ -52,9 +61,14 @@
         <bean class="org.dataconservancy.packaging.tool.impl.generator.DomainObjectResourceBuilder" />               
       </list>
     </property>
+    <property name="ipmRdfTransformService" ref="ipmRdfTransformService"/>
   </bean>
 
-  <bean id="boremPackageGenerator" class="org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator" />
+  <bean id="boremPackageGenerator" class="org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator">
+    <constructor-arg ref="packageAssemblerFactory"/>
+    <constructor-arg ref="packageModelBuilderFactory"/>
+  </bean>
+
   <bean id="testPackageGenerator" class="org.dataconservancy.packaging.tool.impl.TestPackageGenerator" />
   <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
     <property name="generatorMap">
@@ -71,5 +85,9 @@
     <property name="marshallerMap" ref="marshallerMap"/>
     <property name="archive" value="true"/>
   </bean>
+
+  <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>
+
+  <bean id="pcdmProfile" class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile"/>
 
 </beans>

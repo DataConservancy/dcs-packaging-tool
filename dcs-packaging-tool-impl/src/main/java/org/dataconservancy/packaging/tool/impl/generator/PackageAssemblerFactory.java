@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class PackageAssemblerFactory {
 
-    private static Map<String, Class<? extends PackageAssembler>> assemblers;
+    private Map<String, Class<? extends PackageAssembler>> assemblers;
 
     /**
      * Provide an instance of a {@link PackageAssembler} for assembling a single
@@ -44,7 +44,7 @@ public class PackageAssemblerFactory {
      * @throws IllegalAccessException if the parameter list doesn't contain a package format id
      * @throws InstantiationException if there are no assemblers are set on the factory
      */
-    public static PackageAssembler newAssembler(PackageGenerationParameters params) throws IllegalAccessException, InstantiationException {
+    public PackageAssembler newAssembler(PackageGenerationParameters params) throws IllegalAccessException, InstantiationException {
         if (assemblers == null || assemblers.size() == 0) {
             throw new IllegalStateException("No assemblers have been set.");
         }
@@ -70,11 +70,11 @@ public class PackageAssemblerFactory {
     }
 
 
-    public static void setAssemblers(Map<String, Class<? extends PackageAssembler>> assemblers) {
+    public void setAssemblers(Map<String, Class<? extends PackageAssembler>> assemblers) {
         if (assemblers == null || assemblers.size() == 0) {
             throw new IllegalArgumentException("At least one assembler must be provided");
         }
 
-        PackageAssemblerFactory.assemblers = assemblers;
+        this.assemblers = assemblers;
     }
 }
