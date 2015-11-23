@@ -58,7 +58,11 @@
   <!-- SERVICES AND BUILDERS -->
   <bean id="propertiesConfigurationParametersBuilder" class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder" />
 
-  <bean id="boremPackageGenerator" class="org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator" />
+  <bean id="boremPackageGenerator" class="org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator">
+    <constructor-arg ref="packageAssemblerFactory"/>
+    <constructor-arg ref="packageModelBuilderFactory"/>
+  </bean>
+
   <bean id="testPackageGenerator" class="org.dataconservancy.packaging.tool.impl.TestPackageGenerator" />
 
   <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
