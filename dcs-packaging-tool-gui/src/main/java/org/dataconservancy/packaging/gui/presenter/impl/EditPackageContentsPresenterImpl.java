@@ -90,7 +90,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     public javafx.scene.Node display() {
         String disciplinePath = controller.getFactory().getConfiguration().getDisciplineMap();
-        view.setupWindowBuilder(disciplinePath);
+        String userPropertiesPath = controller.getFactory().getConfiguration().getUserProperties();
+        view.setupWindowBuilder(disciplinePath, userPropertiesPath);
 
         view.getErrorLabel().setVisible(false);
 

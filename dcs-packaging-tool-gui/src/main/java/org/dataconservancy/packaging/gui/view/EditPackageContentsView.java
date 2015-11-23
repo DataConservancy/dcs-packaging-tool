@@ -149,7 +149,7 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      */
     Button getReenableWarningsButton();
 
-    void setupWindowBuilder(String disciplinePath);
+    void setupWindowBuilder(String disciplinePath, String userPropertiesPath);
 
     /**
      * Gets the refresh popup

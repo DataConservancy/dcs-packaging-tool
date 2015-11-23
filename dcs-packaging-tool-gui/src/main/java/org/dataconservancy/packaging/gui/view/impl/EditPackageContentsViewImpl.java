@@ -130,15 +130,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Preferences preferences;
     private NodePropertyWindowBuilder windowBuilder;
 
-    private String availableRelationshipsPath;
     private PackageToolPopup refreshPopup;
     private Button refreshPopupPositiveButton;
     private Button refreshPopupNegativeButton;
 
-    public EditPackageContentsViewImpl(final InternalProperties internalProperties, final String availableRelationshipsPath, final Help help) {
+    public EditPackageContentsViewImpl (final InternalProperties internalProperties, final Help help) {
         super();
         this.internalProperties = internalProperties;
-        this.availableRelationshipsPath = availableRelationshipsPath;
 
         //Sets the text of the footer controls.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -894,9 +892,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
    
     @Override
-    public void setupWindowBuilder(String disciplineFilePath){
+    public void setupWindowBuilder(String disciplineFilePath, String userPropertiesPath){
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
-        windowBuilder = new NodePropertyWindowBuilder(cancelPopupLink, applyPopupButton, availableRelationshipsPath, disciplineService);
+        windowBuilder = new NodePropertyWindowBuilder(cancelPopupLink, applyPopupButton, userPropertiesPath, disciplineService);
     }
 
     @Override
