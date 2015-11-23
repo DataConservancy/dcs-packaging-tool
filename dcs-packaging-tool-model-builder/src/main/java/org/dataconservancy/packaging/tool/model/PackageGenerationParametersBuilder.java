@@ -29,7 +29,7 @@ public interface PackageGenerationParametersBuilder {
      * @return A deserialized {@code PackageGenerationParameters} object.
      * @throws ParametersBuildException if the parameters can not be read from the input stream.
      */
-    public PackageGenerationParameters buildParameters (InputStream in) throws ParametersBuildException;
+    PackageGenerationParameters buildParameters (InputStream in) throws ParametersBuildException;
 
     /**
      * Serialize a {@code PackageGenerationParameters} object into a bytestream.
@@ -37,7 +37,7 @@ public interface PackageGenerationParametersBuilder {
      * @param out   the  OutputStream
      * @throws ParametersBuildException if the parameters can not be saved to the output stream
      */
-    public void buildParameters(PackageGenerationParameters params, OutputStream out) throws ParametersBuildException;
+    void buildParameters(PackageGenerationParameters params, OutputStream out) throws ParametersBuildException;
 
 }
 

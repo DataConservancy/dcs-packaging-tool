@@ -32,13 +32,13 @@ public interface PackageExtractor {
      * @return A list of files that were extracted from the package
      * @throws UnpackException if an error occurs during unpacking
      */
-    public List<File> getFilesFromPackageFile(String baseDir, File file) throws UnpackException;
+    List<File> getFilesFromPackageFile(String baseDir, File file) throws UnpackException;
     
     /**
      * Deletes all of the files in the provided directory.
      * @param dir The directory of extracted files to be deleted. 
      */
-    public void cleanUpExtractedPackage(File dir);
+    void cleanUpExtractedPackage(File dir);
     
     /**
      * Accept an InputStream, and extract the files.
@@ -48,20 +48,20 @@ public interface PackageExtractor {
      * @return a List of Files in the package
      * @throws UnpackException if there is an error processing the InputStream
      */
-    public List<File> getFilesFromPackageStream(String baseDir, String fileName, InputStream packageInputStream) throws UnpackException;
+    List<File> getFilesFromPackageStream(String baseDir, String fileName, InputStream packageInputStream) throws UnpackException;
     /**
      * Sets the extract directory that the package will be expanded into. 
      * @param dir A string representing the path to the extract directory can be a full or relative path.
      */
-    public void setExtractDirectory(String dir);
+    void setExtractDirectory(String dir);
     
     /**
      * Get the extract directory the files will be unpacked into.
      * @return String representing the extraction directory
      */
-    public String getExtractDirectory();
+    String getExtractDirectory();
     
-    public String createParentDir(String baseDir, String dir);
+    String createParentDir(String baseDir, String dir);
     
-    public List<File> unpackFilesFromStream(InputStream packageStream, String packageDir, String fileName) throws Exception;
+    List<File> unpackFilesFromStream(InputStream packageStream, String packageDir, String fileName) throws Exception;
 }

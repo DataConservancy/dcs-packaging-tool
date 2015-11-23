@@ -202,7 +202,7 @@ public class BagItPackageAssemblerTest {
         String filePath = "bad~file:name";
         expected.expect(PackageToolException.class);
         expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-         URI result = underTest.reserveResource(filePath, PackageResourceType.DATA);
+        underTest.reserveResource(filePath, PackageResourceType.DATA);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class BagItPackageAssemblerTest {
         String filePath = "bad~file:name";
         expected.expect(PackageToolException.class);
         expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        URI result = underTest.reserveResource(filePath, PackageResourceType.METADATA);
+        underTest.reserveResource(filePath, PackageResourceType.METADATA);
     }
 
     @Test
@@ -218,7 +218,7 @@ public class BagItPackageAssemblerTest {
         String filePath = "bad~file:name";
         expected.expect(PackageToolException.class);
         expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        URI result = underTest.reserveResource(filePath, PackageResourceType.ORE_REM);
+        underTest.reserveResource(filePath, PackageResourceType.ORE_REM);
     }
 
     @Test
@@ -226,7 +226,7 @@ public class BagItPackageAssemblerTest {
         String filePath = "bad~file:name";
         expected.expect(PackageToolException.class);
         expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        URI result = underTest.reserveResource(filePath, PackageResourceType.ONTOLOGY);
+        underTest.reserveResource(filePath, PackageResourceType.ONTOLOGY);
     }
 
     @Test
@@ -234,7 +234,7 @@ public class BagItPackageAssemblerTest {
         String filePath = "bad~file:name";
         expected.expect(PackageToolException.class);
         expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        URI result = underTest.reserveResource(filePath, PackageResourceType.PACKAGE_STATE);
+        underTest.reserveResource(filePath, PackageResourceType.PACKAGE_STATE);
     }
 
 
@@ -359,7 +359,7 @@ public class BagItPackageAssemblerTest {
         CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
         ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
 
-        Set<String> files = new HashSet<String>();
+        Set<String> files = new HashSet<>();
         ArchiveEntry entry = ais.getNextEntry();
         while (entry != null) {
             files.add(entry.getName().replace("\\", "/"));
@@ -455,7 +455,7 @@ public class BagItPackageAssemblerTest {
 
         ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP, pkg.serialize());
 
-        Set<String> files = new HashSet<String>();
+        Set<String> files = new HashSet<>();
         ArchiveEntry entry = ais.getNextEntry();
         while (entry != null) {
             files.add(entry.getName().replace("\\", "/"));
@@ -531,7 +531,7 @@ public class BagItPackageAssemblerTest {
 
         ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, pkg.serialize());
 
-        Set<String> files = new HashSet<String>();
+        Set<String> files = new HashSet<>();
         ArchiveEntry entry = ais.getNextEntry();
         while (entry != null) {
             files.add(entry.getName().replace("\\", "/"));
@@ -636,7 +636,7 @@ public class BagItPackageAssemblerTest {
         CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
         ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
 
-        Set<String> files = new HashSet<String>();
+        Set<String> files = new HashSet<>();
         ArchiveEntry entry = ais.getNextEntry();
         while (entry != null) {
             files.add(entry.getName());
@@ -684,7 +684,7 @@ public class BagItPackageAssemblerTest {
         CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
         ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
 
-        Set<String> files = new HashSet<String>();
+        Set<String> files = new HashSet<>();
         ArchiveEntry entry = ais.getNextEntry();
         while (entry != null) {
             files.add(entry.getName());
@@ -731,7 +731,7 @@ public class BagItPackageAssemblerTest {
         CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
         ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
 
-        Set<String> files = new HashSet<String>();
+        Set<String> files = new HashSet<>();
         ArchiveEntry entry = ais.getNextEntry();
         while (entry != null) {
             files.add(entry.getName());

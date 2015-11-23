@@ -339,9 +339,7 @@ public class DomainProfileObjectStoreImplTest {
             return;
         }
 
-        for (Node child : node.getChildren()) {
-            test_update_object(child);
-        }
+        node.getChildren().forEach(this::test_update_object);
     }
 
     private void check_properties(URI id, NodeType type) {

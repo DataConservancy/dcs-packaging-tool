@@ -27,7 +27,7 @@ public class PropertyConstraint extends CardinalityConstraint {
     }
 
     /**
-     * @param other 
+     * @param other The other object to check if it can be equal to PropertyConstraint
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {

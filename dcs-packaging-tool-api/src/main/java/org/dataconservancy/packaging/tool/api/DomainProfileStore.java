@@ -34,7 +34,7 @@ public interface DomainProfileStore {
     void setSecondaryDomainProfiles(List<DomainProfile> profiles);
 
     /**
-     * @param uri
+     * @param uri The identifier of the node type.
      * @return NodeType identified by the given uri or null if it does not
      *         exist.
      */

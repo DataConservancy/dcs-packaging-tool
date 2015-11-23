@@ -147,7 +147,7 @@ public class NodeTransform extends AbstractDescribedObject {
     }
 
     /**
-     * @param other
+     * @param other The other node transform to compare.
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {

@@ -34,6 +34,6 @@ public enum PackageResourceType {
     METADATA,
 
     /** The Package State file */
-    PACKAGE_STATE;
+    PACKAGE_STATE
 
 }

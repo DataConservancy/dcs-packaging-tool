@@ -42,7 +42,7 @@ public class DroidDriver {
      * @return a List of the detected file formats
      */
     public List<DetectedFormat> detectFormats(File file) {
-        List<DetectedFormat> formats = new ArrayList<DetectedFormat>();
+        List<DetectedFormat> formats = new ArrayList<>();
 
         if (!file.exists()) {
             return detectFormats(file.getName());
@@ -82,7 +82,7 @@ public class DroidDriver {
     public List<DetectedFormat> detectFormats(String filename) {
         List<DetectedFormat> formats = getApplicableFormats(FilePathUtil.getLastFileExtension(filename));
 
-        if (formats == null) return new ArrayList<DetectedFormat>();
+        if (formats == null) return new ArrayList<>();
 
         return formats;
     }

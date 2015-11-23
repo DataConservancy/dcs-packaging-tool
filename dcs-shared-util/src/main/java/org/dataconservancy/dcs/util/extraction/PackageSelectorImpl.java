@@ -28,7 +28,7 @@ public class PackageSelectorImpl implements PackageSelector {
     
  
     public PackageSelectorImpl() {
-        extractors = new HashMap<String, PackageExtractor>();        
+        extractors = new HashMap<>();
     }
     
     @Override

@@ -31,9 +31,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createSingleDirectoryTree() {
-        Node root = treeFactory.createSingleDirectoryTree(profile.getFarmNodeType());
-
-        return root;
+        return treeFactory.createSingleDirectoryTree(profile.getFarmNodeType());
     }
 
     /**
@@ -46,9 +44,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createInvalidSingleFileTree() {
-        Node root = treeFactory.createSingleFileTree(profile.getMediaNodeType());
-
-        return root;
+        return treeFactory.createSingleFileTree(profile.getMediaNodeType());
     }
 
     /**
@@ -63,9 +59,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createTwoDirectoryTree() {
-        Node root = treeFactory.createTwoDirectoryTree(profile.getFarmNodeType(), profile.getBarnNodeType());
-
-        return root;
+        return treeFactory.createTwoDirectoryTree(profile.getFarmNodeType(), profile.getBarnNodeType());
     }
     
     /**
@@ -80,9 +74,7 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createTwoDirectoryTree2() {
-        Node root = treeFactory.createTwoDirectoryTree(profile.getFarmNodeType(), profile.getTroughNodeType());
-
-        return root;
+        return treeFactory.createTwoDirectoryTree(profile.getFarmNodeType(), profile.getTroughNodeType());
     }
 
     /**
@@ -98,25 +90,22 @@ public class FarmIpmFactory {
      * @return root of tree.
      */
     public Node createSimpleTree() {
-        IpmTreeFactory.NodeTypeSetter nodeTypeSetter = new IpmTreeFactory.NodeTypeSetter() {
-            @Override
-            public void setNodeType(Node node, int depth) {
-                switch (depth) {
-                    case 0:
-                        node.setNodeType(profile.getFarmNodeType());
-                        break;
-                    case 1:
-                        node.setNodeType(profile.getBarnNodeType());
-                        break;
-                    case 2:
-                        node.setNodeType(profile.getCowNodeType());
-                        break;
-                    case 3:
-                        node.setNodeType(profile.getMediaNodeType());
-                        break;
-                }
-
+        IpmTreeFactory.NodeTypeSetter nodeTypeSetter = (node, depth) -> {
+            switch (depth) {
+                case 0:
+                    node.setNodeType(profile.getFarmNodeType());
+                    break;
+                case 1:
+                    node.setNodeType(profile.getBarnNodeType());
+                    break;
+                case 2:
+                    node.setNodeType(profile.getCowNodeType());
+                    break;
+                case 3:
+                    node.setNodeType(profile.getMediaNodeType());
+                    break;
             }
+
         };
         treeFactory.setNodeTypeSetter(nodeTypeSetter);
 

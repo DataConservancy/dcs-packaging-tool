@@ -31,6 +31,6 @@ public interface JenaModelFactory {
      *
      * @return the {@code Model}
      */
-    public Model newModel();
+    Model newModel();
 
 }

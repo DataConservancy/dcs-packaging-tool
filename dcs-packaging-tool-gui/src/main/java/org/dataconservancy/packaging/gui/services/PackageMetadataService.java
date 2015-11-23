@@ -43,13 +43,12 @@ public class PackageMetadataService {
     private List<PackageMetadata> optional;
     private List<PackageMetadata> all;
 
-    private String packageMetadataParametersFile;
     private String packageMetadataParametersFilePath;
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public PackageMetadataService(Configuration configuration) throws IOException{
-        packageMetadataParametersFile = configuration.getPackageMetadataParametersFile();
+        String packageMetadataParametersFile = configuration.getPackageMetadataParametersFile();
         packageMetadataParametersFilePath = configuration.resolveConfigurationFile(packageMetadataParametersFile);
         createPackageMetadata(configuration.getConfigurationFileInputStream(packageMetadataParametersFilePath));
     }

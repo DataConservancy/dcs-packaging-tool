@@ -25,9 +25,9 @@ import de.schlichtherle.io.archive.spi.ArchiveEntry;
  */
 public interface PtgArchiveEntry extends ArchiveEntry {
 
-    public long getSize();
+    long getSize();
 
-    public void setSize(long sizeBytes);
+    void setSize(long sizeBytes);
 
 
 

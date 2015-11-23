@@ -37,7 +37,7 @@ public class ContentLoader {
 
     public static Map<String, InputStream> loadContentFrom(List<String> inputLocations)
             throws PackageToolException {
-        Map<String, InputStream> content = new HashMap<String, InputStream>();
+        Map<String, InputStream> content = new HashMap<>();
 
         /* Default if no input locations is stdin */
         if (inputLocations == null || inputLocations.size() == 0) {

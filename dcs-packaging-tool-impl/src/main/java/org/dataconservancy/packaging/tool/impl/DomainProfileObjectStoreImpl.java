@@ -304,7 +304,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     @Override
     public List<Property> getProperties(URI object, NodeType type) {
-        List<Property> result = new ArrayList<Property>();
+        List<Property> result = new ArrayList<>();
 
         Resource obj = model.createResource(object.toString());
 
@@ -319,7 +319,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
 
     @Override
     public List<Property> getProperties(URI object, PropertyType type) {
-        List<Property> result = new ArrayList<Property>();
+        List<Property> result = new ArrayList<>();
 
         Resource obj = model.createResource(object.toString());
 

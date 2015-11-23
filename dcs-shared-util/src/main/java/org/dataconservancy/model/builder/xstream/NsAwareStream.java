@@ -30,6 +30,6 @@ public interface NsAwareStream {
      * @return the QName of the current element
      * @see com.thoughtworks.xstream.io.HierarchicalStreamReader#getNodeName()
      */
-    public QName getQname(); 
+    QName getQname();
 
 }

@@ -15,7 +15,6 @@
  */
 package org.dataconservancy.dcs.util.droid;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import uk.gov.nationalarchives.droid.core.interfaces.IdentificationResult;
 import uk.gov.nationalarchives.droid.core.interfaces.IdentificationResultCollection;
@@ -25,7 +24,11 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * Test for DroidIdentifier class
@@ -41,12 +44,12 @@ public class DroidIdentifierTest extends BaseFileSetUpTest {
         File file = PNG_FILE;
         DroidIdentifier droidIdentifier = new DroidIdentifier();
         IdentificationResultCollection irc = droidIdentifier.detectFormat(file);
-        Assert.assertTrue(0 < irc.getResults().size());
+        assertTrue(0 < irc.getResults().size());
         IdentificationResult result = irc.getResults().get(0);
 
-        Assert.assertTrue("image/png".equals(result.getMimeType()));
-        Assert.assertTrue("fmt/11".equals(result.getPuid()));
-        Assert.assertTrue("Portable Network Graphics".equals(result.getName()));
+        assertTrue("image/png".equals(result.getMimeType()));
+        assertTrue("fmt/11".equals(result.getPuid()));
+        assertTrue("Portable Network Graphics".equals(result.getName()));
     }
 
     @Test

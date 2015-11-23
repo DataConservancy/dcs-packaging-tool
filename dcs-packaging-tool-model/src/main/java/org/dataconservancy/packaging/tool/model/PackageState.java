@@ -16,7 +16,6 @@
 package org.dataconservancy.packaging.tool.model;
 
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
-import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
 
@@ -121,8 +120,8 @@ public class PackageState {
 
     /**
      * Allows one or more values of the specified package metadata to be added.
-     * @param fieldName
-     * @param values
+     * @param fieldName The field name of the package metadata to be added.
+     * @param values The values assigned to the provided package metadata field.
      */
     public void addPackageMetadata(String fieldName, String ... values) {
         if (packageMetadataList.get(fieldName) == null) {
@@ -133,7 +132,7 @@ public class PackageState {
 
     /**
      * Assign a map metadata fields and their values to this package state.
-     * @param metadataList
+     * @param metadataList The map of Package Metadata Fields and values to be set.
      */
     public void setPackageMetadataList(LinkedHashMap <String, List<String>> metadataList) {
         this.packageMetadataList = metadataList;

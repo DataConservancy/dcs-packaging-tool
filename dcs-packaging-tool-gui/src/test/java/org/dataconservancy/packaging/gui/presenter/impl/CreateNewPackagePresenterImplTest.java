@@ -81,8 +81,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
-    private EditPackageContentsPresenterImpl packageDescriptionPresenter;
-
     @Before
     public void setup() throws InterruptedException, IOException {
         if (!initialized) {
@@ -98,7 +96,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             // Setup next page
             EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(internalProperties, help);
             editPackageContentsView.setHeaderView(header);
-            packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
+            EditPackageContentsPresenterImpl packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
             factory.setEditPackageContentsPresenter(packageDescriptionPresenter);
             packageState = new PackageState();
 

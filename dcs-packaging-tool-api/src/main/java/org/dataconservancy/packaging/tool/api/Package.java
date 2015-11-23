@@ -33,27 +33,27 @@ public interface Package {
 	 * 
 	 *  @throws FileNotFoundException 
 	 */
-	public InputStream serialize() throws FileNotFoundException;
+	InputStream serialize() throws FileNotFoundException;
 
 	/**
 	 * Suggested filename (excluding path)
 	 */
-	public String getPackageName();
+	String getPackageName();
 
 	/**
 	 * MIME type of the resulting package serialization
 	 */
-	public String getContentType();
+	String getContentType();
 	
 	/**
 	 * Cleans up any resources associated with the package. 
 	 */
-	public void cleanupPackage();
+	void cleanupPackage();
 	
 	/**
 	 * Determines if the content of the package is still available.
 	 * @return True if the content is available, false otherwise.
 	 */
-	public boolean isAvailable();
+	boolean isAvailable();
 
 }

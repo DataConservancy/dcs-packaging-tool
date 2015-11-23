@@ -33,7 +33,7 @@ public interface PackageModelBuilder {
      * Produce an initializsed builder based on the specified parameters.
      * @param params The parameters used to initialize a specific instance of the builder object
      */
-    public PackageModelBuilder newInstance(PackageGenerationParameters params);
+    PackageModelBuilder newInstance(PackageGenerationParameters params);
 
     /**
      * Create the resources that instantiate a package in a particular model.
@@ -49,5 +49,5 @@ public interface PackageModelBuilder {
      * @param assembler
      *        The assembler in which packaged resources will be created.
      */
-    public void buildModel(PackageState state, PackageAssembler assembler);
+    void buildModel(PackageState state, PackageAssembler assembler);
 }

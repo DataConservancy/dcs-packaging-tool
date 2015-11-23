@@ -127,7 +127,7 @@ public interface PackageAssembler {
      * </p>
      * @return a Package
      */
-    public org.dataconservancy.packaging.tool.api.Package assemblePackage();
+    org.dataconservancy.packaging.tool.api.Package assemblePackage();
 
 
     /**
@@ -138,5 +138,5 @@ public interface PackageAssembler {
      * @param key The name of the parameter to add
      * @param value The value of the parameter to add
      */
-    public void addParameter(String key, String value);
+    void addParameter(String key, String value);
 }
