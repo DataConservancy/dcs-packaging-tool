@@ -206,6 +206,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
                 //when we select zip or exploded as our archiving format, we must select 'none' as our compression
                 if (archiveExtension.equals("zip") || archiveExtension.equals("exploded")) {
+                    // TODO select 'none' as compression and then disable the toggle?
                     Toggle noCompressionToggle = getNoCompressionToggle();
                     if (noCompressionToggle != null && noCompressionToggle != view.getCompressionToggleGroup().getSelectedToggle()) {
                         view.getCompressionToggleGroup().selectToggle(noCompressionToggle);
