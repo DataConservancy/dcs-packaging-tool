@@ -71,36 +71,6 @@ public class App extends Application {
             return;
         }
 
-        /**String configFile;
-
-        //Check if a discipline map file was found in the user config directory.
-        //If not, use the default discipline map file.
-         if (!getParameters().getRaw().contains("-d") && !getParameters().getRaw().contains("--disciplines")) {
-             configFile = config.getDisciplineMapFile();
-             config.setDisciplineMap(config.resolveConfigurationFile(configFile));
-         }
-
-        //Check if the package generation parameters file was found in the user config directory,
-        //If not, use the default package generation parameters file
-        if (!getParameters().getRaw().contains("-p") && !getParameters().getRaw().contains("--generation-params")) {
-            configFile = config.getPackageGenerationParametersFile();
-            config.setPackageGenerationParameters(config.resolveConfigurationFile(configFile));
-        }
-
-         //Check if the package metadata parameters file was found in the user config directory,
-        //If not, use the default package generation parameters file
-        if (!getParameters().getRaw().contains("-m") && !getParameters().getRaw().contains("--metadata-params")) {
-            configFile = config.getPackageMetadataParametersFile();
-            config.setPackageMetadataParameters(config.resolveConfigurationFile(configFile));
-        }
-
-         //Check if a user defined properties file was found in the user config directory.
-        //If not, use the default user properties file.
-         if (!getParameters().getRaw().contains("-u") && !getParameters().getRaw().contains("--user-props")) {
-             configFile = config.getUserPropertiesFile();
-             config.setUserProperties(config.resolveConfigurationFile(configFile));
-         }**/
-
         Controller controller = factory.getController();
 
         controller.startApp();
