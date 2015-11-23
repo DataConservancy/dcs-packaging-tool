@@ -24,6 +24,7 @@ public class NodeType extends AbstractDescribedObject {
     private Map<PropertyType, SuppliedProperty> supplied_properties;
     private FileAssociation file_assoc;
     private CardinalityConstraint child_file_constraint;
+    private NodeType preferredParentType;
     
     /**
      * @return Unique identifier of this node type.
@@ -182,6 +183,21 @@ public class NodeType extends AbstractDescribedObject {
     }
 
     /**
+     * @return The preferred node type of the parent node.
+     */
+    public NodeType getPreferredParentType() {
+        return preferredParentType;
+    }
+
+    /**
+     * Sets the preferred parent type. If the node type has a preferred parent type it will be given preference when the node parent has the provided type.
+     * @param preferredParentType The preferred node type of the parent node.
+     */
+    public void setPreferredParentType(NodeType preferredParentType) {
+        this.preferredParentType = preferredParentType;
+    }
+
+    /**
      * Calculates the HashCode of the NodeType.
      * Note: Lists are converted to HashSets in this method to make them order independent.
      * @return The hashcode of the NodeType.
@@ -230,6 +246,7 @@ public class NodeType extends AbstractDescribedObject {
         result = prime * result + ((profile == null || profile.getIdentifier() == null) ? 0 : profile.getIdentifier().hashCode());
         result = prime * result + ((propertyConstraintSet == null) ? 0 : propertyConstraintSet.hashCode());
         result = prime * result + ((supplied_properties == null) ? 0 : supplied_properties.hashCode());
+        result = prime * result + ((preferredParentType == null) ? 0 : preferredParentType.getIdentifier().hashCode());
         return result;
     }
 
@@ -304,6 +321,14 @@ public class NodeType extends AbstractDescribedObject {
                 return false;
         } else if (!supplied_properties.equals(other.supplied_properties))
             return false;
+        if (preferredParentType == null) {
+            if (other.preferredParentType != null)
+                return false;
+        } else if (preferredParentType.getIdentifier() == null) {
+            if (other.preferredParentType.getIdentifier() != null)
+                return  false;
+        } else if (other.preferredParentType == null || other.preferredParentType.getIdentifier() == null || !preferredParentType.getIdentifier().equals(other.preferredParentType.getIdentifier()))
+            return false;
         return true;
     }
 
@@ -313,6 +338,6 @@ public class NodeType extends AbstractDescribedObject {
                 + ", parent_constraints=" + parent_constraints + ", property_constraints=" + property_constraints
                 + ", inheritable_properties=" + inheritable_properties + ", default_property_values="
                 + default_property_values + ", supplied_properties=" + supplied_properties + ", file_assoc=" + file_assoc
-                + ", child_file_constraint=" + child_file_constraint + "]";
+                + ", child_file_constraint=" + child_file_constraint + ", preferredParentType=" + preferredParentType + "]";
     }
 }

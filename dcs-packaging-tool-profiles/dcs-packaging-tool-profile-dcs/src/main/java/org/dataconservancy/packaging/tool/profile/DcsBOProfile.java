@@ -241,8 +241,8 @@ public class DcsBOProfile
                 .create(NS_DCS_PKGTOOL_PROFILE_BOM + "Project"));
         project.setLabel("Project");
         project.setDescription("Project business object");
-        project.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
-                + "Project")));
+        project.setDomainTypes(Collections.singletonList(URI.create(
+            NS_DCS_ONTOLOGY_BOM + "Project")));
         project.setDomainProfile(this);
         project.setInheritableProperties(Arrays.asList(hasDescription, hasPublisher));
 
@@ -256,8 +256,8 @@ public class DcsBOProfile
                 + "Collection"));
         collection.setLabel("Collection");
         collection.setDescription("Collection business object");
-        collection.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
-                + "Collection")));
+        collection.setDomainTypes(Collections.singletonList(URI.create(
+            NS_DCS_ONTOLOGY_BOM + "Collection")));
         collection.setDomainProfile(this);
         collection.setInheritableProperties(Arrays.asList(hasDescription, hasDiscipline, hasCreator, hasContact, hasPublisher, hasPublicationDate));
         //This sets the preference of collection assignment to a single file, this is to mirror the existing package tool behavior
@@ -271,8 +271,8 @@ public class DcsBOProfile
                 + "DataItem"));
         dataItem.setLabel("DataItem");
         dataItem.setDescription("DataItem business object");
-        dataItem.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
-                + "DataItem")));
+        dataItem.setDomainTypes(Collections.singletonList(URI.create(
+            NS_DCS_ONTOLOGY_BOM + "DataItem")));
         dataItem.setDomainProfile(this);
         //This sets the preference of data item assignment to nodes with more than 1 file, this is to mirror the existing package tool behavior
         //Note this is just a preference the type can still be changed by the user.
@@ -285,22 +285,23 @@ public class DcsBOProfile
         file.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "File"));
         file.setLabel("DataFile");
         file.setDescription("File business object");
-        file.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
-                + "File")));
+        file.setDomainTypes(Collections.singletonList(URI.create(
+            NS_DCS_ONTOLOGY_BOM + "File")));
         file.setDomainProfile(this);
+        file.setPreferredParentType(dataItem);
 
         metadata.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "Metadata"));
         metadata.setLabel("Metadata File");
         metadata.setDescription("File business object representing metadata");
-        metadata.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
-                + "Metadata")));
+        metadata.setDomainTypes(Collections.singletonList(URI.create(
+            NS_DCS_ONTOLOGY_BOM + "Metadata")));
         metadata.setDomainProfile(this);
 
         person.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM + "Person"));
         person.setLabel("Person");
         person.setDescription("Person business object");
-        person.setDomainTypes(Arrays.asList(URI.create(NS_DCS_ONTOLOGY_BOM
-                + "Person")));
+        person.setDomainTypes(Collections.singletonList(URI.create(
+            NS_DCS_ONTOLOGY_BOM + "Person")));
         person.setDomainProfile(this);
 
     }
@@ -569,14 +570,14 @@ public class DcsBOProfile
 
         /* XXX No properties defined in ontology */
 
-        hasContact.setComplexDomainTypes(Arrays.asList(URI.create(NS_FOAF
-                + "person")));
+        hasContact.setComplexDomainTypes(Collections.singletonList(URI.create(
+            NS_FOAF + "person")));
         hasContact.setComplexPropertyConstraints(Arrays
                 .asList(exactlyOne(name), zeroOrMore(phone), zeroOrMore(mbox)));
 
         /* XXX No properties defined in the ontology */
-        hasCreator.setComplexDomainTypes(Arrays.asList(URI.create(NS_FOAF
-                + "person")));
+        hasCreator.setComplexDomainTypes(Collections.singletonList(URI.create(
+            NS_FOAF + "person")));
         hasCreator.setComplexPropertyConstraints(Arrays
                 .asList(exactlyOne(name),
                         zeroOrMore(phone),

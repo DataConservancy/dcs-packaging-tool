@@ -183,6 +183,7 @@ public class FarmDomainProfile extends DomainProfile {
         barn_node_type.setPropertyConstraints(Arrays.asList());
         barn_node_type.setDefaultPropertyValues(Arrays.asList());
         barn_node_type.setParentConstraints(Arrays.asList(farm_parent_constraint));
+        barn_node_type.setPreferredParentType(farm_node_type);
         barn_node_type.setFileAssociation(FileAssociation.DIRECTORY);
         barn_node_type.setDomainProfile(this);
 

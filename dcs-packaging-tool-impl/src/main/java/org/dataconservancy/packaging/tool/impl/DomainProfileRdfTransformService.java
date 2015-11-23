@@ -145,6 +145,8 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         DC_DP_NS_URI, "hasDateTimeValue");
     public static final Property HAS_COMPLEX_VALUE = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasComplexValue");
+    public static final Property HAS_PREFERRED_PARENT_TYPE = ResourceFactory.createProperty(
+        DC_DP_NS_URI, "hasPreferredParentType");
 
     private Map<URI, NodeType> transformedNodeTypes;
 
@@ -288,6 +290,10 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
 
             if (nodeType.getPreferredCountOfChildrenWithFiles() != null) {
                 nodeTypeResource.addProperty(HAS_CHILD_CONSTRAINT, transformCardinalityConstraintToRdf(model, nodeType.getPreferredCountOfChildrenWithFiles()));
+            }
+
+            if (nodeType.getPreferredParentType() != null) {
+                nodeTypeResource.addProperty(HAS_PREFERRED_PARENT_TYPE, transformToRdf(model, nodeType.getPreferredParentType(), domainProfileResource));
             }
         }
         return nodeTypeResource;
@@ -719,6 +725,9 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
             nodeType.setChildFileConstraint(childConstraint);
         }
 
+        if (resource.hasProperty(HAS_PREFERRED_PARENT_TYPE)) {
+            nodeType.setPreferredParentType(transformToNodeType(resource.getPropertyResourceValue(HAS_PREFERRED_PARENT_TYPE), profile, model));
+        }
         return nodeType;
     }
 

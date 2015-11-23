@@ -124,7 +124,32 @@ public class DomainProfileServiceImplTest {
 
         assertTrue(service.validateTree(root));
     }
-    
+
+    /**
+     * A tree consisting of three directories and a file.
+     */
+    @Test
+    public void testAssignSimplePreferredNodeTypes() {
+        Node root = ipmfact.createSimpleTree();
+
+        root.walk(Node::clearNodeTypes);
+
+        boolean success = service.assignNodeTypes(profile, root);
+
+        assertTrue(success);
+
+        root.walk(n -> {
+            assertNotNull(n.getDomainObject());
+            assertNotNull(n.getNodeType());
+        });
+
+        assertTrue(service.validateTree(root));
+
+        //Using preferred types the child of farm should always be barn because it's the preference.
+        assertEquals(profile.getFarmNodeType(), root.getNodeType());
+        assertEquals(profile.getBarnNodeType(), root.getChildren().get(0).getNodeType());
+    }
+
     /**
      * A tree consisting of three directories and a file.
      * The third directory and file are ignored.

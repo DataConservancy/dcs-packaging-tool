@@ -1,6 +1,6 @@
 package org.dataconservancy.packaging.tool.model.dprofile;
 
-import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.junit.Before;
 import org.junit.Test;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -10,6 +10,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class ModelEqualsAndHashCodeTest {
+
+    private NodeType typeA;
+    private NodeType typeB;
+
+    @Before
+    public void setup() throws URISyntaxException {
+        typeA = new NodeType();
+        typeA.setIdentifier(new URI("id:A"));
+        typeB = new NodeType();
+        typeB.setIdentifier(new URI("id:B"));
+    }
+
     @Test
     public void AbstractDescribedObjectTest() {
         EqualsVerifier
@@ -43,6 +55,7 @@ public class ModelEqualsAndHashCodeTest {
                 .forClass(NodeConstraint.class)
                 .allFieldsShouldBeUsed()
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
+                .withPrefabValues(NodeType.class, typeA, typeB)
                 .verify();
     }
     
@@ -52,6 +65,7 @@ public class ModelEqualsAndHashCodeTest {
                 .forClass(NodeTransform.class)
                 .allFieldsShouldBeUsed().withRedefinedSuperclass()
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
+                .withPrefabValues(NodeType.class, typeA, typeB)
                 .verify();
     }
     
@@ -60,6 +74,7 @@ public class ModelEqualsAndHashCodeTest {
         EqualsVerifier
                 .forClass(NodeType.class)
                 .allFieldsShouldBeUsed().withRedefinedSuperclass()
+                .withPrefabValues(NodeType.class, typeA, typeB)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();
     }
@@ -69,6 +84,7 @@ public class ModelEqualsAndHashCodeTest {
         EqualsVerifier
                 .forClass(PropertyConstraint.class)
                 .allFieldsShouldBeUsed().withRedefinedSuperclass()
+                .withPrefabValues(NodeType.class, typeA, typeB)
                 .suppress(Warning.STRICT_INHERITANCE, Warning.NONFINAL_FIELDS)
                 .verify();
     }

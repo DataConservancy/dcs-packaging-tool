@@ -510,6 +510,10 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             return count >= cc.getMinimum() && (count <= cc.getMaximum() || cc.getMaximum() == -1);
         }
 
+        if (type.getPreferredParentType() != null && node.getParent() != null) {
+            return type.getPreferredParentType().equals(node.getParent().getNodeType());
+        }
+
         return false;
     }
 
