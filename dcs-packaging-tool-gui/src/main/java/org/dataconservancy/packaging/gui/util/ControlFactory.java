@@ -93,24 +93,16 @@ public class ControlFactory implements CssConstants {
                         // Perform a lookup for an element with a css class of "text"
                         // This will give the Node that actually renders the text inside the
                         // TextArea
+                        control.applyCss();
                         final Node text = control.lookup(".text");
 
                         //Text will be null if the view has text already when the pop up is being shown
-                        //TODO: In java 8 this can be avoided by calling applyCSS
                         if (text != null) {
                             //If the text area is now bigger then starting size increase the size to fit the text plus the space for padding.
                             if (text.getBoundsInLocal().getHeight() + textAreaPaddingSize > startingTextHeight) {
 
                                 control.setPrefHeight(text.getBoundsInLocal().getHeight() + textAreaPaddingSize);
                             } else { //Otherwise set to the minimum size, this needs to be checked everytime in case the user selects all the text and deletes it
-                                control.setPrefHeight(startingTextHeight);
-                            }
-                        } else {
-                            //In the case where the text is set before the view is laid out we measure the text and then set the size to it.
-                            double textHeight = computeTextHeight(newValue, 170.0) + textAreaPaddingSize;
-                            if (textHeight + textAreaPaddingSize > startingTextHeight) {
-                                 control.setPrefHeight(textHeight);
-                            } else {
                                 control.setPrefHeight(startingTextHeight);
                             }
                         }
