@@ -74,28 +74,12 @@
     <constructor-arg ref="configuration"/>
   </bean>
 
-  <!--
-  <bean id="packageGenerationService" class="org.dataconservancy.packaging.tool.impl.BasicPackageGenerationService">
-    <property name="generatorMap">
-      <map key-type="org.dataconservancy.packaging.tool.api.PackagingFormat">
-        <entry key="BOREM" value-ref="boremPackageGenerator" />
-        <entry key="TEST" value-ref="testPackageGenerator" />
-      </map>
-    </property>
-  </bean>
-  -->
 
   <bean id="phoneNumberValidator" class="org.dataconservancy.packaging.tool.impl.support.PhoneNumberValidator">
     <property name="localCountryCode" value="${localCountryCode}"/>
   </bean>
 
-  <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
-
   <bean id="propertyFormatService" class="org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl"/>
-
-  <bean id="ipmService" class="org.dataconservancy.packaging.tool.impl.IPMServiceImpl">
-    <constructor-arg ref="uriGenerator"/>
-  </bean>
 
   <bean id="packageMetadataPresenter" class="org.dataconservancy.packaging.gui.presenter.impl.PackageMetadataPresenterImpl">
     <constructor-arg ref="packageMetadataView"/>
@@ -213,10 +197,18 @@
     <property name="packageStateSerializer" ref="packageStateSerializer"/>
     <property name="uriGenerator" ref="uriGenerator"/>
   </bean>
-
-  <bean id="openPackageService" class="org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl">
-    <constructor-arg ref="packageStateSerializer"/>
-    <constructor-arg ref="ipmRdfTransformService"/>
+  
+    <!-- Inject our domain profiles -->
+  <bean id="enableDomainProfiles"
+    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetObject" ref="domainProfileStore" />
+    <property name="targetMethod" value="setPrimaryDomainProfiles" />
+    <property name="arguments">
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
+        <ref bean="dcsBoProfile" />
+        <ref bean="pcdmProfile" />
+      </list>
+    </property>
   </bean>
 
 </beans>

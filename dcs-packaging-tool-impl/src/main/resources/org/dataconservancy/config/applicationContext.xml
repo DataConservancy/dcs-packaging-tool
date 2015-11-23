@@ -38,8 +38,6 @@
   <bean id="domainProfileStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
     <property name="primaryDomainProfiles">
       <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
-        <ref bean="dcsBoProfile"/>
-        <ref bean="pcdmProfile"/>
       </list>
     </property>
     <property name="secondaryDomainProfiles">
@@ -78,6 +76,19 @@
       </map>
     </property>
   </bean>
+  
+  <bean id="uriGenerator"
+    class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator" />
+
+  <bean id="ipmService" class="org.dataconservancy.packaging.tool.impl.IPMServiceImpl">
+    <constructor-arg ref="uriGenerator" />
+  </bean>
+  
+  <bean id="openPackageService"
+    class="org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl">
+    <constructor-arg ref="packageStateSerializer" />
+    <constructor-arg ref="ipmRdfTransformService" />
+  </bean>
 
   <!-- (DE)SERIALIZATION -->
   <bean id="packageStateSerializer"
@@ -85,9 +96,5 @@
     <property name="marshallerMap" ref="marshallerMap"/>
     <property name="archive" value="true"/>
   </bean>
-
-  <bean id="dcsBoProfile" class="org.dataconservancy.packaging.tool.profile.DcsBOProfile"/>
-
-  <bean id="pcdmProfile" class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile"/>
 
 </beans>

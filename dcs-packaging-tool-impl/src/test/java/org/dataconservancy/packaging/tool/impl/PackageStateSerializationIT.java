@@ -55,7 +55,7 @@ import static org.junit.Assert.fail;
  * module to populate instances of {@code PackageState}.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml", "classpath:/applicationContext.xml", "classpath*:org/dataconservancy/config/applicationContext.xml"})
+@ContextConfiguration({"classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml", "classpath*:org/dataconservancy/config/applicationContext.xml"})
 public class PackageStateSerializationIT {
 
     /**

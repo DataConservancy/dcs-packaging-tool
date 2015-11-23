@@ -17,52 +17,17 @@
 
   <!-- SERVICES AND BUILDERS -->
 
-  <bean id="openPackageService"
-    class="org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl">
-    <constructor-arg ref="packageStateSerializer" />
-    <constructor-arg ref="ipmRdfTransformService" />
-  </bean>
-
-  <bean id="ipmRdfTransformService"
-    class="org.dataconservancy.packaging.tool.impl.IpmRdfTransformService">
-    <property name="domainProfileStore" ref="domainProfileStore" />
-  </bean>
-
-  <!-- Workaround so as not to screw up Elliot's card. We'll resolve later -->
-  <bean id="ipmDomainProfileServiceHack"
-    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
-    depends-on="ipmRdfTransformService">
-    <property name="targetObject" ref="packageModelBuilder_BOREM" />
-    <property name="targetMethod" value="setIpmRdfTransformService" />
-    <property name="arguments" ref="ipmRdfTransformService" />
-  </bean>
-
-  <bean id="uriGenerator"
-    class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator" />
-
-  <bean id="ipmService" class="org.dataconservancy.packaging.tool.impl.IPMServiceImpl">
-    <constructor-arg ref="uriGenerator" />
-  </bean>
-
-  <bean id="domainProfileStore"
-    class="org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl">
-    <property name="primaryDomainProfiles">
-      <list
-        value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
+  <!-- Inject our domain profiles -->
+  <bean id="enableDomainProfiles"
+    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetObject" ref="domainProfileStore" />
+    <property name="targetMethod" value="setPrimaryDomainProfiles" />
+    <property name="arguments">
+      <list value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile">
         <ref bean="dcsBoProfile" />
         <ref bean="pcdmProfile" />
       </list>
     </property>
-    <property name="secondaryDomainProfiles">
-      <list
-        value-type="org.dataconservancy.packaging.tool.model.dprofile.DomainProfile"></list>
-    </property>
   </bean>
-
-  <bean id="dcsBoProfile"
-    class="org.dataconservancy.packaging.tool.profile.DcsBOProfile" />
-
-  <bean id="pcdmProfile"
-    class="org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile" />
 
 </beans>

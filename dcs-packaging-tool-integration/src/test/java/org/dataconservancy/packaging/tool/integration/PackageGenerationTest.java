@@ -98,6 +98,9 @@ public class PackageGenerationTest {
 
     @Autowired
     public IpmRdfTransformService ipm2rdf;
+    
+    @Autowired
+    public OpenPackageService opener;
 
     PropertiesConfigurationParametersBuilder paramsBuilder =
             new PropertiesConfigurationParametersBuilder();
