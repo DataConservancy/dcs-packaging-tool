@@ -97,7 +97,7 @@ public class PCDMProfile
 
         setPropertyConstraints();
 
-        setRelationshipConstraints();;
+        setRelationshipConstraints();
 
         setFileAssociations();
 
@@ -113,9 +113,12 @@ public class PCDMProfile
 
         setNodeTypes(Arrays.asList(administrativeSet, collection, object, file));
 
-        setNodeTransforms(Arrays.asList());
+        setNodeTransforms(Arrays.asList(administrativeSet_to_collection,
+                                        collection_to_administrativeSet,
+                                        collection_to_object,
+                                        object_to_collection));
 
-        setPropertyTypes(Arrays.asList());
+        setPropertyTypes(Collections.emptyList());
     }
 
     private void defineNodeTypes() {
@@ -123,28 +126,30 @@ public class PCDMProfile
                 + "AdministrativeSet"));
         administrativeSet.setLabel("AdministrativeSet");
         administrativeSet.setDescription("AdministrativeSet object");
-        administrativeSet.setDomainTypes(Arrays.asList(URI.create(NS_PCDM
-                + "AdministrativeSet")));
+        administrativeSet.setDomainTypes(Collections.singletonList(URI.create(
+            NS_PCDM + "AdministrativeSet")));
         administrativeSet.setDomainProfile(this);
 
         collection.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_PCDM
                 + "Collection"));
         collection.setLabel("Collection");
         collection.setDescription("Collection");
-        collection.setDomainTypes(Arrays.asList(URI.create(NS_PCDM
-                + "Collection")));
+        collection.setDomainTypes(Collections.singletonList(URI.create(
+            NS_PCDM + "Collection")));
         collection.setDomainProfile(this);
 
         object.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_PCDM + "Object"));
         object.setLabel("Object");
         object.setDescription("Object");
-        object.setDomainTypes(Arrays.asList(URI.create(NS_PCDM + "Object")));
+        object.setDomainTypes(Collections.singletonList(URI.create(
+            NS_PCDM + "Object")));
         object.setDomainProfile(this);
 
         file.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_PCDM + "File"));
         file.setLabel("File");
         file.setDescription("File");
-        file.setDomainTypes(Arrays.asList(URI.create(NS_PCDM + "File")));
+        file.setDomainTypes(Collections.singletonList(URI.create(
+            NS_PCDM + "File")));
         file.setDomainProfile(this);
 
     }
@@ -157,21 +162,20 @@ public class PCDMProfile
                 + "hasRelatedObject"));
         hasRelatedObject.setPropertyValueType(PropertyValueType.URI);
         hasRelatedObject.setPropertyValueHint(PropertyValueHint.URL);
+
+        setPropertyTypes(Collections.singletonList(hasRelatedObject));
     }
 
     private void setPropertyConstraints() {
-        administrativeSet.setPropertyConstraints(Arrays
-                .asList(zeroOrMore(hasRelatedObject)));
-        collection.setPropertyConstraints(Arrays
-                .asList(zeroOrMore(hasRelatedObject)));
-        object.setPropertyConstraints(Arrays
-                .asList(zeroOrMore(hasRelatedObject)));
+        administrativeSet.setPropertyConstraints(Collections.singletonList(zeroOrMore(hasRelatedObject)));
+        collection.setPropertyConstraints(Collections.singletonList(zeroOrMore(hasRelatedObject)));
+        object.setPropertyConstraints(Collections.singletonList(zeroOrMore(hasRelatedObject)));
         file.setPropertyConstraints(Collections.emptyList());
     }
 
     private void setRelationshipConstraints() {
 
-        administrativeSet.setParentConstraints(Arrays.asList(allowNoParent()));
+        administrativeSet.setParentConstraints(Collections.singletonList(allowNoParent()));
 
         collection
                 .setParentConstraints(Arrays
@@ -235,8 +239,7 @@ public class PCDMProfile
         object_to_collection
                 .setDescription("Transforms an Object into a Collection");
         object_to_collection.setSourceNodeType(object);
-        object_to_collection.setSourceChildConstraints(Arrays
-                .asList(disallowRelationship(file, fileRelation)));
+        object_to_collection.setSourceChildConstraints(Collections.singletonList(disallowRelationship(file, fileRelation)));
         object_to_collection.setResultNodeType(collection);
 
     }
