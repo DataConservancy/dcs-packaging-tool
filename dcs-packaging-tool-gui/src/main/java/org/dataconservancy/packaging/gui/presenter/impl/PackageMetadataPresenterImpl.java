@@ -68,6 +68,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     public Node display() {
         // TODO: Must move bind() to constructor which will require putting domainProfileStore as constructor arg.
         bind();
+
+        //If we navigate back to the package metadata screen after creating a tree we need to disable profile selection
+        if (controller.getPackageTree() != null) {
+            view.getDomainProfilesComboBox().setDisable(true);
+        }
         
         return view.asNode();
     }

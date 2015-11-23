@@ -23,7 +23,6 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
@@ -146,6 +145,7 @@ public class Controller {
         setPackageState(new PackageState(this.toolVersion));
         packageStateFile = null;
         packageStateFileChooser.setInitialFileName(packageStateFileExtension);
+        packageTree = null;
 
         if (clear) {
             clearPresenters();
