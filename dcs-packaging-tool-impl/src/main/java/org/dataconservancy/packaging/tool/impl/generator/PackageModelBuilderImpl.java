@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.SimpleSelector;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
@@ -82,7 +83,8 @@ public class PackageModelBuilderImpl
     public void buildModel(PackageState pstate, PackageAssembler assembler) {
 
         PackageModelBuilderState builderState = new PackageModelBuilderState();
-        builderState.domainObjects = pstate.getDomainObjectRDF();
+        builderState.domainObjects =
+                RdfUtil.copy(pstate.getDomainObjectRDF(), new SimpleSelector());
         builderState.assembler = assembler;
         builderState.params = params;
         builderState.manifest = ModelFactory.createDefaultModel();
