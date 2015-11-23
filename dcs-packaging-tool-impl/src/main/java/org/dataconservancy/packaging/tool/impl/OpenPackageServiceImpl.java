@@ -50,6 +50,9 @@ public class OpenPackageServiceImpl implements OpenPackageService {
 
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
             package_state_serializer.deserialize(state, is);
+        } catch (UnsupportedOperationException e) {
+            // Thrown when called on a non-zip file, wrap as IOException for consistency
+            throw new IOException(e);
         }
 
         return state;
