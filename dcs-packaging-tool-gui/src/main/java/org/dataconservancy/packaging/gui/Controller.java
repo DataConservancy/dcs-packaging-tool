@@ -129,7 +129,7 @@ public class Controller {
     }
 
     public void startApp() {
-        defaultPackageGenerationParametersFilePath = factory.getConfiguration().getPackageGenerationParameters();
+        defaultPackageGenerationParametersFilePath = factory.getConfiguration().resolveConfigurationFile(Configuration.ConfigFile.PKG_GEN_PARAMS);
         showHome(true);
     }
 
