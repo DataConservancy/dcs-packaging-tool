@@ -20,7 +20,6 @@ public class GeneralParameterNames {
 	public static final String PACKAGE_FORMAT_ID = "Package-Format-Id";
 	public static final String PACKAGE_LOCATION = "Package-Location";
 	public static final String PACKAGE_STAGING_LOCATION = "Package-Staging-Location";
-	public static final String CONTENT_ROOT_LOCATION = "Content-Root-Location";
 	public static final String PACKAGE_NAME = "Package-Name";
 	public static final String CHECKSUM_ALGORITHMS = "Checksum-Algs";
 	public static final String COMPRESSION_FORMAT = "Compression-Format";

@@ -870,7 +870,6 @@ public class BagItPackageAssemblerTest {
         params.addParam(GeneralParameterNames.PACKAGE_NAME, packageName);
         params.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocationName);
         params.addParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, packageStagingLocationName);
-        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, contentLocation);
         params.addParam(BagItParameterNames.BAGIT_PROFILE_ID, bagItProfileId);
         params.addParam(BagItParameterNames.CONTACT_NAME, contactName);
         params.addParam(BagItParameterNames.CONTACT_EMAIL, contactEmail);

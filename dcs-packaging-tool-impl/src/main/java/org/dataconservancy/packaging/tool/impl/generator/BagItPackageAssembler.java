@@ -435,7 +435,7 @@ public class BagItPackageAssembler implements PackageAssembler {
      */
     @Override
     public URI createResource(String path, PackageResourceType type, InputStream content) {
-        URI resourceUri = reserveResource(buildPath(path), type);
+        URI resourceUri = reserveResource(path, type);
         putResource(resourceUri, content);
 
         return resourceUri;
@@ -622,38 +622,6 @@ public class BagItPackageAssembler implements PackageAssembler {
                     "Exception occurred when writing bagit.txt file.");
         }
         return bagItFile;
-    }
-
-    /**
-     * According to Usecase DCS-TXT-10, BagIt bags that include ORE ReM will contain "PKG-BAG-DIR", which is "a string
-     * consisting of a valid Unix directory name that, if specified, will be treated as the top-level bag directory
-     * name." Base on this assertion, path used to create resources will be relative to this PKG-BAG-DIR.
-     * @param string the string used to build the path
-     * @return  a String representing the path
-     */
-    private String buildPath(String string) {
-
-        String rootLocation = params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0);
-
-        File file;
-        if(rootLocation != null) {
-            String contentRoot = FilenameUtils.separatorsToUnix(rootLocation);
-            file = new File(contentRoot, string);
-        }
-        else
-        {
-            file = new File(string);
-        }
-
-        if(!file.exists()){
-               throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_STRAY_FILE,
-                    "Provided file path indicates that that file " + file.getPath() + " does not reside within the " +
-                    "specified content root location of: " + params.getParam(GeneralParameterNames.CONTENT_ROOT_LOCATION,0));
-
-        }
-
-       //return file.getPath();
-        return string;
     }
 
     private File archiveBag() throws PackageToolException {

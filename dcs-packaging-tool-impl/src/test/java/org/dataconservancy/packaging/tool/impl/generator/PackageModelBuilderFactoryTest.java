@@ -45,7 +45,6 @@ public class PackageModelBuilderFactoryTest {
         PackageState desc = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
-        params.addParam(GeneralParameterNames.CONTENT_ROOT_LOCATION, folder.getRoot().getPath());
         PackageModelBuilder builder = PackageModelBuilderFactory.newBuilder(desc, params);
 
         assertNotNull(builder);
