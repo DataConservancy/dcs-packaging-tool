@@ -278,6 +278,7 @@ public class DcsBOProfile
         //Note this is just a preference the type can still be changed by the user.
         CardinalityConstraint dataItemPreferences = new CardinalityConstraint();
         dataItemPreferences.setMin(2);
+        dataItemPreferences.setMax(-1);
         dataItem.setChildFileConstraint(dataItemPreferences);
         dataItem.setInheritableProperties(Collections.singletonList(hasDescription));
 
