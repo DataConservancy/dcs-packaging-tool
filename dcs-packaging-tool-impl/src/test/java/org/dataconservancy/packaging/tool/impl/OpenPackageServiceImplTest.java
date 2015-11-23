@@ -29,7 +29,7 @@ public class OpenPackageServiceImplTest {
     private static final String PACKAGE_ZIP_RESOURCE = "fakebag.zip";
     private static final String PACKAGE_TAR_RESOURCE = "fakebag.tar";
     private static final String PACKAGE_TAR_GZ_RESOURCE = "fakebag.tar.gz";
-    private static final String PACKAGE_STATE_RESOURCE = "fakebag/META-INF/org.dataconservancy.bagit/PKG-DESC/STATE";
+    private static final String PACKAGE_STATE_RESOURCE = "fakebag/META-INF/org.dataconservancy.bagit/STATE";
 
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
@@ -144,9 +144,11 @@ public class OpenPackageServiceImplTest {
         File base_dir = new File(extract_dir, "fakebag");
         
         new File(extract_dir, "fakebag/data").mkdirs();
-        new File(extract_dir, PACKAGE_STATE_RESOURCE).getParentFile().mkdirs();
+        File stateDir = new File(extract_dir, PACKAGE_STATE_RESOURCE);
+        stateDir.mkdirs();
+        System.out.println(stateDir.getPath());
         
-        copy_resource(PACKAGE_STATE_RESOURCE, new File(extract_dir, PACKAGE_STATE_RESOURCE));
+        copy_resource(PACKAGE_STATE_RESOURCE, new File(stateDir, "state.bin"));
         
         OpenedPackage opened_pkg = service.openExplodedPackage(base_dir);
         

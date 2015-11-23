@@ -50,7 +50,7 @@ import org.dataconservancy.packaging.tool.ontologies.Ontologies;
  * @author apb
  * @version $Id$
  */
-class RdfUtil {
+public class RdfUtil {
 
     @SuppressWarnings("unchecked")
     private static final Map<String, String> PREFIX_MAP = MapUtils
@@ -60,6 +60,7 @@ class RdfUtil {
      * Select all triples that are "local" to the given subject.
      * <p>
      * Given a URI, "local" triples include those who have a subject that:
+     * </p>
      * <ul>
      * <li>is the URI</li>
      * <li>Has a 'hash' relationship to the URI (e.g.
@@ -67,7 +68,7 @@ class RdfUtil {
      * <code>http://example.org/x#foo</code>)</li>
      * <li>is a blank node traversable by the URI or any related hash URIs</li>
      * </ul>
-     * </p>
+     * 
      * 
      * @param subject
      *        a resource that is the Subject of at least one statement.

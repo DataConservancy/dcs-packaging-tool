@@ -50,6 +50,7 @@ import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl;
 import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.impl.URIGenerator;
+import org.dataconservancy.packaging.tool.model.OpenedPackage;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder;
@@ -59,6 +60,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_NAME;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_LOCATION;
 
@@ -98,7 +101,7 @@ public class PackageGenerationTest {
 
     @Autowired
     public IpmRdfTransformService ipm2rdf;
-    
+
     @Autowired
     public OpenPackageService opener;
 
@@ -106,7 +109,7 @@ public class PackageGenerationTest {
             new PropertiesConfigurationParametersBuilder();
 
     @Test
-    public void createPackageTest() throws Exception {
+    public void basicRoundTripTest() throws Exception {
         Node tree =
                 ipmService.createTreeFromFileSystem(Paths
                         .get(this.getClass().getResource("/TestContent/README")
@@ -128,6 +131,7 @@ public class PackageGenerationTest {
         profileService.assignNodeTypes(profiles.get(DCS_PROFILE), tree);
 
         PackageState state = new PackageState();
+
         state.setDomainObjectRDF(model);
         state.setPackageTree(ipm2rdf.transformToRDF(tree));
 
@@ -142,14 +146,28 @@ public class PackageGenerationTest {
             params.addParam(PACKAGE_LOCATION, "/tmp");
 
             Package pkg = createPakageService.generatePackage(state, params);
-            
-            try (OutputStream out =
-                    new FileOutputStream(new File(folder.getRoot(), pkg.getPackageName()))) {
+
+            File packageFile = new File(folder.getRoot(), pkg.getPackageName());
+
+            try (OutputStream out = new FileOutputStream(packageFile)) {
                 IOUtils.copy(pkg.serialize(), out);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
             pkg.cleanupPackage();
+
+            File staging = new File(folder.getRoot(), "stage");
+            staging.mkdirs();
+
+            OpenedPackage opened = opener.openPackage(staging, packageFile);
+
+            Model openedDomainObjects =
+                    opened.getPackageState().getDomainObjectRDF();
+
+            int ORIG_TRIPLE_COUNT = model.listStatements().toSet().size();
+            assertTrue(ORIG_TRIPLE_COUNT > 0);
+            assertEquals(ORIG_TRIPLE_COUNT, openedDomainObjects
+                    .listStatements().toSet().size());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

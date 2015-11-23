@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import java.nio.file.Path;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -17,6 +18,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.api.OpenPackageService;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
@@ -34,7 +36,7 @@ import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
  */
 public class OpenPackageServiceImpl implements OpenPackageService {
     // Location of package state file in package base directory
-    private final static String PACKAGE_STATE_PATH = "META-INF/org.dataconservancy.bagit/PKG-DESC/STATE";
+    private final static String PACKAGE_STATE_PATH = "META-INF/org.dataconservancy.bagit/STATE";
 
     private PackageStateSerializer package_state_serializer;
     private IpmRdfTransformService ipm_transform_service;
@@ -186,9 +188,18 @@ public class OpenPackageServiceImpl implements OpenPackageService {
 
     @Override
     public OpenedPackage openExplodedPackage(File dir) throws IOException {
-        String path = FilenameUtils.separatorsToSystem(PACKAGE_STATE_PATH);
+        File path = new File(dir, FilenameUtils.separatorsToSystem(PACKAGE_STATE_PATH));
+        
+        if (!path.exists() || !path.isDirectory()) {
+            throw new RuntimeException(String.format("Package state directory %s does not exist!",
+                                                     path.getPath()));
+        }
 
-        PackageState state = load_package_state(new File(dir, path));
+        if (path.listFiles().length != 1) {
+            throw new RuntimeException(String.format("Package state directory %s must have exactly one file in it"));
+        }
+
+        PackageState state = load_package_state(path.listFiles()[0]);
 
         // Load package tree and rewrite bag URIs to point to files in directory
 
