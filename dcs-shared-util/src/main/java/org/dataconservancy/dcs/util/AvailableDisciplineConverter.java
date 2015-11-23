@@ -21,7 +21,11 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.dataconservancy.model.builder.xstream.AbstractEntityConverter;
 
-import java.lang.Class;import java.lang.Object;import java.lang.Override;import java.lang.String;import java.util.ArrayList;
+import java.lang.Class;
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.String;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +75,7 @@ public class AvailableDisciplineConverter extends AbstractEntityConverter {
     @Override
     public Object unmarshal(HierarchicalStreamReader reader,
                             UnmarshallingContext context) {
-        Map<String, List<String>> disciplines = new HashMap<String, List<String>>();        
+        Map<String, List<String>> disciplines = new HashMap<>();
         
         while (reader.hasMoreChildren()) {
             reader.moveDown();
@@ -81,7 +85,7 @@ public class AvailableDisciplineConverter extends AbstractEntityConverter {
             if (containerElementName.equals(E_DISCIPLINE_GROUP)) {
                 String groupName = reader.getAttribute(A_DISCIPLINE_GROUP_NAME);
                 if (!isEmptyOrNull(groupName)) {
-                    List<String> disciplineList = new ArrayList<String>();
+                    List<String> disciplineList = new ArrayList<>();
                     while (reader.hasMoreChildren()) {
                         reader.moveDown();
                         if (getElementName(reader).equals(E_DISCIPLINE)) {

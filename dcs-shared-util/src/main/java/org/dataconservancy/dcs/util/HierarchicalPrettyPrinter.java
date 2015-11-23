@@ -15,7 +15,8 @@
  */
 package org.dataconservancy.dcs.util;
 
-import java.lang.CharSequence;import java.lang.String;import java.lang.StringBuilder; /**
+import java.lang.CharSequence;import java.lang.String;import java.lang.StringBuilder;
+/**
  * Provides methods making it easier to pretty-print strings in a hierarchical fashion.  Especially where the goal is to
  * present the string form of an instance of the DCS data model.
  */

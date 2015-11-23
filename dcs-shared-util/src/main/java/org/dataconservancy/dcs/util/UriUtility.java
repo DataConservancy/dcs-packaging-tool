@@ -15,9 +15,6 @@
  */
 package org.dataconservancy.dcs.util;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -42,11 +39,9 @@ public class UriUtility {
      * @return true if the URI is a URL with a non-empty host and uses either the http or https protocol
      */
     public static boolean isHttpUrl(URI toCheck) {
-        if (toCheck.getHost() != null && (toCheck.getScheme().equals("http") || toCheck.getScheme().equals("https"))) {
-            return true;
-        } else {
-            return false;
-        }
+        return toCheck.getHost() != null &&
+            (toCheck.getScheme().equals("http") ||
+                 toCheck.getScheme().equals("https"));
     }
 
 
