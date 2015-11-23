@@ -79,12 +79,10 @@ public class Configuration {
         },
         PKG_METADATA_PARAMS{
             //the filename set in the config_default.properties file
-            public String fileName(){
-                return packageMetadataParametersFile;
-            }
+            public String fileName(){ return packageMetadataParametersFile; }
              //the command line file path, if set
             public String commandLinePath(){
-                return packageGenerationParameters;
+                return packageMetadataParameters;
             }
         },
         USER_PROPS{
