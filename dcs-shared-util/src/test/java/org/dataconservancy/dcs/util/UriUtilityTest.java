@@ -231,7 +231,8 @@ public class UriUtilityTest {
         assertTrue(baseDir.isDirectory());
 
         // bag://my-bag/data/file.txt
-        URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null);
+        URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null, null);
+        System.out.println(bagUri.toString());
 
         assertEquals(Paths.get(baseDir.toString(), "my-bag/data/file.txt"),
                 UriUtility.resolveBagUri(baseDir.toPath(), bagUri));
@@ -240,7 +241,7 @@ public class UriUtilityTest {
     @Test
     public void testResolveBagUriExceptions() throws Exception {
         try {
-            UriUtility.resolveBagUri(null, new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null));
+            UriUtility.resolveBagUri(null, new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null, null));
             fail();
         } catch (IllegalArgumentException e) {
             // expected
@@ -254,7 +255,7 @@ public class UriUtilityTest {
         }
 
         try {
-            UriUtility.resolveBagUri(Paths.get("foo"), new URI("file", "my-bag", "/data/file.txt", null));
+            UriUtility.resolveBagUri(Paths.get("foo"), new URI("file", "my-bag", "/data/file.txt", null, null));
             fail();
         } catch (IllegalArgumentException e) {
             // expected
