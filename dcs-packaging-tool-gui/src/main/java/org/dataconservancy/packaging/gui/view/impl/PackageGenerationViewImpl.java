@@ -485,7 +485,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         contentScrollPane.setVvalue(0);
     }
 
-    public void loadAvailableProjects(String availableProjectsFilePath) {
+ /*   public void loadAvailableProjects(String availableProjectsFilePath) {
         List<String> projects = new ArrayList<>();
         try {
             InputStream fileStream;
@@ -514,5 +514,5 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
             log.error("Error loading available projects.");
         }
 
-    }
+    }*/
 }
