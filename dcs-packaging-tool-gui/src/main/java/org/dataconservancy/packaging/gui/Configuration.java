@@ -99,77 +99,48 @@ public class Configuration {
        abstract String fileName();
     }
 
-    public void setConfigurationDirectory(String dir){
-        this.configurationDirectory = dir;
+    public static void setConfigurationDirectory(String dir){
+        configurationDirectory = dir;
     }
 
-    public String getConfigurationDirectory(){
-        return configurationDirectory;
+    //Setters for the names of the files
+    public static void setDisciplineMapFile(String file){
+        disciplineMapFile = file;
     }
 
-    //Setters and getters for the names of the files
-    public void setDisciplineMapFile(String disciplineMapFile){
-        this.disciplineMapFile = disciplineMapFile;
+    public void setPackageGenerationParametersFile(String file) {
+        packageGenerationParametersFile = file;
     }
 
-    public String getDisciplineMapFile(){
-        return disciplineMapFile;
+    public void setPackageMetadataParametersFile(String file){
+        packageMetadataParametersFile = file;
     }
 
-    public void setPackageGenerationParametersFile(String packageGenerationParametersFile) {
-        this.packageGenerationParametersFile = packageGenerationParametersFile;
+    public void setUserPropertiesFile(String file){
+        userPropertiesFile = file;
     }
 
-    public String getPackageGenerationParametersFile() {
-        return packageGenerationParametersFile;
-    }
-
-    public void setPackageMetadataParametersFile(String packageMetadataParametersFile){
-        this.packageMetadataParametersFile = packageMetadataParametersFile;
-    }
-
-    public String getPackageMetadataParametersFile(){
-        return packageMetadataParametersFile;
-    }
-
-    public void setUserPropertiesFile(String userPropertiesFile){
-        this.userPropertiesFile = userPropertiesFile;
-    }
-
-    public String getUserPropertiesFile(){
-        return userPropertiesFile;
-    }
-
-
-    //Setters and getters for the actual file locations we will be using
+    //Setters for the actual file locations we will be using
 
     @Option(name="--disciplines", aliases={"-d"}, usage="Sets the discipline map xml file")
-    public void setDisciplineMap(String disciplineMap){
-        this.disciplineMap = disciplineMap;
+    public void setDisciplineMap(String file){
+        disciplineMap = file;
     }
-
-    //public String getDisciplineMap() {return disciplineMap; }
 
     @Option(name="--generation-params", aliases={"-p"}, usage="Sets the package generation parameters file")
-    public void setPackageGenerationParameters(String packageGenerationParameters){
-        this.packageGenerationParameters = packageGenerationParameters;
+    public void setPackageGenerationParameters(String file){
+        packageGenerationParameters = file;
     }
-
-    //public String getPackageGenerationParameters(){return packageGenerationParameters;}
 
     @Option(name="--metadata-params", aliases={"-m"}, usage="Sets the package metadata parameters file")
-    public void setPackageMetadataParameters(String packageMetadataParameters){
-        this.packageMetadataParameters = packageMetadataParameters;
+    public void setPackageMetadataParameters(String file){
+        packageMetadataParameters = file;
     }
-
-    //public String getPackageMetadataParameters(){return packageMetadataParameters; }
 
     @Option(name="--user-props", aliases={"-u"}, usage ="Sets the user defined properties file")
-    public void setUserProperties(String userProperties){
-        this.userProperties = userProperties;
+    public void setUserProperties(String file){
+        userProperties = file;
     }
-
-    //public String getUserProperties(){ return userProperties; }
 
     /**
      *  This method locates the default configuration with the supplied file name, in the user's configuration directory.
@@ -178,7 +149,7 @@ public class Configuration {
      *                              config_defaults.properties file and set on the  *File fields.
      * @return the user's local configuration path
      */
-    private String locateUserConfigFile(String fileName) {
+    private static String locateUserConfigFile(String fileName) {
         File confFile = new File(userConfDirectory, fileName);
         if (confFile.exists()) {
             return (confFile.getPath());
@@ -194,7 +165,7 @@ public class Configuration {
      *                              config_defaults.properties file and set on the  *File fields.
      * @return the default configuration path
      */
-    private String locateDefaultConfigFile(String fileName) {
+    private static String locateDefaultConfigFile(String fileName) {
         if (configurationDirectory.startsWith("classpath:")) {
             if (configurationDirectory.endsWith("/")) {
                 return configurationDirectory + fileName;
@@ -216,7 +187,7 @@ public class Configuration {
      *
      * @return  the resolved configuration.file path
      */
-    public String resolveConfigurationFile(ConfigFile configFile){
+    public static String resolveConfigurationFile(ConfigFile configFile){
         //look for a file name specified on the command line
         if(configFile.commandLinePath() != null) {
             return configFile.commandLinePath();
@@ -236,14 +207,14 @@ public class Configuration {
      * @return the InputStream associated with the file path
      * @throws IOException if there was an error obtaining the InputStream
      */
-    public InputStream getConfigurationFileInputStream(ConfigFile configFile) throws IOException{
-        InputStream fileStream = null;
+    public static InputStream getConfigurationFileInputStream(ConfigFile configFile) throws IOException{
+        InputStream fileStream;
         String filePath = resolveConfigurationFile(configFile);
         if (filePath.startsWith("classpath:")) {
             String path = filePath.substring("classpath:".length());
-            fileStream = this.getClass().getResourceAsStream(path);
+            fileStream = Configuration.class.getResourceAsStream(path);
             //this also works:
-            // URL url = this.getClass().getResource(path);
+            //URL url = Configuration.class.getResource(path);
             //fileStream = url.openStream();
         } else {
             fileStream = new FileInputStream(filePath);

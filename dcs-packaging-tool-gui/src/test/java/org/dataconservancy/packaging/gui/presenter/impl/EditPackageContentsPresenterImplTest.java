@@ -97,20 +97,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         project.walk(domainProfileObjectStore::updateObject);
         goToNextPage = false;
 
-        Configuration configuration = new Configuration() {
-            @Override
-            public String resolveConfigurationFile(ConfigFile configFile){
-                switch(configFile){
-                    case DISCIPLINE_MAP:
-                        return "MOO";
-                    case USER_PROPS:
-                        return "classpath:/userProperties.json";
-                    default:
-                        return null;
-                }
-            }
-
-        };
+        Configuration configuration = new Configuration();
 
         Factory factory = new Factory();
         factory.setConfiguration(configuration);
