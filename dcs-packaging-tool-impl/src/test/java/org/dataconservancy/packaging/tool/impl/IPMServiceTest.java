@@ -98,10 +98,10 @@ public class IPMServiceTest {
     }
 
     /**
-     * Tests that symbolic links that create cycles throw an exception during tree creation.
+     * Tests that symbolic links that create cycles are ignored and not added to the package
      * @throws Exception
      */
-    @Test(expected=IOException.class)
+    @Test
     public void symLinkCycleTest() throws Exception {
         File tempDir = tmpfolder.newFolder("moo");
 
@@ -118,7 +118,14 @@ public class IPMServiceTest {
             return;
         }
 
-        underTest.createTreeFromFileSystem(tempDir.toPath());
+        Node root = underTest.createTreeFromFileSystem(tempDir.toPath());
+
+        assertNotNull(root);
+
+        //Ensure we end up with one node with one child.
+        assertNotNull(root.getChildren());
+        assertEquals(1, root.getChildren().size());
+        assertNull(root.getChildren().get(0).getChildren());
     }
 
     /**

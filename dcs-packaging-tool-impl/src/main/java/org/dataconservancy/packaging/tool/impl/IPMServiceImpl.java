@@ -71,17 +71,19 @@ public class IPMServiceImpl implements IPMService {
         try {
             if (visitedFiles.contains(path.toRealPath())) {
                 if (Files.isSymbolicLink(path)) {
-                    throw new IOException("Symbolic link cycle detected." +
+                    log.warn("Symbolic link cycle detected." +
                                               "Fix offending symbolic link at " +
                                               path.toFile().toString() +
                                               ", which points to " +
                                               path.toRealPath());
+                    return null;
                 } else {
-                    throw new IOException("Symbolic link cycle detected." +
+                    log.warn("Symbolic link cycle detected." +
                                               "There is a symbolic link under " +
                                               path.getRoot().toString() +
                                               " which points to " + path +
                                               ".  Find the link and remove it.");
+                    return null;
                 }
             } else {
                 visitedFiles.add(path.toRealPath());
