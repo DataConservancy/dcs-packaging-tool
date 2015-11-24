@@ -55,6 +55,14 @@ public class PackageStateBuilder
          * URIs, domain object URIs.
          */
         try {
+
+            /* Set FileInfo to null for directories. */
+            state.tree.walk(n -> {
+                if (n.getFileInfo() != null && n.getFileInfo().isDirectory()) {
+                    n.getFileInfo().setLocation(null);
+                }
+            });
+
             state.pkgState.setPackageTree(rdf2ipm.transformToRDF(state.tree));
         } catch (Exception e) {
             throw new RuntimeException(e);
