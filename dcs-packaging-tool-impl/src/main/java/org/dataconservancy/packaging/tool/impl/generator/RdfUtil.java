@@ -42,7 +42,13 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.system.PrefixMapFactory;
 
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.ontologies.Ontologies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.REM_SERIALIZATION_FORMAT;
 
 /**
  * Collection of RDF slicing and dicing utilities.
@@ -51,6 +57,8 @@ import org.dataconservancy.packaging.tool.ontologies.Ontologies;
  * @version $Id$
  */
 public class RdfUtil {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RdfUtil.class);
 
     @SuppressWarnings("unchecked")
     private static final Map<String, String> PREFIX_MAP = MapUtils
@@ -182,5 +190,55 @@ public class RdfUtil {
                                                    null);
 
         return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    /**
+     * Determines the preferred serialization for RDF-based package resources.  This method consults the supplied
+     * {@code PackageGenerationParameters} for a preferred format.  A default {@code RDFFormat} may be supplied, which
+     * will be returned if the preferred serialization cannot be determined.  The default format may be {@code null},
+     * which is interpreted as {@code RDFFormat#TURTLE_PRETTY}.
+     *
+     * @param params the package generation parameters
+     * @param defaultFormat the default format to use, may be {@code null}
+     * @return the {@code RDFFormat} to use when serializing package resources
+     * @throws IllegalArgumentException if the supplied {@code params} are {@code null}
+     */
+    public static RDFFormat determineSerialization(PackageGenerationParameters params, RDFFormat defaultFormat) {
+
+        if (params == null) {
+            throw new IllegalArgumentException("Supplied PackageGenerationParameters must not be null.");
+        }
+
+        if (defaultFormat == null) {
+            defaultFormat = RDFFormat.TURTLE_PRETTY;
+        }
+
+        RDFFormat format = defaultFormat;
+
+        if (params.getParam(REM_SERIALIZATION_FORMAT) != null &&
+                !params.getParam(REM_SERIALIZATION_FORMAT).isEmpty()) {
+
+            final String selectedSerialization = params.getParam(REM_SERIALIZATION_FORMAT).get(0);
+            try {
+                SERIALIZATION_FORMAT selectedFormat = SERIALIZATION_FORMAT.valueOf(selectedSerialization);
+
+                switch (selectedFormat) {
+                    case JSONLD:
+                        format = RDFFormat.JSONLD_PRETTY;
+                        break;
+                    case TURTLE:
+                        format = RDFFormat.TURTLE_PRETTY;
+                        break;
+                    case XML:
+                        format = RDFFormat.RDFXML_PRETTY;
+                        break;
+                }
+            } catch (IllegalArgumentException e) {
+                LOG.warn("Unsupported serialization format requested: '" + selectedSerialization + "', " +
+                        "returning default serialization '" + format.toString() + "'" );
+            }
+        }
+
+        return format;
     }
 }
