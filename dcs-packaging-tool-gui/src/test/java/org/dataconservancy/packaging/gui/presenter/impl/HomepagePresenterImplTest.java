@@ -89,7 +89,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
     }
 
     /**
-     * Tests that hitting continue without a domain profile displays an error message.
+     * Tests that hitting open existing package goes to the next screen.
      */
     @Test
     public void testContinueToOpenExistingPackage() {
