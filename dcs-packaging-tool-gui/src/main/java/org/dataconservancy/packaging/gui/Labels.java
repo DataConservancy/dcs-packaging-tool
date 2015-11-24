@@ -131,7 +131,8 @@ public class Labels {
         UNASSIGNED_LABEL("unassigned.label"),
         OPTIONAL_PROPERTIES_LABEL("optionalproperties.label"),
         REQUIRED_PROPERTIES_LABEL("requiredproperties.label"),
-        SELECT_STAGING_DIRECTORY("selectstagingdir.label");
+        SELECT_STAGING_DIRECTORY("selectstagingdir.label"),
+        PROPERTY_MISSING_LABEL("propertymissing.label");
 
         private String property;
 
