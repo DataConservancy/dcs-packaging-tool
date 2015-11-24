@@ -34,8 +34,6 @@ public class Errors {
         PACKAGE_TREE_VALIDATION_ERROR("packagetreevalidation.error"),
         PACKAGE_STATE_SAVE_ERROR("packagestatesave.error"),
         PACKAGE_STATE_LOAD_ERROR("packagestateload.error"),
-        HIERARCHICAL_RELATIONSHIP_ERROR("hierarchicalrelationship.error"),
-        INVALID_RELATIONSHIP_ERROR("invalidrelationship.error"),
         PARAM_LOADING_ERROR("paramsloading.error"),
         OUTPUT_DIR_NOT_CREATED_ERROR("outputDirNotCreated.error"),
         PROPERTY_LOSS_WARNING("propertyloss.warning"),
@@ -44,7 +42,9 @@ public class Errors {
         ADD_CONTENT_ERROR("addcontent.error"),
         REFRESH_ERROR("refresh.error"),
         IO_CREATE_ERROR("iocreate.error"),
-        UNIGNORE_ERROR("unignoretype.error");
+        UNIGNORE_ERROR("unignoretype.error"),
+        INVALID_TREE_ERROR("invalidtree.error"),
+        MISSING_PROPERTY_ERROR("missingproperty.error");
 
 
         private String property;
