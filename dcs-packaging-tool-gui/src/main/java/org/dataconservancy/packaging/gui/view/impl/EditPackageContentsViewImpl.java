@@ -57,6 +57,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
@@ -553,7 +554,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
                     if (!invalidProperties.isEmpty() && !hideWarningPopup) {
 
-                        showWarningPopup(TextFactory.getText(Errors.ErrorKey.PROPERTY_LOSS_WARNING), TextFactory.format(Messages.MessageKey.WARNING_INVALID_PROPERTY, transform.getResultNodeType().getLabel(), formatInvalidProperties(invalidProperties)), true, true);
+                        showWarningPopup(TextFactory.getText(
+                                Errors.ErrorKey.PROPERTY_LOSS_WARNING), TextFactory.format(Messages.MessageKey.WARNING_INVALID_PROPERTY, transform.getResultNodeType().getLabel(), formatInvalidProperties(invalidProperties)), true, true);
                         getWarningPopupNegativeButton().setOnAction(actionEvent1 -> {
                             getWarningPopup().hide();
                             preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), hideFutureWarningPopupCheckBox.selectedProperty().getValue());
@@ -892,9 +894,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     }
    
     @Override
-    public void setupWindowBuilder(String disciplineFilePath, String userPropertiesPath){
+    public void setupWindowBuilder(){
+        String disciplineFilePath = Configuration.resolveConfigurationFile(Configuration.ConfigFile.DISCIPLINE_MAP);
         DisciplineLoadingService disciplineService = new DisciplineLoadingService(disciplineFilePath);
-        windowBuilder = new NodePropertyWindowBuilder(cancelPopupLink, applyPopupButton, userPropertiesPath, disciplineService);
+        windowBuilder = new NodePropertyWindowBuilder(cancelPopupLink, applyPopupButton, disciplineService);
     }
 
     @Override

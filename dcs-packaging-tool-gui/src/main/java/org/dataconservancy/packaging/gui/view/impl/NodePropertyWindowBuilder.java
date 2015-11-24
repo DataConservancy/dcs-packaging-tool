@@ -29,6 +29,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DisciplineLoadingService;
+import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Messages;
@@ -49,9 +50,7 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,13 +81,13 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public NodePropertyWindowBuilder(Hyperlink cancelPopupLink, Button applyPopupButton, String availableRelationshipsPath,
+    public NodePropertyWindowBuilder(Hyperlink cancelPopupLink, Button applyPopupButton,
                                      DisciplineLoadingService disciplineLoadingService) {
         this.cancelPopupLink = cancelPopupLink;
         this.applyPopupButton = applyPopupButton;
 
         this.disciplineLoadingService = disciplineLoadingService;
-        loadAvailableRelationships(availableRelationshipsPath);
+        loadAvailableRelationships();
     }
 
     public Pane buildArtifactPropertiesLayout(Node node,
@@ -407,42 +406,13 @@ public class NodePropertyWindowBuilder implements CssConstants {
         });
     }
 
-    private void loadAvailableRelationships(String relationshipsPath) {
+    private void loadAvailableRelationships() {
 
-        if (relationshipsPath != null && !relationshipsPath.isEmpty()) {
-            if (relationshipsPath.startsWith("classpath:")) {
-                String path = relationshipsPath.substring("classpath:".length());
-                if(!path.startsWith("/")){
-                    path = "/" + path;
-                }
-                InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream(path);
-                if (fileStream != null) {
-                    availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
-                } else {
-                    log.error("Error reading classpath relationships file: " + relationshipsPath);
-                }
-
-            } else {
-                File paramFile = new File(relationshipsPath);
-                if (paramFile.exists()) {
-                    try {
-                        availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(new FileInputStream(paramFile));
-                    } catch (FileNotFoundException e) {
-                        log.error("Error reading selected relationships file: " + relationshipsPath + " " + e.getMessage());
-                    }
-                }
-            }
-        }
-
-        //If the file is null attempt to load the built in resource file.
-        if (availableUserDefinedPropertyVocabularies.isEmpty()) {
-            InputStream fileStream = NodePropertyWindowBuilder.class.getResourceAsStream("/userProperties.json");
-            if (fileStream != null) {
-                availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(fileStream);
-            }
-            else {
-                log.error("Error reading default relationships file. Couldn't find classpath file: /userProperties.json");
-            }
+        try {
+            InputStream is = Configuration.getConfigurationFileInputStream(Configuration.ConfigFile.USER_PROPS);
+            availableUserDefinedPropertyVocabularies = UserDefinedPropertyGroupJSONBuilder.deserialize(is);
+        } catch(IOException e) {
+            log.error(e.getMessage());
         }
     }
 

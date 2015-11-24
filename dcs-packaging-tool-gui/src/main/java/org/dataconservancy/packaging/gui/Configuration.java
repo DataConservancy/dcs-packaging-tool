@@ -207,7 +207,7 @@ public class Configuration {
      * @return the InputStream associated with the file path
      * @throws IOException if there was an error obtaining the InputStream
      */
-    public static InputStream getConfigurationFileInputStream(ConfigFile configFile) throws IOException{
+    public static InputStream getConfigurationFileInputStream(ConfigFile configFile) throws IOException {
         InputStream fileStream;
         String filePath = resolveConfigurationFile(configFile);
         if (filePath.startsWith("classpath:")) {
@@ -219,7 +219,9 @@ public class Configuration {
         } else {
             fileStream = new FileInputStream(filePath);
         }
-
+        if (fileStream == null){
+                throw new IOException("Could not open configuration file " + filePath);
+        }
         return fileStream;
     }
 
