@@ -150,8 +150,8 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         view.setPresenter(presenter);
         // Setup controller to handle going to the next page.
         controller.setCreateNewPackage(true);
-        controller.getCreateNewPackagePagesStack().clear();
-        controller.getCreateNewPackagePagesStack().push(Page.GENERATE_PACKAGE);
+        controller.getPageStack().clear();
+        controller.getPageStack().push(Page.GENERATE_PACKAGE);
         PackageGenerationViewImpl packageGenerationView = new PackageGenerationViewImpl(help);
         packageGenerationView.setHeaderView(headerView);
         factory.setPackageGenerationPresenter(new PackageGenerationPresenterImpl(packageGenerationView));

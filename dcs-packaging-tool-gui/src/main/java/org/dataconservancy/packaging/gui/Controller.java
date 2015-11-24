@@ -82,10 +82,7 @@ public class Controller {
     private Page currentPage;
     private Stack<Page> previousPages;
 
-    private Stack<Page> createNewPackagePagesStack;
-
-    private Stack<Page> openExistingPackagePagesStack;
-    private boolean createNewPackage;
+    private Stack<Page> pageStack;
 
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
     private final ConcurrentHashMap<Object, Semaphore> locks = new ConcurrentHashMap<>();
@@ -95,13 +92,11 @@ public class Controller {
         this.container = new BorderPane();
         container.getStyleClass().add(CssConstants.ROOT_CLASS);
         previousPages = new Stack<>();
-        createNewPackagePagesStack = new Stack<>();
-        openExistingPackagePagesStack = new Stack<>();
+        pageStack = new Stack<>();
         toolVersion = new ApplicationVersion();
         ipmRdfTransformService = new IpmRdfTransformService();
         packageStateFileChooser = new FileChooser();
         packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package State File (.zip)", packageStateFileExtension));
-        initiatePagesStacks();
     }
 
     public Factory getFactory() {
@@ -129,7 +124,7 @@ public class Controller {
     }
 
     public void startApp() {
-        defaultPackageGenerationParametersFilePath = factory.getConfiguration().resolveConfigurationFile(Configuration.ConfigFile.PKG_GEN_PARAMS);
+        defaultPackageGenerationParametersFilePath = Configuration.resolveConfigurationFile(Configuration.ConfigFile.PKG_GEN_PARAMS);
         showHome(true);
     }
 
@@ -139,10 +134,14 @@ public class Controller {
      * @param clear Set to true if the fields on the home page should be cleared, false if not.
      */
     public void showHome(boolean clear) {
+        initializePageStack();
+
         container.setTop((VBox) factory.getHeaderView());
         currentPage = Page.HOMEPAGE;
 
-        setPackageState(new PackageState(this.toolVersion));
+        packageState = new PackageState(this.toolVersion);
+        initializeDomainStoreAndServices();
+
         packageStateFile = null;
         packageStateFileChooser.setInitialFileName(packageStateFileExtension);
         packageTree = null;
@@ -156,20 +155,13 @@ public class Controller {
     }
 
     /**
-     * Initiates the page stacks so the application flows appropriately
+     * Initializes the page stack with the shared screens.
      */
-    private void initiatePagesStacks() {
-        createNewPackagePagesStack.clear();
-        createNewPackagePagesStack.add(Page.GENERATE_PACKAGE);
-        createNewPackagePagesStack.add(Page.EDIT_PACKAGE_CONTENTS);
-        createNewPackagePagesStack.add(Page.CREATE_NEW_PACKAGE);
-        createNewPackagePagesStack.add(Page.PACKAGE_METADATA);
-
-        openExistingPackagePagesStack.clear();
-        openExistingPackagePagesStack.add(Page.GENERATE_PACKAGE);
-        openExistingPackagePagesStack.add(Page.EDIT_PACKAGE_CONTENTS);
-        openExistingPackagePagesStack.add(Page.EXISTING_PACKAGE_METADATA);
-        openExistingPackagePagesStack.add(Page.OPEN_EXISTING_PACKAGE);
+    private void initializePageStack() {
+        pageStack.clear();
+        previousPages.clear();
+        pageStack.add(Page.GENERATE_PACKAGE);
+        pageStack.add(Page.EDIT_PACKAGE_CONTENTS);
     }
 
     /**
@@ -203,9 +195,9 @@ public class Controller {
     }
 
     /**
-     * Switch to creating package description.
+     * Show the create new package presenter
      */
-    public void showCreatePackageDescription() {
+    public void showCreateNewPackage() {
         show(factory.getCreateNewPackagePresenter());
     }
 
@@ -316,22 +308,15 @@ public class Controller {
     //Advances the application to the next page. Or redisplays the current page if it's the last page.
     public void goToNextPage() {
         previousPages.push(currentPage);
-        if (createNewPackage) {
-            currentPage = createNewPackagePagesStack.pop();
-        } else {
-            currentPage = openExistingPackagePagesStack.pop();
-        }
+        currentPage = pageStack.pop();
+
         showPage();
     }
 
     //Returns the application to the previous page
     public void goToPreviousPage() {
         if (previousPages != null && !previousPages.isEmpty()) {
-            if (createNewPackage) {
-                createNewPackagePagesStack.push(currentPage);
-            } else {
-                openExistingPackagePagesStack.push(currentPage);
-            }
+            pageStack.push(currentPage);
             currentPage = previousPages.pop();
             showPage();
         }
@@ -353,7 +338,7 @@ public class Controller {
                 showPackageMetadata(true);
                 break;
             case CREATE_NEW_PACKAGE:
-                showCreatePackageDescription();
+                showCreateNewPackage();
                 break;
             case EDIT_PACKAGE_CONTENTS:
                 showEditPackageContents();
@@ -389,7 +374,6 @@ public class Controller {
         }
     }
 
-
     public PackageState getPackageState() {
         return packageState;
     }
@@ -397,6 +381,7 @@ public class Controller {
     public void setPackageState(PackageState packageState) {
         this.packageState = packageState;
         initializeDomainStoreAndServices();
+        initializeEditPackagePageStack();
     }
 
     public PackageToolPopup getCrossPageProgressIndicatorPopUp() {
@@ -424,16 +409,16 @@ public class Controller {
     }
 
     public void setCreateNewPackage(boolean createNewPackage) {
-        this.createNewPackage = createNewPackage;
+        if (createNewPackage) {
+            initializeCreateNewPackagePageStack();
+        } else {
+            pageStack.add(Page.OPEN_EXISTING_PACKAGE);
+        }
     }
 
     // Only used for tests so each test's continue button can be tested.
-    public Stack<Page> getCreateNewPackagePagesStack() {
-        return createNewPackagePagesStack;
-    }
-
-    public Stack<Page> getOpenExistingPackagePagesStack() {
-        return openExistingPackagePagesStack;
+    public Stack<Page> getPageStack() {
+        return pageStack;
     }
 
     public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer){
@@ -468,6 +453,35 @@ public class Controller {
         }
 
         domainProfileService = new DomainProfileServiceImpl(store, uriGenerator);
+    }
+
+    /*
+     * If we're creating a new package we add the metadata screen and the new package content screen to the stack.
+     */
+    private void initializeCreateNewPackagePageStack() {
+        pageStack.add(Page.CREATE_NEW_PACKAGE);
+        pageStack.add(Page.PACKAGE_METADATA);
+    }
+
+    /*
+     * If we're opening a package or state we add the metadata screen. If the tree hasn't been created in the state we add that screen as well.
+     */
+    private void initializeEditPackagePageStack() {
+        //First we reset any previously loaded edit pages.
+        //This can occur if the user selects a state file and then returns to select another one
+        if (pageStack.peek() == Page.EXISTING_PACKAGE_METADATA) {
+            pageStack.pop();
+        }
+
+        if (pageStack.peek() == Page.CREATE_NEW_PACKAGE) {
+            pageStack.pop();
+        }
+
+        //Then add the new pages based on how complete the state file is.
+        if (packageState.getPackageTree() == null) {
+            pageStack.add(Page.CREATE_NEW_PACKAGE);
+        }
+        pageStack.add(Page.EXISTING_PACKAGE_METADATA);
     }
 
     public DomainProfileService getDomainProfileService() {

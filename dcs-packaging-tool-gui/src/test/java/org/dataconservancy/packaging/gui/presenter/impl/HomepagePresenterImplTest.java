@@ -18,13 +18,9 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.view.HeaderView;
-import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
-import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl;
-import org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,23 +40,16 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
     private HomepageViewImpl view;
 
     private boolean showNextPage;
-    private Controller controller;
-    private HeaderView header;
 
 
     @Before
     public void setup() throws InterruptedException, IOException {
         showNextPage = false;
 
-        controller = new Controller() {
+        Controller controller = new Controller() {
 
             @Override
-            public void showCreatePackageDescription() {
-                showNextPage = true;
-            }
-
-            @Override
-            public void showOpenExistingPackage() {
+            public void goToNextPage() {
                 showNextPage = true;
             }
         };
@@ -70,13 +59,11 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
         factory.setController(controller);
 
         view = new HomepageViewImpl(help);
-        header = new HeaderViewImpl();
+        HeaderView header = new HeaderViewImpl();
         view.setHeaderView(header);
         presenter = new HomepagePresenterImpl(view);
 
         presenter.setController(controller);
-
-
     }
 
 
@@ -89,18 +76,11 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
     }
 
     /**
-     * Tests that hitting continue without a package name displays an error message.
+     * Tests that hitting create a new package goes to the next page
      */
     @Test
     public void testContinueToCreateNewPackage() {
         assertFalse(showNextPage);
-
-        // Setup controller to handle going to the next page.
-        controller.getCreateNewPackagePagesStack().clear();
-        controller.getCreateNewPackagePagesStack().push(Page.CREATE_NEW_PACKAGE);
-        CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(help);
-        createNewPackageView.setHeaderView(header);
-        factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
 
         view.getCreateNewPackageButton().fire();
         assertTrue(showNextPage);
@@ -114,13 +94,6 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
     @Test
     public void testContinueToOpenExistingPackage() {
         assertFalse(showNextPage);
-
-        // Setup controller to handle going to the next page.
-        controller.getOpenExistingPackagePagesStack().clear();
-        controller.getOpenExistingPackagePagesStack().push(Page.OPEN_EXISTING_PACKAGE);
-        OpenExistingPackageView openExistingPackageView = new OpenExistingPackageViewImpl(help);
-        openExistingPackageView.setHeaderView(header);
-        factory.setOpenExistingPackagePresenter(new OpenExistingPackagePresenterImpl(openExistingPackageView));
 
         view.getOpenExistingPackageButton().fire();
         assertTrue(showNextPage);

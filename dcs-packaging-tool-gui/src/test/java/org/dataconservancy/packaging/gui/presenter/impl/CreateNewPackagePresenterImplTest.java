@@ -145,8 +145,8 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
 
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);
-            controller.getCreateNewPackagePagesStack().clear();
-            controller.getCreateNewPackagePagesStack().push(Page.EDIT_PACKAGE_CONTENTS);
+            controller.getPageStack().clear();
+            controller.getPageStack().push(Page.EDIT_PACKAGE_CONTENTS);
             editPackageContentsView.setHeaderView(header);
 
             initialized = true;
@@ -244,7 +244,8 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                     assertFalse(showNextPage);
                     view.getContinueButton().fire();
                 } catch (Exception e) {
-
+                    //This should happen in the test
+                    System.err.print(e.getMessage());
                 }
             }
         }

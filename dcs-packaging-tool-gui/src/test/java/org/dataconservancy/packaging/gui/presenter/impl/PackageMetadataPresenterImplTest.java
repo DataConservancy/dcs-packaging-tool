@@ -75,7 +75,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             Controller controller = new Controller() {
 
                 @Override
-                public void showCreatePackageDescription() {
+                public void showCreateNewPackage() {
                     showNextPage = true;
                 }
             };
@@ -108,8 +108,8 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             presenter.setDomainProfileStore(domainProfileStore);
             // Setup controller to handle going to the next page.
             controller.setCreateNewPackage(true);
-            controller.getCreateNewPackagePagesStack().clear();
-            controller.getCreateNewPackagePagesStack().push(Page.CREATE_NEW_PACKAGE);
+            controller.getPageStack().clear();
+            controller.getPageStack().push(Page.CREATE_NEW_PACKAGE);
             CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(help);
             createNewPackageView.setHeaderView(header);
             factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
