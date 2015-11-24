@@ -15,6 +15,12 @@
  */
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.ARCHIVING_FORMAT;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.COMPRESSION_FORMAT;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_LOCATION;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.REM_SERIALIZATION_FORMAT;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.*;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.XML;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -26,16 +32,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.net.URISyntaxException;
 
+import javafx.scene.control.Toggle;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
@@ -48,7 +52,6 @@ import org.dataconservancy.packaging.tool.model.*;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -142,8 +145,8 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         assertTrue(params.getParam(GeneralParameterNames.ARCHIVING_FORMAT).contains(archiveChoice));
         assertEquals(1, params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).size());
         assertTrue(params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).contains(compressionChoice));
-        assertEquals(1, params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).size());
-        assertEquals(params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).get(0), serializationChoice);
+        assertEquals(1, params.getParam(REM_SERIALIZATION_FORMAT).size());
+        assertEquals(params.getParam(REM_SERIALIZATION_FORMAT).get(0), serializationChoice);
         System.out.println("test");
     }
 
@@ -246,8 +249,8 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         pkgParams.addParam(GeneralParameterNames.PACKAGE_NAME, controller.getPackageState().getPackageName());
         pkgParams.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "tar");
         pkgParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, "gz");
-        pkgParams.addParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, "xml");
-        pkgParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation.getAbsolutePath());
+        pkgParams.addParam(REM_SERIALIZATION_FORMAT, "xml");
+        pkgParams.addParam(PACKAGE_LOCATION, packageLocation.getAbsolutePath());
 
         presenter.setTestBackgroundService();
 
@@ -286,6 +289,122 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         }
     }
 
+    /**
+     * <p>
+     * Tests the side affects of selecting toggles and firing buttons.  Essentially this test is about testing the
+     * event handlers attached to various UI elements.
+     * </p>
+     * <p>
+     * PackageGenerationPresenterImpl is full of event handlers that manipulate the state of its components, notably
+     * PackageGenerationParameters.  There was a bug where the user selected an output directory for an exploded
+     * archive, resulting in erronous information being written to the PackageGenerationParameters by an event handler.
+     * This test ensures this specific bug won't resurface, while also somewhat lazily testing the side effects of other
+     * event handlers on the PackageGenerationParameters.
+     * </p>
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testExplodedPackageGeneration() throws IOException, InterruptedException, ParametersBuildException {
 
+        // simulates the output directory selected by a user when serializing the package.
+        outputDirectory = tmpfolder.newFolder();
 
+        // Mock the PackageGenerationParametersBuilder to return 'pkgParams', so we can test the contents of the
+        // parameters after we invoke the test methods on the presenter.
+        PackageGenerationParametersBuilder mockParamsBuilder = mock(PackageGenerationParametersBuilder.class);
+        final PackageGenerationParameters pkgParams = new PackageGenerationParameters();
+        pkgParams.addParam(GeneralParameterNames.PACKAGE_NAME, controller.getPackageState().getPackageName());
+        when(mockParamsBuilder.buildParameters(any(InputStream.class))).thenAnswer(invocationOnMock -> pkgParams);
+
+        // Mock the PackageGenerationService to do nothing.
+        PackageGenerationService mockGenerationSvc = mock(PackageGenerationService.class);
+
+        // Update the Controller mock to return an non-null File
+        when(controller.showOpenDirectoryDialog(any())).thenReturn(outputDirectory);
+
+        presenter.setTestBackgroundService();
+        presenter.setPackageGenerationService(mockGenerationSvc);
+        presenter.setPackageGenerationParametersBuilder(mockParamsBuilder);
+
+        presenter.display();
+
+        // Compression: None
+        view.getCompressionToggleGroup().selectToggle(presenter.getNoCompressionToggle());
+
+        // Archive: Exploded
+        view.getArchiveToggleGroup().selectToggle(presenter.getExplodedArchiveToggle());
+
+        // Serialization: XML
+        view.getSerializationToggleGroup().selectToggle(presenter.getSerializationToggle(XML));
+
+        // Select the output directory ('outputDirectory' above)
+        view.getSelectOutputDirectoryButton().fire();
+        view.getContinueButton().fire();
+
+        assertFalse(view.getErrorLabel().isVisible());
+
+        verify(controller).showOpenDirectoryDialog(any(DirectoryChooser.class));
+        verify(mockGenerationSvc).generatePackage(any(PackageState.class), any(PackageGenerationParameters.class));
+        verify(mockParamsBuilder).buildParameters(any(InputStream.class));
+
+        assertNotNull(pkgParams.getParam(REM_SERIALIZATION_FORMAT, 0));
+        assertEquals(XML.name(), pkgParams.getParam(REM_SERIALIZATION_FORMAT, 0));
+
+        assertNotNull(pkgParams.getParam(ARCHIVING_FORMAT, 0));
+        assertEquals("exploded", pkgParams.getParam(ARCHIVING_FORMAT, 0));
+
+        // Setting the compression format to "none" results in the param being removed altogether.
+        assertNull(pkgParams.getParam(COMPRESSION_FORMAT, 0));
+
+        // This was the specific bug: the PACKAGE_LOCATION was getting written twice, so it had two values.  The
+        // first value was incorrect, but the second value was correct.  the Assembler would look at the first value
+        // only, and output the package to the incorrect location.  So we make sure that there is only one package
+        // location specified, and that it's the expected location.
+        assertNotNull(pkgParams.getParam(PACKAGE_LOCATION, 0));
+        assertEquals(1, pkgParams.getParam(PACKAGE_LOCATION).size());
+        assertEquals(outputDirectory.getAbsolutePath(), pkgParams.getParam(PACKAGE_LOCATION, 0));
+    }
+
+    /**
+     * Ensures that the Toggle representing 'no compression' is available.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetNoCompressionToggle() throws Exception {
+        Toggle noCompressionToggle = presenter.getNoCompressionToggle();
+        assertNotNull(noCompressionToggle);
+        assertEquals("", noCompressionToggle.getUserData().toString());
+    }
+
+    /**
+     * Ensures that the Toggle representing an 'exploded' archive is available.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetExplodedArchiveToggle() throws Exception {
+        Toggle t = presenter.getExplodedArchiveToggle();
+        assertNotNull(t);
+        assertEquals("exploded", t.getUserData());
+    }
+
+    /**
+     * Ensures that every SERIALIZATION_FORMAT is available as a Toggle.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetSerializationToggle() throws Exception {
+        int found = 0;
+        for (GeneralParameterNames.SERIALIZATION_FORMAT format : values()) {
+            Toggle t = presenter.getSerializationToggle(format);
+            assertNotNull(t);
+            assertEquals(format.name(), t.getUserData().toString());
+            found++;
+        }
+
+        assertEquals(values().length, found);
+    }
 }

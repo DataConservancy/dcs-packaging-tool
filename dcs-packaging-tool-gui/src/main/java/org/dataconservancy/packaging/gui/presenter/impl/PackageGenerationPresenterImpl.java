@@ -561,7 +561,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
      *
      * @return toggle
      */
-    private Toggle getNoCompressionToggle() {
+    Toggle getNoCompressionToggle() {
         List<Toggle> compressionToggles = view.getCompressionToggleGroup().getToggles();
         for (Toggle toggle : compressionToggles) {
             String compressionExtension = (String) toggle.getUserData();
@@ -569,6 +569,38 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 return toggle;
             }
         }
+        return null;
+    }
+
+    /**
+     * Returns the Toggle for specifying "exploded" bag serializations (as opposed to an archived form like tar or zip)
+     *
+     * @return the toggle, or {@code null} if it is not found.
+     */
+    Toggle getExplodedArchiveToggle() {
+        List<Toggle> archiveToggles = view.getArchiveToggleGroup().getToggles();
+        for (Toggle toggle : archiveToggles) {
+            if ("exploded" == toggle.getUserData()) {
+                return toggle;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the Toggle for the specified serialization format.
+     *
+     * @param format the serialization format
+     * @return the toggle, or {@code null} if it is not found.
+     */
+    Toggle getSerializationToggle(GeneralParameterNames.SERIALIZATION_FORMAT format) {
+        List<Toggle> serializationToggles = view.getSerializationToggleGroup().getToggles();
+        for (Toggle t : serializationToggles) {
+            if (format.name().equals(t.getUserData().toString())) {
+                return t;
+            }
+        }
+
         return null;
     }
 
