@@ -62,8 +62,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
     private EditPackageContentsPresenterImpl presenter;
     private EditPackageContentsViewImpl view;
 
-    private boolean goToNextPage;
-
     @Autowired
     @Qualifier("profileService")
     private DomainProfileService profileService;
@@ -95,7 +93,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         dataFile = dataItem.getChildren().get(0);
 
         project.walk(domainProfileObjectStore::updateObject);
-        goToNextPage = false;
 
         Configuration configuration = new Configuration();
 
@@ -113,11 +110,6 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }
-
-            @Override
-            public void showGeneratePackage() {
-                goToNextPage = true;
             }
 
             @Override

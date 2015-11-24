@@ -70,50 +70,42 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
     @Before
     public void setup() throws IOException {
-            showNextPage = false;
+        showNextPage = false;
 
-            Controller controller = new Controller() {
+        Controller controller = new Controller() {
 
-                @Override
-                public void showCreateNewPackage() {
-                    showNextPage = true;
-                }
-            };
-            controller.setFactory(factory);
-            controller.setPackageState(new PackageState());
+            @Override
+            public void goToNextPage() {
+                showNextPage = true;
+            }
+        };
+        controller.setFactory(factory);
+        controller.setPackageState(new PackageState());
 
-            factory.setController(controller);
+        factory.setController(controller);
 
-            DomainProfileStore domainProfileStore = new DomainProfileStoreJenaImpl(){
+        DomainProfileStore domainProfileStore = new DomainProfileStoreJenaImpl(){
 
-              @Override
-              public List<DomainProfile> getPrimaryDomainProfiles(){
-                  List<DomainProfile> domainProfileList= new ArrayList<>();
-                  domainProfileList.add(new DcsBOProfile());
-                  return domainProfileList;
-              }
+          @Override
+          public List<DomainProfile> getPrimaryDomainProfiles(){
+              List<DomainProfile> domainProfileList= new ArrayList<>();
+              domainProfileList.add(new DcsBOProfile());
+              return domainProfileList;
+          }
 
-            };
+        };
 
-            view = new PackageMetadataViewImpl(help);
+        view = new PackageMetadataViewImpl(help);
 
-            HeaderView header = new HeaderViewImpl();
-            view.setHeaderView(header);
-            presenter = new PackageMetadataPresenterImpl(view);
+        HeaderView header = new HeaderViewImpl();
+        view.setHeaderView(header);
+        presenter = new PackageMetadataPresenterImpl(view);
 
-            presenter.setController(controller);
+        presenter.setController(controller);
 
-            service = new PackageMetadataService(configuration);
-            presenter.setPackageMetadataService(service);
-            presenter.setDomainProfileStore(domainProfileStore);
-            // Setup controller to handle going to the next page.
-            controller.setCreateNewPackage(true);
-            controller.getPageStack().clear();
-            controller.getPageStack().push(Page.CREATE_NEW_PACKAGE);
-            CreateNewPackageViewImpl createNewPackageView = new CreateNewPackageViewImpl(help);
-            createNewPackageView.setHeaderView(header);
-            factory.setCreateNewPackagePresenter(new CreateNewPackagePresenterImpl(createNewPackageView));
-
+        service = new PackageMetadataService(configuration);
+        presenter.setPackageMetadataService(service);
+        presenter.setDomainProfileStore(domainProfileStore);
     }
 
 
@@ -143,25 +135,6 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
         view.getContinueButton().fire();
         assertFalse(showNextPage);
         assertTrue(view.getErrorLabel().getText().length() > 0);
-    }
-
-    /**
-     * Tests that hitting continue without a domain profile displays an error message.
-     */
-    @Ignore //domain profile is never null now, pulldown menu has a default value
-    @Test
-    public void testContinueWithoutDomainProfile() {
-        presenter.display();
-
-        view.getPackageNameField().setText("Some name");
-        for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
-            view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> ((TextField) node).setText("Some Text"));
-        }
-
-        assertEquals(0, view.getErrorLabel().getText().length());
-        assertFalse(showNextPage);
-        view.getContinueButton().fire();
-        assertFalse(showNextPage);
     }
 
     /**

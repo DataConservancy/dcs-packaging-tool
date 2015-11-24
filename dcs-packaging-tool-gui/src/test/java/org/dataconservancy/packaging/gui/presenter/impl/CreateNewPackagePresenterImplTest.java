@@ -20,7 +20,6 @@ import javafx.application.Platform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
-import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
@@ -65,7 +64,6 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
     private CreateNewPackageView view;
 
     private boolean showDirectoryDialog;
-    private boolean showFileDialog;
     private File chosenFile;
     
     private boolean showNextPage;
@@ -87,17 +85,11 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
 
             showDirectoryDialog = false;
             showNextPage = false;
-            showFileDialog = false;
             chosenFile = null;
             chosenDirectory = null;
 
             HeaderView header = new HeaderViewImpl();
 
-            // Setup next page
-            EditPackageContentsView editPackageContentsView = new EditPackageContentsViewImpl(internalProperties, help);
-            editPackageContentsView.setHeaderView(header);
-            EditPackageContentsPresenterImpl packageDescriptionPresenter = new EditPackageContentsPresenterImpl(editPackageContentsView);
-            factory.setEditPackageContentsPresenter(packageDescriptionPresenter);
             packageState = new PackageState();
 
             Controller controller = new Controller() {
@@ -110,12 +102,11 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
 
                 @Override
                 public File showOpenFileDialog(FileChooser chooser) {
-                    showFileDialog = true;
                     return chosenFile;
                 }
 
                 @Override
-                public void showEditPackageContents() {
+                public void goToNextPage() {
                     showNextPage = true;
                 }
 
@@ -143,11 +134,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             when(ipmService.createTreeFromFileSystem(any(Path.class))).thenReturn(root);
             presenter.setIpmService(ipmService);
 
-            // Setup controller to handle going to the next page.
-            controller.setCreateNewPackage(true);
-            controller.getPageStack().clear();
-            controller.getPageStack().push(Page.EDIT_PACKAGE_CONTENTS);
-            editPackageContentsView.setHeaderView(header);
+
 
             initialized = true;
         }

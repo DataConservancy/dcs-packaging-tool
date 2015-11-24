@@ -185,30 +185,6 @@ public class Controller {
     }
 
     /**
-     * Switch to package metadata
-     */
-    private void showPackageMetadata(boolean existing) {
-        show(factory.getPackageMetadataPresenter());
-        if (existing) {
-            factory.getPackageMetadataPresenter().setExistingValues();
-        }
-    }
-
-    /**
-     * Show the create new package presenter
-     */
-    public void showCreateNewPackage() {
-        show(factory.getCreateNewPackagePresenter());
-    }
-
-    /**
-     * Switch to the screen for selecting a package directory.
-     */
-    public void showOpenExistingPackage() {
-        show(factory.getOpenExistingPackagePresenter());
-    }
-
-    /**
      * @return container node of controller
      */
     public Parent asParent() {
@@ -222,14 +198,6 @@ public class Controller {
      */
     private void show(Presenter presenter) {
         container.setCenter(presenter.display());
-    }
-
-    public void showGeneratePackage() {
-        show(factory.getPackageGenerationPresenter());
-    }
-
-    public void showEditPackageContents() {
-        show(factory.getEditPackageContentsPresenter());
     }
 
     /**
@@ -332,22 +300,19 @@ public class Controller {
                 showHomepage();
                 break;
             case PACKAGE_METADATA:
-                showPackageMetadata(false);
-                break;
-            case EXISTING_PACKAGE_METADATA:
-                showPackageMetadata(true);
+                show(factory.getPackageMetadataPresenter());
                 break;
             case CREATE_NEW_PACKAGE:
-                showCreateNewPackage();
+                show(factory.getCreateNewPackagePresenter());
                 break;
             case EDIT_PACKAGE_CONTENTS:
-                showEditPackageContents();
+                show(factory.getEditPackageContentsPresenter());
                 break;
             case GENERATE_PACKAGE:
-                showGeneratePackage();
+                show(factory.getPackageGenerationPresenter());
                 break;
             case OPEN_EXISTING_PACKAGE:
-                showOpenExistingPackage();
+                show(factory.getOpenExistingPackagePresenter());
                 break;
             default:
                 //There is no next page do nothing
@@ -469,19 +434,21 @@ public class Controller {
     private void initializeEditPackagePageStack() {
         //First we reset any previously loaded edit pages.
         //This can occur if the user selects a state file and then returns to select another one
-        if (pageStack.peek() == Page.EXISTING_PACKAGE_METADATA) {
-            pageStack.pop();
-        }
+        if (!pageStack.empty()) {
+            if (pageStack.peek() == Page.PACKAGE_METADATA) {
+                pageStack.pop();
+            }
 
-        if (pageStack.peek() == Page.CREATE_NEW_PACKAGE) {
-            pageStack.pop();
+            if (pageStack.peek() == Page.CREATE_NEW_PACKAGE) {
+                pageStack.pop();
+            }
         }
 
         //Then add the new pages based on how complete the state file is.
         if (packageState.getPackageTree() == null) {
             pageStack.add(Page.CREATE_NEW_PACKAGE);
         }
-        pageStack.add(Page.EXISTING_PACKAGE_METADATA);
+        pageStack.add(Page.PACKAGE_METADATA);
     }
 
     public DomainProfileService getDomainProfileService() {

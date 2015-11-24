@@ -22,6 +22,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.dcs.util.DateUtility;
+import org.dataconservancy.dcs.util.Util;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
@@ -69,22 +70,28 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         // TODO: Must move bind() to constructor which will require putting domainProfileStore as constructor arg.
         bind();
 
+        setExistingValues();
+
         //If we navigate back to the package metadata screen after creating a tree we need to disable profile selection
         if (controller.getPackageTree() != null) {
             view.getDomainProfilesComboBox().setDisable(true);
         }
-        
         return view.asNode();
     }
 
-    @Override
-    public void setExistingValues() {
+    private void setExistingValues() {
         if (getController().getPackageState().hasPackageMetadataValues()) {
             view.clearAllFields();
 
-            view.getPackageNameField().setText(getController().getPackageState().getPackageName());
-            view.getDomainProfilesComboBox().setValue(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
-            view.getDomainProfilesComboBox().setDisable(true);
+            if (!Util.isEmptyOrNull(getController().getPackageState().getPackageName())) {
+                view.getPackageNameField().setText(getController().getPackageState().getPackageName());
+            }
+
+            if (getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE) != null &&
+                !getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).isEmpty() &&
+                !Util.isEmptyOrNull(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0))) {
+                view.getDomainProfilesComboBox().setValue(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
+            }
 
             view.getAllDynamicFields().stream().filter(node ->
                                                            getController().getPackageState().getPackageMetadataValues(node.getId()) !=

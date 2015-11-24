@@ -30,11 +30,6 @@ public interface PackageMetadataPresenter extends Presenter {
     void setPackageMetadataService(PackageMetadataService packageMetadataService);
 
     /**
-     * Sets the existing values on the form's fields if they can be retrieved from the PackageState
-     */
-    void setExistingValues();
-
-    /**
      * Sets the DomainProfileStore to be used to retrieve the available DomainProfiles
      * @param domainProfileStore The domain profile store that will be used to retrieve the domain profiles.
      */
