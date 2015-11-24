@@ -406,7 +406,7 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getProjectNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        assertFalse(service.validateProperties(node, profile.getProjectNodeType()));
+        assertFalse(service.validateProperties(node, profile.getProjectNodeType()).isEmpty());
 
         Property title = new Property(profile.getHasTitle());
         title.setStringValue("title");
@@ -432,7 +432,7 @@ public class DcBoProfileServiceTest {
         hasPublisher.setStringValue("publisher");
         service.addProperty(node, hasPublisher);
 
-        assertTrue(service.validateProperties(node, profile.getProjectNodeType()));
+        assertTrue(service.validateProperties(node, profile.getProjectNodeType()).isEmpty());
     }
 
     /**
@@ -518,7 +518,7 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getCollectionNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
+        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()).isEmpty());
 
         Property title = new Property(profile.getHasTitle());
         title.setStringValue("title");
@@ -532,7 +532,7 @@ public class DcBoProfileServiceTest {
         createDate.setDateTimeValue(new DateTime());
         service.addProperty(node, createDate);
 
-        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()));
+        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()).isEmpty());
     }
 
     /**
@@ -544,7 +544,7 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getDataItemNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        assertFalse(service.validateProperties(node, profile.getDataItemNodeType()));
+        assertFalse(service.validateProperties(node, profile.getDataItemNodeType()).isEmpty());
 
         Property title = new Property(profile.getHasTitle());
         title.setStringValue("title");
@@ -562,7 +562,7 @@ public class DcBoProfileServiceTest {
         modifiedDate.setDateTimeValue(new DateTime());
         service.addProperty(node, modifiedDate);
 
-        assertTrue(service.validateProperties(node, profile.getDataItemNodeType()));
+        assertTrue(service.validateProperties(node, profile.getDataItemNodeType()).isEmpty());
     }
 
     /**
@@ -574,7 +574,7 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getFileNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        assertFalse(service.validateProperties(node, profile.getFileNodeType()));
+        assertFalse(service.validateProperties(node, profile.getFileNodeType()).isEmpty());
 
         Property title = new Property(profile.getHasTitle());
         title.setStringValue("title");
@@ -600,7 +600,7 @@ public class DcBoProfileServiceTest {
         size.setLongValue(1234L);
         service.addProperty(node, size);
 
-        assertTrue(service.validateProperties(node, profile.getFileNodeType()));
+        assertTrue(service.validateProperties(node, profile.getFileNodeType()).isEmpty());
     }
 
     /**
@@ -612,7 +612,7 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getMetadataNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        assertFalse(service.validateProperties(node, profile.getMetadataNodeType()));
+        assertFalse(service.validateProperties(node, profile.getMetadataNodeType()).isEmpty());
 
         Property title = new Property(profile.getHasTitle());
         title.setStringValue("title");
@@ -638,7 +638,7 @@ public class DcBoProfileServiceTest {
         size.setLongValue(1234L);
         service.addProperty(node, size);
 
-        assertTrue(service.validateProperties(node, profile.getMetadataNodeType()));
+        assertTrue(service.validateProperties(node, profile.getMetadataNodeType()).isEmpty());
     }
 
     /**
@@ -650,7 +650,7 @@ public class DcBoProfileServiceTest {
         node.setNodeType(profile.getCollectionNodeType());
         node.setDomainObject(URI.create("domain:object"));
 
-        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
+        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()).isEmpty());
 
         Property title = new Property(profile.getHasTitle());
         title.setStringValue("title");
@@ -664,7 +664,7 @@ public class DcBoProfileServiceTest {
         createDate.setDateTimeValue(new DateTime());
         service.addProperty(node, createDate);
 
-        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()));
+        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()).isEmpty());
 
         Property creator = new Property(profile.getHasCreator());
 
@@ -674,7 +674,7 @@ public class DcBoProfileServiceTest {
         creator.setComplexValue(Collections.singletonList(phone));
         service.addProperty(node, creator);
 
-        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()));
+        assertFalse(service.validateProperties(node, profile.getCollectionNodeType()).isEmpty());
 
         Property name = new Property(profile.getName());
         name.setStringValue("name");
@@ -685,7 +685,7 @@ public class DcBoProfileServiceTest {
         service.removeProperty(node, profile.getHasCreator());
         service.addProperty(node, creator);
 
-        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()));
+        assertTrue(service.validateProperties(node, profile.getCollectionNodeType()).isEmpty());
     }
 
     // Update objects and then validate the tree

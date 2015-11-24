@@ -245,7 +245,7 @@ public class DomainProfileServiceImplTest {
         node.setDomainObject(URI.create("domain:object"));
 
         // Missing species, title, and weight
-        assertFalse(service.validateProperties(node, profile.getCowNodeType()));
+        assertFalse(service.validateProperties(node, profile.getCowNodeType()).isEmpty());
 
         Property species = new Property(profile.getSpeciesPropertyType());
         species.setStringValue("robocow");
@@ -256,13 +256,13 @@ public class DomainProfileServiceImplTest {
         service.addProperty(node, title);
 
         // Missing weight
-        assertFalse(service.validateProperties(node, profile.getCowNodeType()));
+        assertFalse(service.validateProperties(node, profile.getCowNodeType()).isEmpty());
 
         Property weight = new Property(profile.getWeightPropertyType());
         weight.setLongValue(100);
         service.addProperty(node, weight);
 
-        assertTrue(service.validateProperties(node, profile.getCowNodeType()));
+        assertTrue(service.validateProperties(node, profile.getCowNodeType()).isEmpty());
     }
 
     /**
@@ -276,7 +276,7 @@ public class DomainProfileServiceImplTest {
         node.setDomainObject(URI.create("domain:object"));
 
         // Missing title and person
-        assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
+        assertFalse(service.validateProperties(node, profile.getFarmNodeType()).isEmpty());
 
         Property title = new Property(profile.getTitlePropertyType());
         title.setStringValue("Jim's farm.");
@@ -284,7 +284,7 @@ public class DomainProfileServiceImplTest {
         service.addProperty(node, title);
 
         // Missing person
-        assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
+        assertFalse(service.validateProperties(node, profile.getFarmNodeType()).isEmpty());
 
         Property person1 = new Property(profile.getFarmerPropertyType());
 
@@ -296,7 +296,7 @@ public class DomainProfileServiceImplTest {
         service.addProperty(node, person1);
 
         // Missing mbox on person1
-        assertFalse(service.validateProperties(node, profile.getFarmNodeType()));
+        assertFalse(service.validateProperties(node, profile.getFarmNodeType()).isEmpty());
 
         Property mbox1 = new Property(profile.getMboxPropertyType());
         mbox1.setStringValue("mooooo@moo");
@@ -307,7 +307,7 @@ public class DomainProfileServiceImplTest {
         service.removeProperty(node, profile.getFarmerPropertyType());
         service.addProperty(node, person1);
 
-        assertTrue(service.validateProperties(node, profile.getFarmNodeType()));
+        assertTrue(service.validateProperties(node, profile.getFarmNodeType()).isEmpty());
     }
 
     @Test

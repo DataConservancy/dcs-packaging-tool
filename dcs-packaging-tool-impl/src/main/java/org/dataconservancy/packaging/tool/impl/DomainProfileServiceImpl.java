@@ -75,7 +75,9 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     @Override
-    public boolean validateProperties(Node node, NodeType type) {
+    public List<PropertyConstraint> validateProperties(Node node, NodeType type) {
+        List<PropertyConstraint> constraintViolations = new ArrayList<>();
+
         if (node.getDomainObject() == null) {
             throw new IllegalArgumentException("Node does not have domain object.");
         }
@@ -86,15 +88,15 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             List<Property> vals = objstore.getProperties(node.getDomainObject(), prop_type);
 
             if (vals.size() < pc.getMinimum() || (pc.getMaximum() != -1 && vals.size() > pc.getMaximum())) {
-                return false;
+                constraintViolations.add(pc);
             }
 
             if (!validate_complex_property_cardinality(vals)) {
-                return false;
+                constraintViolations.add(pc);
             }
         }
 
-        return true;
+        return constraintViolations;
     }
 
     // Check cardinality of complex properties in list.

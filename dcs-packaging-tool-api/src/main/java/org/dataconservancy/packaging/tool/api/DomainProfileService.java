@@ -6,6 +6,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
@@ -74,9 +75,9 @@ public interface DomainProfileService {
      * @param type
      *            The type of node to get properties for or null for all node
      *            types.
-     * @return valid or invalid
+     * @return A list of the property constraints that are violated, or an empty list of the object is valid.
      */
-    boolean validateProperties(Node node, NodeType type);
+    List<PropertyConstraint> validateProperties(Node node, NodeType type);
 
     /**
      * Remove domain object associated with node. The node itself is not
