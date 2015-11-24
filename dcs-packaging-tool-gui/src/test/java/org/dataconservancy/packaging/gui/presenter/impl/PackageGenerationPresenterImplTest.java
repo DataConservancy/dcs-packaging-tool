@@ -143,7 +143,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         assertEquals(1, params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).size());
         assertTrue(params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).contains(compressionChoice));
         assertEquals(1, params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).size());
-        assertTrue(params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).contains(serializationChoice));
+        assertEquals(params.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).get(0), serializationChoice);
         System.out.println("test");
     }
 

@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -83,6 +84,7 @@ public class DomainObjectResourceBuilderTest {
                         .startsWith("file")));
 
         /* Should use PackageAssembler to reserve resources and rename URIs */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
 
         /* Now they should be file URIs */
@@ -119,6 +121,7 @@ public class DomainObjectResourceBuilderTest {
                 new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
 
@@ -154,6 +157,7 @@ public class DomainObjectResourceBuilderTest {
                 new DomainObjectResourceBuilder();
 
         /* This should work OK */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
         serializer.finish(state);
@@ -188,6 +192,7 @@ public class DomainObjectResourceBuilderTest {
                 new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
         serializer.finish(state);
@@ -263,6 +268,7 @@ public class DomainObjectResourceBuilderTest {
                 new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
         serializer.finish(state);
@@ -317,6 +323,7 @@ public class DomainObjectResourceBuilderTest {
                 new DomainObjectResourceBuilder();
 
         /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
         serializer.finish(state);
@@ -354,6 +361,7 @@ public class DomainObjectResourceBuilderTest {
         fileNode.setIgnored(true);
 
         /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
         serializer.finish(state);

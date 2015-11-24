@@ -235,7 +235,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             if (remSerializationToggle != null) {
 
                 //Set the parameter for compression format.
-                String serializationFormat = (String) remSerializationToggle.getUserData();
+                String serializationFormat = remSerializationToggle.getUserData().toString();
                 generationParams.removeParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT);
 
                 if (!serializationFormat.isEmpty()) {
@@ -448,7 +448,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         if (view.getSerializationToggleGroup().getSelectedToggle() != null) {
-            String oreReMSerializationFormat = (String) view.getSerializationToggleGroup().getSelectedToggle().getUserData();
+            String oreReMSerializationFormat = view.getSerializationToggleGroup().getSelectedToggle().getUserData().toString();
             if (!oreReMSerializationFormat.isEmpty()) {
                 generationParams.addParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, oreReMSerializationFormat);
             }

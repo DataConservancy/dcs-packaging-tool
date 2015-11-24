@@ -34,6 +34,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.ResourceUtils;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
@@ -41,6 +42,7 @@ import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
 import static org.dataconservancy.packaging.tool.impl.generator.IPMUtil.path;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.bare;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.determineSerialization;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputStream;
 
@@ -113,7 +115,11 @@ class DomainObjectResourceBuilder
 
                     /* This is where the domain object will be serialized */
                     node.setIdentifier(state.assembler
-                            .reserveResource(path(node, ".ttl"),
+                            .reserveResource(path(node,
+                                    "." + determineSerialization(state.params, RDFFormat.TURTLE_PRETTY)
+                                            .getLang()
+                                            .getFileExtensions()
+                                            .get(0)),
                                              PackageResourceType.DATA));
 
                     URI newDomainObjectURI = node.getIdentifier();
@@ -211,7 +217,7 @@ class DomainObjectResourceBuilder
         }
 
         try (InputStream stream =
-                toInputStream(domainObjectGraph, RDFFormat.TURTLE)) {
+                toInputStream(domainObjectGraph, determineSerialization(state.params, RDFFormat.TURTLE))) {
             state.assembler.putResource(node.getIdentifier(), stream);
         } catch (Exception e) {
             throw new RuntimeException(e);

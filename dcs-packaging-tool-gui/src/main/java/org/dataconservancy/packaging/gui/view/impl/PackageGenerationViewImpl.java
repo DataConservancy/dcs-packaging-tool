@@ -43,6 +43,8 @@ import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,19 +216,19 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         jsonRadioButton = new RadioButton(TextFactory.getText(LabelKey.JSON_BUTTON));
         jsonRadioButton.setToggleGroup(serializationToggleGroup);
-        jsonRadioButton.setUserData("json");
+        jsonRadioButton.setUserData(GeneralParameterNames.SERIALIZATION_FORMAT.JSONLD);
         jsonRadioButton.setSelected(true);
         serializationOptions.getChildren().add(jsonRadioButton);
 
         xmlRadioButton = new RadioButton(TextFactory.getText(LabelKey.XML_BUTTON));
         xmlRadioButton.setToggleGroup(serializationToggleGroup);
-        xmlRadioButton.setUserData("xml");
+        xmlRadioButton.setUserData(GeneralParameterNames.SERIALIZATION_FORMAT.XML);
         xmlRadioButton.setSelected(false);
         serializationOptions.getChildren().add(xmlRadioButton);
 
         turtleRadioButton = new RadioButton(TextFactory.getText(LabelKey.TURTLE_BUTTON));
         turtleRadioButton.setToggleGroup(serializationToggleGroup);
-        turtleRadioButton.setUserData("turtle");
+        turtleRadioButton.setUserData(GeneralParameterNames.SERIALIZATION_FORMAT.TURTLE);
         turtleRadioButton.setSelected(false);
         serializationOptions.getChildren().add(turtleRadioButton);
 
@@ -485,7 +487,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         contentScrollPane.setVvalue(0);
     }
 
-    public void loadAvailableProjects(String availableProjectsFilePath) {
+ /*   public void loadAvailableProjects(String availableProjectsFilePath) {
         List<String> projects = new ArrayList<>();
         try {
             InputStream fileStream;
@@ -514,5 +516,5 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
             log.error("Error loading available projects.");
         }
 
-    }
+    }*/
 }

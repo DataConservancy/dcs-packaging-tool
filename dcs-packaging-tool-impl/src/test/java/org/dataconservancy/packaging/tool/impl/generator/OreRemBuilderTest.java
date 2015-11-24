@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,6 +80,7 @@ public class OreRemBuilderTest {
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
         state.manifest = ModelFactory.createDefaultModel();
         state.tree = root;
+        state.params = new PackageGenerationParameters();
 
         serializer.init(state);
         root.walk(node -> {
@@ -129,6 +131,7 @@ public class OreRemBuilderTest {
         state.assembler = new FunctionalAssemblerMock(folder.getRoot());
         state.manifest = ModelFactory.createDefaultModel();
         state.tree = root;
+        state.params = new PackageGenerationParameters();
 
         serializer.init(state);
         root.walk(node -> {

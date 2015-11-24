@@ -23,7 +23,14 @@ public class GeneralParameterNames {
 	public static final String PACKAGE_NAME = "Package-Name";
 	public static final String CHECKSUM_ALGORITHMS = "Checksum-Algs";
 	public static final String COMPRESSION_FORMAT = "Compression-Format";
-	public static final String REM_SERIALIZATION_FORMAT = "ReM-Serialization-Format";
+
+    /**
+     * Parameter identifying the format used to serialized RDF-based resources in
+     * the package.  Possible values are contained in {@code GeneralParameterNames#SERIALIZATION_FORMAT}.
+     * The parameter name is a bit of a misnomer, because it is consulted when
+     * serializing <em>all</em> RDF-based resources, not just the ORE-ReM.
+     */
+    public static final String REM_SERIALIZATION_FORMAT = "ReM-Serialization-Format";
 	public static final String ARCHIVING_FORMAT = "Archiving-Format";
     public static final String EXTERNAL_PROJECT_ID = "External-Project-Id";
 	public static final String DOMAIN_PROFILE = "Domain-Profile";
@@ -37,4 +44,26 @@ public class GeneralParameterNames {
 	 * </p>
 	 */
 	public static final String VALIDATE_PACKAGE_DESCRIPTION = "Validate-Package-Description";
+
+    /**
+     * Possible values for the {@link #REM_SERIALIZATION_FORMAT} parameter. This is a list
+     * of supported serialization formats for RDF data (ORE-ReM, domain objects, etc)
+     * serialized to the package.
+     */
+	public enum SERIALIZATION_FORMAT {
+        /**
+         * Pretty-printed RDF/XML
+         */
+		XML,
+
+        /**
+         * Pretty-printed JSON-LD
+         */
+        JSONLD,
+
+        /**
+         * Pretty-printed Turtle
+         */
+        TURTLE
+	}
 }
