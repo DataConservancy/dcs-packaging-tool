@@ -155,6 +155,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
                 view.getOutputDirectoryChooser().setInitialDirectory(file.getAbsoluteFile());
                 //Set the package location parameter based on the new output directory.
                 packageLocation = file;
+                generationParams.removeParam(GeneralParameterNames.PACKAGE_LOCATION);
                 generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, file.getAbsolutePath());
                 view.getContinueButton().setDisable(false);
                 view.getCurrentOutputDirectoryTextField().setText(file.getAbsolutePath());
