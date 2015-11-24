@@ -34,6 +34,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.RDFWriter;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Selector;
 import org.apache.jena.rdf.model.SimpleSelector;
@@ -182,12 +183,23 @@ public class RdfUtil {
          */
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        RDFDataMgr.createGraphWriter(format).write(out,
-                                                   model.getGraph(),
-                                                   PrefixMapFactory
-                                                           .create(prefixes),
-                                                   null,
-                                                   null);
+
+        // In order to serialize RDF/XML that contains '<>' denoting
+        // a server-assigned resource URI, we have to configure the
+        // RDF writer specially, otherwise Jena will barf
+        if (format.toString().contains("XML")) {
+            RDFWriter writer = model.getWriter("RDF/XML-ABBREV");
+            writer.setProperty("relativeURIs", "same-document");
+            writer.setProperty("allowBadURIs", "true");
+            writer.write(model, out, null);
+        } else {
+            RDFDataMgr.createGraphWriter(format).write(out,
+                                                        model.getGraph(),
+                                                        PrefixMapFactory
+                                                                .create(prefixes),
+                                                        null,
+                                                        null);
+        }
 
         return new ByteArrayInputStream(out.toByteArray());
     }
