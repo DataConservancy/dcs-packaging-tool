@@ -207,18 +207,20 @@ public class OpenPackageServiceImpl implements OpenPackageService {
 
         try {
             root = ipm_transform_service.transformToNode(state.getPackageTree());
+
+            root.walk(n -> update_file_info(n, dir));
+
+            OpenedPackage result = new OpenedPackage();
+
+            result.setBaseDirectory(dir);
+            result.setPackageTree(root);
+            state.setPackageTree(ipm_transform_service.transformToRDF(root));
+            result.setPackageState(state);
+            
+            return result;
+        
         } catch (RDFTransformException e) {
             throw new IOException(e);
         }
-
-        root.walk(n -> update_file_info(n, dir));
-
-        OpenedPackage result = new OpenedPackage();
-
-        result.setBaseDirectory(dir);
-        result.setPackageTree(root);
-        result.setPackageState(state);
-
-        return result;
     }
 }
