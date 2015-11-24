@@ -55,7 +55,9 @@ public class OpenPackageServiceImplTest {
 
         fake_file_path = "data/test.txt";
 
-        FileInfo info = new FileInfo(UriUtility.makeBagUriString(new File(fake_file_path), null), "test.txt");
+        URI test_bag_uri = UriUtility.makeBagUriString(new File(new File("fakebag"), fake_file_path), null);
+        FileInfo info = new FileInfo(test_bag_uri, "test.txt");
+        
         fake_package_tree.setFileInfo(info);
         fakestate.setPackageTree(rdftrans.transformToRDF(fake_package_tree));
 

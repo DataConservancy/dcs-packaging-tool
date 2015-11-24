@@ -179,9 +179,12 @@ public class OpenPackageServiceImpl implements OpenPackageService {
         }
     }
 
-    private void update_file_info(Node n, File baseDir) {
+    private void update_file_info(Node n, File base_dir) {
+        // base_dir path has package name as last element
+        File extract_dir = base_dir.getParentFile();
+        
         if (n.getFileInfo() != null && UriUtility.isBagUri(n.getFileInfo().getLocation())) {
-            Path resolvedPath = UriUtility.resolveBagUri(baseDir.toPath(), n.getFileInfo().getLocation());
+            Path resolvedPath = UriUtility.resolveBagUri(extract_dir.toPath(), n.getFileInfo().getLocation());
             n.getFileInfo().setLocation(resolvedPath.toUri());
         }
     }
@@ -207,18 +210,20 @@ public class OpenPackageServiceImpl implements OpenPackageService {
 
         try {
             root = ipm_transform_service.transformToNode(state.getPackageTree());
+
+            root.walk(n -> update_file_info(n, dir));
+
+            OpenedPackage result = new OpenedPackage();
+
+            result.setBaseDirectory(dir);
+            result.setPackageTree(root);
+            state.setPackageTree(ipm_transform_service.transformToRDF(root));
+            result.setPackageState(state);
+            
+            return result;
+        
         } catch (RDFTransformException e) {
             throw new IOException(e);
         }
-
-        root.walk(n -> update_file_info(n, dir));
-
-        OpenedPackage result = new OpenedPackage();
-
-        result.setBaseDirectory(dir);
-        result.setPackageTree(root);
-        result.setPackageState(state);
-
-        return result;
     }
 }

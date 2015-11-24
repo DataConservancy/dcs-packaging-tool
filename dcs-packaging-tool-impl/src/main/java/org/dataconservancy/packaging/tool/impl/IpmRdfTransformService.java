@@ -247,7 +247,9 @@ public class IpmRdfTransformService implements PackageResourceMapConstants  {
         Resource fileInfoResource = model.createResource();
         fileInfoResource.addProperty(RDF.type, FILE_INFO_TYPE);
         fileInfoResource.addProperty(HAS_NAME, info.getName());
-        fileInfoResource.addProperty(HAS_LOCATION, info.getLocation().toString());
+        if (info.getLocation() != null) {
+            fileInfoResource.addProperty(HAS_LOCATION, info.getLocation().toString());
+        }
         fileInfoResource.addLiteral(HAS_SIZE, info.getSize());
         fileInfoResource.addLiteral(IS_BYTE_STREAM, info.isFile());
         fileInfoResource.addLiteral(IS_DIRECTORY, info.isDirectory());
