@@ -179,9 +179,12 @@ public class OpenPackageServiceImpl implements OpenPackageService {
         }
     }
 
-    private void update_file_info(Node n, File baseDir) {
+    private void update_file_info(Node n, File base_dir) {
+        // base_dir path has package name as last element
+        File extract_dir = base_dir.getParentFile();
+        
         if (n.getFileInfo() != null && UriUtility.isBagUri(n.getFileInfo().getLocation())) {
-            Path resolvedPath = UriUtility.resolveBagUri(baseDir.toPath(), n.getFileInfo().getLocation());
+            Path resolvedPath = UriUtility.resolveBagUri(extract_dir.toPath(), n.getFileInfo().getLocation());
             n.getFileInfo().setLocation(resolvedPath.toUri());
         }
     }
