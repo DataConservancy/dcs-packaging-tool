@@ -26,6 +26,7 @@ import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.determineSerialization;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputStream;
 
@@ -77,8 +78,10 @@ public class OreReMBuilder
 
     @Override
     public void finish(PackageModelBuilderState state) {
-        try (InputStream rem = toInputStream(state.manifest, RDFFormat.TURTLE)) {
-            state.assembler.createResource("ORE-REM.ttl",
+        RDFFormat serializationFormat = determineSerialization(state.params, RDFFormat.TURTLE_PRETTY);
+        String extension = serializationFormat.getLang().getFileExtensions().get(0);
+        try (InputStream rem = toInputStream(state.manifest, serializationFormat)) {
+            state.assembler.createResource("ORE-REM." + extension,
                                            PackageResourceType.ORE_REM,
                                            rem);
         } catch (Exception e) {
