@@ -225,7 +225,14 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     super.onContinuePressed();
                 }
             });
-            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, missingPropertyBuilder.toString()), false, false);
+
+            view.getWarningPopupNegativeButton().setOnAction(arg01 -> {
+                if (view.getWarningPopup() != null &&
+                    view.getWarningPopup().isShowing()) {
+                    view.getWarningPopup().hide();
+                }
+            });
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, missingPropertyBuilder.toString()), true, false);
             return;
         }
         //
