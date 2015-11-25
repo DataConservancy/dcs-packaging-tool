@@ -119,6 +119,19 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
             try {
+                StringBuilder missingPropertyBuilder = new StringBuilder();
+                validateNodeProperties(controller.getPackageTree(), missingPropertyBuilder);
+                if (missingPropertyBuilder.length() > 0) {
+                   view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                       if (view.getWarningPopup() != null &&
+                           view.getWarningPopup().isShowing()) {
+                           view.getWarningPopup().hide();
+                           super.onContinuePressed();
+                       }
+                   });
+                   view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, missingPropertyBuilder.toString()), false, false);
+                   return;
+                }
                 getController().savePackageStateFile();
             } catch (IOException | RDFTransformException e) {
                 view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
