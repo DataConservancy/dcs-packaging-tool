@@ -238,22 +238,21 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
             HBox hbox = new HBox(3);
 
-            ImageView exclamImage = new ImageView();
-            exclamImage.getStyleClass().add(EXCLAMATION_IMAGE);
-            exclamImage.setFitHeight(12);
-            exclamImage.setFitWidth(5);
+            ImageView exclaimImage = new ImageView("/images/orange_exclamation.png");
+            exclaimImage.setFitHeight(20);
+            exclaimImage.setFitWidth(5);
 
-            Label exclamLabel = new Label();
-            exclamLabel.setGraphic(exclamImage);
+            Label exclaimLabel = new Label();
+            exclaimLabel.setGraphic(exclaimImage);
 
-            Tooltip exclamTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
-            exclamTooltip.setPrefWidth(300);
-            exclamTooltip.setWrapText(true);
-            exclamTooltip.setFont(Font.font(12));
-            Tooltip.install(exclamLabel, exclamTooltip);
+            Tooltip exclaimTooltip = new Tooltip(TextFactory.getText(LabelKey.FILE_MISSING_TIP));
+            exclaimTooltip.setPrefWidth(300);
+            exclaimTooltip.setWrapText(true);
+            exclaimTooltip.setFont(Font.font(12));
+            Tooltip.install(exclaimLabel, exclaimTooltip);
 
             if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
-                hbox.getChildren().add(exclamLabel);
+                hbox.getChildren().add(exclaimLabel);
             }
 
             Label viewLabel = new Label();
@@ -399,6 +398,25 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         content.getChildren().add(artifactTree);
+
+        ImageView missingFileIndicator = new ImageView("/images/orange_exclamation.png");
+        missingFileIndicator.setFitHeight(20);
+        missingFileIndicator.setFitWidth(5);
+
+        ImageView missingPropertyIndicator = new ImageView("/images/red_exclamation.png");
+        missingPropertyIndicator.setFitHeight(20);
+        missingPropertyIndicator.setFitWidth(5);
+
+        VBox legend = new VBox(6);
+        Label missingFile = new Label(TextFactory.getText(LabelKey.MISSING_FILE_LEGEND));
+        missingFile.setGraphic(missingFileIndicator);
+        legend.getChildren().add(missingFile);
+
+        Label missingProperty = new Label(TextFactory.getText(LabelKey.MISSING_PROPERTY_LEGEND));
+        missingProperty.setGraphic(missingPropertyIndicator);
+        legend.getChildren().add(missingProperty);
+
+        content.getChildren().add(legend);
         VBox.setVgrow(artifactTree, Priority.ALWAYS);
 
         //Controls for the package artifact popup
@@ -542,7 +560,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 itemList.add(item);
 
                 if (!invalidProperties.isEmpty()) {
-                    ImageView invalidImage = new ImageView("/images/orange_exclamation.png");
+                    ImageView invalidImage = new ImageView("/images/yellow_exclamation.png");
                     invalidImage.setFitWidth(8);
                     invalidImage.setFitHeight(24);
                     item.setGraphic(invalidImage);

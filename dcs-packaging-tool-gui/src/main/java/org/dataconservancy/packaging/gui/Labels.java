@@ -132,7 +132,9 @@ public class Labels {
         OPTIONAL_PROPERTIES_LABEL("optionalproperties.label"),
         REQUIRED_PROPERTIES_LABEL("requiredproperties.label"),
         SELECT_STAGING_DIRECTORY("selectstagingdir.label"),
-        PROPERTY_MISSING_LABEL("propertymissing.label");
+        PROPERTY_MISSING_LABEL("propertymissing.label"),
+        MISSING_FILE_LEGEND("missingfilelegend.label"),
+        MISSING_PROPERTY_LEGEND("missingpropertylegend.label");
 
         private String property;
 

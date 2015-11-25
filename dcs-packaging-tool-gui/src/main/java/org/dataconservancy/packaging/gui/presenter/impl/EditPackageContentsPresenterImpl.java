@@ -256,7 +256,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             exclamImage.setFitWidth(5);
 
             Tooltip exclamTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.PROPERTY_MISSING_LABEL));
-              Tooltip.install(exclamImage, exclamTooltip);
+            Tooltip.install(exclamImage, exclamTooltip);
 
             invalidItem.setGraphic(exclamImage);
         }
