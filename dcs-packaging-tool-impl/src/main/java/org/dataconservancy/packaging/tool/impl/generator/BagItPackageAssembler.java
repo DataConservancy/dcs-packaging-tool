@@ -215,22 +215,25 @@ public class BagItPackageAssembler implements PackageAssembler {
             validateCompressionFormat();
         }
 
-        //Create a parent dir, must be in a user-controlled location. default will be set here as the users homeDir/packageStaging.
+        //we write out the package to a "staging" location, which is the same as the output location specified by the
+        //user in the case of an exploded package.
+        //So wreate a parent dir for staging - we choose tmp/DCS-PackageToolStaging for compressed packages
         //This can be overridden in the defaultGenerationParams file
         //This will help prevent deleting data if a user tries to create a package in place.
-        String packageStagingLocationName = System.getProperty("user.home") + File.separator + "DCS-PackageToolStaging";
+        String packageStagingLocationName;
         String packageStagingLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, 0);
         String packageLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
 
         if (isExploded) {
-            if (packageLocationParameterValue != null && !packageLocationParameterValue.isEmpty()) {
                 packageStagingLocationName = packageLocationParameterValue;
-            }
         } else {
             if (packageStagingLocationParameterValue != null && !packageStagingLocationParameterValue.isEmpty()) {
                 packageStagingLocationName = packageStagingLocationParameterValue;
+            } else {
+                packageStagingLocationName = System.getProperty("java.io.tmpdir") + File.separator + "DCS-PackageToolStaging";
             }
         }
+
         packageLocationDir = new File(packageStagingLocationName);
 
         //Creating base directory for the bag based on specified package name
