@@ -18,10 +18,14 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.ImageView;
+import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
+import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
@@ -36,6 +40,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
@@ -64,7 +69,7 @@ import java.util.prefs.Preferences;
  * Implementation for the presenter that displays the package description tree. Handles generation of the tree, changing types of artifacts,
  * sorting tree elements, validating the package description, and saving the changed package description. 
  */
-public class EditPackageContentsPresenterImpl extends BasePresenterImpl implements EditPackageContentsPresenter, PreferenceChangeListener {
+public class EditPackageContentsPresenterImpl extends BasePresenterImpl implements EditPackageContentsPresenter, PreferenceChangeListener, CssConstants {
 
     private EditPackageContentsView view;
     private IPMService ipmService;
@@ -185,7 +190,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             view.getArtifactDetailsWindow().hide();
         }
 
-        //Perform simple validation to make sure the package description is valid.
+        //Perform simple validation to make sure the tree structure is valid.
         if (!controller.getDomainProfileService().validateTree(controller.getPackageTree())) {
             view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
                 if (view.getWarningPopup() != null &&
@@ -193,10 +198,68 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     view.getWarningPopup().hide();
                 }
             });
-            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), "Tree was not valid", false, false);
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.getText(ErrorKey.INVALID_TREE_ERROR), false, false);
             return;
         }
+
+        StringBuilder missingPropertyBuilder = new StringBuilder();
+        validateNodeProperties(controller.getPackageTree(), missingPropertyBuilder);
+        if (missingPropertyBuilder.length() > 0) {
+            view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                if (view.getWarningPopup() != null &&
+                    view.getWarningPopup().isShowing()) {
+                    view.getWarningPopup().hide();
+                    super.onContinuePressed();
+                }
+            });
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, missingPropertyBuilder.toString()), false, false);
+            return;
+        }
+        //
         super.onContinuePressed();
+    }
+
+    /*
+     * Validates that all required properties are filled in for a given node.
+     */
+    private void validateNodeProperties(Node node, StringBuilder errBuilder) {
+        List<PropertyConstraint> violatedConstraints = controller.getDomainProfileService().validateProperties(node, node.getNodeType());
+        if (!violatedConstraints.isEmpty()) {
+            markNodeAsInvalid(node);
+
+            if (node.getFileInfo() != null) {
+                errBuilder.append(node.getFileInfo().getLocation().toString()).append("\n");
+            } else {
+                errBuilder.append(node.getIdentifier().toString()).append("\n");
+            }
+
+            for (PropertyConstraint violation : violatedConstraints) {
+                errBuilder.append("\t--").append(violation.getPropertyType().getLabel()).append("\n");
+            }
+
+            errBuilder.append("\n");
+        }
+
+        if (node.getChildren() != null) {
+            for (Node child : node.getChildren()) {
+                validateNodeProperties(child, errBuilder);
+            }
+        }
+    }
+
+    private void markNodeAsInvalid(Node node) {
+        TreeItem<Node> invalidItem = findItem(node);
+
+        if(invalidItem != null) {
+            ImageView exclamImage = new ImageView("/images/red_exclamation.png");
+            exclamImage.setFitHeight(20);
+            exclamImage.setFitWidth(5);
+
+            Tooltip exclamTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.PROPERTY_MISSING_LABEL));
+              Tooltip.install(exclamImage, exclamTooltip);
+
+            invalidItem.setGraphic(exclamImage);
+        }
     }
 
     @Override
@@ -213,7 +276,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     view.getWarningPopup().hide();
                 }
             });
-            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), "Tree was not valid", false, false);
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.getText(ErrorKey.INVALID_TREE_ERROR), false, false);
             return;
         }
         super.onBackPressed();
@@ -334,6 +397,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
             //apply metadata inheritance
             applyMetadataInheritance(view.getPopupNode());
+
+            StringBuilder missingPropertyBuilder = new StringBuilder();
+            validateNodeProperties(view.getPopupNode(), missingPropertyBuilder);
         }
     }
 
