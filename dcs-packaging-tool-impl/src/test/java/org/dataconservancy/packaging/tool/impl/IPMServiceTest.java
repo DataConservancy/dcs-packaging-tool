@@ -7,6 +7,7 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -102,6 +103,7 @@ public class IPMServiceTest {
      * @throws Exception
      */
     @Test
+    @Category(Privileged.class)
     public void symLinkCycleTest() throws Exception {
         File tempDir = tmpfolder.newFolder("moo");
 
@@ -133,6 +135,7 @@ public class IPMServiceTest {
      * @throws Exception
      */
     @Test
+    @Category(Privileged.class)
     public void validSymLinkToFileTest() throws Exception {
         File linkedFile = tmpfolder.newFile("linkedFile");
         File tempDir = tmpfolder.newFolder("validSymLinkToFileTest");
@@ -163,6 +166,7 @@ public class IPMServiceTest {
      * @throws Exception
      */
     @Test
+    @Category(Privileged.class)
     public void validSymLinkToDirectoryTest() throws Exception {
         File linkedDir = tmpfolder.newFolder("linkedDir");
         File linkedFileA = new File(linkedDir, "linkedFileA.txt");

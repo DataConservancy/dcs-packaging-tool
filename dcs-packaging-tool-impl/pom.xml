@@ -27,6 +27,26 @@
     <artifactId>dcs-packaging-tool</artifactId>
     <version>0.10.1-SNAPSHOT</version>
   </parent>
+  
+  <profiles>
+  
+    <!--  Excludes tests that could require escalated privileges on Windows hosts.  For example,
+          creating symbolic links is technically a privileged operation -->
+    <profile>
+      <id>unprivileged</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludedGroups>org.dataconservancy.packaging.tool.impl.Privileged</excludedGroups>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <!-- Build ====================================================== -->
   
