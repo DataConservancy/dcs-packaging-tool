@@ -58,7 +58,7 @@ public class DcBoProfileServiceTest {
         assertTrue(success);
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
-        assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
     }
 
     /**
@@ -83,7 +83,7 @@ public class DcBoProfileServiceTest {
         assertTrue(success);
         assertNotNull(root.getNodeType());
         assertNotNull(root.getDomainObject());
-        assertEquals(profile.getProjectNodeType().getIdentifier(), root.getNodeType().getIdentifier());
+        assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getNodeType().getIdentifier());
         assertEquals(profile.getCollectionNodeType().getIdentifier(), root.getChildren().get(0).getNodeType().getIdentifier());
 
         checkValidTree(root);
