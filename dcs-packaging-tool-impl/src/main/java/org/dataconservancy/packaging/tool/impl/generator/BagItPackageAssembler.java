@@ -216,8 +216,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //we write out the package to a "staging" location, which is the same as the output location specified by the
-        //user in the case of an exploded package.
-        //So wreate a parent dir for staging - we choose tmp/DCS-PackageToolStaging for compressed packages
+        //user in the case of an exploded package. For compressed bags we create a parent directory in the tmp directory
         //This can be overridden in the defaultGenerationParams file
         //This will help prevent deleting data if a user tries to create a package in place.
         String packageStagingLocationName;
