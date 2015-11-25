@@ -488,10 +488,6 @@
 	-fx-padding: 10 0 0 0;
 }
 
-.ExclamationImage {
-	-fx-image: url("../images/orange_exclamation.png");
-}
-
 .text-area .scroll-bar:vertical:disabled {
     -fx-opacity: 0;
 }

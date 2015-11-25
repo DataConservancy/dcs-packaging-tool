@@ -53,7 +53,6 @@ public interface CssConstants {
     String TRASH_IMAGE = "TrashImage";
     String TOOLTIP_IMAGE = "TooltipImage";
     String FORM_FIELDS_DIVISION_CLASS = "FormFieldsDivision";
-    String EXCLAMATION_IMAGE = "ExclamationImage";
     String INHERITANCE_CONTROLS = "InheritanceControls";
     String GROUP_TITLE = "GroupTitle";
     String PROPERTY = "Property";
