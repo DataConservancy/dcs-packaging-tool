@@ -83,6 +83,12 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>uk.com.robust-it</groupId>
+      <artifactId>cloning</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
   
 </project>
