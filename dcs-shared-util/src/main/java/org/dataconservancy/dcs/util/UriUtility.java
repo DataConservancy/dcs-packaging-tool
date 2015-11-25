@@ -125,10 +125,19 @@ public class UriUtility {
 
         String path = FilenameUtils.separatorsToUnix(relativePath.toString());
 
-        // Remove leading slashes from the path
-        path = path.replaceFirst("^\\/*", "");
+        Path forUri = Paths.get(path);
 
-        return new URI("bag", null, "//"+path, null);
+        if (forUri.getNameCount() > 1) {
+            Path uriAuthority = forUri.getName(0);
+            Path uriPath = forUri.subpath(1, forUri.getNameCount());
+            if (!uriPath.isAbsolute()) {
+                uriPath = Paths.get("/", uriPath.toString());
+            }
+
+            return new URI(BAG_URI_SCHEME, uriAuthority.toString(), uriPath.toString(), null, null);
+        }
+
+        return new URI(BAG_URI_SCHEME, forUri.toString(), null, null, null);
     }
 
     /**
