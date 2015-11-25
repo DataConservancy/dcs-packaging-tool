@@ -107,7 +107,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         preferences.addPreferenceChangeListener(this);
-        
+
+        validateNodeProperties(controller.getPackageTree(), new StringBuilder());
+
         return view.asNode();
     }
 
@@ -258,6 +260,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
             errBuilder.append("\n");
+        } else {
+            markNodeAsValid(node);
         }
 
         if (node.getChildren() != null) {
@@ -279,6 +283,14 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             Tooltip.install(exclamImage, exclamTooltip);
 
             invalidItem.setGraphic(exclamImage);
+        }
+    }
+
+    private void markNodeAsValid(Node node) {
+        TreeItem<Node> validItem = findItem(node);
+
+        if(validItem != null) {
+            validItem.setGraphic(null);
         }
     }
 
