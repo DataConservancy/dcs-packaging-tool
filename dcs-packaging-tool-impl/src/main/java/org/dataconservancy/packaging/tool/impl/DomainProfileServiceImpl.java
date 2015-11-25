@@ -78,24 +78,26 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     public List<PropertyConstraint> validateProperties(Node node, NodeType type) {
         List<PropertyConstraint> constraintViolations = new ArrayList<>();
 
-        if (node.getDomainObject() == null) {
-            throw new IllegalArgumentException("Node does not have domain object.");
-        }
-
-        for (PropertyConstraint pc : type.getPropertyConstraints()) {
-            PropertyType prop_type = pc.getPropertyType();
-
-            List<Property> vals = objstore.getProperties(node.getDomainObject(), prop_type);
-
-            if (vals.size() < pc.getMinimum() || (pc.getMaximum() != -1 && vals.size() > pc.getMaximum())) {
-                constraintViolations.add(pc);
+        if (!node.isIgnored()) {
+            if (node.getDomainObject() == null) {
+                throw new IllegalArgumentException("Node does not have domain object.");
             }
 
-            if (!validate_complex_property_cardinality(vals)) {
-                constraintViolations.add(pc);
+            for (PropertyConstraint pc : type.getPropertyConstraints()) {
+                PropertyType prop_type = pc.getPropertyType();
+
+                List<Property> vals = objstore.getProperties(node.getDomainObject(), prop_type);
+
+                if (vals.size() < pc.getMinimum() ||
+                    (pc.getMaximum() != -1 && vals.size() > pc.getMaximum())) {
+                    constraintViolations.add(pc);
+                }
+
+                if (!validate_complex_property_cardinality(vals)) {
+                    constraintViolations.add(pc);
+                }
             }
         }
-
         return constraintViolations;
     }
 
