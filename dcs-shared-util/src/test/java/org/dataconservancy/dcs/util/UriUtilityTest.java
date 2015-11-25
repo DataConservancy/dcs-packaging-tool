@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -233,7 +232,6 @@ public class UriUtilityTest {
 
         // bag://my-bag/data/file.txt
         URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null, null);
-        System.out.println(bagUri.toString());
 
         assertEquals(Paths.get(baseDir.toString(), "my-bag/data/file.txt"),
                 UriUtility.resolveBagUri(baseDir.toPath(), bagUri));

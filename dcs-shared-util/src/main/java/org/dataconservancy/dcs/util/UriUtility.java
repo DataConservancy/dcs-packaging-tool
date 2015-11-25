@@ -124,20 +124,19 @@ public class UriUtility {
         }
 
         String path = FilenameUtils.separatorsToUnix(relativePath.toString());
-
-        Path forUri = Paths.get(path);
-
-        if (forUri.getNameCount() > 1) {
-            Path uriAuthority = forUri.getName(0);
-            Path uriPath = forUri.subpath(1, forUri.getNameCount());
+        if (relativePath.getNameCount() > 1) {
+        	
+            Path uriAuthority = relativePath.getName(0);
+            Path uriPath = relativePath.subpath(1, relativePath.getNameCount());
+            path = FilenameUtils.separatorsToUnix(uriPath.toString());
             if (!uriPath.isAbsolute()) {
-                uriPath = Paths.get("/", uriPath.toString());
+                path = "/" + path;
             }
-
-            return new URI(BAG_URI_SCHEME, uriAuthority.toString(), uriPath.toString(), null, null);
+            
+            return new URI(BAG_URI_SCHEME, uriAuthority.toString(), path, null, null);
         }
 
-        return new URI(BAG_URI_SCHEME, forUri.toString(), null, null, null);
+        return new URI(BAG_URI_SCHEME, path, null, null, null);
     }
 
     /**
