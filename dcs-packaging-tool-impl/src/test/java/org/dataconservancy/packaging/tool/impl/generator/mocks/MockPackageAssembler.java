@@ -36,6 +36,12 @@ public class MockPackageAssembler implements PackageAssembler {
     public URI reserveResource(String path, PackageResourceType type) {
         return null;
     }
+    
+    @Override
+    public URI reserveDirectory(String path, PackageResourceType type) {
+        return null;
+    }
+    
 
     @Override
     public void putResource(URI uri, InputStream content) {

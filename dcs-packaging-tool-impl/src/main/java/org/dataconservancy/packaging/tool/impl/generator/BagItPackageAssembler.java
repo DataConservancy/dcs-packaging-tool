@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.dcs.model.Checksum;
 import org.dataconservancy.packaging.tool.api.PackageChecksumService;
-import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.api.Package;
@@ -329,16 +328,18 @@ public class BagItPackageAssembler implements PackageAssembler {
             }
         }
     }
-
-    /**
-     * @param path
-     *        Logical file path (including filename) of the resource relative to
-     *        the package.
-     * @param type the PackageResourceType
-     * @return the URI
-     */
+    
+    public URI reserveDirectory(String path, PackageResourceType type) {
+        return reserve(path, type, true);
+    }
+    
     @Override
     public URI reserveResource(String path, PackageResourceType type) {
+        return reserve(path, type, false);
+    }
+
+
+    private URI reserve(String path, PackageResourceType type, boolean isDirectory) {
         String decodedPath;
         try {
             decodedPath = new String(URLCodec.decodeUrl(path.getBytes()));
@@ -381,26 +382,36 @@ public class BagItPackageAssembler implements PackageAssembler {
                 if (!isDirCreated) {
                     throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
                 }
+                if (isDirectory && !newFile.mkdir()) {
+                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
+                }
             }
 
             //Remove the package location directory and the slash trailing it.                                            s
             URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
+            
+            /* Directory URIs end in '/' */
+            if (isDirectory) {
+                relativeURI = URI.create(relativeURI.toString() + "/");
+            }
 
             fileURIMap.put(relativeURI, newFile.toURI());
 
-            switch(type){
-                case DATA:
-                    dataFiles.add(newFile);
-                    break;
-                case ORE_REM:
-                     params.addParam(BagItParameterNames.PACKAGE_MANIFEST, relativeURI.toString());
-                case ONTOLOGY:
-                case METADATA:
-                case PACKAGE_STATE:
-                    tagFiles.add(newFile);
-                    break;
-                default:
-                    break;
+            if (!isDirectory) {
+                switch(type){
+                    case DATA:
+                        dataFiles.add(newFile);
+                        break;
+                    case ORE_REM:
+                        params.addParam(BagItParameterNames.PACKAGE_MANIFEST, relativeURI.toString());
+                    case ONTOLOGY:
+                    case METADATA:
+                    case PACKAGE_STATE:
+                        tagFiles.add(newFile);
+                        break;
+                    default:
+                        break;
+                }
             }
 
             return relativeURI;
