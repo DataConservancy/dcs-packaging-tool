@@ -43,7 +43,7 @@ public class PackageModelBuilderState {
      * Anything that renames a resource in the domain object graph MUST put it
      * here.
      * <p>
-     * This is a map of old URI to new URU.
+     * This is a map of old URI to new URI.
      * </p>
      */
     public Map<String, String> renamedResources;
