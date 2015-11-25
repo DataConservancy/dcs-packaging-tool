@@ -61,6 +61,20 @@ public class FunctionalAssemblerMock
             throw new RuntimeException(e);
         }
     }
+    
+    @Override
+    public URI reserveDirectory(String path, PackageResourceType type) {
+        try {
+            File reserved = new File(dir, path);
+            reserved.mkdirs();
+            reserved.deleteOnExit();
+            URI uri = reserved.toURI();
+            files.put(uri, reserved);
+            return uri;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void putResource(URI uri, InputStream content) {

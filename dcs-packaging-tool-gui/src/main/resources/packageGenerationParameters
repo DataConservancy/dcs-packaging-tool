@@ -13,5 +13,5 @@ Checksum-Algs = md5
 Archiving-Format = tar
 #Options for Compression-format are: gz, none
 Compression-Format = gz
-#Options for ReM-Serialization-Format are: json, turtle, xml
-ReM-Serialization-Format = json
+#Options for ReM-Serialization-Format are: JSONLD, TURTLE, XML
+ReM-Serialization-Format = TURTLE

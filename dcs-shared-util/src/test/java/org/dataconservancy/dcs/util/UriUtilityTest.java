@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -260,5 +261,35 @@ public class UriUtilityTest {
         } catch (IllegalArgumentException e) {
             // expected
         }
+    }
+
+    @Test
+    public void testMakeBagUriStringRelativization() throws Exception {
+        // Because the base directory doesn't contain the supplied file, only 'file' is used
+        // in the returned URI.
+        assertEquals("bag://file",
+                UriUtility.makeBagUriString(new File("file"), new File("anotherdir")).toString());
+
+        // Because the supplied file contains the base directory, a relative URI is created.
+        assertEquals("bag://file",
+                UriUtility.makeBagUriString(new File("/basedir/file"), new File("/basedir")).toString());
+
+        // Because the supplied file contains the base directory, a relative URI is created.
+        assertEquals("bag://data/file",
+                UriUtility.makeBagUriString(new File("/basedir/data/file"), new File("/basedir")).toString());
+
+    }
+
+    @Test
+    public void testMakeBagUriStringSpaceCharacters() throws Exception {
+        // bag:// uri authority component with spaces
+        assertEquals( "bag://base%20dir%20with%20spaces/file",
+                UriUtility.makeBagUriString(new File("base dir with spaces", "file"),
+                        new File("basedir with spaces")).toString());
+
+        // bag:// uri path component with spaces
+        assertEquals( "bag://basedir/file%20with%20spaces",
+                        UriUtility.makeBagUriString(new File("/foo/basedir/file with spaces"),
+                                new File("/foo")).toString());
     }
 }

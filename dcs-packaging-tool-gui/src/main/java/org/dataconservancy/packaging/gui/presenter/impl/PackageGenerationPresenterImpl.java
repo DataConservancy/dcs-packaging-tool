@@ -484,13 +484,15 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         if (generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT) != null
                 && !generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).isEmpty()) {
-            for (Toggle serializationToggle : view.getSerializationToggleGroup().getToggles()) {
-                if (serializationToggle.getUserData()
-                        .equals(generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).get(0))) {
-                    serializationToggle.setSelected(true);
-                    break;
-                }
+            String value = generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, 0);
+            Toggle selectedToggle = null;
+            try {
+                selectedToggle = getSerializationToggle(GeneralParameterNames.SERIALIZATION_FORMAT.valueOf(value));
+            } catch (IllegalArgumentException e) {
+                log.warn("Unsupported value for serialization: '" + value + "', defaulting to 'XML'." );
+                selectedToggle = getSerializationToggle(GeneralParameterNames.SERIALIZATION_FORMAT.XML);
             }
+            view.getSerializationToggleGroup().selectToggle(selectedToggle);
         }
 
         if (generationParams.getParam(BagItParameterNames.CHECKSUM_ALGORITHMS) != null

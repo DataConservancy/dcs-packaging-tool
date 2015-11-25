@@ -172,6 +172,15 @@ public class BagItPackageAssemblerTest {
                 +  "data" + "/" + filePath ;
         assertTrue(expectedURI.equals(result.toString()));
     }
+    
+    @Test
+    public void testReserveURIForDirectory() {
+        String filePath = "myProject/myTextFile.txt";
+        URI result = underTest.reserveDirectory(filePath, PackageResourceType.DATA);
+        String expectedURI = "bag://" + packageName + "/"
+                +  "data" + "/" + filePath + '/';
+        assertTrue(expectedURI.equals(result.toString()));
+    }
 
     @Test
     public void testReserveURIForPackageStateFile() {

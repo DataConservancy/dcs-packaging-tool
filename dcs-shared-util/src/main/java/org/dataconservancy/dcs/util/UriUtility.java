@@ -125,17 +125,36 @@ public class UriUtility {
 
         String path = FilenameUtils.separatorsToUnix(relativePath.toString());
 
-        // Remove leading slashes from the path
-        path = path.replaceFirst("^\\/*", "");
+        Path forUri = Paths.get(path);
 
-        return new URI("bag", null, "//"+path, null);
+        if (forUri.getNameCount() > 1) {
+            Path uriAuthority = forUri.getName(0);
+            Path uriPath = forUri.subpath(1, forUri.getNameCount());
+            if (!uriPath.isAbsolute()) {
+                uriPath = Paths.get("/", uriPath.toString());
+            }
+
+            return new URI(BAG_URI_SCHEME, uriAuthority.toString(), uriPath.toString(), null, null);
+        }
+
+        return new URI(BAG_URI_SCHEME, forUri.toString(), null, null, null);
     }
 
     /**
      * Resolves the supplied {@code bag://} URI against a platform-specific base directory.  This method is used to
      * resolve resources in a bag to a platform-specific {@code Path} used by the caller to access the content of the
-     * resource.  If a bag has been exploded into the directory {@code /tmp/foo/my-bag} (where the bag payload directory
-     * is located at {@code /tmp/foo/my-bag/data}) then the base directory of the bag is {@code /tmp/foo}.
+     * resource.
+     * <p>
+     * Example usage: 
+     * Given a bag that contains a resource identified by the URI {@code bag://my-bag/data/bar}, and the bag has been
+     * exploded into the directory {@code /tmp/foo/my-bag} (where the bag payload directory is located at
+     * {@code /tmp/foo/my-bag/data}) then the base directory of the bag is {@code /tmp/foo}.  If the caller wishes to
+     * resolve the URI {@code bag://my-bag/data/bar}, they would invoke this method:
+     * </p>
+     * <pre>
+     *     Path result = UriUtility.resolveBagUri(Paths.get("/tmp/foo"), new URI("bag://my-bag/data/bar"));
+     *     assert Paths.get("/tmp/foo/my-bag/data/bar").equals(result);
+     * </pre>
      * <p>
      * The base directory does not need to exist.  This implementation will {@link Path#normalize() normalize} the
      * supplied directory.

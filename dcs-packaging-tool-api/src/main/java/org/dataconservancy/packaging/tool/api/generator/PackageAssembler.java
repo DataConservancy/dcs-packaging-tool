@@ -16,7 +16,6 @@
 
 package org.dataconservancy.packaging.tool.api.generator;
 
-import org.dataconservancy.packaging.tool.api.*;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 
 import java.io.InputStream;
@@ -63,6 +62,24 @@ public interface PackageAssembler {
      * @return URI of reserved resource
      */
     URI reserveResource(String path, PackageResourceType type);
+    
+    /**
+     * Reserve (create a name, and potentially storage location for) a directory.
+     * <p>
+     * Given a path and resource type, this method reserves a directory name
+     * Note: This operation is optional. If an assembler does not support
+     * reserving URIs, then it shall throw and
+     * {@link UnsupportedOperationException}
+     * </p>
+     *
+     * @param path
+     *        Logical file path (including filename) of the directory relative to
+     *        the package.
+     * @param type
+     *        Resource type  (e.g. data, metadata, etc).
+     * @return URI of reserved resource
+     */
+    URI reserveDirectory(String path, PackageResourceType type);
 
     /**
      * Commit new content to a previously created or reserved resource.

@@ -407,4 +407,35 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         assertEquals(values().length, found);
     }
+
+    /**
+     * Ensures that the default serialization format is Turtle.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testDefaultSerializationToggle() throws Exception {
+        // Mock the PackageGenerationService to do nothing.
+        PackageGenerationService mockGenerationSvc = mock(PackageGenerationService.class);
+
+        presenter.setTestBackgroundService();
+        presenter.setPackageGenerationService(mockGenerationSvc);
+
+        // We need the concrete builder so that it will read in the defaults from the classpath resource.
+        PropertiesConfigurationParametersBuilder paramsBuilder = new PropertiesConfigurationParametersBuilder();
+        presenter.setPackageGenerationParametersBuilder(paramsBuilder);
+
+        presenter.display();
+
+        // Ensure that the generation params include the correct value.
+        assertNotNull(presenter.getGenerationParams().getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, 0));
+        assertEquals(GeneralParameterNames.SERIALIZATION_FORMAT.TURTLE.name(),
+                presenter.getGenerationParams().getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, 0));
+        assertEquals(1,
+                presenter.getGenerationParams().getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).size());
+
+        // Ensure that the proper default value has been set from the generation parameters.
+        assertEquals(presenter.getSerializationToggle(TURTLE).getUserData(),
+                view.getSerializationToggleGroup().getSelectedToggle().getUserData());
+    }
 }

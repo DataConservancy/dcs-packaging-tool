@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.dcs.model.Checksum;
 import org.dataconservancy.packaging.tool.api.PackageChecksumService;
-import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.api.Package;
@@ -215,22 +214,24 @@ public class BagItPackageAssembler implements PackageAssembler {
             validateCompressionFormat();
         }
 
-        //Create a parent dir, must be in a user-controlled location. default will be set here as the users homeDir/packageStaging.
+        //we write out the package to a "staging" location, which is the same as the output location specified by the
+        //user in the case of an exploded package. For compressed bags we create a parent directory in the tmp directory
         //This can be overridden in the defaultGenerationParams file
         //This will help prevent deleting data if a user tries to create a package in place.
-        String packageStagingLocationName = System.getProperty("user.home") + File.separator + "DCS-PackageToolStaging";
+        String packageStagingLocationName;
         String packageStagingLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, 0);
         String packageLocationParameterValue = params.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
 
         if (isExploded) {
-            if (packageLocationParameterValue != null && !packageLocationParameterValue.isEmpty()) {
                 packageStagingLocationName = packageLocationParameterValue;
-            }
         } else {
             if (packageStagingLocationParameterValue != null && !packageStagingLocationParameterValue.isEmpty()) {
                 packageStagingLocationName = packageStagingLocationParameterValue;
+            } else {
+                packageStagingLocationName = System.getProperty("java.io.tmpdir") + File.separator + "DCS-PackageToolStaging";
             }
         }
+
         packageLocationDir = new File(packageStagingLocationName);
 
         //Creating base directory for the bag based on specified package name
@@ -327,16 +328,18 @@ public class BagItPackageAssembler implements PackageAssembler {
             }
         }
     }
-
-    /**
-     * @param path
-     *        Logical file path (including filename) of the resource relative to
-     *        the package.
-     * @param type the PackageResourceType
-     * @return the URI
-     */
+    
+    public URI reserveDirectory(String path, PackageResourceType type) {
+        return reserve(path, type, true);
+    }
+    
     @Override
     public URI reserveResource(String path, PackageResourceType type) {
+        return reserve(path, type, false);
+    }
+
+
+    private URI reserve(String path, PackageResourceType type, boolean isDirectory) {
         String decodedPath;
         try {
             decodedPath = new String(URLCodec.decodeUrl(path.getBytes()));
@@ -379,26 +382,36 @@ public class BagItPackageAssembler implements PackageAssembler {
                 if (!isDirCreated) {
                     throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
                 }
+                if (isDirectory && !newFile.mkdir()) {
+                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
+                }
             }
 
             //Remove the package location directory and the slash trailing it.                                            s
             URI relativeURI = UriUtility.makeBagUriString(newFile, packageLocationDir);
+            
+            /* Directory URIs end in '/' */
+            if (isDirectory) {
+                relativeURI = URI.create(relativeURI.toString() + "/");
+            }
 
             fileURIMap.put(relativeURI, newFile.toURI());
 
-            switch(type){
-                case DATA:
-                    dataFiles.add(newFile);
-                    break;
-                case ORE_REM:
-                     params.addParam(BagItParameterNames.PACKAGE_MANIFEST, relativeURI.toString());
-                case ONTOLOGY:
-                case METADATA:
-                case PACKAGE_STATE:
-                    tagFiles.add(newFile);
-                    break;
-                default:
-                    break;
+            if (!isDirectory) {
+                switch(type){
+                    case DATA:
+                        dataFiles.add(newFile);
+                        break;
+                    case ORE_REM:
+                        params.addParam(BagItParameterNames.PACKAGE_MANIFEST, relativeURI.toString());
+                    case ONTOLOGY:
+                    case METADATA:
+                    case PACKAGE_STATE:
+                        tagFiles.add(newFile);
+                        break;
+                    default:
+                        break;
+                }
             }
 
             return relativeURI;

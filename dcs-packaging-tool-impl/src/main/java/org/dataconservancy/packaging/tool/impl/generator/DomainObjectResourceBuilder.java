@@ -34,7 +34,6 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.ResourceUtils;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
-import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
@@ -60,6 +59,10 @@ import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputS
  */
 class DomainObjectResourceBuilder
         implements NodeVisitor {
+
+    public String OBJECT_PATH = "obj/";
+
+    public String BINARY_PATH = "bin/";
 
     PackageStateSerializer serializer;
 
@@ -115,11 +118,14 @@ class DomainObjectResourceBuilder
 
                     /* This is where the domain object will be serialized */
                     node.setIdentifier(state.assembler
-                            .reserveResource(path(node,
-                                    "." + determineSerialization(state.params, RDFFormat.TURTLE_PRETTY)
-                                            .getLang()
-                                            .getFileExtensions()
-                                            .get(0)),
+                            .reserveResource(OBJECT_PATH
+                                                     + path(node,
+                                                            "."
+                                                                    + determineSerialization(state.params,
+                                                                                             RDFFormat.TURTLE_PRETTY)
+                                                                            .getLang()
+                                                                            .getFileExtensions()
+                                                                            .get(0)),
                                              PackageResourceType.DATA));
 
                     URI newDomainObjectURI = node.getIdentifier();
@@ -128,7 +134,9 @@ class DomainObjectResourceBuilder
                         try {
                             URI binaryURI =
                                     state.assembler
-                                            .createResource(path(node, ""),
+                                            .createResource(BINARY_PATH
+                                                                    + path(node,
+                                                                           ""),
                                                             PackageResourceType.DATA,
                                                             node.getFileInfo()
                                                                     .getLocation()
@@ -166,6 +174,12 @@ class DomainObjectResourceBuilder
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
+                    } else if (node.getFileInfo().isDirectory()) {
+                        /* It's a directory, so reserve a bag URI */
+                        node.getFileInfo().setLocation(state.assembler
+                                .reserveDirectory(path(node, ""),
+                                                  PackageResourceType.DATA));
+                        System.out.println("Set file location to " + node.getFileInfo().getLocation());
                     }
 
                     node.setDomainObject(newDomainObjectURI);
@@ -217,7 +231,9 @@ class DomainObjectResourceBuilder
         }
 
         try (InputStream stream =
-                toInputStream(domainObjectGraph, determineSerialization(state.params, RDFFormat.TURTLE))) {
+                toInputStream(domainObjectGraph,
+                              determineSerialization(state.params,
+                                                     RDFFormat.TURTLE))) {
             state.assembler.putResource(node.getIdentifier(), stream);
         } catch (Exception e) {
             throw new RuntimeException(e);
