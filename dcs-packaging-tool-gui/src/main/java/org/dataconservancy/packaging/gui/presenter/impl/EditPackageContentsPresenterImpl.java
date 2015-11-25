@@ -275,22 +275,22 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         TreeItem<Node> invalidItem = findItem(node);
 
         if(invalidItem != null) {
-            ImageView exclamImage = new ImageView("/images/red_exclamation.png");
-            exclamImage.setFitHeight(20);
-            exclamImage.setFitWidth(5);
+            ImageView exclaimImage = new ImageView("/images/red_exclamation.png");
+            exclaimImage.setFitHeight(20);
+            exclaimImage.setFitWidth(5);
 
-            Tooltip exclamTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.PROPERTY_MISSING_LABEL));
-            Tooltip.install(exclamImage, exclamTooltip);
+            Tooltip exclaimTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.PROPERTY_MISSING_LABEL));
+            Tooltip.install(exclaimImage, exclaimTooltip);
 
-            invalidItem.setGraphic(exclamImage);
+            invalidItem.setGraphic(exclaimImage);
         }
     }
 
     private void markNodeAsValid(Node node) {
         TreeItem<Node> validItem = findItem(node);
 
-        if(validItem != null) {
-            validItem.setGraphic(null);
+        if(validItem != null && validItem.getGraphic() != null) {
+            validItem.getGraphic().setVisible(false);
         }
     }
 
