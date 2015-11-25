@@ -144,12 +144,15 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         }
 
         if (type.getDefaultPropertyValues() != null) {
-            type.getDefaultPropertyValues().forEach(v -> add_property(object, v));
+            type.getDefaultPropertyValues().stream().filter(value -> getProperties(node.getDomainObject(), value.getPropertyType()).isEmpty()).forEach(value -> add_property(object, value));
         }
 
         if (type.getSuppliedProperties() != null) {
-            type.getSuppliedProperties().forEach(
-                    (pt, sp) -> as_property_values(pt, sp, node.getFileInfo()).forEach(v -> add_property(object, v)));
+            type.getSuppliedProperties().keySet().stream().filter(suppliedType -> getProperties(node.getDomainObject(), suppliedType).isEmpty()).forEach(suppliedType -> {
+                for (Property value : as_property_values(suppliedType, type.getSuppliedProperties().get(suppliedType), node.getFileInfo())) {
+                    add_property(object, value);
+                }
+            });
         }
     }
 
