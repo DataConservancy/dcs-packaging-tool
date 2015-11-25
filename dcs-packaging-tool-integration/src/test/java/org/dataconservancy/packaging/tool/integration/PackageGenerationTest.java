@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,53 +17,31 @@
 package org.dataconservancy.packaging.tool.integration;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import java.net.URI;
 
 import java.nio.file.Paths;
 
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
-
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
-import org.dataconservancy.packaging.tool.api.DomainProfileStore;
-import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.OpenPackageService;
-import org.dataconservancy.packaging.tool.api.Package;
-import org.dataconservancy.packaging.tool.api.PackageGenerationService;
-import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl;
-import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
-import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
-import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
-import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
-import org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder;
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
-import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_NAME;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_LOCATION;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
 
 @ContextConfiguration({
         "classpath*:org/dataconservancy/config/applicationContext.xml",
@@ -85,89 +63,106 @@ public class PackageGenerationTest {
             .create("http//dataconservancy.org/ptg-profiles/dcs-bo-1.0");
 
     @Autowired
-    public IPMService ipmService;
+    DomainProfileServiceFactory profileServiceFactory;
 
     @Autowired
-    public OpenPackageService openPackageService;
+    PackageInitializer initializer;
 
     @Autowired
-    public PackageGenerationService createPakageService;
-
-    @Autowired
-    public URIGenerator uriGen;
-
-    @Autowired
-    public DomainProfileStore profileStore;
-
-    @Autowired
-    public IpmRdfTransformService ipm2rdf;
-
-    @Autowired
-    public OpenPackageService opener;
-
-    PropertiesConfigurationParametersBuilder paramsBuilder =
-            new PropertiesConfigurationParametersBuilder();
+    public Packager packager;
 
     @Test
-    public void basicRoundTripTest() throws Exception {
-        Node tree =
-                ipmService.createTreeFromFileSystem(Paths
-                        .get(this.getClass().getResource("/TestContent/README")
-                                .toURI()).getParent().resolve("Parent_Dir"));
+    public void fileExistsTest() throws Exception {
 
-        Map<URI, DomainProfile> profiles =
-                profileStore
-                        .getPrimaryDomainProfiles()
-                        .stream()
-                        .collect(Collectors.toMap(DomainProfile::getIdentifier,
-                                                  Function.identity()));
+        PackageState state = initializer.initialize(DCS_PROFILE);
 
-        Model model = ModelFactory.createDefaultModel();
-        DomainProfileObjectStoreImpl objectStore =
-                new DomainProfileObjectStoreImpl(model, uriGen);
-        DomainProfileService profileService =
-                new DomainProfileServiceImpl(objectStore, uriGen);
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
-        profileService.assignNodeTypes(profiles.get(DCS_PROFILE), tree);
-
-        PackageState state = new PackageState();
-
-        state.setDomainObjectRDF(model);
-        state.setPackageTree(ipm2rdf.transformToRDF(tree));
-
-        try (InputStream props =
-                this.getClass()
-                        .getResourceAsStream("/PackageGenerationParams.properties")) {
-
-            PackageGenerationParameters params =
-                    paramsBuilder.buildParameters(props);
-
-            params.addParam(PACKAGE_NAME, "TestPackage");
-            params.addParam(PACKAGE_LOCATION, "/tmp");
-
-            Package pkg = createPakageService.generatePackage(state, params);
-
-            File packageFile = new File(folder.getRoot(), pkg.getPackageName());
-
-            try (OutputStream out = new FileOutputStream(packageFile)) {
-                IOUtils.copy(pkg.serialize(), out);
+        opened.getPackageTree().walk(node -> {
+            if (node.getFileInfo() != null && node.getFileInfo().isFile()) {
+                File file =
+                        Paths.get(node.getFileInfo().getLocation()).toFile();
+                assertTrue(file.exists());
+                assertTrue(file.isFile());
             }
-            pkg.cleanupPackage();
+        });
+    }
 
-            File staging = new File(folder.getRoot(), "stage");
-            staging.mkdirs();
+    @Test
+    public void directoriesExistTest() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
 
-            OpenedPackage opened = opener.openPackage(staging, packageFile);
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
-            Model openedDomainObjects =
-                    opened.getPackageState().getDomainObjectRDF();
+        opened.getPackageTree()
+                .walk(node -> {
+                    if (node.getFileInfo() != null
+                            && node.getFileInfo().isDirectory()) {
+                        File dir =
+                                Paths.get(node.getFileInfo().getLocation())
+                                        .toFile();
+                        assertTrue(dir.exists());
+                        assertTrue(dir.isDirectory());
 
-            int ORIG_TRIPLE_COUNT = model.listStatements().toSet().size();
-            assertTrue(ORIG_TRIPLE_COUNT > 0);
-            assertEquals(ORIG_TRIPLE_COUNT, openedDomainObjects
-                    .listStatements().toSet().size());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+                    }
+                });
+    }
+
+    /*
+     * XXX It may be presumptuous to assume this should pass. This verifies that
+     * there are no property errors (e.g. missing required properties). It may
+     * be a conscious choice of certain profiles to have property requirements
+     * that cannot be met by automated means, thus requiring inteligent
+     * human/author action in the UI before this kind of test would pass.
+     */
+    @Test
+    @Ignore
+    public void propertyErrorTest() {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
+
+        DomainProfileService profileService =
+                profileServiceFactory.getProfileService(opened
+                        .getPackageState().getDomainObjectRDF());
+
+        opened.getPackageTree().walk(node -> assertTrue(profileService
+                .validateProperties(node, node.getNodeType()).isEmpty()));
+    }
+
+    /*
+     * Verifies that the IPM tree in the opened package points to domain objects
+     * in the opened domain object RDF model.
+     */
+    @Test
+    public void domainObjectReferenceTest() {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        Model originalModel = state.getDomainObjectRDF();
+
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
+
+        Model openedModel = opened.getPackageState().getDomainObjectRDF();
+
+        opened.getPackageTree()
+                .walk(node -> assertEquals(nonzero(cut(originalModel,
+                                                       selectLocal(originalModel
+                                                               .getResource(node
+                                                                       .getDomainObject()
+                                                                       .toString())))
+                                                   .listStatements().toSet()
+                                                   .size()),
+                                           cut(openedModel,
+                                               selectLocal(openedModel
+                                                       .getResource(node
+                                                               .getDomainObject()
+                                                               .toString())))
+                                                   .listStatements().toSet()
+                                                   .size()));
+    }
+
+    private static long nonzero(long val) {
+        assertTrue(val > 0);
+        return val;
     }
 }

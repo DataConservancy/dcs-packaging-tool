@@ -29,5 +29,11 @@
       </list>
     </property>
   </bean>
+  
+  <bean class="org.dataconservancy.packaging.tool.integration.PackageInitializer" />
+  
+  <bean class="org.dataconservancy.packaging.tool.integration.Packager" />
+  
+  <bean class="org.dataconservancy.packaging.tool.integration.DomainProfileServiceFactory" />
 
 </beans>
