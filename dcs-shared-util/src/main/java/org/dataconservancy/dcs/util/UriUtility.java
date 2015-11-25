@@ -145,7 +145,7 @@ public class UriUtility {
      * resolve resources in a bag to a platform-specific {@code Path} used by the caller to access the content of the
      * resource.
      * <p>
-     * Example usage:<br/>
+     * Example usage: 
      * Given a bag that contains a resource identified by the URI {@code bag://my-bag/data/bar}, and the bag has been
      * exploded into the directory {@code /tmp/foo/my-bag} (where the bag payload directory is located at
      * {@code /tmp/foo/my-bag/data}) then the base directory of the bag is {@code /tmp/foo}.  If the caller wishes to
