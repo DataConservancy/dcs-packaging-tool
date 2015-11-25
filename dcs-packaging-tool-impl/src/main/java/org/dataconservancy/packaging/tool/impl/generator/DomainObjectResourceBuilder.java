@@ -34,7 +34,6 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.ResourceUtils;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
-import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
@@ -60,6 +59,9 @@ import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputS
  */
 class DomainObjectResourceBuilder
         implements NodeVisitor {
+    
+    public String OBJECT_PATH = "obj/";
+    public String BINARY_PATH = "bin/";
 
     PackageStateSerializer serializer;
 
@@ -115,7 +117,7 @@ class DomainObjectResourceBuilder
 
                     /* This is where the domain object will be serialized */
                     node.setIdentifier(state.assembler
-                            .reserveResource(path(node,
+                            .reserveResource(OBJECT_PATH + path(node,
                                     "." + determineSerialization(state.params, RDFFormat.TURTLE_PRETTY)
                                             .getLang()
                                             .getFileExtensions()
@@ -128,7 +130,7 @@ class DomainObjectResourceBuilder
                         try {
                             URI binaryURI =
                                     state.assembler
-                                            .createResource(path(node, ""),
+                                            .createResource(BINARY_PATH + path(node, ""),
                                                             PackageResourceType.DATA,
                                                             node.getFileInfo()
                                                                     .getLocation()
