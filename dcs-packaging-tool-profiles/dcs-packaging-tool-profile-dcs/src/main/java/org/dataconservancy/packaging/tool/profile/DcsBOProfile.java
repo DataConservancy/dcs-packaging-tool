@@ -715,6 +715,8 @@ public class DcsBOProfile
         //So the data item remains unchanged unless empty then it's deleted.
         dataFileToCollectionMetadataFile.setSourceNodeType(dataItem);
         dataFileToCollectionMetadataFile.setResultNodeType(dataItem);
+        //Data Item can't be root
+        dataFileToCollectionMetadataFile.setSourceParentConstraint(allowRelationshipTo(collection, memberRel));
         dataFileToCollectionMetadataFile.setSourceChildConstraints(Arrays.asList(allowRelationshipTo(file, memberRel), allowRelationshipTo(metadata, metadataRel)));
         dataFileToCollectionMetadataFile.setMoveChildrenToParent(true);
         dataFileToCollectionMetadataFile.setRemoveEmptyResult(true);
