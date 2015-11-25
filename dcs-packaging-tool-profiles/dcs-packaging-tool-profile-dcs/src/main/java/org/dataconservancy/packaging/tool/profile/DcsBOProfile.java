@@ -246,12 +246,6 @@ public class DcsBOProfile
         project.setDomainProfile(this);
         project.setInheritableProperties(Arrays.asList(hasDescription, hasPublisher));
 
-        //This sets the preference of project assignment to no files, this is to mirror the existing package tool behavior
-        //Note this is just a preference the type can still be changed by the user.
-        CardinalityConstraint projectFilePreference = new CardinalityConstraint();
-        projectFilePreference.setMax(0);
-        project.setChildFileConstraint(projectFilePreference);
-
         collection.setIdentifier(URI.create(NS_DCS_PKGTOOL_PROFILE_BOM
                 + "Collection"));
         collection.setLabel("Collection");
@@ -263,7 +257,7 @@ public class DcsBOProfile
         //This sets the preference of collection assignment to a single file, this is to mirror the existing package tool behavior
         //Note this is just a preference the type can still be changed by the user.
         CardinalityConstraint collectionFilePreference = new CardinalityConstraint();
-        collectionFilePreference.setMin(1);
+        collectionFilePreference.setMin(0);
         collectionFilePreference.setMax(1);
         collection.setChildFileConstraint(collectionFilePreference);
 
