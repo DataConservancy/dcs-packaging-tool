@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.collections.MapUtils;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.ResourceUtils;
@@ -97,19 +98,14 @@ class DomainObjectResourceBuilder
                 .walk(node -> {
 
                     /* Skip over removed nodes */
-                    if (node.isIgnored()) {
-                        /* Remove the domain object graph */
-                        Model ignored =
-                                cut(state.domainObjects,
-                                    selectLocal(state.domainObjects
-                                            .getResource(node.getDomainObject()
-                                                    .toString())));
+                    if (node.isIgnored() || node.getDomainObject() == null) {
+                        if (node.getDomainObject() != null) {
+                            /* Remove the domain object graph */
+                            Model ignored = cut(state.domainObjects, selectLocal(state.domainObjects.getResource(node.getDomainObject().toString())));
 
-                        /* Remove triples that involve a subject defined in it */
-                        ignored.listSubjects()
-                                .filterKeep(r -> r.isURIResource())
-                                .forEachRemaining(r -> state.domainObjects
-                                        .removeAll(null, null, r));
+                            /* Remove triples that involve a subject defined in it */
+                            ignored.listSubjects().filterKeep(RDFNode::isURIResource).forEachRemaining(r -> state.domainObjects.removeAll(null, null, r));
+                        }
                         return;
                     }
 
@@ -188,12 +184,10 @@ class DomainObjectResourceBuilder
                      * Rebase all URIs and hash URIs to the assembler-provided
                      * URI
                      */
-                    remap(state.domainObjects,
-                          bare(originalDomainObjectURI.toString()),
-                          node.getDomainObject().toString(),
-                          originalResources,
-                          state.renamedResources);
-
+                    if (originalDomainObjectURI != null
+                        && node.getDomainObject() != null) {
+                        remap(state.domainObjects, bare(originalDomainObjectURI.toString()), node.getDomainObject().toString(), originalResources, state.renamedResources);
+                    }
                 });
     }
 
