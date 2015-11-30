@@ -256,6 +256,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         backgroundService.setNode(controller.getPackageTree());
 
         backgroundService.setOnSucceeded(workerStateEvent -> {
+            view.getValidationProgressPopup().hide();
             String validationString = (String) workerStateEvent.getSource().getValue();
             backgroundService.reset();
 
