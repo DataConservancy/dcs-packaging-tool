@@ -741,17 +741,11 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         warningPopup.setTitleText(title);
 
-        ScrollPane contentPane = new ScrollPane();
-        contentPane.setMaxHeight(400);
-
         VBox content = new VBox(48);
-        content.setPrefWidth(400);
+        content.setPrefWidth(300);
         Label errorMessageLabel = new Label(errorMessage);
         errorMessageLabel.setWrapText(true);
-
-        contentPane.setContent(errorMessageLabel);
-
-        content.getChildren().add(contentPane);
+        content.getChildren().add(errorMessageLabel);
 
         if (allowFutureHide) {
             content.getChildren().add(hideFutureWarningPopupCheckBox);
