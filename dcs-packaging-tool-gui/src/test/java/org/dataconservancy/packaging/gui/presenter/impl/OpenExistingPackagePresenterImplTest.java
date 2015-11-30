@@ -55,7 +55,7 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
         when(controller.showOpenFileDialog(any())).thenReturn(tmpfolder.newFile());
         when(controller.showOpenDirectoryDialog(any())).thenReturn(tmpfolder.newFolder());
         when(controller.getFactory()).thenReturn(factory);
-
+        when(controller.getPackageStateFileExtension()).thenReturn("*.zip");
         view = new OpenExistingPackageViewImpl(help);
 
         HeaderView headerView = new HeaderViewImpl();
