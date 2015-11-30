@@ -15,9 +15,16 @@
  */
 package org.dataconservancy.packaging.tool.model;
 
+import com.rits.cloning.Cloner;
+
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.SimpleSelector;
+
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 
 import java.io.File;
+
+import java.lang.reflect.Field;
 
 import org.dataconservancy.packaging.tool.model.ser.SerializationScope;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
@@ -203,6 +210,46 @@ public class PackageState {
     public void setUserSpecifiedProperties(
         Map<URI, List<Property>> userSpecifiedProperties) {
         this.userSpecifiedProperties = userSpecifiedProperties;
+    }
+
+    /**
+     * Returns a deep copy of this object.  This implementation is <strong>{@code final}</strong> because we do not obey
+     * the convention of calling {@code super.clone()}; subclasses could not rely, then, on the expected behavior:
+     * {@code x.clone().getClass() == x.getClass()}.  This class does <em>not</em> implement {@code Cloneable}, because
+     * it is <em>not</em> ok for {@code Object.clone()} to perform a field-by-field copy (i.e. a shallow copy).
+     *
+     * @return a deep copy of this object
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    public final Object clone() throws CloneNotSupportedException {
+        Cloner c = new Cloner();
+        PackageState clone = new PackageState();
+
+        try {
+            for (Field field : this.getClass().getDeclaredFields()) {
+                if (Model.class.isAssignableFrom(field.getType())) {
+                    field.set(clone, copy(((Model) field.get(this))));
+                } else {
+                    field.set(clone, c.deepClone(field.get(this)));
+                }
+            }
+        } catch (IllegalAccessException e) {
+            /* Just skip */
+        }
+
+        return clone;
+    }
+    
+    /* Copy an rdf model */
+    private static Model copy(Model from) {
+        Model extracted = ModelFactory.createDefaultModel();
+
+        from.listStatements(new SimpleSelector()).forEachRemaining(s -> {
+            extracted.add(s);
+        });
+
+        return extracted;
     }
 
     @Override

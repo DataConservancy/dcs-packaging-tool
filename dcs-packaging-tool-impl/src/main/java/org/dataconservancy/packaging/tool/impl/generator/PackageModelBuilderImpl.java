@@ -89,12 +89,16 @@ public class PackageModelBuilderImpl
         builderState.params = params;
         builderState.manifest = ModelFactory.createDefaultModel();
         builderState.renamedResources = new HashMap<>();
-        builderState.pkgState = pstate;
+        try {
+            builderState.pkgState = (PackageState) pstate.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Error cloning package state", e);
+        }
 
         try {
 
             builderState.tree =
-                    rdf2ipm.transformToNode(pstate.getPackageTree());
+                    rdf2ipm.transformToNode(RdfUtil.copy(pstate.getPackageTree(), new SimpleSelector()));
 
             visitors.forEach(v -> v.init(builderState));
 

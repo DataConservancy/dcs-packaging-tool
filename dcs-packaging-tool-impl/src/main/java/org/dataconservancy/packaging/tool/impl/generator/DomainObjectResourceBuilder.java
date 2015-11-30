@@ -20,6 +20,8 @@ import java.io.InputStream;
 
 import java.net.URI;
 
+import java.nio.file.Paths;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -110,6 +112,14 @@ class DomainObjectResourceBuilder
                         return;
                     }
 
+                    /* Sanity check */
+                    if (node.getFileInfo() != null
+                            && !Paths.get(node.getFileInfo().getLocation())
+                                    .toFile().exists()) {
+                        throw new RuntimeException("IPM node points to file location that doesn't exist: "
+                                + node.getFileInfo().getLocation());
+                    }
+
                     /* Get the former domain object URI */
                     URI originalDomainObjectURI = node.getDomainObject();
 
@@ -174,9 +184,8 @@ class DomainObjectResourceBuilder
                     } else if (node.getFileInfo().isDirectory()) {
                         /* It's a directory, so reserve a bag URI */
                         node.getFileInfo().setLocation(state.assembler
-                                .reserveDirectory(path(node, ""),
+                                .reserveDirectory(BINARY_PATH + path(node, ""),
                                                   PackageResourceType.DATA));
-                        System.out.println("Set file location to " + node.getFileInfo().getLocation());
                     }
 
                     node.setDomainObject(newDomainObjectURI);

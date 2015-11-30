@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Johns Hopkins University
+ * Copyright 2015 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,53 +17,38 @@
 package org.dataconservancy.packaging.tool.integration;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import java.net.URI;
 
 import java.nio.file.Paths;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.SimpleSelector;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
-import org.dataconservancy.packaging.tool.api.DomainProfileStore;
-import org.dataconservancy.packaging.tool.api.IPMService;
-import org.dataconservancy.packaging.tool.api.OpenPackageService;
-import org.dataconservancy.packaging.tool.api.Package;
-import org.dataconservancy.packaging.tool.api.PackageGenerationService;
-import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl;
-import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
-import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
-import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
-import org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder;
-import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
-import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_NAME;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_LOCATION;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
 
 @ContextConfiguration({
         "classpath*:org/dataconservancy/config/applicationContext.xml",
@@ -85,89 +70,128 @@ public class PackageGenerationTest {
             .create("http//dataconservancy.org/ptg-profiles/dcs-bo-1.0");
 
     @Autowired
-    public IPMService ipmService;
+    DomainProfileServiceFactory profileServiceFactory;
 
     @Autowired
-    public OpenPackageService openPackageService;
+    PackageInitializer initializer;
 
     @Autowired
-    public PackageGenerationService createPakageService;
-
-    @Autowired
-    public URIGenerator uriGen;
-
-    @Autowired
-    public DomainProfileStore profileStore;
+    public Packager packager;
 
     @Autowired
     public IpmRdfTransformService ipm2rdf;
 
-    @Autowired
-    public OpenPackageService opener;
+    @Test
+    public void fileExistsTest() throws Exception {
 
-    PropertiesConfigurationParametersBuilder paramsBuilder =
-            new PropertiesConfigurationParametersBuilder();
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
+
+        opened.getPackageTree().walk(node -> {
+            if (node.getFileInfo() != null && node.getFileInfo().isFile()) {
+                File file =
+                        Paths.get(node.getFileInfo().getLocation()).toFile();
+                assertTrue(file.exists());
+                assertTrue(file.isFile());
+            }
+        });
+    }
 
     @Test
-    public void basicRoundTripTest() throws Exception {
-        Node tree =
-                ipmService.createTreeFromFileSystem(Paths
-                        .get(this.getClass().getResource("/TestContent/README")
-                                .toURI()).getParent().resolve("Parent_Dir"));
+    public void directoriesExistTest() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
 
-        Map<URI, DomainProfile> profiles =
-                profileStore
-                        .getPrimaryDomainProfiles()
-                        .stream()
-                        .collect(Collectors.toMap(DomainProfile::getIdentifier,
-                                                  Function.identity()));
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
-        Model model = ModelFactory.createDefaultModel();
-        DomainProfileObjectStoreImpl objectStore =
-                new DomainProfileObjectStoreImpl(model, uriGen);
+        opened.getPackageTree()
+                .walk(node -> {
+                    if (node.getFileInfo() != null
+                            && node.getFileInfo().isDirectory()) {
+                        File dir =
+                                Paths.get(node.getFileInfo().getLocation())
+                                        .toFile();
+                        assertTrue(dir.exists());
+                        assertTrue(dir.isDirectory());
+
+                    }
+                });
+    }
+
+    /*
+     * XXX It may be presumptuous to assume this should pass. This verifies that
+     * there are no property errors (e.g. missing required properties). It may
+     * be a conscious choice of certain profiles to have property requirements
+     * that cannot be met by automated means, thus requiring inteligent
+     * human/author action in the UI before this kind of test would pass.
+     */
+    @Test
+    @Ignore
+    public void propertyErrorTest() {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
+
         DomainProfileService profileService =
-                new DomainProfileServiceImpl(objectStore, uriGen);
+                profileServiceFactory.getProfileService(opened
+                        .getPackageState().getDomainObjectRDF());
 
-        profileService.assignNodeTypes(profiles.get(DCS_PROFILE), tree);
+        opened.getPackageTree().walk(node -> assertTrue(profileService
+                .validateProperties(node, node.getNodeType()).isEmpty()));
+    }
 
-        PackageState state = new PackageState();
+    /*
+     * Verifies that the IPM tree in the opened package points to domain objects
+     * in the opened domain object RDF model.
+     */
+    @Test
+    public void domainObjectReferenceTest() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
 
-        state.setDomainObjectRDF(model);
-        state.setPackageTree(ipm2rdf.transformToRDF(tree));
+        Map<URI, Integer> originalDomainObjectSizes = domainObjectSizes(state);
 
-        try (InputStream props =
-                this.getClass()
-                        .getResourceAsStream("/PackageGenerationParams.properties")) {
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
-            PackageGenerationParameters params =
-                    paramsBuilder.buildParameters(props);
+        /*
+         * Make sure the act of creating a package didn't alter domain object
+         * references!
+         */
+        assertEquals(originalDomainObjectSizes, domainObjectSizes(state));
 
-            params.addParam(PACKAGE_NAME, "TestPackage");
-            params.addParam(PACKAGE_LOCATION, "/tmp");
+        opened.getPackageState().getDomainObjectRDF();
+        
+        // TODO  Compart to serialized package
 
-            Package pkg = createPakageService.generatePackage(state, params);
+    }
 
-            File packageFile = new File(folder.getRoot(), pkg.getPackageName());
+    private Map<URI, Integer> domainObjectSizes(PackageState state)
+            throws RDFTransformException {
+        Map<URI, Integer> originalDomainObjectSizes =
+                new HashMap<URI, Integer>();
 
-            try (OutputStream out = new FileOutputStream(packageFile)) {
-                IOUtils.copy(pkg.serialize(), out);
-            }
-            pkg.cleanupPackage();
+        Model model = copy(state.getDomainObjectRDF(), new SimpleSelector());
 
-            File staging = new File(folder.getRoot(), "stage");
-            staging.mkdirs();
+        ipm2rdf.transformToNode(state.getPackageTree())
+                .walk(node -> {
 
-            OpenedPackage opened = opener.openPackage(staging, packageFile);
+                    if (node.getDomainObject() != null) {
+                        originalDomainObjectSizes.put(node.getIdentifier(),
+                                                      cut(model,
+                                                          selectLocal(model
+                                                                  .getResource(node
+                                                                          .getDomainObject()
+                                                                          .toString())))
+                                                              .listStatements()
+                                                              .toSet().size());
+                    } else {
+                        originalDomainObjectSizes.put(node.getIdentifier(), 0);
+                    }
+                });
 
-            Model openedDomainObjects =
-                    opened.getPackageState().getDomainObjectRDF();
+        assertEquals("Model contained triples not reachable by domain objects!",
+                     0,
+                     model.listStatements().toSet().size());
 
-            int ORIG_TRIPLE_COUNT = model.listStatements().toSet().size();
-            assertTrue(ORIG_TRIPLE_COUNT > 0);
-            assertEquals(ORIG_TRIPLE_COUNT, openedDomainObjects
-                    .listStatements().toSet().size());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return originalDomainObjectSizes;
     }
 }
