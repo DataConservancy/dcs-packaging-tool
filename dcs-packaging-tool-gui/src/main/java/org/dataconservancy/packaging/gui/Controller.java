@@ -451,6 +451,10 @@ public class Controller {
         pageStack.add(Page.PACKAGE_METADATA);
     }
 
+    public String getPackageStateFileExtension() {
+        return packageStateFileExtension;
+    }
+
     public DomainProfileService getDomainProfileService() {
         return domainProfileService;
     }
