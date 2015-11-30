@@ -16,8 +16,11 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
@@ -29,12 +32,12 @@ import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
-import org.dataconservancy.packaging.tool.impl.support.Validator;
-import org.dataconservancy.packaging.tool.impl.support.ValidatorFactory;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
+import org.dataconservancy.packaging.tool.impl.support.Validator;
+import org.dataconservancy.packaging.tool.impl.support.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
@@ -76,6 +79,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     private PropertyFormatService propertyFormatService;
     private Preferences preferences;
 
+    private PropertyValidationService backgroundService;
+
     private Set<URI> expandedNodes;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -84,6 +89,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         this.view = view;
         expandedNodes = new HashSet<>();
         view.setPresenter(this);
+        backgroundService = new PropertyValidationService();
 
         bind();
     }
@@ -108,12 +114,30 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         preferences.addPreferenceChangeListener(this);
 
-        validateNodeProperties(controller.getPackageTree(), new StringBuilder());
+        backgroundService.setNode(controller.getPackageTree());
+
+        view.getValidationProgressPopup().show();
+        backgroundService.start();
 
         return view.asNode();
     }
 
     private void bind() {
+        backgroundService.setOnCancelled(event -> {
+            backgroundService.reset();
+            view.getValidationProgressPopup().hide();
+        });
+
+        backgroundService.setOnFailed(workerStateEvent -> {
+            backgroundService.reset();
+            view.getValidationProgressPopup().hide();
+        });
+
+        backgroundService.setOnSucceeded(workerStateEvent -> {
+            backgroundService.reset();
+            view.getValidationProgressPopup().hide();
+        });
+
         //Displays the file selector, and then saves the package description to the given file. 
         view.getSaveButton().setOnAction(arg0 -> {
             if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
@@ -121,19 +145,27 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
 
             try {
-                StringBuilder missingPropertyBuilder = new StringBuilder();
-                validateNodeProperties(controller.getPackageTree(), missingPropertyBuilder);
-                if (missingPropertyBuilder.length() > 0) {
-                   view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
-                       if (view.getWarningPopup() != null &&
-                           view.getWarningPopup().isShowing()) {
-                           view.getWarningPopup().hide();
-                           super.onContinuePressed();
-                       }
-                   });
-                   view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, missingPropertyBuilder.toString()), false, false);
-                   return;
-                }
+                backgroundService.setNode(controller.getPackageTree());
+
+                backgroundService.setOnSucceeded(workerStateEvent -> {
+                    view.getValidationProgressPopup().hide();
+                    String validationString = (String) workerStateEvent.getSource().getValue();
+                    backgroundService.reset();
+
+                    if (validationString != null && !validationString.isEmpty()) {
+                        view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                           if (view.getWarningPopup() != null &&
+                               view.getWarningPopup().isShowing()) {
+                               view.getWarningPopup().hide();
+                           }
+                        });
+                        view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, validationString), false, false);
+                    }
+                });
+
+                view.getValidationProgressPopup().show();
+                backgroundService.start();
+
                 getController().savePackageStateFile();
             } catch (IOException | RDFTransformException e) {
                 view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
@@ -184,6 +216,10 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         });
 
         view.getRefreshPopupNegativeButton().setOnAction(event -> view.getRefreshPopup().hide());
+
+        if (Platform.isFxApplicationThread()) {
+            view.getValidationProgressPopup().setCancelEventHandler(event -> backgroundService.cancel());
+        }
     }
 
     private void getIgnoredNodes(Node node, List<Node> ignoredNodes) {
@@ -217,58 +253,36 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             return;
         }
 
-        StringBuilder missingPropertyBuilder = new StringBuilder();
-        validateNodeProperties(controller.getPackageTree(), missingPropertyBuilder);
-        if (missingPropertyBuilder.length() > 0) {
-            view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
-                if (view.getWarningPopup() != null &&
-                    view.getWarningPopup().isShowing()) {
-                    view.getWarningPopup().hide();
-                    super.onContinuePressed();
-                }
-            });
+        backgroundService.setNode(controller.getPackageTree());
 
-            view.getWarningPopupNegativeButton().setOnAction(arg01 -> {
-                if (view.getWarningPopup() != null &&
-                    view.getWarningPopup().isShowing()) {
-                    view.getWarningPopup().hide();
-                }
-            });
-            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, missingPropertyBuilder.toString()), true, false);
-            return;
-        }
-        //
-        super.onContinuePressed();
-    }
+        backgroundService.setOnSucceeded(workerStateEvent -> {
+            String validationString = (String) workerStateEvent.getSource().getValue();
+            backgroundService.reset();
 
-    /*
-     * Validates that all required properties are filled in for a given node.
-     */
-    private void validateNodeProperties(Node node, StringBuilder errBuilder) {
-        List<PropertyConstraint> violatedConstraints = controller.getDomainProfileService().validateProperties(node, node.getNodeType());
-        if (!violatedConstraints.isEmpty()) {
-            markNodeAsInvalid(node);
+            if (validationString != null && !validationString.isEmpty()) {
+                view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                   if (view.getWarningPopup() != null &&
+                       view.getWarningPopup().isShowing()) {
+                       view.getWarningPopup().hide();
+                       super.onContinuePressed();
+                   }
+                });
 
-            if (node.getFileInfo() != null) {
-                errBuilder.append(node.getFileInfo().getLocation().toString()).append("\n");
+                view.getWarningPopupNegativeButton().setOnAction(arg01 -> {
+                    if (view.getWarningPopup() != null &&
+                        view.getWarningPopup().isShowing()) {
+                        view.getWarningPopup().hide();
+                    }
+                });
+                view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.format(ErrorKey.MISSING_PROPERTY_ERROR, validationString), false, false);
             } else {
-                errBuilder.append(node.getIdentifier().toString()).append("\n");
+                super.onContinuePressed();
             }
+        });
 
-            for (PropertyConstraint violation : violatedConstraints) {
-                errBuilder.append("\t--").append(violation.getPropertyType().getLabel()).append("\n");
-            }
+        view.getValidationProgressPopup().show();
+        backgroundService.start();
 
-            errBuilder.append("\n");
-        } else {
-            markNodeAsValid(node);
-        }
-
-        if (node.getChildren() != null) {
-            for (Node child : node.getChildren()) {
-                validateNodeProperties(child, errBuilder);
-            }
-        }
     }
 
     private void markNodeAsInvalid(Node node) {
@@ -430,8 +444,10 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             //apply metadata inheritance
             applyMetadataInheritance(view.getPopupNode());
 
-            StringBuilder missingPropertyBuilder = new StringBuilder();
-            validateNodeProperties(view.getPopupNode(), missingPropertyBuilder);
+            backgroundService.setNode(controller.getPackageTree());
+
+            view.getValidationProgressPopup().show();
+            backgroundService.start();
         }
     }
 
@@ -782,5 +798,67 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     public void rebuildTreeView() {
         displayPackageTree();
+    }
+
+    /*
+     * Validates that all required properties are filled in for a given node.
+     */
+    private void validateNodeProperties(Node node, StringBuilder errBuilder) {
+        if (Thread.currentThread().isInterrupted()) {
+            return;
+        }
+        List<PropertyConstraint> violatedConstraints = controller.getDomainProfileService().validateProperties(node, node.getNodeType());
+        if (!violatedConstraints.isEmpty()) {
+            markNodeAsInvalid(node);
+
+            if (node.getFileInfo() != null) {
+                errBuilder.append(node.getFileInfo().getLocation().toString()).append("\n");
+            } else {
+                errBuilder.append(node.getIdentifier().toString()).append("\n");
+            }
+
+            for (PropertyConstraint violation : violatedConstraints) {
+                errBuilder.append("\t--").append(violation.getPropertyType().getLabel()).append("\n");
+            }
+
+            errBuilder.append("\n");
+        } else {
+            markNodeAsValid(node);
+        }
+
+        if (node.getChildren() != null) {
+            for (Node child : node.getChildren()) {
+                validateNodeProperties(child, errBuilder);
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+            }
+        }
+    }
+    /**
+     * A {@link javafx.concurrent.Service} which executes the {@link javafx.concurrent.Task} for validation the properties in the tree.
+     */
+    private class PropertyValidationService extends Service<String> {
+
+        Node node;
+        public PropertyValidationService() {
+        }
+
+        public void setNode(Node node) {
+            this.node = node;
+        }
+
+        @Override
+        protected Task<String> createTask() {
+            return new Task<String>() {
+                @Override
+                protected String call() throws Exception {
+                    StringBuilder builder = new StringBuilder();
+                    validateNodeProperties(node, builder);
+
+                    return builder.toString();
+                }
+            };
+        }
     }
 }

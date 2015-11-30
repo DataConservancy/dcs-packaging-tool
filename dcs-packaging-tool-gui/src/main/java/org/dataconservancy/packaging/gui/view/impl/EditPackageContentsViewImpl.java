@@ -714,20 +714,22 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         if (validationProgressPopup == null) {
             validationProgressPopup = new ProgressDialogPopup();
             validationProgressPopup.setTitleText(TextFactory.getText(LabelKey.PROPERTY_VALIDATION_PROGRESS_LABEL));
-        }
-        if (getScene() != null && getScene().getWindow() != null) {
-            double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
-            double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
-            validationProgressPopup.setOwner(getScene().getWindow());
-            validationProgressPopup.show(x, y);
-            validationProgressPopup.hide();
 
-            //Get the content width and height to property center the popup.
-            x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - validationProgressPopup.getWidth()/2.0;
-            y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - validationProgressPopup.getHeight()/2.0;
-            validationProgressPopup.setOwner(getScene().getWindow());
-            validationProgressPopup.show(x, y);
+            if (getScene() != null && getScene().getWindow() != null) {
+                double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
+                double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
+                validationProgressPopup.setOwner(getScene().getWindow());
+                validationProgressPopup.show(x, y);
+                validationProgressPopup.hide();
+
+                //Get the content width and height to property center the popup.
+                x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - validationProgressPopup.getWidth()/2.0;
+                y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - validationProgressPopup.getHeight()/2.0;
+                validationProgressPopup.setOwner(getScene().getWindow());
+                validationProgressPopup.show(x, y);
+            }
         }
+
         return validationProgressPopup;
     }
 
