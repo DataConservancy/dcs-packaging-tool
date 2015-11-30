@@ -82,11 +82,14 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
@@ -138,9 +141,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     private ProgressDialogPopup validationProgressPopup;
 
+    private Set<URI> nodesMissingFiles;
+
     public EditPackageContentsViewImpl (final InternalProperties internalProperties, final Help help) {
         super();
         this.internalProperties = internalProperties;
+
+        nodesMissingFiles = new HashSet<>();
 
         //Sets the text of the footer controls.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -255,6 +262,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
             if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
                 hbox.getChildren().add(exclaimLabel);
+                nodesMissingFiles.add(packageNode.getIdentifier());
+            } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
+                nodesMissingFiles.remove(packageNode.getIdentifier());
             }
 
             Label viewLabel = new Label();
@@ -944,6 +954,11 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public PackageToolPopup getRefreshPopup() {
         return refreshPopup;
+    }
+
+    @Override
+    public Set<URI> getMissingFileNodes() {
+        return nodesMissingFiles;
     }
 
 }

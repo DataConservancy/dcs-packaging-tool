@@ -44,7 +44,8 @@ public class Errors {
         IO_CREATE_ERROR("iocreate.error"),
         UNIGNORE_ERROR("unignoretype.error"),
         INVALID_TREE_ERROR("invalidtree.error"),
-        MISSING_PROPERTY_ERROR("missingproperty.error");
+        MISSING_PROPERTY_ERROR("missingproperty.error"),
+        MISSING_FILES_ERROR("filesmissing.error");
 
 
         private String property;

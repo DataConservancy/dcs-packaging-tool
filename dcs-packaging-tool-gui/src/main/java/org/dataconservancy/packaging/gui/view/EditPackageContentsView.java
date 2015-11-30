@@ -31,8 +31,10 @@ import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A view that shows the pacakge description tree, and displays a popup to show package artifact properties.
@@ -181,4 +183,10 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * @return The progres dialog popup that lets the user know the tree is being validated.
      */
     ProgressDialogPopup getValidationProgressPopup();
+
+    /**
+     * Gets the set of ids that are missing files.
+     * @return The set of ids that are missing file or an empty set if all files are present.
+     */
+    Set<URI> getMissingFileNodes();
 }

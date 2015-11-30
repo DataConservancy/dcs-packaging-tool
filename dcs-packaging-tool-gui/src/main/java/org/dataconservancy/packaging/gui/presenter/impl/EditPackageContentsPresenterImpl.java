@@ -205,6 +205,18 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             return;
         }
 
+        //Check if any nodes are missing files, if so don't allow continue
+        if (!view.getMissingFileNodes().isEmpty()) {
+            view.getWarningPopupPositiveButton().setOnAction(arg01 -> {
+                if (view.getWarningPopup() != null &&
+                    view.getWarningPopup().isShowing()) {
+                    view.getWarningPopup().hide();
+                }
+            });
+            view.showWarningPopup(TextFactory.getText(ErrorKey.PACKAGE_TREE_VALIDATION_ERROR), TextFactory.getText(ErrorKey.MISSING_FILES_ERROR), false, false);
+            return;
+        }
+
         super.onContinuePressed();
 
     }
