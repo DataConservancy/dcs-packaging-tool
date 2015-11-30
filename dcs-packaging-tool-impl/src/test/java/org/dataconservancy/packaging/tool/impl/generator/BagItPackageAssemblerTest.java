@@ -16,6 +16,7 @@
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.junit.Assert;
+
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -26,6 +27,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
+
 import org.dataconservancy.packaging.tool.api.*;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
@@ -33,12 +35,14 @@ import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +50,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.*;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import java.nio.file.Paths;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -180,6 +188,10 @@ public class BagItPackageAssemblerTest {
         String expectedURI = "bag://" + packageName + "/"
                 +  "data" + "/" + filePath + '/';
         assertTrue(expectedURI.equals(result.toString()));
+        
+        assertTrue(Paths
+                   .get(URI.create(packageStagingLocation.toURI().toString()
+                           + packageName + "/data/" + filePath)).toFile().exists());
     }
 
     @Test

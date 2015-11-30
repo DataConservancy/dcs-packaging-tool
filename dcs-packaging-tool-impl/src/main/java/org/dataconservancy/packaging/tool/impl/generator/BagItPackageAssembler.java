@@ -385,6 +385,8 @@ public class BagItPackageAssembler implements PackageAssembler {
                 if (isDirectory && !newFile.mkdir()) {
                     throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
                 }
+            } else if (isDirectory && !newFile.mkdir()) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
             }
 
             //Remove the package location directory and the slash trailing it.                                            s
