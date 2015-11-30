@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 
 import org.apache.commons.collections.MapUtils;
 
@@ -262,7 +263,7 @@ class DomainObjectResourceBuilder
 
         /* Swap out the base URI for each matching resource */
         toReplace.entrySet().forEach(res -> {
-            String newURI = res.getKey().replaceFirst(oldBaseURI, newBaseURI);
+            String newURI = res.getKey().replaceFirst(oldBaseURI, Matcher.quoteReplacement(newBaseURI));
             renameMap.put(res.getValue().toString(), newURI);
             ResourceUtils.renameResource(res.getValue(), newURI);
         });
