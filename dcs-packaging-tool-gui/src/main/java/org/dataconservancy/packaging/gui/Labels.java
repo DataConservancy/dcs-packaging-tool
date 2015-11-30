@@ -134,7 +134,8 @@ public class Labels {
         SELECT_STAGING_DIRECTORY("selectstagingdir.label"),
         PROPERTY_MISSING_LABEL("propertymissing.label"),
         MISSING_FILE_LEGEND("missingfilelegend.label"),
-        MISSING_PROPERTY_LEGEND("missingpropertylegend.label");
+        MISSING_PROPERTY_LEGEND("missingpropertylegend.label"),
+        PROPERTY_VALIDATION_PROGRESS_LABEL("propertyvalidationprogress.label");
 
         private String property;
 

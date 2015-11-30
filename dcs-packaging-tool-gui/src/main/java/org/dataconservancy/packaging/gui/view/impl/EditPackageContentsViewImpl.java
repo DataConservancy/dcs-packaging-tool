@@ -69,6 +69,7 @@ import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
+import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.util.UserDefinedPropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
 import org.dataconservancy.packaging.tool.api.IPMService;
@@ -135,6 +136,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private PackageToolPopup refreshPopup;
     private Button refreshPopupPositiveButton;
     private Button refreshPopupNegativeButton;
+
+    private ProgressDialogPopup validationProgressPopup;
 
     public EditPackageContentsViewImpl (final InternalProperties internalProperties, final Help help) {
         super();
@@ -704,6 +707,28 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public PackageToolPopup getWarningPopup() {
         return warningPopup;
+    }
+
+    @Override
+    public ProgressDialogPopup getValidationProgressPopup() {
+        if (validationProgressPopup == null) {
+            validationProgressPopup = new ProgressDialogPopup();
+            validationProgressPopup.setTitleText(TextFactory.getText(LabelKey.PROPERTY_VALIDATION_PROGRESS_LABEL));
+        }
+        if (getScene() != null && getScene().getWindow() != null) {
+            double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
+            double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
+            validationProgressPopup.setOwner(getScene().getWindow());
+            validationProgressPopup.show(x, y);
+            validationProgressPopup.hide();
+
+            //Get the content width and height to property center the popup.
+            x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - validationProgressPopup.getWidth()/2.0;
+            y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - validationProgressPopup.getHeight()/2.0;
+            validationProgressPopup.setOwner(getScene().getWindow());
+            validationProgressPopup.show(x, y);
+        }
+        return validationProgressPopup;
     }
 
     @Override
