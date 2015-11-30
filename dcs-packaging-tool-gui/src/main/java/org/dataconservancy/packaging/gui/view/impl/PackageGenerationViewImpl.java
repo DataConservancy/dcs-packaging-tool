@@ -353,8 +353,8 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         //packageGenerationSuccessPopup.setAutoHide(false);
         //Offset the popup to cover the buttons but not be off the screen.
-        x -= 340;
-        y -= 60;
+        x -= 270;
+        y -= 100;
 
         if (getScene() != null && getScene().getWindow() != null) {
             packageGenerationSuccessPopup.setOwner(getScene().getWindow());
