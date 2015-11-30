@@ -391,9 +391,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     public void updateItem(Node packageNode, boolean empty) {
                         super.updateItem(packageNode, empty);
                         if (packageNode != null && packageNode.isIgnored()) {
-                            getStyleClass().add(PACKAGE_DESCRIPTION_ROW_IGNORE);
+                            getStyleClass().add(PACKAGE_CONTENT_TREE_IGNORE_ROW);
                         } else {
-                            getStyleClass().removeAll(PACKAGE_DESCRIPTION_ROW_IGNORE);
+                            getStyleClass().removeAll(PACKAGE_CONTENT_TREE_IGNORE_ROW);
                         }
                     }
                 };
