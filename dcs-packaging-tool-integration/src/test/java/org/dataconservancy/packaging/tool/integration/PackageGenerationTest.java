@@ -158,9 +158,17 @@ public class PackageGenerationTest {
          */
         assertEquals(originalDomainObjectSizes, domainObjectSizes(state));
 
-        opened.getPackageState().getDomainObjectRDF();
-        
-        // TODO  Compart to serialized package
+        /* Make sure opened package still has valid references */
+        assertEquals(originalDomainObjectSizes,
+                     domainObjectSizes(opened.getPackageState()));
+
+        /*
+         * Now re-package the opened package, and verify that the references are
+         * yet again valid
+         */
+        assertEquals(originalDomainObjectSizes, domainObjectSizes(packager
+                .createPackage(opened.getPackageState(), folder.getRoot())
+                .getPackageState()));
 
     }
 

@@ -34,19 +34,18 @@ import org.apache.commons.io.IOUtils;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-
 import org.apache.jena.rdf.model.Resource;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.impl.generator.mocks.FunctionalAssemblerMock;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -56,6 +55,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 public class PackageStateBuilderTest {
+
+    public IpmRdfTransformService ipm2rdf = new IpmRdfTransformService();
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -79,7 +80,7 @@ public class PackageStateBuilderTest {
                     .write((OutputStream) args[1], "TURTLE");
             return null;
         }).when(serializer).serialize(any(PackageState.class),
-                                          any(OutputStream.class));
+                                      any(OutputStream.class));
 
         PackageStateBuilder builder = new PackageStateBuilder();
         builder.setPackageStateSerializer(serializer);
@@ -98,6 +99,7 @@ public class PackageStateBuilderTest {
         state.renamedResources.put(oldURI, newURI);
 
         state.tree = new Node(URI.create("http://example.org/blah"));
+        state.pkgState.setPackageTree(ipm2rdf.transformToRDF(state.tree));
 
         builder.finish(state);
 
@@ -111,11 +113,11 @@ public class PackageStateBuilderTest {
         Model serializedModel = ModelFactory.createDefaultModel();
         serializedModel.read(IOUtils.toInputStream(serialized), null, "TURTLE");
 
-        /* Verify that the model was mutated according to the map */
-        assertTrue(serializedModel.listSubjects()
-                .mapWith(Resource::toString).toSet().contains(newURI));
-        assertFalse(serializedModel.listSubjects()
-                .mapWith(Resource::toString).toSet().contains(oldURI));
+        /* Verify that the model was not mutated according to the map */
+        assertFalse(serializedModel.listSubjects().mapWith(Resource::toString)
+                .toSet().contains(newURI));
+        assertTrue(serializedModel.listSubjects().mapWith(Resource::toString)
+                .toSet().contains(oldURI));
     }
 
     private String getPkgStateAsString() throws IOException {

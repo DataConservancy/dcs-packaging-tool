@@ -25,10 +25,12 @@ import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class PackageStateBuilder
         implements NodeVisitor {
 
+    @Autowired
     IpmRdfTransformService rdf2ipm = new IpmRdfTransformService();
 
     PackageStateSerializer pkgSer;
@@ -51,19 +53,34 @@ public class PackageStateBuilder
     public void finish(PackageModelBuilderState state) {
 
         /*
-         * We use the mutated IPM tree, which has updated references for file
-         * URIs, domain object URIs.
+         * Update file locations in the IPM tree
          */
         try {
-            state.pkgState.setPackageTree(rdf2ipm.transformToRDF(state.tree));
+            Node tree =
+                    rdf2ipm.transformToNode(state.pkgState.getPackageTree());
+
+            tree.walk(node -> {
+                if (node.getFileInfo() != null
+                        && state.renamedContentLocations.containsKey(node
+                                .getFileInfo().getLocation())) {
+                    node.getFileInfo()
+                            .setLocation(state.renamedContentLocations.get(node
+                                    .getFileInfo().getLocation()));
+
+                }
+            });
+
+            state.pkgState.setPackageTree(rdf2ipm.transformToRDF(tree));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        /* Now, re-map resources of the domain object graph */
-        state.renamedResources.forEach((oldURI, newURI) -> ResourceUtils
+        /*
+         * Re-map file URIs to bag URIs the package state domain object graph
+         */
+        state.renamedContentLocations.forEach((oldURI, newURI) -> ResourceUtils
                 .renameResource(state.pkgState.getDomainObjectRDF()
-                        .getResource(oldURI), newURI));
+                        .getResource(oldURI.toString()), newURI.toString()));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         pkgSer.serialize(state.pkgState, out);
