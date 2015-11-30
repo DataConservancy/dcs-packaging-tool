@@ -16,10 +16,15 @@
 package org.dataconservancy.packaging.tool.model;
 
 import com.rits.cloning.Cloner;
+
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.SimpleSelector;
+
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 
 import java.io.File;
+
+import java.lang.reflect.Field;
 
 import org.dataconservancy.packaging.tool.model.ser.SerializationScope;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
@@ -27,14 +32,12 @@ import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
 import java.net.URI;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.jena.rdf.model.Model;
 
@@ -221,8 +224,32 @@ public class PackageState {
     @Override
     public final Object clone() throws CloneNotSupportedException {
         Cloner c = new Cloner();
-        c.dontCloneInstanceOf(org.apache.jena.atlas.lib.cache.CacheGuava.class);
-        return c.deepClone(this);
+        PackageState clone = new PackageState();
+
+        try {
+            for (Field field : this.getClass().getDeclaredFields()) {
+                if (Model.class.isAssignableFrom(field.getType())) {
+                    field.set(clone, copy(((Model) field.get(this))));
+                } else {
+                    field.set(clone, c.deepClone(field.get(this)));
+                }
+            }
+        } catch (IllegalAccessException e) {
+            /* Just skip */
+        }
+
+        return clone;
+    }
+    
+    /* Copy an rdf model */
+    private static Model copy(Model from) {
+        Model extracted = ModelFactory.createDefaultModel();
+
+        from.listStatements(new SimpleSelector()).forEachRemaining(s -> {
+            extracted.add(s);
+        });
+
+        return extracted;
     }
 
     @Override

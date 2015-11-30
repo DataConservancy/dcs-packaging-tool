@@ -22,7 +22,11 @@ import java.net.URI;
 
 import java.nio.file.Paths;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.SimpleSelector;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,14 +36,17 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
 import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
 
@@ -70,6 +77,9 @@ public class PackageGenerationTest {
 
     @Autowired
     public Packager packager;
+
+    @Autowired
+    public IpmRdfTransformService ipm2rdf;
 
     @Test
     public void fileExistsTest() throws Exception {
@@ -135,34 +145,53 @@ public class PackageGenerationTest {
      * in the opened domain object RDF model.
      */
     @Test
-    public void domainObjectReferenceTest() {
+    public void domainObjectReferenceTest() throws Exception {
         PackageState state = initializer.initialize(DCS_PROFILE);
 
-        Model originalModel = state.getDomainObjectRDF();
+        Map<URI, Integer> originalDomainObjectSizes = domainObjectSizes(state);
 
         OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
-        Model openedModel = opened.getPackageState().getDomainObjectRDF();
+        /*
+         * Make sure the act of creating a package didn't alter domain object
+         * references!
+         */
+        assertEquals(originalDomainObjectSizes, domainObjectSizes(state));
 
-        opened.getPackageTree()
-                .walk(node -> assertEquals(nonzero(cut(originalModel,
-                                                       selectLocal(originalModel
-                                                               .getResource(node
-                                                                       .getDomainObject()
-                                                                       .toString())))
-                                                   .listStatements().toSet()
-                                                   .size()),
-                                           cut(openedModel,
-                                               selectLocal(openedModel
-                                                       .getResource(node
-                                                               .getDomainObject()
-                                                               .toString())))
-                                                   .listStatements().toSet()
-                                                   .size()));
+        opened.getPackageState().getDomainObjectRDF();
+        
+        // TODO  Compart to serialized package
+
     }
 
-    private static long nonzero(long val) {
-        assertTrue(val > 0);
-        return val;
+    private Map<URI, Integer> domainObjectSizes(PackageState state)
+            throws RDFTransformException {
+        Map<URI, Integer> originalDomainObjectSizes =
+                new HashMap<URI, Integer>();
+
+        Model model = copy(state.getDomainObjectRDF(), new SimpleSelector());
+
+        ipm2rdf.transformToNode(state.getPackageTree())
+                .walk(node -> {
+
+                    if (node.getDomainObject() != null) {
+                        originalDomainObjectSizes.put(node.getIdentifier(),
+                                                      cut(model,
+                                                          selectLocal(model
+                                                                  .getResource(node
+                                                                          .getDomainObject()
+                                                                          .toString())))
+                                                              .listStatements()
+                                                              .toSet().size());
+                    } else {
+                        originalDomainObjectSizes.put(node.getIdentifier(), 0);
+                    }
+                });
+
+        assertEquals("Model contained triples not reachable by domain objects!",
+                     0,
+                     model.listStatements().toSet().size());
+
+        return originalDomainObjectSizes;
     }
 }
