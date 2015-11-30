@@ -52,14 +52,24 @@ public class FilenameValidatorService {
     public final List<String> findInvalidFilenames(Path rootDirectoryPath) throws IOException, InterruptedException {
         List<String> invalidFilenames = new ArrayList<>();
 
+        List<Path> visitedPaths = new ArrayList<>();
+
         Files.walkFileTree(rootDirectoryPath, new SimpleFileVisitor<Path>() {
 
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                     throws IOException {
+
                 if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
                     invalidFilenames.add(path.toString());
                 }
+
+                if (visitedPaths.contains(path.toRealPath())) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+
+                visitedPaths.add(path);
+
                 return FileVisitResult.CONTINUE;
             }
 
@@ -69,6 +79,13 @@ public class FilenameValidatorService {
                 if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
                     invalidFilenames.add(path.toString());
                 }
+
+                if (visitedPaths.contains(path.toRealPath())) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+
+                visitedPaths.add(path);
+
                 return FileVisitResult.CONTINUE;
             }
         });
