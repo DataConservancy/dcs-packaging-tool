@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui.util;
 
 import javafx.scene.control.TextField;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Class that extends TextField but only allow numeric values to be entered.
@@ -55,6 +56,6 @@ public class NumericTextField extends TextField
     private boolean validate(String text)
     {
         //Only allow numeric values or backspaces/deletes
-        return text.matches("[0-9]") || text.equals("");
+        return StringUtils.isNumeric(text) || text.isEmpty();
     }
 }
