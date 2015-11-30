@@ -32,7 +32,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
-
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -44,17 +43,6 @@ import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.PackageGenerationView;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
-import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Implementation of the view that displays the controls for generating a package.
@@ -101,8 +89,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     public Button createAnotherPackageButton;
     
     private ProgressDialogPopup progressDialogPopup;
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private ScrollPane contentScrollPane;
 
