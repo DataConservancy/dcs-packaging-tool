@@ -272,12 +272,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
 
             String labelText;
-
+            labelText = packageNode.getFileInfo().getName();
             if (packageNode.getFileInfo() != null) {
-                if (getFullPathCheckBox().selectedProperty().getValue()) {
+                if (getFullPathCheckBox().selectedProperty().getValue() && packageNode.getFileInfo().getLocation() != null ) {
                     labelText = packageNode.getFileInfo().getLocation().toString();
-                } else {
-                    labelText = packageNode.getFileInfo().getName();
                 }
                 viewLabel.setText(labelText);
             } else {
