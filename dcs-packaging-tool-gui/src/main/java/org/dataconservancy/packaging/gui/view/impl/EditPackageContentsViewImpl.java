@@ -415,10 +415,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         missingFile.setGraphic(missingFileIndicator);
         legend.getChildren().add(missingFile);
 
-        Label missingProperty = new Label(TextFactory.getText(LabelKey.MISSING_PROPERTY_LEGEND));
-        missingProperty.setGraphic(missingPropertyIndicator);
-        legend.getChildren().add(missingProperty);
-
         content.getChildren().add(legend);
         VBox.setVgrow(artifactTree, Priority.ALWAYS);
 
