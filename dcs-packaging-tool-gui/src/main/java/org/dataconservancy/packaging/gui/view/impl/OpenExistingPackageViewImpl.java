@@ -19,6 +19,8 @@ import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
+import org.dataconservancy.packaging.gui.util.PackageToolPopup;
+import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 
 import javafx.geometry.Insets;
@@ -43,6 +45,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     private TextField choosePackageFileTextField;
     private Button choosePackageStagingDirectoryButton;
     private TextField choosePackageStagingDirectoryTextField;
+    private ProgressDialogPopup progressDialogPopup;
 
     public OpenExistingPackageViewImpl(Help help) {
         super();
@@ -153,6 +156,29 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         setHelpPopupContent(help.get(Help.HelpKey.OPEN_EXISTING_PACKAGE));
     }
 
+    @Override
+    public ProgressDialogPopup getProgressPopup() {
+        if (progressDialogPopup == null) {
+            progressDialogPopup = new ProgressDialogPopup();
+            progressDialogPopup.setTitleText(TextFactory.getText(Labels.LabelKey.LOADING_PACKAGE_LABEL));
+
+            if (getScene() != null && getScene().getWindow() != null) {
+                double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
+                double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
+                progressDialogPopup.setOwner(getScene().getWindow());
+                progressDialogPopup.show(x, y);
+                progressDialogPopup.hide();
+
+                //Get the content width and height to property center the popup.
+                x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - progressDialogPopup.getWidth()/2.0;
+                y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - progressDialogPopup.getHeight()/2.0;
+                progressDialogPopup.setOwner(getScene().getWindow());
+                progressDialogPopup.show(x, y);
+            }
+        }
+
+        return progressDialogPopup;
+    }
     @Override
     public Button getChoosePackageStateFileButton() {
         return choosePackageStateFileButton;

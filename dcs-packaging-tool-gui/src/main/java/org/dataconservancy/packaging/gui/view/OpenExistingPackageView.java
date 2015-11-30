@@ -19,6 +19,7 @@ import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePrese
 
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 
 /**
  * If the user selects to open an existing package, this view is shown.
@@ -89,4 +90,10 @@ public interface OpenExistingPackageView extends View<OpenExistingPackagePresent
      * @return The TextField to display the file.
      */
     TextField getChoosePackageFileTextField();
+
+    /**
+     * A progress dialog that is shown when loading a package.
+     * @return The progress dialog shown when loading a package.
+     */
+    ProgressDialogPopup getProgressPopup();
 }
