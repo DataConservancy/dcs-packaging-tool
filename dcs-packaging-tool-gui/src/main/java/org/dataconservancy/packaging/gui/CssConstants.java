@@ -65,4 +65,6 @@ public interface CssConstants {
     String CATEGORY_SUB_TITLE = "CategorySubTitle";
     String EDIT_PACKAGE_TREE_BUTTON = "EditPackageTreeButton";
     String EDIT_PACKAGE_TREE_MENU = "EditPackageContentsView-MenuItem";
+    String REQUIRED_PROPERTY = "RequiredProperty";
+    String REQUIRED_PROPERTY_EXPLANATION = "RequiredPropertyExplanation";
 }

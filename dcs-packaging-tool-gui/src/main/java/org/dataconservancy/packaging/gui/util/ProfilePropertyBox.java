@@ -50,6 +50,11 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         HBox propertyLabelAndValueBox = new HBox(12);
         propertyLabelAndValueBox.setAlignment(Pos.CENTER_LEFT);
         Label propertyNameLabel = new Label(propertyConstraint.getPropertyType().getLabel());
+
+        if (propertyConstraint.getMinimum() > 0) {
+            propertyNameLabel.getStyleClass().add(REQUIRED_PROPERTY);
+        }
+
         propertyNameLabel.setPrefWidth(100);
         propertyNameLabel.setWrapText(true);
         propertyLabelAndValueBox.getChildren().add(propertyNameLabel);

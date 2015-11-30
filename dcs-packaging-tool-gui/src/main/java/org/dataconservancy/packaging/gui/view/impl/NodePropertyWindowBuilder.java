@@ -186,6 +186,11 @@ public class NodePropertyWindowBuilder implements CssConstants {
         PropertyCategoryBox generalPropertyBox = new PropertyCategoryBox(TextFactory.format(Messages.MessageKey.TYPE_PROPERTY_LABEL, nodeType.getLabel()));
         propertyContent.getChildren().add(generalPropertyBox);
 
+        Label requiredPropertiesExplanation = new Label(TextFactory.getText(Labels.LabelKey.REQUIRED_PROPERTIES_EXPLANATION_LABEL));
+        requiredPropertiesExplanation.setWrapText(true);
+        requiredPropertiesExplanation.getStyleClass().add(REQUIRED_PROPERTY_EXPLANATION);
+        generalPropertyBox.getChildren().add(requiredPropertiesExplanation);
+
         List<PropertyConstraint> sortedProperties = new ArrayList<>();
 
         //Get the property name key set and then create a sorted list from it.

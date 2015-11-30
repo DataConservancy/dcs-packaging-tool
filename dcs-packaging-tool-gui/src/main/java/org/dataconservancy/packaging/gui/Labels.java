@@ -135,7 +135,8 @@ public class Labels {
         PROPERTY_MISSING_LABEL("propertymissing.label"),
         MISSING_FILE_LEGEND("missingfilelegend.label"),
         MISSING_PROPERTY_LEGEND("missingpropertylegend.label"),
-        PROPERTY_VALIDATION_PROGRESS_LABEL("propertyvalidationprogress.label");
+        PROPERTY_VALIDATION_PROGRESS_LABEL("propertyvalidationprogress.label"),
+        REQUIRED_PROPERTIES_EXPLANATION_LABEL("requiredpropertyexplanation.label");
 
         private String property;
 
