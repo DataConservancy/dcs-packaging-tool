@@ -75,8 +75,6 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     private File packageLocation;
     private String packageFileName;
 
-
-
     public PackageGenerationPresenterImpl(PackageGenerationView view) {
         super(view);
         this.view = view;
@@ -616,17 +614,16 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         this.packageGenerationParamsBuilder = packageParamsBuilder;
     }
 
-
     //Method should only be used for testing, will run all code on the same thread to simplify the test.
     protected void setTestBackgroundService() {
         this.backgroundService = new AsyncPackageService();
         bind();
     }
 
-
     protected PackageGenerationParameters getGenerationParams() {
         return generationParams;
     }
+
     /*
      * Simple interface that shadows JavaFX service this is used so we can create our own instance to use in testing.
      */

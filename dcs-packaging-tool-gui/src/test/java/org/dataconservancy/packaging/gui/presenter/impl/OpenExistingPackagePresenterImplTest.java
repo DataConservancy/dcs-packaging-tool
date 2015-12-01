@@ -63,6 +63,7 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
         view.setHeaderView(headerView);
 
         presenter = new OpenExistingPackagePresenterImpl(view);
+        presenter.setTestBackgroundService();
         presenter.setController(controller);
         presenter.setInternalProperties(internalProperties);
 
