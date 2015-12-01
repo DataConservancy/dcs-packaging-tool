@@ -30,6 +30,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.DirectoryWalker;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -57,6 +61,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.ontologies.ModelResources;
 import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -68,6 +73,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
@@ -406,10 +416,38 @@ public class PackageGenerationTest {
         assertTrue(comparisons.isEmpty());
     }
 
-    /*
-     * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
-     * generic tree operations should be in a common library?
+    /**
+     * Insures the models from ModelResources are included in the final package.  Currently every
+     * model exposed by {@code ModelResources#RESOURCE_MAP} should have a serialization in the
+     * final package under the ONT directory per our spec.
+     *
+     * @throws Exception
      */
+    @Test
+    public void testOntologiesIncluded() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+        OpenedPackage openedPackage = packager.createPackage(state, folder.getRoot());
+        List<File> models = new ArrayList<>();
+        OntDirectoryWalker walker = new OntDirectoryWalker();
+
+        walker.doWalk(openedPackage.getBaseDirectory(), models);
+
+        assertTrue(ModelResources.RESOURCE_MAP.size() > 0);
+        assertEquals(ModelResources.RESOURCE_MAP.size(), models.size());
+        List<String> packageModelNames = models.stream().collect(Collectors.mapping(File::getName, Collectors.toList()));
+        ModelResources.RESOURCE_MAP.values().stream().forEach(resource -> {
+            if (resource.startsWith("/")) {
+                resource = resource.substring(1, resource.length());
+            }
+            assertTrue(packageModelNames.contains(resource));
+        });
+
+    }
+
+    /*
+         * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
+         * generic tree operations should be in a common library?
+         */
     private void buildContentRoots(Node node, Node newTree) throws IOException {
         if (node.getChildren() != null) {
             for (Node child : node.getChildren()) {
@@ -538,5 +576,19 @@ public class PackageGenerationTest {
                 });
 
         return domainObjects;
+    }
+
+    private class OntDirectoryWalker extends DirectoryWalker<File> {
+
+        public void doWalk(File baseDir, List<File> models) throws IOException {
+            walk(baseDir, models);
+        }
+
+        @Override
+        protected void handleFile(File file, int depth, Collection<File> results) throws IOException {
+            if (file.getParentFile().getName().equals("ONT") && file.getName().endsWith(".ttl")) {
+                results.add(file);
+            }
+        }
     }
 }
