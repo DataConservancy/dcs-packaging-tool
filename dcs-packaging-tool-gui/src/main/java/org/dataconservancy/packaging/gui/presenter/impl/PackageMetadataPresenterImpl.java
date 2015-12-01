@@ -134,6 +134,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             } catch (IOException | RDFTransformException e){
                 view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                 view.getErrorLabel().setVisible(true);
+                view.scrollToTop();
             }
         });
 
@@ -149,6 +150,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 } catch (IOException | RDFTransformException e) {
                     view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                     view.getErrorLabel().setVisible(true);
+                    view.scrollToTop();
                 }
             }
 
@@ -157,6 +159,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         } else {
             view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
             view.getErrorLabel().setVisible(true);
+            view.scrollToTop();
         }
     }
 
