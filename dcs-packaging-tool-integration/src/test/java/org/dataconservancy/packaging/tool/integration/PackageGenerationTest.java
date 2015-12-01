@@ -54,6 +54,8 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -281,6 +283,65 @@ public class PackageGenerationTest {
                         domainObjectSizes(opened.getPackageState()));
         assertEquals(domainObjectSizes(opened.getPackageState()),
                      domainObjectSizes(afterSaveAndReopen.getPackageState()));
+    }
+
+    @Test
+    public void customPropertiesTest() throws Exception {
+        URI customPredicate = URI.create("urn:test:customPropertiesTest");
+        PropertyType customPropertyType = new PropertyType();
+        customPropertyType.setDomainPredicate(customPredicate);
+        customPropertyType.setPropertyValueType(PropertyValueType.STRING);
+
+        PackageState initialState = initializer.initialize(DCS_PROFILE);
+
+        Node nodeForProperty =
+                ipm2rdf.transformToNode(initialState.getPackageTree());
+        Property property = new Property(customPropertyType);
+        property.setStringValue(nodeForProperty.toString());
+
+        initialState.getUserSpecifiedProperties()
+                .put(nodeForProperty.getIdentifier(), Arrays.asList(property));
+
+        /* Now add a custom property. Unpack the tree, add, and re-pack */
+        applyCustomProperties(initialState);
+
+        OpenedPackage opened =
+                packager.createPackage(initialState, folder.getRoot());
+
+        assertEquals(domainObjectSizes(initialState),
+                     domainObjectSizes(opened.getPackageState()));
+        Model openedModel = opened.getPackageState().getDomainObjectRDF();
+        Set<String> customValues =
+                openedModel
+                        .listObjectsOfProperty(openedModel.getProperty(customPredicate
+                                .toString())).mapWith(RDFNode::asLiteral)
+                        .mapWith(Literal::getString).toSet();
+
+        assertEquals(1, customValues.size());
+        assertTrue(customValues.contains(property.getStringValue()));
+
+    }
+
+    private void applyCustomProperties(PackageState state)
+            throws RDFTransformException {
+        DomainProfileService profileService =
+                profileServiceFactory.getProfileService(state
+                        .getDomainObjectRDF());
+
+        /* Now add a custom property. Unpack the tree, add, and re-pack */
+        Node initialTree = ipm2rdf.transformToNode(state.getPackageTree());
+
+        state.getUserSpecifiedProperties()
+                .forEach((nodeURI, properties) -> {
+                    initialTree.walk(node -> {
+                        if (node.getIdentifier().equals(nodeURI)) {
+                            properties.forEach(prop -> profileService
+                                    .addProperty(node, prop));
+                        }
+                    });
+                });
+
+        state.setPackageTree(ipm2rdf.transformToRDF(initialTree));
     }
 
     @Test

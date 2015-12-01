@@ -20,6 +20,7 @@ import java.net.URI;
 
 import java.nio.file.Paths;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,6 +79,7 @@ public class PackageInitializer {
 
             state.setDomainObjectRDF(model);
             state.setPackageTree(ipm2rdf.transformToRDF(tree));
+            state.setUserSpecifiedProperties(new HashMap<>());
             return state;
         } catch (Exception e) {
             throw new RuntimeException(e);
