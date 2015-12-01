@@ -54,6 +54,19 @@ public interface Ontologies {
 
     public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema#";
 
+    public static final String NS_DCAM = "http://purl.org/dc/dcam/";
+
+    public static final String NS_DCMITYPE = "http://purl.org/dc/dcmitype/";
+
+    public static final String NS_DCELEMENTS = "http://purl.org/dc/elements/1.1/";
+
+    public static final String NS_LDP = "http://www.w3.org/ns/ldp#";
+
+    public static final String NS_OWL2 = "http://www.w3.org/2002/07/owl#";
+
+    public static final String NS_RDFG = "http://www.w3.org/2004/03/trix/rdfg-1/";
+
+
     /**
      * Central map of prefixes, consistent with all ontologies used herein.
      * <p>
