@@ -169,9 +169,21 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         controller.setPackageState(pkg.getPackageState());
         controller.setPackageTree(pkg.getPackageTree());
 
-        super.onContinuePressed();
+        if (pkg.getBaseDirectory() == null) {
+            // Package state was loaded, go to next page.
+            controller.goToNextPage();
+        } else {
+            // Package was loaded, save state and go to next page.
+            super.onContinuePressed();
+        }
     }
-
+    
+    @Override
+    public void onBackPressed() {
+        // Do not save state.
+        getController().goToPreviousPage();
+    }
+ 
     @Override
     public void clear() {
         clearError();

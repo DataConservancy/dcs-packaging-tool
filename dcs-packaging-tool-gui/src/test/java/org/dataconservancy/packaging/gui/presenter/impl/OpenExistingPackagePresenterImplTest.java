@@ -3,6 +3,7 @@ package org.dataconservancy.packaging.gui.presenter.impl;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +35,8 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     private OpenExistingPackageViewImpl view;
     private OpenPackageService open_package_service;
     private Controller controller;
-
+    private OpenedPackage pkg = new OpenedPackage();
+    
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
@@ -69,8 +71,6 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
 
         Node tree = new Node(URI.create("test:moo"));
         PackageState state = new PackageState();
-
-        OpenedPackage pkg = new OpenedPackage();
 
         pkg.setBaseDirectory(tmpfolder.newFolder());
         pkg.setPackageState(state);
@@ -129,17 +129,50 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
 
     /**
      * Test that package state and tree are set when user opens a package state
-     * and continues.
+     * and continues. Verify that state is not saved.
      * 
-     * @throws IOException
+     * @throws Exception
      */
     @Test
-    public void testContinue() throws IOException {
+    public void testContinueOnPackageState() throws Exception {
+        pkg.setBaseDirectory(null);
+        
         view.getChoosePackageStateFileButton().fire();
         view.getContinueButton().fire();
 
         verify(controller).setPackageState(any());
         verify(controller).setPackageTree(any());
         verify(controller).goToNextPage();
+        verify(controller, times(0)).savePackageStateFile();
+    }
+    
+    /**
+     * Test that package state and tree are set when user opens a package state
+     * and continues. Verify that state is saved.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testContinueOnPackage() throws Exception {
+        view.getChoosePackageStateFileButton().fire();
+        view.getContinueButton().fire();
+
+        verify(controller).setPackageState(any());
+        verify(controller).setPackageTree(any());
+        verify(controller).goToNextPage();
+        verify(controller).savePackageStateFile();
+    }
+    
+    /**
+     * Verify that state is not saved.
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testGoBack() throws Exception {
+        view.getCancelLink().fire();
+
+        verify(controller).goToPreviousPage();
+        verify(controller, times(0)).savePackageStateFile();
     }
 }
