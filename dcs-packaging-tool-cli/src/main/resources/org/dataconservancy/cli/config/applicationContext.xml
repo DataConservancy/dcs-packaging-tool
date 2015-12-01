@@ -29,16 +29,6 @@
     class="org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder">
   </bean>
 
-    <bean id="uriGenerator" class="org.dataconservancy.packaging.tool.impl.SimpleURIGenerator"/>
-
-  <bean id="domainProfileObjectStore" class="org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl">
-     <constructor-arg ref="uriGenerator"/>
-   </bean>
-
-   <bean id="profileService" class="org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl">
-     <constructor-arg ref="domainProfileObjectStore"/>
-     <constructor-arg ref="uriGenerator"/>
-   </bean>
 
 </beans>
 

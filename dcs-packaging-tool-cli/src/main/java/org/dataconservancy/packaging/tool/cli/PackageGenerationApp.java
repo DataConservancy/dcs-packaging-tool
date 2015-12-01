@@ -19,6 +19,7 @@ import java.io.*;
 
 
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
@@ -33,10 +34,14 @@ import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStore;
+import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl;
 import org.dataconservancy.packaging.tool.impl.DomainProfileRdfTransformService;
 import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
 import org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
+import org.dataconservancy.packaging.tool.impl.SimpleURIGenerator;
+import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
@@ -195,6 +200,11 @@ public class PackageGenerationApp {
 	}
 
 	private void run() throws PackageToolException {
+         appContext = new ClassPathXmlApplicationContext(
+                new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
+                        "classpath*:org/dataconservancy/config/applicationContext.xml",
+                        "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
+                "classpath*:applicationContext.xml"});
         boolean useDefaults = true;
 
 		// Prepare parameter builder
@@ -268,7 +278,9 @@ public class PackageGenerationApp {
         PackageState state = new PackageState();
 
         Model objectModel = ModelFactory.createDefaultModel();
-        DomainProfileService profileService = appContext.getBean("profileService", DomainProfileServiceImpl.class);
+        URIGenerator uriGen = appContext.getBean("uriGenerator", SimpleURIGenerator.class);
+        DomainProfileObjectStore domainProfileObjectStore = new DomainProfileObjectStoreImpl(uriGen);
+        DomainProfileService profileService = new DomainProfileServiceImpl(domainProfileObjectStore, uriGen);
 
         if(this.domainProfileFile != null) {String domainProfilePath = domainProfileFile.getPath();
             try{
@@ -288,13 +300,15 @@ public class PackageGenerationApp {
                 System.out.println(profile.toString());
                 state.setDomainObjectRDF(objectModel);
                 DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
+                //domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
                 domainProfileStore.getPrimaryDomainProfiles().add(profile);
+                IpmRdfTransformService ipm2rdf = appContext.getBean("ipmRdfTransformService", IpmRdfTransformService.class);
+                ipm2rdf.setDomainProfileStore(domainProfileStore);
 
                 if(!profileService.assignNodeTypes(profile, tree)){
                  System.err.println("Unable to assign node types to tree.");
                 }
-                IpmRdfTransformService ipm2rdf = new IpmRdfTransformService();
-                ipm2rdf.setDomainProfileStore(domainProfileStore);
+
                 state.setPackageTree(ipm2rdf.transformToRDF(tree));
             } catch (FileNotFoundException e) {
                 System.err.println("Error opening the domain profile file at " + domainProfilePath);
