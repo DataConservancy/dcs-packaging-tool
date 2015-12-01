@@ -563,12 +563,16 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             if (nodeOne.getFileInfo() == null) {
                 if (nodeTwo.getFileInfo() == null) {
                     return 0;
+                } else if (nodeTwo.getFileInfo().isDirectory()) {
+                    return 1;
                 } else {
                     return -1;
                 }
-            } else {
-                if (nodeTwo.getFileInfo() == null) {
+            } else if (nodeTwo.getFileInfo() == null) {
+                if (nodeOne.getFileInfo().isDirectory()) {
                     return -1;
+                } else {
+                    return 1;
                 }
             }
 
