@@ -16,6 +16,9 @@
 
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import java.net.URI;
+
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.jena.rdf.model.Model;
@@ -46,7 +49,21 @@ public class PackageModelBuilderState {
      * This is a map of old URI to new URI.
      * </p>
      */
-    public Map<String, String> renamedResources;
+    public Map<String, String> renamedResources = new HashMap<>();
+
+    /**
+     * This contains a mapping of renamed content location URIs.
+     * <p>
+     * This is a map of old URI to new URI
+     * </p>
+     */
+    public Map<URI, URI> renamedContentLocations = new HashMap<>();
+
+    /**
+     * Maps IPM node URIs to the location of a serialization in a package that
+     * contains it.
+     */
+    public Map<URI, URI> domainObjectSerializationLocations = new HashMap<>();
 
     /**
      * RDF manifest associated with this package.

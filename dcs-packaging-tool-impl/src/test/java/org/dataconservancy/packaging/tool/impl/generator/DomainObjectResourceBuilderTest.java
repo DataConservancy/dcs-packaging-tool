@@ -125,7 +125,9 @@ public class DomainObjectResourceBuilderTest {
         serializer.init(state);
         state.tree.walk(node -> serializer.visitNode(node, state));
 
-        try (InputStream in = state.tree.getIdentifier().toURL().openStream()) {
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getIdentifier()).toURL().openStream()) {
             String serialized = IOUtils.toString(in);
 
             /*
@@ -199,7 +201,8 @@ public class DomainObjectResourceBuilderTest {
 
         Node fileNode = state.tree.getChildren().get(0);
 
-        assertNotEquals(fileNode.getIdentifier(), fileNode.getDomainObject());
+        assertNotEquals(state.domainObjectSerializationLocations.get(fileNode
+                .getIdentifier()), fileNode.getDomainObject());
         assertEquals(fileNode.getDomainObject(), fileNode.getFileInfo()
                 .getLocation());
         assertNotEquals(fileNode.getDomainObject(),
@@ -221,7 +224,9 @@ public class DomainObjectResourceBuilderTest {
          * Make sure the domain object serialization deserializes, and has the
          * domain object URI as a subject
          */
-        try (InputStream in = fileNode.getIdentifier().toURL().openStream()) {
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(fileNode.getIdentifier()).toURL().openStream()) {
 
             Model deserialized = ModelFactory.createDefaultModel();
 
@@ -273,9 +278,12 @@ public class DomainObjectResourceBuilderTest {
         state.tree.walk(node -> serializer.visitNode(node, state));
         serializer.finish(state);
 
-        assertEquals(fileNode.getIdentifier(), fileNode.getDomainObject());
+        assertEquals(state.domainObjectSerializationLocations.get(fileNode
+                .getIdentifier()), fileNode.getDomainObject());
 
-        try (InputStream in = fileNode.getIdentifier().toURL().openStream()) {
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(fileNode.getIdentifier()).toURL().openStream()) {
 
             Model deserialized = ModelFactory.createDefaultModel();
 
@@ -330,20 +338,66 @@ public class DomainObjectResourceBuilderTest {
 
         Model deserialized = ModelFactory.createDefaultModel();
 
-        try (InputStream in = state.tree.getIdentifier().toURL().openStream()) {
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getIdentifier()).toURL().openStream()) {
             deserialized.read(in,
                               state.tree.getIdentifier().toString(),
                               "TURTLE");
         }
         try (InputStream in =
-                state.tree.getChildren().get(0).getIdentifier().toURL()
-                        .openStream()) {
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getChildren().get(0).getIdentifier())
+                        .toURL().openStream()) {
             deserialized.read(in, state.tree.getChildren().get(0)
                     .getIdentifier().toString(), "TURTLE");
         }
 
         assertEquals(COUNT, deserialized.listStatements().toSet().size());
 
+    }
+
+    @Test
+    public void nullFileInfoTest() throws Exception {
+        PackageModelBuilderState state = bootstrap2();
+
+        state.tree.walk(node -> {
+            if (node.getFileInfo().isDirectory()) {
+                node.setFileInfo(null);
+            }
+        });
+
+        int COUNT = state.domainObjects.listStatements().toSet().size();
+
+        state.assembler = new FunctionalAssemblerMock(folder.getRoot());
+
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
+
+        /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
+        serializer.init(state);
+        state.tree.walk(node -> serializer.visitNode(node, state));
+        serializer.finish(state);
+
+        Model deserialized = ModelFactory.createDefaultModel();
+
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getIdentifier()).toURL().openStream()) {
+            deserialized.read(in,
+                              state.tree.getIdentifier().toString(),
+                              "TURTLE");
+        }
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getChildren().get(0).getIdentifier())
+                        .toURL().openStream()) {
+            deserialized.read(in, state.tree.getChildren().get(0)
+                    .getIdentifier().toString(), "TURTLE");
+        }
+
+        assertEquals(COUNT, deserialized.listStatements().toSet().size());
     }
 
     @Test
@@ -368,7 +422,9 @@ public class DomainObjectResourceBuilderTest {
 
         Model deserialized = ModelFactory.createDefaultModel();
 
-        try (InputStream in = state.tree.getIdentifier().toURL().openStream()) {
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getIdentifier()).toURL().openStream()) {
             String content = IOUtils.toString(in);
             deserialized.read(IOUtils.toInputStream(content), state.tree
                     .getIdentifier().toString(), "TURTLE");

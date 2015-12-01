@@ -35,6 +35,11 @@
     
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
+      <artifactId>dcs-packaging-tool-ontologies</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-profile-dcs</artifactId>
     </dependency>
     

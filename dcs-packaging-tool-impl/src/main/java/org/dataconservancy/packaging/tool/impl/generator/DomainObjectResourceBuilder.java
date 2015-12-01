@@ -104,10 +104,21 @@ class DomainObjectResourceBuilder
                     if (node.isIgnored() || node.getDomainObject() == null) {
                         if (node.getDomainObject() != null) {
                             /* Remove the domain object graph */
-                            Model ignored = cut(state.domainObjects, selectLocal(state.domainObjects.getResource(node.getDomainObject().toString())));
+                            Model ignored =
+                                    cut(state.domainObjects,
+                                        selectLocal(state.domainObjects
+                                                .getResource(node
+                                                        .getDomainObject()
+                                                        .toString())));
 
-                            /* Remove triples that involve a subject defined in it */
-                            ignored.listSubjects().filterKeep(RDFNode::isURIResource).forEachRemaining(r -> state.domainObjects.removeAll(null, null, r));
+                            /*
+                             * Remove triples that involve a subject defined in
+                             * it
+                             */
+                            ignored.listSubjects()
+                                    .filterKeep(RDFNode::isURIResource)
+                                    .forEachRemaining(r -> state.domainObjects
+                                            .removeAll(null, null, r));
                         }
                         return;
                     }
@@ -124,22 +135,25 @@ class DomainObjectResourceBuilder
                     URI originalDomainObjectURI = node.getDomainObject();
 
                     /* This is where the domain object will be serialized */
-                    node.setIdentifier(state.assembler
-                            .reserveResource(OBJECT_PATH
-                                                     + path(node,
-                                                            "."
-                                                                    + determineSerialization(state.params,
-                                                                                             RDFFormat.TURTLE_PRETTY)
-                                                                            .getLang()
-                                                                            .getFileExtensions()
-                                                                            .get(0)),
-                                             PackageResourceType.DATA));
+                    URI newDomainObjectURI =
+                            state.assembler
+                                    .reserveResource(OBJECT_PATH
+                                                             + path(node,
+                                                                    "."
+                                                                            + determineSerialization(state.params,
+                                                                                                     RDFFormat.TURTLE_PRETTY)
+                                                                                    .getLang()
+                                                                                    .getFileExtensions()
+                                                                                    .get(0)),
+                                                     PackageResourceType.DATA);
 
-                    URI newDomainObjectURI = node.getIdentifier();
+                    state.domainObjectSerializationLocations.put(node
+                            .getIdentifier(), newDomainObjectURI);
 
-                    if (node.getFileInfo().isFile()) {
+                    if (node.getFileInfo() != null
+                            && node.getFileInfo().isFile()) {
                         try {
-                            URI binaryURI =
+                            URI newFileLocation =
                                     state.assembler
                                             .createResource(BINARY_PATH
                                                                     + path(node,
@@ -152,6 +166,10 @@ class DomainObjectResourceBuilder
 
                             URI originalFileLocation =
                                     node.getFileInfo().getLocation();
+
+                            state.renamedContentLocations
+                                    .put(originalFileLocation, newFileLocation);
+
                             if (!state.domainObjects
                                     .containsResource(state.domainObjects
                                             .getResource(originalFileLocation
@@ -162,7 +180,7 @@ class DomainObjectResourceBuilder
                                  * to, then the domain object URI *is* the
                                  * binary URI
                                  */
-                                newDomainObjectURI = binaryURI;
+                                newDomainObjectURI = newFileLocation;
                             } else {
                                 /*
                                  * We replace references to file location with
@@ -171,21 +189,29 @@ class DomainObjectResourceBuilder
                                 remap(state.domainObjects,
                                       bare(node.getFileInfo().getLocation()
                                               .toString()),
-                                      binaryURI.toString(),
+                                      newFileLocation.toString(),
                                       originalResources,
                                       state.renamedResources);
 
                             }
 
-                            node.getFileInfo().setLocation(binaryURI);
+                            node.getFileInfo().setLocation(newFileLocation);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
-                    } else if (node.getFileInfo().isDirectory()) {
-                        /* It's a directory, so reserve a bag URI */
-                        node.getFileInfo().setLocation(state.assembler
-                                .reserveDirectory(BINARY_PATH + path(node, ""),
-                                                  PackageResourceType.DATA));
+                    } else if (node.getFileInfo() != null
+                            && node.getFileInfo().isDirectory()) {
+                        /* It's a directory, so map it to a directory bag URI */
+                        URI newLocation =
+                                state.assembler
+                                        .reserveDirectory(BINARY_PATH
+                                                                  + path(node,
+                                                                         ""),
+                                                          PackageResourceType.DATA);
+
+                        state.renamedContentLocations.put(node.getFileInfo()
+                                .getLocation(), newLocation);
+                        node.getFileInfo().setLocation(newLocation);
                     }
 
                     node.setDomainObject(newDomainObjectURI);
@@ -195,8 +221,12 @@ class DomainObjectResourceBuilder
                      * URI
                      */
                     if (originalDomainObjectURI != null
-                        && node.getDomainObject() != null) {
-                        remap(state.domainObjects, bare(originalDomainObjectURI.toString()), node.getDomainObject().toString(), originalResources, state.renamedResources);
+                            && node.getDomainObject() != null) {
+                        remap(state.domainObjects,
+                              bare(originalDomainObjectURI.toString()),
+                              node.getDomainObject().toString(),
+                              originalResources,
+                              state.renamedResources);
                     }
                 });
     }
@@ -218,10 +248,12 @@ class DomainObjectResourceBuilder
                 cut(state.domainObjects, selectLocal(primaryDomainObject));
 
         /*
-         * If the domain object is not at the binary URI, give it the null
-         * relative URI for serialization.
+         * If the domain object is serialized at a location that is identical to
+         * its URI, then use the null relative URI in its representation.
          */
-        if (node.getDomainObject().equals(node.getIdentifier())) {
+        if (node.getDomainObject()
+                .equals(state.domainObjectSerializationLocations.get(node
+                        .getIdentifier()))) {
             String baseURI = bare(primaryDomainObject.getURI());
             domainObjectGraph
                     .listSubjects()
@@ -238,7 +270,9 @@ class DomainObjectResourceBuilder
                 toInputStream(domainObjectGraph,
                               determineSerialization(state.params,
                                                      RDFFormat.TURTLE))) {
-            state.assembler.putResource(node.getIdentifier(), stream);
+            state.assembler
+                    .putResource(state.domainObjectSerializationLocations
+                            .get(node.getIdentifier()), stream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -271,10 +305,15 @@ class DomainObjectResourceBuilder
                 + Character.MAX_VALUE));
 
         /* Swap out the base URI for each matching resource */
-        toReplace.entrySet().forEach(res -> {
-            String newURI = res.getKey().replaceFirst(oldBaseURI, Matcher.quoteReplacement(newBaseURI));
-            renameMap.put(res.getValue().toString(), newURI);
-            ResourceUtils.renameResource(res.getValue(), newURI);
-        });
+        toReplace
+                .entrySet()
+                .forEach(res -> {
+                    String newURI =
+                            res.getKey()
+                                    .replaceFirst(oldBaseURI,
+                                                  Matcher.quoteReplacement(newBaseURI));
+                    renameMap.put(res.getValue().toString(), newURI);
+                    ResourceUtils.renameResource(res.getValue(), newURI);
+                });
     }
 }
