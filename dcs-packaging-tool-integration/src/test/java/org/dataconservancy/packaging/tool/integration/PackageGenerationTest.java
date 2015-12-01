@@ -563,13 +563,12 @@ public class PackageGenerationTest {
                 .mapWith(RDFNode::asResource)
                 .mapWith(Resource::getURI)
                 .mapWith(URI::create)
-                .mapWith(uri -> UriUtility.resolveBagUri(baseDir, uri))
-                .mapWith(Path::toFile)
-                .forEachRemaining(domainObjectFile -> {
+                .forEachRemaining(bagUri -> {
                     try (FileInputStream in =
-                            new FileInputStream(domainObjectFile)) {
-                        domainObjects.read(domainObjectFile.toURI().toString());
+                            new FileInputStream(UriUtility
+                                    .resolveBagUri(baseDir, bagUri).toFile())) {
 
+                        domainObjects.read(in, bagUri.toString(), "TURTLE");
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
