@@ -136,7 +136,7 @@ xsd:dateTime a rdfs:Datatype;
 
 xsd:dateTimeStamp a rdfs:Datatype;
   rdfs:isDefinedBy <http://www.w3.org/TR/xmlschema11-2/#dateTimeStamp> ;
-  rdfs:comment """The lexical space of dateTimeStamp consists of strings which are in the ·lexical space· of dateTime and which also match the regular expression '.*(Z|(\+|-)[0-9][0-9]:[0-9][0-9])'""" ;
+  rdfs:comment """The lexical space of dateTimeStamp consists of strings which are in the ·lexical space· of dateTime and which also match the regular expression [regex removed because RIOT and older Jena parsing code can't agree on how escaping should work]""" ;
   rdfs:label "dataTimeStamp" .
 
 xsd:time a rdfs:Datatype;
