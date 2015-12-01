@@ -127,7 +127,7 @@ public class Configuration {
         disciplineMap = file;
     }
 
-    @Option(name="--generation-params", aliases={"-p"}, usage="Sets the package generation parameters file")
+    @Option(name="--generation-params", aliases={"-g"}, usage="Sets the package generation parameters file")
     public void setPackageGenerationParameters(String file){
         packageGenerationParameters = file;
     }

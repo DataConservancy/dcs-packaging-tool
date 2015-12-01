@@ -17,16 +17,26 @@ package org.dataconservancy.packaging.tool.cli;
 
 import java.io.*;
 
+
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
+import org.dataconservancy.packaging.tool.api.DomainProfileStore;
+import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
-import org.dataconservancy.packaging.tool.model.BagItParameterNames;
+import org.dataconservancy.packaging.tool.impl.DomainProfileRdfTransformService;
+import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
+import org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl;
+import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
@@ -34,7 +44,9 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
 import org.dataconservancy.packaging.tool.model.ParametersBuildException;
-import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
+import org.dataconservancy.packaging.tool.model.RDFTransformException;
+import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -64,9 +76,8 @@ public class PackageGenerationApp {
 	 * 
 	 * Arguments
 	 */
-	@Argument(multiValued = true, index = 0, metaVar = "[infile]", usage = "package description file, omit to use stdin")
-	private String location = null;
-
+	@Argument(multiValued = true, index = 0, metaVar = "[infile]", usage = "domain profile file, omit to use stdin")
+    public File domainProfileFile = null;
 	/*
 	 * 
 	 * General Options
@@ -96,8 +107,12 @@ public class PackageGenerationApp {
 	public PackagingFormat pkgFormat = PackagingFormat.BOREM;
 
 	/** Package Generation Params location */
-	@Option(name = "-p", aliases = { "--generation-params" }, metaVar = "<file>", usage = "package generation params file location")
+	@Option(name = "-g", aliases = { "--generation-params" }, metaVar = "<file>", usage = "package generation params file location")
 	public File packageGenerationParamsFile;
+
+    /**Content Location Root */
+    @Option(name = "-r", aliases = { "--content-root"}, usage = "content root location on the filesystem")
+    public String contentRootFile;
 
     /** Archive format **/
     @Option(name = "-a", aliases = { "--archiving-format"}, metaVar = "tar|zip", usage = "Archive format to use when creating the package.  Defaults to tar")
@@ -136,8 +151,8 @@ public class PackageGenerationApp {
 		appContext = new ClassPathXmlApplicationContext(
                          new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
                                  "classpath*:org/dataconservancy/config/applicationContext.xml",
-                                      "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
-                                      "classpath*:applicationContext.xml"});
+                                 "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
+                                 "classpath*:applicationContext.xml"});
     }
 
 	public static void main(String[] args) {
@@ -235,6 +250,59 @@ public class PackageGenerationApp {
             }
         }
 
+        Node tree = null;
+        if(this.contentRootFile != null) {
+            try{
+                IPMService ipmService = appContext.getBean("ipmService", IPMService.class);
+                tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile));
+            } catch (IOException e) {
+                System.err.println("Error opening the content root directory at " + contentRootFile);
+            }
+
+        } else {
+            System.err.println("Content root directory was not specified");
+        }
+
+        //now we do what we have to do to create a package state
+        DomainProfile profile = null;
+        PackageState state = new PackageState();
+
+        Model objectModel = ModelFactory.createDefaultModel();
+        DomainProfileService profileService = appContext.getBean("profileService", DomainProfileServiceImpl.class);
+
+        if(this.domainProfileFile != null) {String domainProfilePath = domainProfileFile.getPath();
+            try{
+                InputStream fileStream = new FileInputStream(domainProfileFile);
+
+                if(domainProfilePath.endsWith(".ttl")) {
+                    objectModel.read(fileStream, null, "TTL");
+                } else if(domainProfilePath.endsWith(".xml")) {
+                    objectModel.read(fileStream, null, "RDF/XML");
+                } else {
+                    System.err.println("Domain profile must be a turtle file with name ending in .ttl, or an RDF/XML file " +
+                            "with name ending in .xml");
+                }
+
+                DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
+                profile = domainProfileRdfTransformService.transformToProfile(objectModel);
+                System.out.println(profile.toString());
+                state.setDomainObjectRDF(objectModel);
+                DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
+                domainProfileStore.getPrimaryDomainProfiles().add(profile);
+
+                if(!profileService.assignNodeTypes(profile, tree)){
+                 System.err.println("Unable to assign node types to tree.");
+                }
+                IpmRdfTransformService ipm2rdf = new IpmRdfTransformService();
+                ipm2rdf.setDomainProfileStore(domainProfileStore);
+                state.setPackageTree(ipm2rdf.transformToRDF(tree));
+            } catch (FileNotFoundException e) {
+                System.err.println("Error opening the domain profile file at " + domainProfilePath);
+            } catch (RDFTransformException e) {
+                System.err.println("Error transforming the tree's internal package model to RDF");
+            }
+        }
+
         if (this.pkgFormat != null) {
             packageParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, this.pkgFormat.name());
         }
@@ -257,7 +325,7 @@ public class PackageGenerationApp {
         // Get and load the Package State file, use it to get the content root location
         // This will be overridden always as it needs to match what's on disk, so shouldn't really
         // be provided in the params files anyway
-        PackageState packageState = getPackageState();
+        //PackageState packageState = getPackageState();
 
         // Print package generation parameters, if desired
         if (info) {
@@ -273,9 +341,8 @@ public class PackageGenerationApp {
         PackageGenerationService generationService = appContext.getBean(
                 "packageGenerationService", PackageGenerationService.class);
 
-        
         Package pkg = generationService
-                .generatePackage(packageState, packageParams);
+                .generatePackage(state, packageParams);
                 
 
         // Write to the destination. do not write a package file if we have an exploded package
@@ -321,7 +388,7 @@ public class PackageGenerationApp {
 	 * PackageDescription files are specified. It would be nice to handle STDIN
 	 * too (through the value '-' rather than file path).
 	 */
-	private PackageState getPackageState() {
+/*	private PackageState getPackageState() {
         PackageState packageState = new PackageState();
 
         PackageStateSerializer packageStateSerializer = appContext.getBean("packageStateSerializer", PackageStateSerializer.class);
@@ -352,7 +419,7 @@ public class PackageGenerationApp {
 
 		return packageState;
 	}
-
+  */
 
     /**
      * Create a PackageGenerationParameter for command line flags
