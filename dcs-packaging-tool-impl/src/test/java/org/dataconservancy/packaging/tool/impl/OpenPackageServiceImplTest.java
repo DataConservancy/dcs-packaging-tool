@@ -111,7 +111,14 @@ public class OpenPackageServiceImplTest {
         copy_resource(res, pkgfile);
 
         File base_dir = new File(stage, "fakebag");
-
+        base_dir.mkdir();
+        
+        File data_dir = new File(base_dir, "data");
+        data_dir.mkdir();
+        
+        File test = new File(base_dir, fake_file_path);
+        test.createNewFile();
+        
         OpenedPackage opened_pkg = service.openPackage(stage, pkgfile);
 
         assertNotNull(opened_pkg);
@@ -145,10 +152,14 @@ public class OpenPackageServiceImplTest {
         File extract_dir = tmpfolder.newFolder();
         File base_dir = new File(extract_dir, "fakebag");
         
-        new File(extract_dir, "fakebag/data").mkdirs();
+        File data_dir = new File(extract_dir, "fakebag/data");
+        data_dir.mkdirs();
+        
         File stateDir = new File(extract_dir, PACKAGE_STATE_RESOURCE);
         stateDir.mkdirs();
-        System.out.println(stateDir.getPath());
+       
+        File test = new File(base_dir, fake_file_path);
+        test.createNewFile();
         
         copy_resource(PACKAGE_STATE_RESOURCE, new File(stateDir, "state.bin"));
         
