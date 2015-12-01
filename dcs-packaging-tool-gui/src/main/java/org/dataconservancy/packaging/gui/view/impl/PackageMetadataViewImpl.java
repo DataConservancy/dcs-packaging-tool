@@ -73,7 +73,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private List<Node> allDynamicFields;
     private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
-    private FileChooser packageStateFileChooser;
     private Set<String> failedValidation;
 
     public PackageMetadataViewImpl(Help help) {
@@ -89,9 +88,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         if (Platform.isFxApplicationThread()) {
             warningPopup = new WarningPopup();
         }
-
-        packageStateFileChooser = new FileChooser();
-        packageStateFileChooser.setInitialFileName(".zip");
 
         //Set up the text for the controls in the footer.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -278,11 +274,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     @Override
     public boolean isFormAlreadyDrawn() {
         return formAlreadyDrawn;
-    }
-
-    @Override
-    public FileChooser getPackageStateFileChooser() {
-        return packageStateFileChooser;
     }
 
     /**
