@@ -84,6 +84,7 @@ public class PackageStateBuilderTest {
 
         PackageStateBuilder builder = new PackageStateBuilder();
         builder.setPackageStateSerializer(serializer);
+        builder.setIpmRdfTransformationService(new IpmRdfTransformService());
 
         Model model = ModelFactory.createDefaultModel();
 

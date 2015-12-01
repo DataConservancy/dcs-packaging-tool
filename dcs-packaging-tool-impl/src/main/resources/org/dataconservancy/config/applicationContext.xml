@@ -55,6 +55,7 @@
         <bean class="org.dataconservancy.packaging.tool.impl.generator.OreReMBuilder" />
         <bean class="org.dataconservancy.packaging.tool.impl.generator.PackageStateBuilder">
           <property name="packageStateSerializer" ref="packageStateSerializer"/> 
+          <property name="ipmRdfTransformationService" ref="ipmRdfTransformService" />
         </bean>
         <bean class="org.dataconservancy.packaging.tool.impl.generator.DomainObjectResourceBuilder" />
         <bean class="org.dataconservancy.packaging.tool.impl.generator.BrainDeadModelIncluder" />

@@ -25,18 +25,23 @@ import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 public class PackageStateBuilder
         implements NodeVisitor {
 
-    @Autowired
-    IpmRdfTransformService rdf2ipm = new IpmRdfTransformService();
+    public IpmRdfTransformService rdf2ipm;
 
     PackageStateSerializer pkgSer;
 
+    @Required
     public void setPackageStateSerializer(PackageStateSerializer ser) {
         this.pkgSer = ser;
+    }
+
+    @Required
+    public void setIpmRdfTransformationService(IpmRdfTransformService rdf2ipm) {
+        this.rdf2ipm = rdf2ipm;
     }
 
     @Override
