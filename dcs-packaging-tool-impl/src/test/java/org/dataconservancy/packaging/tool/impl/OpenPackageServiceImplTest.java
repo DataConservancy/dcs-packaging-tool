@@ -127,7 +127,8 @@ public class OpenPackageServiceImplTest {
         assertNotNull(opened_pkg.getPackageTree());
         assertEquals(fake_package_tree.getIdentifier(), opened_pkg.getPackageTree().getIdentifier());
 
-        assertEquals(new File(base_dir, fake_file_path).toURI(),
+        // Make sure to resolve to real path in case of symlinks
+        assertEquals(new File(base_dir, fake_file_path).toPath().toRealPath().toUri(),
                 opened_pkg.getPackageTree().getFileInfo().getLocation());
     }
 
