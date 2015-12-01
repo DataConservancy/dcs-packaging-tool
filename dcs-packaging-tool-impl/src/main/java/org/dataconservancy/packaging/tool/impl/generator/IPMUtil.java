@@ -18,8 +18,12 @@ package org.dataconservancy.packaging.tool.impl.generator;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 
+import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+
+import static org.apache.commons.codec.digest.DigestUtils.shaHex;
 
 public class IPMUtil {
 
@@ -27,18 +31,25 @@ public class IPMUtil {
         Deque<String> pathStack = new ArrayDeque<>();
 
         pathStack.push(suffix);
-        pathStack.push(node.getFileInfo().getName());
+        pathStack.push(name(node));
 
         while (!node.isRoot()) {
             node = node.getParent();
-            pathStack.push("/");
-            pathStack.push(node.getFileInfo().getName());
+            if (node.getFileInfo() != null) {
+                pathStack.push("/");
+                pathStack.push(name(node));
+            }
         }
 
         StringBuilder builder = new StringBuilder();
         pathStack.forEach(builder::append);
         return builder.toString();
 
+    }
+
+    public static String name(Node node) {
+        return Optional.ofNullable(node.getFileInfo()).map(FileInfo::getName)
+                .orElse(shaHex(node.getIdentifier().toString()));
     }
 
 }

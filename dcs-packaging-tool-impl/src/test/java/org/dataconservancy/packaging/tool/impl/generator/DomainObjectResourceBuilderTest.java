@@ -358,6 +358,49 @@ public class DomainObjectResourceBuilderTest {
     }
 
     @Test
+    public void nullFileInfoTest() throws Exception {
+        PackageModelBuilderState state = bootstrap2();
+
+        state.tree.walk(node -> {
+            if (node.getFileInfo().isDirectory()) {
+                node.setFileInfo(null);
+            }
+        });
+
+        int COUNT = state.domainObjects.listStatements().toSet().size();
+
+        state.assembler = new FunctionalAssemblerMock(folder.getRoot());
+
+        DomainObjectResourceBuilder serializer =
+                new DomainObjectResourceBuilder();
+
+        /* Init and walk the tree */
+        state.params = new PackageGenerationParameters();
+        serializer.init(state);
+        state.tree.walk(node -> serializer.visitNode(node, state));
+        serializer.finish(state);
+
+        Model deserialized = ModelFactory.createDefaultModel();
+
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getIdentifier()).toURL().openStream()) {
+            deserialized.read(in,
+                              state.tree.getIdentifier().toString(),
+                              "TURTLE");
+        }
+        try (InputStream in =
+                state.domainObjectSerializationLocations
+                        .get(state.tree.getChildren().get(0).getIdentifier())
+                        .toURL().openStream()) {
+            deserialized.read(in, state.tree.getChildren().get(0)
+                    .getIdentifier().toString(), "TURTLE");
+        }
+
+        assertEquals(COUNT, deserialized.listStatements().toSet().size());
+    }
+
+    @Test
     public void ignoreTest() throws Exception {
         PackageModelBuilderState state = bootstrap2();
 

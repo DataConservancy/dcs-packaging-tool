@@ -150,8 +150,8 @@ class DomainObjectResourceBuilder
                     state.domainObjectSerializationLocations.put(node
                             .getIdentifier(), newDomainObjectURI);
 
-
-                    if (node.getFileInfo().isFile()) {
+                    if (node.getFileInfo() != null
+                            && node.getFileInfo().isFile()) {
                         try {
                             URI newFileLocation =
                                     state.assembler
@@ -199,13 +199,21 @@ class DomainObjectResourceBuilder
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
-                    } else if (node.getFileInfo().isDirectory()) {
-                        /* It's a directory, so reserve a bag URI */
-                        node.getFileInfo().setLocation(state.assembler
-                                .reserveDirectory(BINARY_PATH + path(node, ""),
-                                                  PackageResourceType.DATA));
+                    } else if (node.getFileInfo() != null
+                            && node.getFileInfo().isDirectory()) {
+                        /* It's a directory, so map it to a directory bag URI */
+                        URI newLocation =
+                                state.assembler
+                                        .reserveDirectory(BINARY_PATH
+                                                                  + path(node,
+                                                                         ""),
+                                                          PackageResourceType.DATA);
+
+                        state.renamedContentLocations.put(node.getFileInfo()
+                                .getLocation(), newLocation);
+                        node.getFileInfo().setLocation(newLocation);
                     }
-                    
+
                     node.setDomainObject(newDomainObjectURI);
 
                     /*
