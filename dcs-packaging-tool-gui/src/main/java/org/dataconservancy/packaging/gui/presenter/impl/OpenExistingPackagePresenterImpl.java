@@ -127,8 +127,8 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         // User selects an serialized package
         view.getChoosePackageFileButton().setOnAction(event -> {
             fileChooser.getExtensionFilters().clear();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package File", "*zip", "*ZIP", "*tar", "*TAR", "*gz", "*GZ", "*gzip", "*GZIP"));
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package File", "*.zip", "*.ZIP", "*.tar", "*.TAR", "*.gz", "*.GZ", "*.gzip", "*.GZIP"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 
             File file = controller.showOpenFileDialog(fileChooser);
 

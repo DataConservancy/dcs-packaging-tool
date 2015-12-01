@@ -91,6 +91,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case FILE_NAME:
                         textPropertyBox.getChildren().remove(validationLabel);
                         validationImageLabel.setGraphic(successImage);
+                        validationImageLabel.setVisible(true);
                         break;
                 }
             } else {

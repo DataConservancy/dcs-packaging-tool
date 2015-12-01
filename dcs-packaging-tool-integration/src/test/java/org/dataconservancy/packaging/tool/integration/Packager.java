@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.dataconservancy.packaging.tool.api.OpenPackageService;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageState;
@@ -35,12 +36,13 @@ import org.dataconservancy.packaging.tool.model.PropertiesConfigurationParameter
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_LOCATION;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_NAME;
 
 public class Packager {
 
     PropertiesConfigurationParametersBuilder paramsBuilder =
             new PropertiesConfigurationParametersBuilder();
+
+    public static final String PACKAGE_NAME = "TestPackage";
 
     @Autowired
     public OpenPackageService openPackageService;
@@ -59,7 +61,7 @@ public class Packager {
             PackageGenerationParameters params =
                     paramsBuilder.buildParameters(props);
 
-            params.addParam(PACKAGE_NAME, "TestPackage");
+            params.addParam(GeneralParameterNames.PACKAGE_NAME, PACKAGE_NAME);
             params.addParam(PACKAGE_LOCATION, "/tmp");
 
             Package pkg = createPakageService.generatePackage(state, params);

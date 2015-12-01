@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.nio.file.Path;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -18,7 +17,6 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.api.OpenPackageService;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
@@ -53,7 +51,8 @@ public class OpenPackageServiceImpl implements OpenPackageService {
         try (InputStream is = new BufferedInputStream(new FileInputStream(file))) {
             package_state_serializer.deserialize(state, is);
         } catch (UnsupportedOperationException e) {
-            // Thrown when called on a non-zip file, wrap as IOException for consistency
+            // Thrown when called on a non-zip file, wrap as IOException for
+            // consistency
             throw new IOException(e);
         }
 
@@ -63,21 +62,21 @@ public class OpenPackageServiceImpl implements OpenPackageService {
     @Override
     public OpenedPackage openPackageState(File file) throws IOException {
         OpenedPackage result = new OpenedPackage();
-        
+
         PackageState state = load_package_state(file);
-        
+
         result.setPackageState(state);
-        
+
         try {
             // No bag URIs to rewrite
-            
+
             if (state.getPackageTree() != null) {
                 result.setPackageTree(ipm_transform_service.transformToNode(state.getPackageTree()));
             }
         } catch (RDFTransformException e) {
             throw new IOException(e);
         }
-        
+
         return result;
     }
 
@@ -179,49 +178,61 @@ public class OpenPackageServiceImpl implements OpenPackageService {
         }
     }
 
-    private void update_file_info(Node n, File base_dir) {
+    private void update_file_info(Node n, File base_dir) throws IOException {
         // base_dir path has package name as last element
         File extract_dir = base_dir.getParentFile();
-        
+
         if (n.getFileInfo() != null && UriUtility.isBagUri(n.getFileInfo().getLocation())) {
             Path resolvedPath = UriUtility.resolveBagUri(extract_dir.toPath(), n.getFileInfo().getLocation());
-            n.getFileInfo().setLocation(resolvedPath.toUri());
+            n.getFileInfo().setLocation(resolvedPath.toRealPath().toUri());
         }
     }
 
     @Override
     public OpenedPackage openExplodedPackage(File dir) throws IOException {
         File path = new File(dir, FilenameUtils.separatorsToSystem(PACKAGE_STATE_PATH));
-        
+
         if (!path.exists() || !path.isDirectory()) {
-            throw new RuntimeException(String.format("Package state directory %s does not exist!",
-                                                     path.getPath()));
+            throw new IOException(String.format("Package state directory %s does not exist!", path.getPath()));
         }
 
         if (path.listFiles().length != 1) {
-            throw new RuntimeException(String.format("Package state directory %s must have exactly one file in it"));
+            throw new IOException(String.format("Package state directory %s must have exactly one file in it"));
         }
 
         PackageState state = load_package_state(path.listFiles()[0]);
 
         // Load package tree and rewrite bag URIs to point to files in directory
 
-        Node root;
-
         try {
-            root = ipm_transform_service.transformToNode(state.getPackageTree());
+            Node root = ipm_transform_service.transformToNode(state.getPackageTree());
 
-            root.walk(n -> update_file_info(n, dir));
+            IOException[] holder = new IOException[1];
 
+            root.walk(n -> {
+                if (holder[0] == null) {
+                    try {
+                        update_file_info(n, dir); 
+                    } catch (IOException e) {
+                        holder[0] = e;
+                    }
+                }
+            });
+
+            // If update_file_info threw an exception, throw it.
+            if (holder[0] != null) {
+                throw holder[0];
+            }
+            
             OpenedPackage result = new OpenedPackage();
 
             result.setBaseDirectory(dir);
             result.setPackageTree(root);
             state.setPackageTree(ipm_transform_service.transformToRDF(root));
             result.setPackageState(state);
-            
+
             return result;
-        
+
         } catch (RDFTransformException e) {
             throw new IOException(e);
         }

@@ -25,7 +25,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,8 +71,6 @@ public class OreRemBuilderTest {
         root.addChild(child2);
         child1.addChild(leaf);
 
-        List<URI> uris = new ArrayList<>();
-
         OreReMBuilder serializer = new OreReMBuilder();
 
         PackageModelBuilderState state = new PackageModelBuilderState();
@@ -84,7 +81,12 @@ public class OreRemBuilderTest {
 
         serializer.init(state);
         root.walk(node -> {
-            uris.add(node.getIdentifier());
+
+            state.domainObjectSerializationLocations.put(node.getIdentifier(),
+                                                         URI.create(node
+                                                                 .getIdentifier()
+                                                                 .toString()
+                                                                 + "#ser"));
             serializer.visitNode(node, state);
         });
 
@@ -105,8 +107,11 @@ public class OreRemBuilderTest {
                         .mapWith(o -> URI.create(o.asResource().getURI()))
                         .toList();
 
-        assertTrue(uris.containsAll(aggregatedResources));
-        assertTrue(aggregatedResources.containsAll(uris));
+        aggregatedResources
+                .forEach(uri -> assertTrue(state.domainObjectSerializationLocations
+                        .values().contains(uri)));
+        state.domainObjectSerializationLocations.values()
+                .forEach(uri -> assertTrue(aggregatedResources.contains(uri)));
     }
 
     @Test
@@ -123,8 +128,6 @@ public class OreRemBuilderTest {
         child2.setIgnored(true);
         leaf.setIgnored(true);
 
-        List<URI> uris = new ArrayList<>();
-
         OreReMBuilder serializer = new OreReMBuilder();
 
         PackageModelBuilderState state = new PackageModelBuilderState();
@@ -136,7 +139,9 @@ public class OreRemBuilderTest {
         serializer.init(state);
         root.walk(node -> {
             if (!node.isIgnored()) {
-                uris.add(node.getIdentifier());
+                state.domainObjectSerializationLocations.put(node
+                        .getIdentifier(), URI.create(node.getIdentifier()
+                        .toString() + "#ser"));
             }
             serializer.visitNode(node, state);
         });
@@ -155,8 +160,11 @@ public class OreRemBuilderTest {
                         .mapWith(o -> URI.create(o.asResource().getURI()))
                         .toList();
 
-        assertTrue(uris.containsAll(aggregatedResources));
-        assertTrue(aggregatedResources.containsAll(uris));
+        aggregatedResources
+                .forEach(uri -> assertTrue(state.domainObjectSerializationLocations
+                        .values().contains(uri)));
+        state.domainObjectSerializationLocations.values()
+                .forEach(uri -> assertTrue(aggregatedResources.contains(uri)));
     }
 
     private String getRemAsString() throws IOException {

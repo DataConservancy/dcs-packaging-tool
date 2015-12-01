@@ -19,13 +19,11 @@ import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -60,7 +58,6 @@ public class PackageMetadataViewImplTest extends BaseGuiTest {
         assertNotNull(view.getContinueButton());
         assertNotNull(view.getDomainProfilesComboBox());
         assertNotNull(view.getErrorLabel());
-        assertNotNull(view.getPackageStateFileChooser());
         assertNotNull(view.getAllDynamicFields());
         assertTrue(view.getAllDynamicFields().size() > 0);
     }
