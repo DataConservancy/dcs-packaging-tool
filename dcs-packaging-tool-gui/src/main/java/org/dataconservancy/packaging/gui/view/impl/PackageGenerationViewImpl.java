@@ -449,7 +449,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     @Override
     public PackageToolPopup getProgressPopup() {
         if (progressDialogPopup == null) {
-            progressDialogPopup = new ProgressDialogPopup();
+            progressDialogPopup = new ProgressDialogPopup(true);
             progressDialogPopup.setTitleText(TextFactory.getText(LabelKey.GENERATING_PACKAGE_LABEL));
         }
         if (getScene() != null && getScene().getWindow() != null) {

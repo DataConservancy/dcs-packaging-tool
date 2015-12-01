@@ -114,9 +114,8 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     public void showProgressIndicatorPopUp() {
 
         if (progressIndicatorPopUp == null) {
-            progressIndicatorPopUp = new ProgressDialogPopup();
+            progressIndicatorPopUp = new ProgressDialogPopup(true);
         }
-
 
         progressIndicatorPopUp.setTitleText(TextFactory.getText(LabelKey.PROGRESS_INDICATOR));
         progressIndicatorPopUp.setMoveable(true);

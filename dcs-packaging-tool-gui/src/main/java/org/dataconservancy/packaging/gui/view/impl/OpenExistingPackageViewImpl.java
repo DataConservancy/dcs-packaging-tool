@@ -159,7 +159,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     @Override
     public ProgressDialogPopup getProgressPopup() {
         if (progressDialogPopup == null) {
-            progressDialogPopup = new ProgressDialogPopup();
+            progressDialogPopup = new ProgressDialogPopup(false);
             progressDialogPopup.setTitleText(TextFactory.getText(Labels.LabelKey.LOADING_PACKAGE_LABEL));
 
             if (getScene() != null && getScene().getWindow() != null) {

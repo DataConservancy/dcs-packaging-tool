@@ -33,7 +33,7 @@ public class ProgressDialogPopup extends PackageToolPopup {
 
     Label message;
     Button cancelButton;
-    public ProgressDialogPopup() {
+    public ProgressDialogPopup(boolean cancelable) {
         super();
 
         VBox content = new VBox();
@@ -45,9 +45,11 @@ public class ProgressDialogPopup extends PackageToolPopup {
         progressBar.setPrefWidth(300);
         content.getChildren().add(progressBar);
 
-        cancelButton = new Button();
-        cancelButton.setText(TextFactory.getText(Labels.LabelKey.CANCEL_BUTTON));
-        content.getChildren().add(cancelButton);
+        if (cancelable) {
+            cancelButton = new Button();
+            cancelButton.setText(TextFactory.getText(Labels.LabelKey.CANCEL_BUTTON));
+            content.getChildren().add(cancelButton);
+        }
 
         super.setContent(content);
     }

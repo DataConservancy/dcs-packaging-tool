@@ -715,7 +715,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public ProgressDialogPopup getValidationProgressPopup() {
         if (validationProgressPopup == null) {
-            validationProgressPopup = new ProgressDialogPopup();
+            validationProgressPopup = new ProgressDialogPopup(true);
             validationProgressPopup.setTitleText(TextFactory.getText(LabelKey.PROPERTY_VALIDATION_PROGRESS_LABEL));
 
             if (getScene() != null && getScene().getWindow() != null) {
