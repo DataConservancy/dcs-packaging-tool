@@ -21,14 +21,20 @@ import java.io.IOException;
 
 import java.net.URI;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.SimpleSelector;
 
 import org.junit.Before;
@@ -38,6 +44,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
+import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
@@ -46,18 +53,24 @@ import org.dataconservancy.packaging.tool.model.OpenedPackage;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.NodeTransform;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import de.schlichtherle.io.FileInputStream;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_DCS_ONTOLOGY_BOM;
+import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
 
 @ContextConfiguration({
         "classpath*:org/dataconservancy/config/applicationContext.xml",
@@ -77,6 +90,8 @@ public class PackageGenerationTest {
 
     URI DCS_PROFILE = URI
             .create("http//dataconservancy.org/ptg-profiles/dcs-bo-1.0");
+
+    private DcsBOProfile bop = new DcsBOProfile();
 
     @Autowired
     DomainProfileServiceFactory profileServiceFactory;
@@ -184,6 +199,88 @@ public class PackageGenerationTest {
                 .createPackage(opened.getPackageState(), folder.getRoot())
                 .getPackageState()));
 
+    }
+
+    /*
+     * Verifies that complex properties can successfully be persisted and
+     * re-opened
+     */
+    @Test
+    public void complexPropertiesTest() throws Exception {
+        PackageState initialState = initializer.initialize(DCS_PROFILE);
+
+        OpenedPackage opened =
+                packager.createPackage(initialState, folder.getRoot());
+
+        DomainProfileService profileService =
+                profileServiceFactory.getProfileService(opened
+                        .getPackageState().getDomainObjectRDF());
+
+        Property creator1 = new Property(bop.getHasCreator());
+        Property creator1_name = new Property(bop.getName());
+        creator1_name.setStringValue("Fred");
+        Property creator1_mbox = new Property(bop.getMbox());
+        creator1_mbox.setStringValue("fred@mertz.org");
+        creator1.setComplexValue(Arrays.asList(creator1_name, creator1_mbox));
+
+        Property creator2 = new Property(bop.getHasCreator());
+        Property creator2_name = new Property(bop.getName());
+        creator2_name.setStringValue("Ethel");
+        Property creator2_mbox = new Property(bop.getMbox());
+        creator2_mbox.setStringValue("ethel@mertz.org");
+        creator2.setComplexValue(Arrays.asList(creator2_name, creator2_mbox));
+
+        /* Add two creators to each collection */
+        opened.getPackageTree().walk(node -> {
+            if (node.getNodeType().getDomainTypes()
+                    .contains(URI.create(NS_DCS_ONTOLOGY_BOM + "Collection"))) {
+                profileService.addProperty(node, creator1);
+                profileService.addProperty(node, creator2);
+            }
+        });
+
+        OpenedPackage afterSaveAndReopen =
+                packager.createPackage(opened.getPackageState(),
+                                       folder.getRoot());
+
+        Set<String> initialObjects =
+                initialState.getDomainObjectRDF().listObjects()
+                        .filterKeep(RDFNode::isLiteral)
+                        .mapWith(RDFNode::asLiteral)
+                        .mapWith(Literal::getString).toSet();
+        Set<String> openedObjects =
+                opened.getPackageState().getDomainObjectRDF().listObjects()
+                        .filterKeep(RDFNode::isLiteral)
+                        .mapWith(RDFNode::asLiteral)
+                        .mapWith(Literal::getString).toSet();
+        Set<String> afterSaveAndReopenObjects =
+                afterSaveAndReopen.getPackageState().getDomainObjectRDF()
+                        .listObjects().filterKeep(RDFNode::isLiteral)
+                        .mapWith(RDFNode::asLiteral)
+                        .mapWith(Literal::getString).toSet();
+        Set<String> afterSaveAndReopenCustodialObjects =
+                custodialDomainObjects(afterSaveAndReopen).listObjects()
+                        .filterKeep(RDFNode::isLiteral)
+                        .mapWith(RDFNode::asLiteral)
+                        .mapWith(Literal::getString).toSet();
+
+        assertFalse(initialObjects.contains(creator1_name.getStringValue()));
+        assertTrue(openedObjects.contains(creator1_name.getStringValue()));
+        assertTrue(openedObjects.contains(creator2_name.getStringValue()));
+        assertTrue(afterSaveAndReopenObjects.contains(creator1_name
+                .getStringValue()));
+        assertTrue(afterSaveAndReopenObjects.contains(creator2_name
+                .getStringValue()));
+        assertTrue(afterSaveAndReopenCustodialObjects.contains(creator1_name
+                .getStringValue()));
+        assertTrue(afterSaveAndReopenCustodialObjects.contains(creator2_name
+                .getStringValue()));
+
+        custodialDomainObjects(opened);
+        assertNotEquals(domainObjectSizes(initialState),
+                        domainObjectSizes(opened.getPackageState()));
+        assertEquals(domainObjectSizes(opened.getPackageState()),
+                     domainObjectSizes(afterSaveAndReopen.getPackageState()));
     }
 
     @Test
@@ -343,5 +440,42 @@ public class PackageGenerationTest {
                      model.listStatements().toSet().size());
 
         return originalDomainObjectSizes;
+    }
+
+    private Model custodialDomainObjects(OpenedPackage pkg) throws Exception {
+        /* Lame, hardcoded for now */
+        URI remURI =
+                URI.create(String
+                        .format("bag://%s/META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM/ORE-REM.ttl",
+                                Packager.PACKAGE_NAME));
+
+        Path baseDir = pkg.getBaseDirectory().getParentFile().toPath();
+
+        Path remPath = UriUtility.resolveBagUri(baseDir, remURI);
+
+        Model rem = ModelFactory.createDefaultModel();
+        try (FileInputStream in = new FileInputStream(remPath.toFile())) {
+            rem.read(in, remURI.toString(), "TURTLE");
+        }
+
+        Model domainObjects = ModelFactory.createDefaultModel();
+
+        rem.listObjectsOfProperty(rem.getProperty(NS_ORE + "aggregates"))
+                .mapWith(RDFNode::asResource)
+                .mapWith(Resource::getURI)
+                .mapWith(URI::create)
+                .mapWith(uri -> UriUtility.resolveBagUri(baseDir, uri))
+                .mapWith(Path::toFile)
+                .forEachRemaining(domainObjectFile -> {
+                    try (FileInputStream in =
+                            new FileInputStream(domainObjectFile)) {
+                        domainObjects.read(domainObjectFile.toURI().toString());
+
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+        return domainObjects;
     }
 }

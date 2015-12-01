@@ -18,6 +18,8 @@ package org.dataconservancy.packaging.tool.impl.generator;
 
 import java.io.InputStream;
 
+import java.net.URI;
+
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFFormat;
@@ -65,22 +67,26 @@ public class OreReMBuilder
         Resource aggregation = state.manifest.getResource("#Aggregation");
         Property aggregates = state.manifest.getProperty(NS_ORE + "aggregates");
 
-        /*
-         * The resource containing the domain object serialization is stored in
-         * node.getIdentifier()
-         */
         if (!node.isIgnored()) {
+
+            URI serializationLocation =
+                    state.domainObjectSerializationLocations.get(node
+                            .getIdentifier());
+
             aggregation.addProperty(aggregates, state.manifest
-                    .createResource(node.getIdentifier().toString()));
+                    .createResource(serializationLocation.toString()));
         }
 
     }
 
     @Override
     public void finish(PackageModelBuilderState state) {
-        RDFFormat serializationFormat = determineSerialization(state.params, RDFFormat.TURTLE_PRETTY);
-        String extension = serializationFormat.getLang().getFileExtensions().get(0);
-        try (InputStream rem = toInputStream(state.manifest, serializationFormat)) {
+        RDFFormat serializationFormat =
+                determineSerialization(state.params, RDFFormat.TURTLE_PRETTY);
+        String extension =
+                serializationFormat.getLang().getFileExtensions().get(0);
+        try (InputStream rem =
+                toInputStream(state.manifest, serializationFormat)) {
             state.assembler.createResource("ORE-REM." + extension,
                                            PackageResourceType.ORE_REM,
                                            rem);
