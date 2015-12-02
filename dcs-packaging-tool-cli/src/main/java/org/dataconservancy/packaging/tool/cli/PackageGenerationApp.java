@@ -170,9 +170,9 @@ public class PackageGenerationApp {
 
 	public PackageGenerationApp() {
 		appContext = new ClassPathXmlApplicationContext(
-                         new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
-                                 "classpath*:org/dataconservancy/config/applicationContext.xml",
-                                 "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml"});
+                "classpath*:org/dataconservancy/cli/config/applicationContext.xml",
+                "classpath*:org/dataconservancy/config/applicationContext.xml",
+                "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml");
     }
 
 	public static void main(String[] args) {
@@ -284,7 +284,7 @@ public class PackageGenerationApp {
         //we need to validate any specified file locations in the package generation paramsto make sure they exist
         validateLocationParameters(packageParams);
 
-        Node tree = null;
+        Node tree;
         if(this.contentRootFile != null) {
             if(this.contentRootFile.exists()) {
                 try {
@@ -303,7 +303,7 @@ public class PackageGenerationApp {
         }
 
         //now we do what we have to do to create a package state
-        DomainProfile profile = null;
+        DomainProfile profile;
         PackageState state = new PackageState();
 
         //add package metadata to state
@@ -348,8 +348,6 @@ public class PackageGenerationApp {
                     }
 
                     state.setPackageTree(ipm2rdf.transformToRDF(tree));
-                } catch (FileNotFoundException e) {
-                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_CANT_OPEN, e);
                 } catch (RDFTransformException e) {
                     throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF, e);
                 } catch (IOException e) {
@@ -380,7 +378,7 @@ public class PackageGenerationApp {
             }
         }
 
-        File outFile = null;
+        File outFile;
 
         // Generate the package
         PackageGenerationService generationService = appContext.getBean(
@@ -429,21 +427,18 @@ public class PackageGenerationApp {
     private LinkedHashMap<String, List<String>> createPackageMetadata(){
         Properties props = new Properties();
         try(InputStream fileStream = new FileInputStream(packageMetadataFile)){
-            if (fileStream != null) {
-                props.load(fileStream);
-            } else {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
-            }
+            props.load(fileStream);
         } catch (FileNotFoundException e) {
-             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
+             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN, e);
         } catch (IOException e) {
-             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
+            log.error(e.getMessage());
+            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
         }
 
         LinkedHashMap<String, List<String>> metadata = new LinkedHashMap<>();
         //add package name to the metadata
         if(packageName != null && !packageName.isEmpty()){
-            metadata.put("Package-Name", Arrays.asList(packageName.trim()));
+            metadata.put("Package-Name", Collections.singletonList(packageName.trim()));
         }
 
         List<String> valueList;
@@ -480,6 +475,12 @@ public class PackageGenerationApp {
         return params;
     }
 
+    /**
+     * we validate locations of files passed as arguments elsewhere, but the locations passed as options
+     * eventually end up in the PAckageGenerationsParameters. We validate these parameter values only after
+     * we finish the process of building the parameters from the various available sources.
+     * @param params  the package generation parameters
+     */
     private void validateLocationParameters(PackageGenerationParameters params) {
 
         //required, cannot be null
