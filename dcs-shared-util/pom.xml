@@ -73,6 +73,12 @@
             <resourceBundles>
               <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
             </resourceBundles>
+            <supplementalModelArtifacts>
+              <supplementalModelArtifact>org.dataconservancy:supplemental-resources:2.0.0-SNAPSHOT</supplementalModelArtifact>
+            </supplementalModelArtifacts>
+            <supplementalModels>
+              <supplementalModel>/supplemental-models.xml</supplementalModel>
+            </supplementalModels>
           </configuration>
           <executions>
             <execution>
