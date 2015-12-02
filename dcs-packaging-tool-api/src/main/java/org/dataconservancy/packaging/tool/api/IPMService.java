@@ -65,4 +65,12 @@ public interface IPMService {
      * @param newPath The new path to assign to the node.
     */
     void remapNode(Node node, Path newPath);
+
+    /**
+     * Refreshes the tree content with the latest state from the file system. This will build a tree from the current file system backing the given node to compare
+     * with the existing tree structure.
+     * @param node The node to refresh.
+     * @return A map of the nodes and their status after comparison.
+     */
+    Map<Node, NodeComparison> refreshTreeContent(Node node) throws IOException;
 }

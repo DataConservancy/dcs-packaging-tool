@@ -23,7 +23,6 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
-import org.apache.jena.ontology.Profile;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
@@ -56,7 +55,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -659,8 +657,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     public Map<Node, NodeComparison> refreshTreeContent(Node node) {
         Map<Node, NodeComparison> resultMap = new HashMap<>();
         try {
-            Node newTree = buildComparisonTree(node);
-            resultMap = ipmService.compareTree(node, newTree);
+            resultMap = ipmService.refreshTreeContent(node);
         } catch (IOException e) {
             log.error(e.getMessage());
             view.getErrorLabel().setText(
@@ -670,70 +667,6 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
 
         return resultMap;
-    }
-
-    /**
-     * Builds a tree from the current file system to compare with the existing file system.
-     * @param node The node from the existing tree that will be the root of the comparison
-     * @return The root of the new tree to compare
-     * @throws IOException If there is a problem reading from the file system.
-     */
-    private Node buildComparisonTree(Node node) throws IOException {
-        Node newTree = ipmService.createTreeFromFileSystem(Paths.get(node.getFileInfo().getLocation()));
-        buildContentRoots(node, newTree);
-
-        return newTree;
-    }
-
-    /**
-     * Loops through the existing tree to find any content locations different from their parent, it then builds a tree from the file system under that location.
-     * @param node The node to check for different content locations
-     * @param newTree The new tree to add the tree from the file system to
-     * @throws IOException If there is a problem reading from the file system.
-     */
-    private void buildContentRoots(Node node, Node newTree) throws IOException {
-        if (node.getChildren() != null) {
-            for (Node child : node.getChildren()) {
-                if (child.getFileInfo() != null && Paths.get(child.getFileInfo().getLocation()).toFile().exists()) {
-                    if (!Paths.get(child.getFileInfo().getLocation()).startsWith(Paths.get(node.getFileInfo().getLocation()))) {
-                        Node newTreeParent = getNewTreeNodeForExistingNode(node, newTree);
-                        if (newTreeParent != null) {
-                            newTreeParent.addChild(buildComparisonTree(child));
-                        } else {
-                            newTree.addChild(buildComparisonTree(child));
-                        }
-                    } else if (child.getChildren() != null) {
-                        buildContentRoots(child, newTree);
-                    }
-                } else if (child.getChildren() != null) {
-                    buildContentRoots(child, newTree);
-                }
-            }
-        }
-    }
-
-    /**
-     * Finds nodes in the new comparison tree that correspond to nodes in the existing tree.
-     * This is used to ensure new content locations are placed in the correct spot in the tree.
-     * @param node The node to find in the new tree.
-     * @param newTree The new tree to search for the node.
-     * @return The node from the new tree or false if none exists
-     */
-    private Node getNewTreeNodeForExistingNode(Node node, Node newTree) {
-        Node foundNode = null;
-        if (node.getFileInfo() != null && newTree.getFileInfo() != null
-            && node.getFileInfo().getLocation().equals(newTree.getFileInfo().getLocation())) {
-            foundNode =  newTree;
-        } else if (newTree.getChildren() != null){
-            for (Node newTreeChild : newTree.getChildren()) {
-                foundNode = getNewTreeNodeForExistingNode(node, newTreeChild);
-                if (foundNode != null) {
-                    break;
-                }
-            }
-        }
-
-        return foundNode;
     }
 
     public void displayPackageTree() {
