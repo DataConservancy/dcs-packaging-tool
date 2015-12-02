@@ -26,7 +26,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
@@ -46,6 +45,8 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuild
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.ParametersBuildException;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,7 +90,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         //This presenter has no information to clear
     }
 
-    public Node display() {
+    public javafx.scene.Node display() {
         //Clear out any values from the previous run
         view.getErrorLabel().setText("");
         view.getCurrentOutputDirectoryTextField().setText("");
@@ -295,10 +297,37 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             }
             view.getProgressPopup().show();
         }
+
+        //Before generating the package set any user defined properties on the model.
+        for (URI nodeId : controller.getPackageState().getUserSpecifiedProperties().keySet()) {
+            Node node = findNodeForId(controller.getPackageTree(), nodeId);
+            if (node != null) {
+                for (Property userDefinedProperty : controller.getPackageState().getUserSpecifiedProperties().get(nodeId)) {
+                    controller.getDomainProfileService().addProperty(node, userDefinedProperty);
+                }
+            }
+        }
+
         backgroundService.setOverwriteFile(false);
         backgroundService.execute();
 
 
+    }
+
+    private Node findNodeForId(Node candidateNode, URI nodeId) {
+        Node node = null;
+        if (candidateNode.getIdentifier().equals(nodeId)) {
+            node = candidateNode;
+        } else if (candidateNode.getChildren() != null) {
+            for (Node childCandidate : candidateNode.getChildren()) {
+                node = findNodeForId(childCandidate, nodeId);
+                if (node != null) {
+                    break;
+                }
+            }
+        }
+
+        return node;
     }
 
     /*
@@ -483,7 +512,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         if (generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT) != null
                 && !generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT).isEmpty()) {
             String value = generationParams.getParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, 0);
-            Toggle selectedToggle = null;
+            Toggle selectedToggle;
             try {
                 selectedToggle = getSerializationToggle(GeneralParameterNames.SERIALIZATION_FORMAT.valueOf(value));
             } catch (IllegalArgumentException e) {
