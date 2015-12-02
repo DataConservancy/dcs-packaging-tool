@@ -1,5 +1,6 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -7,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -14,10 +16,12 @@ import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Factory;
+import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl.FILE_TYPE;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl;
 import org.dataconservancy.packaging.tool.api.OpenPackageService;
+import org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -36,6 +40,8 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     private OpenPackageService open_package_service;
     private Controller controller;
     private OpenedPackage pkg = new OpenedPackage();
+    private File opened_file;
+    private File opened_dir;
     
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();
@@ -53,9 +59,12 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
 
         factory.setConfiguration(new Configuration());
 
+        opened_file = tmpfolder.newFile();
+        opened_dir = tmpfolder.newFolder();
+        
         controller = mock(Controller.class);
-        when(controller.showOpenFileDialog(any())).thenReturn(tmpfolder.newFile());
-        when(controller.showOpenDirectoryDialog(any())).thenReturn(tmpfolder.newFolder());
+        when(controller.showOpenFileDialog(any())).thenReturn(opened_file);
+        when(controller.showOpenDirectoryDialog(any())).thenReturn(opened_dir);
         when(controller.getFactory()).thenReturn(factory);
         when(controller.getPackageStateFileExtension()).thenReturn("*.zip");
         view = new OpenExistingPackageViewImpl(help);
@@ -92,7 +101,7 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     }
 
     /**
-     * Test that open package service is called.
+     * Test that selected file and type are set correctly.
      * 
      * @throws IOException
      */
@@ -100,11 +109,13 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     public void testOpenPackageState() throws IOException {
         view.getChoosePackageStateFileButton().fire();
 
-        verify(open_package_service).openPackageState(Mockito.any());
+        assertEquals(opened_file, presenter.getSelectedFile());
+        assertEquals(FILE_TYPE.STATE_FILE, presenter.getSelectedFileType());
+        assertEquals(false, view.getContinueButton().isDisabled());
     }
 
     /**
-     * Test that open package service is called.
+     * Test that selected file and type are set correctly.
      * 
      * @throws IOException
      */
@@ -112,11 +123,13 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     public void testOpenPackage() throws IOException {
         view.getChoosePackageFileButton().fire();
 
-        verify(open_package_service).openPackage(Mockito.any(), Mockito.any());
+        assertEquals(opened_file, presenter.getSelectedFile());
+        assertEquals(FILE_TYPE.PACKAGE, presenter.getSelectedFileType());
+        assertEquals(false, view.getContinueButton().isDisabled());
     }
 
     /**
-     * Test that open package service is called.
+     * Test that selected file and type are set correctly.
      * 
      * @throws IOException
      */
@@ -124,7 +137,9 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     public void testOpenExplodedPackage() throws IOException {
         view.getChooseExplodedPackageDirectoryButton().fire();
 
-        verify(open_package_service).openExplodedPackage(Mockito.any());
+        assertEquals(opened_dir, presenter.getSelectedFile());
+        assertEquals(FILE_TYPE.EXPLODED_PACKAGE, presenter.getSelectedFileType());
+        assertEquals(false, view.getContinueButton().isDisabled());
     }
 
     /**
@@ -154,7 +169,7 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testContinueOnPackage() throws Exception {
-        view.getChoosePackageStateFileButton().fire();
+        view.getChoosePackageFileButton().fire();
         view.getContinueButton().fire();
 
         verify(controller).setPackageState(any());

@@ -29,7 +29,8 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
     private OpenExistingPackageView view;
     private DirectoryChooser directoryChooser;
     private FileChooser fileChooser;
-    private OpenedPackage pkg;
+    private File selectedFile;
+    private FILE_TYPE selectedFileType;
     private File stagingDir;
     private LoadPackageService loadPackageBackgroundService;
 
@@ -50,35 +51,46 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
     }
 
     private void bind() {
-
         if (loadPackageBackgroundService == null) {
             loadPackageBackgroundService = new BackgroundPackageService();
         }
 
+        // Background load service called when continue button fired
         loadPackageBackgroundService.setOnSucceeded(t -> {
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().hide();
             }
-            pkg = (OpenedPackage) t.getSource().getValue();
+            
+            OpenedPackage pkg = (OpenedPackage) t.getSource().getValue();
+            
             loadPackageBackgroundService.reset();
-            view.getContinueButton().setDisable(false);
+            
+            controller.setPackageState(pkg.getPackageState());
+            controller.setPackageTree(pkg.getPackageTree());
+
+            if (pkg.getBaseDirectory() == null) {
+                // Package state was loaded, go to next page.
+                controller.goToNextPage();
+            } else {
+                // Package was loaded, save state and go to next page.
+                super.onContinuePressed();
+            }
         });
 
         loadPackageBackgroundService.setOnFailed(workerStateEvent -> {
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().hide();
             }
+            
             if (workerStateEvent.getSource().getMessage() == null ||
                     workerStateEvent.getSource().getMessage().isEmpty()) {
                 Throwable e = workerStateEvent.getSource().getException();
                 showError(TextFactory.format(ErrorKey.PACKAGE_STATE_LOAD_ERROR));
                 log.error(e.getMessage());
             } else {
-                view.getErrorLabel().setText(workerStateEvent.getSource().getMessage());
+                showError(workerStateEvent.getSource().getMessage());
             }
 
-            view.getErrorLabel().setTextFill(Color.RED);
-            view.getErrorLabel().setVisible(true);
             loadPackageBackgroundService.reset();
         });
 
@@ -86,9 +98,9 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().hide();
             }
-            view.getErrorLabel().setText(workerStateEvent.getSource().getMessage());
-            view.getErrorLabel().setTextFill(Color.RED);
-            view.getErrorLabel().setVisible(true);
+            
+            showError(workerStateEvent.getSource().getMessage());
+
             loadPackageBackgroundService.reset();
         });
 
@@ -111,17 +123,16 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
 
             File file = controller.showOpenFileDialog(fileChooser);
 
-            if (file == null) {
+            if (file== null) {
                 return;
             }
 
             clear();
             view.getChoosePackageStateFileTextField().setText(file.getName());
-
-            loadPackageBackgroundService.execute(file, FILE_TYPE.STATE_FILE);
-            if (Platform.isFxApplicationThread()) {
-                view.getProgressPopup().show();
-            }
+            view.getContinueButton().setDisable(false);
+            
+            selectedFile = file;
+            selectedFileType = FILE_TYPE.STATE_FILE;
         });
 
         // User selects an serialized package
@@ -138,11 +149,10 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
 
             clear();
             view.getChoosePackageFileTextField().setText(file.getName());
-
-            loadPackageBackgroundService.execute(file, FILE_TYPE.PACKAGE);
-            if (Platform.isFxApplicationThread()) {
-                view.getProgressPopup().show();
-            }
+            view.getContinueButton().setDisable(false);
+            
+            selectedFile = file;
+            selectedFileType = FILE_TYPE.PACKAGE;
         });
 
         // User selects an exploded package
@@ -154,28 +164,31 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
             }
 
             clear();
-
             view.getChooseExplodedPackageDirectoryTextField().setText(file.getName());
-
-            loadPackageBackgroundService.execute(file, FILE_TYPE.EXPLODED_PACKAGE);
-            if (Platform.isFxApplicationThread()) {
-                view.getProgressPopup().show();
-            }
+            view.getContinueButton().setDisable(false);
+            
+            selectedFile = file;
+            selectedFileType = FILE_TYPE.EXPLODED_PACKAGE;
         });
     }
 
+    // Needed for testing.
+    protected File getSelectedFile() {
+        return selectedFile;
+    }
+    
+    // Needed for testing.
+    protected FILE_TYPE getSelectedFileType() {
+        return selectedFileType;
+    }
+    
     @Override
     public void onContinuePressed() {
-        controller.setPackageState(pkg.getPackageState());
-        controller.setPackageTree(pkg.getPackageTree());
-
-        if (pkg.getBaseDirectory() == null) {
-            // Package state was loaded, go to next page.
-            controller.goToNextPage();
-        } else {
-            // Package was loaded, save state and go to next page.
-            super.onContinuePressed();
-        }
+        loadPackageBackgroundService.execute(selectedFile, selectedFileType);
+        
+         if (Platform.isFxApplicationThread()) {
+            view.getProgressPopup().show();
+        }             
     }
     
     @Override
@@ -208,7 +221,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         bind();
     }
 
-    private enum FILE_TYPE {
+    protected enum FILE_TYPE {
         STATE_FILE,
         EXPLODED_PACKAGE,
         PACKAGE
