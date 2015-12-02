@@ -26,6 +26,18 @@ public enum PackagingToolReturnInfo {
     CMD_LINE_PARAM_BUILD_EXCEPTION(3, "Commandline App: Attempt to parse the provided parameter file failed. "),
     CMD_LINE_INPUT_ERROR(4, "Commandline App: Error reading from input."),
     CMD_LINE_PACKAGE_NOT_GENERATED(5, "Commandline App: Error creating package, null package returned."),
+    CMD_LINE_CONTENT_ROOT_NOT_SPECIFIED(6, "Commandline App: Content root directory was not specified"),
+    CMD_LINE_DOMAIN_PROFILE_NOT_SPECIFIED(7, "Commandline App: Domain profile was not specified" ),
+    CMD_LINE_BAD_DOMAIN_PROFILE_EXTENSION(8, "Commandline App: Domain profile must be a turtle file with name ending in .ttl, or an RDF/XML file " +
+                                "with name ending in .xml"),
+    CMD_LINE_CONTENT_ROOT_CANT_OPEN(9, "Commandline App: Content root directory could not be opened"),
+    CMD_LINE_DOMAIN_PROFILE_CANT_OPEN(10,"Commandline App: Domain profile file could not be opened"),
+    CMD_LINE_PACKAGE_METADATA_CANT_OPEN(10,"Commandline App: Package metadata file could not be opened"),
+    CMD_LINE_CANT_ASSIGN_NODE_TYPES(11, "Unable to assign node types to tree"),
+    CMD_LINE_CANT_TRANSFORM_TO_RDF(12, "Error transforming the tree's internal package model to RDF"),
+    CMD_LINE_PACKAGE_LOCATION_CANT_OPEN(13,"Commandline App: Package location could not be opened"),
+    CMD_LINE_STAGING_LOCATION_CANT_OPEN(14,"Commandline App: Package staging location could not be opened"),
+    CMD_LINE_PACKAGE_LOCATION_NOT_SPECIFIED(15, "Commandline App: Packaeg location was not specified"),
 
     /* general exceptions used across the board */
     PKG_FILE_NOT_FOUND_EXCEPTION (100,"File not found"),

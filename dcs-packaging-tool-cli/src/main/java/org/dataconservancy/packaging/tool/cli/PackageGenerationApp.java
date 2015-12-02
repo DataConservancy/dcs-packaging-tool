@@ -163,6 +163,10 @@ public class PackageGenerationApp {
     @Option(name = "--stdout", usage = "Write to stdout, instead of to a file.")
     public boolean stdout = false;
 
+    /** Serialization Format **/
+    @Option(name = "-z", aliases = { "--serialization", "--serialization-format"}, metaVar="JSONLD|TURTLE|XML", usage = "Serialization format for the ORE-ReM file")
+    public String serializationFormat;
+
 
 	public PackageGenerationApp() {
 		appContext = new ClassPathXmlApplicationContext(
@@ -211,10 +215,7 @@ public class PackageGenerationApp {
 	}
 
 	private void run() throws PackageToolException {
-         appContext = new ClassPathXmlApplicationContext(
-                new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
-                        "classpath*:org/dataconservancy/config/applicationContext.xml",
-                        "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml"});
+
         boolean useDefaults = true;
 
 		// Prepare parameter builder
@@ -270,6 +271,19 @@ public class PackageGenerationApp {
             }
         }
 
+        // Finally, override with command line options
+        // If any options overridden, this will cause useDefaults to become false, if it wasn't already
+        PackageGenerationParameters flagParams = createCommandLinePrefs();
+        if (!flagParams.getKeys().isEmpty()) {
+            useDefaults = false;
+            System.err.println("Overriding generation parameters using command line flags");
+            updateCompression(flagParams);
+            packageParams.overrideParams(flagParams);
+        }
+
+        //we need to validate any specified file locations in the package generation paramsto make sure they exist
+        validateLocationParameters(packageParams);
+
         Node tree = null;
         if(this.contentRootFile != null) {
             if(this.contentRootFile.exists()) {
@@ -277,15 +291,15 @@ public class PackageGenerationApp {
                     IPMService ipmService = appContext.getBean("ipmService", IPMService.class);
                     tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile.getPath()));
                 } catch (IOException e) {
-                    System.err.println("Error opening the content root directory at " + contentRootFile.getPath());
+                    log.error(e.getMessage());
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CONTENT_ROOT_CANT_OPEN);
                 }
             } else {
-               System.err.println("Content root directory " + contentRootFile.getPath() + " could not be opened.");
-                System.exit(1);
+               throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CONTENT_ROOT_CANT_OPEN);
             }
 
         } else {
-            System.err.println("Content root directory was not specified");
+            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CONTENT_ROOT_NOT_SPECIFIED);
         }
 
         //now we do what we have to do to create a package state
@@ -297,8 +311,7 @@ public class PackageGenerationApp {
             if(packageMetadataFile.exists()) {
                 state.setPackageMetadataList(createPackageMetadata());
             } else {
-                System.err.println("Package metadata File " + packageMetadataFile.getPath() + " could not be opened.");
-                System.exit(1);
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_CANT_OPEN);
             }
         }
 
@@ -310,7 +323,7 @@ public class PackageGenerationApp {
         DomainProfileService profileService = new DomainProfileServiceImpl(domainProfileObjectStore, uriGen);
 
         if(this.domainProfileFile != null) {
-            if(this.domainProfileFile.exists()) {
+
                 String domainProfilePath = domainProfileFile.getPath();
 
                 try (InputStream fileStream = new FileInputStream(domainProfileFile)) {
@@ -319,13 +332,11 @@ public class PackageGenerationApp {
                     } else if (domainProfilePath.endsWith(".xml")) {
                         profileObjectModel.read(fileStream, null, "RDF/XML");
                     } else {
-                        System.err.println("Domain profile must be a turtle file with name ending in .ttl, or an RDF/XML file " +
-                                "with name ending in .xml");
+                        throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_BAD_DOMAIN_PROFILE_EXTENSION);
                     }
 
                     DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
                     profile = domainProfileRdfTransformService.transformToProfile(profileObjectModel);
-                    //System.out.println(profile.toString());
                     state.setDomainObjectRDF(domainObjectModel);
                     DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
                     domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
@@ -333,49 +344,33 @@ public class PackageGenerationApp {
                     ipm2rdf.setDomainProfileStore(domainProfileStore);
 
                     if (!profileService.assignNodeTypes(profile, tree)) {
-                        System.err.println("Unable to assign node types to tree.");
+                        throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_ASSIGN_NODE_TYPES);
                     }
 
                     state.setPackageTree(ipm2rdf.transformToRDF(tree));
                 } catch (FileNotFoundException e) {
-                    System.err.println("Error opening the domain profile file at " + domainProfilePath);
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_CANT_OPEN, e);
                 } catch (RDFTransformException e) {
-                    System.err.println("Error transforming the tree's internal package model to RDF");
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF, e);
                 } catch (IOException e) {
-                    System.err.println("Could not open the domain profile " + domainProfilePath);
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_CANT_OPEN, e);
                 }
-            } else {
-                System.err.println("Domain profile " + domainProfileFile.getPath() + " could not be opened.");
-                System.exit(1);
-            }
+
 
         } else {
-           System.err.println("Domain profile file path was not specified");
+           throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_NOT_SPECIFIED);
         }
 
         if (this.pkgFormat != null) {
             packageParams.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, this.pkgFormat.name());
         }
 
-        // Finally, override with command line options
-        // If any options overridden, this will cause useDefaults to become false, if it wasn't already
-        PackageGenerationParameters flagParams = createCommandLinePrefs();
-        if (!flagParams.getKeys().isEmpty()) {
-            useDefaults = false;
-            System.err.println("Overriding generation parameters using command line flags");
-            updateCompression(flagParams);
-            packageParams.overrideParams(flagParams);
-        }
+
 
         // If nothing else overrode the defaults, say so
         if (useDefaults) {
             System.err.println("Using default values for all parameters");
         }
-
-        // Get and load the Package State file, use it to get the content root location
-        // This will be overridden always as it needs to match what's on disk, so shouldn't really
-        // be provided in the params files anyway
-        //PackageState packageState = getPackageState();
 
         // Print package generation parameters, if desired
         if (info) {
@@ -433,16 +428,16 @@ public class PackageGenerationApp {
 
     private LinkedHashMap<String, List<String>> createPackageMetadata(){
         Properties props = new Properties();
-        try(InputStream fileStream = new FileInputStream(packageMetadataFile);){
+        try(InputStream fileStream = new FileInputStream(packageMetadataFile)){
             if (fileStream != null) {
                 props.load(fileStream);
             } else {
-                System.err.println("Could not open file " + packageMetadataFile.getPath());
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
             }
         } catch (FileNotFoundException e) {
-               System.err.println("Could not open file " + packageMetadataFile.getPath());
+             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
         } catch (IOException e) {
-            System.err.println("Error opening file " + packageMetadataFile.getPath());
+             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
         }
 
         LinkedHashMap<String, List<String>> metadata = new LinkedHashMap<>();
@@ -479,8 +474,34 @@ public class PackageGenerationApp {
         if (checksums != null && !checksums.isEmpty()) {
             params.addParam(GeneralParameterNames.CHECKSUM_ALGORITHMS, checksums);
         }
-
+        if(serializationFormat != null){
+            params.addParam(GeneralParameterNames.REM_SERIALIZATION_FORMAT, serializationFormat);
+        }
         return params;
+    }
+
+    private void validateLocationParameters(PackageGenerationParameters params) {
+
+        //required, cannot be null
+        String packageLocation = params.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
+        if (packageLocation == null || packageLocation.isEmpty()) {
+            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_LOCATION_NOT_SPECIFIED);
+        } else {
+            File packageLocationFile = new File(packageLocation);
+            if (!packageLocationFile.exists()) {
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_LOCATION_CANT_OPEN);
+            }
+        }
+
+
+        //not required, might be null, will get default value in the assembler
+        String packageStagingLocation = params.getParam(GeneralParameterNames.PACKAGE_STAGING_LOCATION, 0);
+        if (packageStagingLocation != null && !packageStagingLocation.isEmpty()) {
+            File packageStagingLocationFile = new File(packageStagingLocation);
+            if (!packageStagingLocationFile.exists()) {
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_STAGING_LOCATION_CANT_OPEN);
+            }
+        }
     }
 
 
