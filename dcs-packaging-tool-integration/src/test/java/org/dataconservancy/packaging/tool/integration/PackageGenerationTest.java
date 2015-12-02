@@ -327,28 +327,33 @@ public class PackageGenerationTest {
         OpenedPackage opened =
                 packager.createPackage(initialState, folder.getRoot());
 
-        Path baseDir = opened.getBaseDirectory().getParentFile().toPath();
+        Path baseDir =
+                opened.getBaseDirectory().getParentFile().getCanonicalFile()
+                        .toPath();
 
         /*
          * Opened package re-map bah URIs to files. We need the original bag
          * URIs, so re-create them!
          */
         Set<String> fileLocations = new HashSet<>();
-        opened.getPackageTree().walk(node -> {
-            if (node.getFileInfo() != null && node.getFileInfo().isFile()) {
-                try {
-                    URI bagURIForFile =
-                            UriUtility.makeBagUriString(Paths.get(node
-                                                                .getFileInfo()
-                                                                .getLocation())
-                                                                .toFile(),
-                                                        baseDir.toFile());
-                    fileLocations.add(bagURIForFile.toString());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        opened.getPackageTree()
+                .walk(node -> {
+                    if (node.getFileInfo() != null
+                            && node.getFileInfo().isFile()) {
+                        try {
+                            URI bagURIForFile =
+                                    UriUtility.makeBagUriString(Paths.get(node
+                                                                        .getFileInfo()
+                                                                        .getLocation())
+                                                                        .toFile()
+                                                                        .getCanonicalFile(),
+                                                                baseDir.toFile());
+                            fileLocations.add(bagURIForFile.toString());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
         assertFalse(fileLocations.isEmpty());
 
         Model custodialDomainObjects = custodialDomainObjects(opened);
