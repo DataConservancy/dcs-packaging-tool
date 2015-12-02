@@ -271,12 +271,17 @@ public class PackageGenerationApp {
         }
 
         Node tree = null;
-        if(this.contentRootFile != null && this.contentRootFile.exists()) {
-            try{
-                IPMService ipmService = appContext.getBean("ipmService", IPMService.class);
-                tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile.getPath()));
-            } catch (IOException e) {
-                System.err.println("Error opening the content root directory at " + contentRootFile.getPath());
+        if(this.contentRootFile != null) {
+            if(this.contentRootFile.exists()) {
+                try {
+                    IPMService ipmService = appContext.getBean("ipmService", IPMService.class);
+                    tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile.getPath()));
+                } catch (IOException e) {
+                    System.err.println("Error opening the content root directory at " + contentRootFile.getPath());
+                }
+            } else {
+               System.err.println("Content root directory " + contentRootFile.getPath() + " could not be opened.");
+                System.exit(1);
             }
 
         } else {
@@ -289,7 +294,12 @@ public class PackageGenerationApp {
 
         //add package metadata to state
         if(packageMetadataFile != null) {
-            state.setPackageMetadataList(readPackageMetadata());
+            if(packageMetadataFile.exists()) {
+                state.setPackageMetadataList(createPackageMetadata());
+            } else {
+                System.err.println("Package metadata File " + packageMetadataFile.getPath() + " could not be opened.");
+                System.exit(1);
+            }
         }
 
         //add package tree to state
@@ -299,39 +309,48 @@ public class PackageGenerationApp {
         DomainProfileObjectStore domainProfileObjectStore = new DomainProfileObjectStoreImpl(domainObjectModel, uriGen);
         DomainProfileService profileService = new DomainProfileServiceImpl(domainProfileObjectStore, uriGen);
 
-        if(this.domainProfileFile != null && this.domainProfileFile.exists()) {
-            String domainProfilePath = domainProfileFile.getPath();
-            try{
-                InputStream fileStream = new FileInputStream(domainProfileFile);
+        if(this.domainProfileFile != null) {
+            if(this.domainProfileFile.exists()) {
+                String domainProfilePath = domainProfileFile.getPath();
 
-                if(domainProfilePath.endsWith(".ttl")) {
-                    profileObjectModel.read(fileStream, null, "TTL");
-                } else if(domainProfilePath.endsWith(".xml")) {
-                    profileObjectModel.read(fileStream, null, "RDF/XML");
-                } else {
-                    System.err.println("Domain profile must be a turtle file with name ending in .ttl, or an RDF/XML file " +
-                            "with name ending in .xml");
+                try (InputStream fileStream = new FileInputStream(domainProfileFile)) {
+                    if (domainProfilePath.endsWith(".ttl")) {
+                        profileObjectModel.read(fileStream, null, "TTL");
+                    } else if (domainProfilePath.endsWith(".xml")) {
+                        profileObjectModel.read(fileStream, null, "RDF/XML");
+                    } else {
+                        System.err.println("Domain profile must be a turtle file with name ending in .ttl, or an RDF/XML file " +
+                                "with name ending in .xml");
+                    }
+
+                    DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
+                    profile = domainProfileRdfTransformService.transformToProfile(profileObjectModel);
+                    //System.out.println(profile.toString());
+                    state.setDomainObjectRDF(domainObjectModel);
+                    DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
+                    domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
+                    IpmRdfTransformService ipm2rdf = appContext.getBean("ipmRdfTransformService", IpmRdfTransformService.class);
+                    ipm2rdf.setDomainProfileStore(domainProfileStore);
+
+                    if (!profileService.assignNodeTypes(profile, tree)) {
+                        System.err.println("Unable to assign node types to tree.");
+                    }
+
+                    state.setPackageTree(ipm2rdf.transformToRDF(tree));
+                } catch (FileNotFoundException e) {
+                    System.err.println("Error opening the domain profile file at " + domainProfilePath);
+                } catch (RDFTransformException e) {
+                    System.err.println("Error transforming the tree's internal package model to RDF");
+                } catch (IOException e) {
+                    System.err.println("Could not open the domain profile " + domainProfilePath);
                 }
-
-                DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
-                profile = domainProfileRdfTransformService.transformToProfile(profileObjectModel);
-                //System.out.println(profile.toString());
-                state.setDomainObjectRDF(domainObjectModel);
-                DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
-                domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
-                IpmRdfTransformService ipm2rdf = appContext.getBean("ipmRdfTransformService", IpmRdfTransformService.class);
-                ipm2rdf.setDomainProfileStore(domainProfileStore);
-
-                if(!profileService.assignNodeTypes(profile, tree)){
-                 System.err.println("Unable to assign node types to tree.");
-                }
-
-                state.setPackageTree(ipm2rdf.transformToRDF(tree));
-            } catch (FileNotFoundException e) {
-                System.err.println("Error opening the domain profile file at " + domainProfilePath);
-            } catch (RDFTransformException e) {
-                System.err.println("Error transforming the tree's internal package model to RDF");
+            } else {
+                System.err.println("Domain profile " + domainProfileFile.getPath() + " could not be opened.");
+                System.exit(1);
             }
+
+        } else {
+           System.err.println("Domain profile file path was not specified");
         }
 
         if (this.pkgFormat != null) {
@@ -412,10 +431,9 @@ public class PackageGenerationApp {
         }
     }
 
-    private LinkedHashMap<String, List<String>> readPackageMetadata(){
+    private LinkedHashMap<String, List<String>> createPackageMetadata(){
         Properties props = new Properties();
-        try{
-            InputStream fileStream = new FileInputStream(packageMetadataFile);
+        try(InputStream fileStream = new FileInputStream(packageMetadataFile);){
             if (fileStream != null) {
                 props.load(fileStream);
             } else {
@@ -428,11 +446,17 @@ public class PackageGenerationApp {
         }
 
         LinkedHashMap<String, List<String>> metadata = new LinkedHashMap<>();
+        //add package name to the metadata
+        if(packageName != null && !packageName.isEmpty()){
+            metadata.put("Package-Name", Arrays.asList(packageName.trim()));
+        }
+
         List<String> valueList;
         for (String key : props.stringPropertyNames()) {
               valueList = Arrays.asList(props.getProperty(key).trim().split("\\s*,\\s*"));
               metadata.put(key,valueList);
         }
+
         return metadata;
     }
 
