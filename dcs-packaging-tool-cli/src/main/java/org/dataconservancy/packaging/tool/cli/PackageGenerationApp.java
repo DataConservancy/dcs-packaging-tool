@@ -24,7 +24,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import java.nio.file.Paths;
+
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
@@ -33,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.api.IPMService;
@@ -161,8 +165,7 @@ public class PackageGenerationApp {
 		appContext = new ClassPathXmlApplicationContext(
                          new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
                                  "classpath*:org/dataconservancy/config/applicationContext.xml",
-                                 "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
-                                 "classpath*:applicationContext.xml"});
+                                 "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml"});
     }
 
 	public static void main(String[] args) {
@@ -208,8 +211,7 @@ public class PackageGenerationApp {
          appContext = new ClassPathXmlApplicationContext(
                 new String[]{"classpath*:org/dataconservancy/cli/config/applicationContext.xml",
                         "classpath*:org/dataconservancy/config/applicationContext.xml",
-                        "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
-                "classpath*:applicationContext.xml"});
+                        "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml"});
         boolean useDefaults = true;
 
 		// Prepare parameter builder
@@ -306,8 +308,7 @@ public class PackageGenerationApp {
                 //System.out.println(profile.toString());
                 state.setDomainObjectRDF(domainObjectModel);
                 DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
-                //domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
-                domainProfileStore.getPrimaryDomainProfiles().add(profile);
+                domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
                 IpmRdfTransformService ipm2rdf = appContext.getBean("ipmRdfTransformService", IpmRdfTransformService.class);
                 ipm2rdf.setDomainProfileStore(domainProfileStore);
 
