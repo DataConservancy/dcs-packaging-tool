@@ -77,6 +77,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
             addNewButton.setText(TextFactory.format(Messages.MessageKey.ADD_NEW_MESSAGE, propertyConstraint.getPropertyType().getLabel()));
             subPropertyBoxes = new ArrayList<>();
             createChildProfilePropertyBoxes(existingProperties, listener, propertyValuesBox);
+            listener.changed(null, "n/a", "n/a");
             getChildren().add(propertyValuesBox);
 
             if (propertyConstraint.getMaximum() > 1 || propertyConstraint.getMaximum() == -1) {
@@ -200,6 +201,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
                     propertyValueBox.getChildren().add(subProfilePropertyBox);
                     addChangeListenerToProfileBox(subProfilePropertyBox, listener);
                 }
+
 
                 subPropertyBoxes.add(complexPropertyBoxList);
             }
@@ -343,14 +345,17 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
             if (subPropertyBoxes != null) {
                 for (List<ProfilePropertyBox> complexPropertyList : subPropertyBoxes) {
                     for (ProfilePropertyBox profilePropertyBox : complexPropertyList) {
-                        for (PropertyBox propertyBox : profilePropertyBox.propertyBoxes) {
-                            if (propertyBox.getValue() != null) {
-                                if (propertyBox.getValue() instanceof String &&
-                                    propertyBox.getValueAsString().isEmpty()) {
+                        //For complex properties we should only care if required properties are filled in
+                        if (profilePropertyBox.getPropertyConstraint().getMinimum() >= 1) {
+                            for (PropertyBox propertyBox : profilePropertyBox.propertyBoxes) {
+                                if (propertyBox.getValue() != null) {
+                                    if (propertyBox.getValue() instanceof String &&
+                                        propertyBox.getValueAsString().isEmpty()) {
+                                        return true;
+                                    }
+                                } else {
                                     return true;
                                 }
-                            } else {
-                                return true;
                             }
                         }
                     }
