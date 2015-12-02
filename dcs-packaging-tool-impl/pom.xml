@@ -170,11 +170,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.dataconservancy.shared</groupId>
       <artifactId>dcs-shared-util</artifactId>
     </dependency>
