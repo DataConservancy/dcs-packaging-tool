@@ -63,7 +63,6 @@
               <artifactId>servlet-api</artifactId>
               <version>2.5</version>
             </dependency>
-
           </dependencies>
         </plugin>
 
@@ -74,6 +73,7 @@
     <!-- Plugins  ================================================= -->
     
     <plugins>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -110,7 +110,15 @@
 
   <!-- Dependencies  ============================================== -->
   
-  <dependencies>
+  <dependencies>    
+    
+    <!-- Provided Dependencies ==================================== -->
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
     
     <!-- Compile Dependencies ===================================== -->
 
@@ -160,12 +168,6 @@
       <groupId>uk.gov.nationalarchives</groupId>
       <artifactId>droid-container</artifactId>
       <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Runtime Dependencies ===================================== -->
