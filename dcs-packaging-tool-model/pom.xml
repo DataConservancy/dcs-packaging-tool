@@ -14,23 +14,27 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>  
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>dcs-packaging-tool-model</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool Model</name>
-  
+
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>
     <artifactId>dcs-packaging-tool</artifactId>
     <version>0.10.1-SNAPSHOT</version>
   </parent>
-  
-  <!-- Profiles  =================================================== -->
 
-  <!-- Build ====================================================== -->
-    <build>
-     <plugins>
+  <!-- Build ======================================================= -->
+  
+  <build>
+    
+    <plugins>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -48,33 +52,28 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
+      
     </plugins>
+    
   </build>
+
+
+  <!-- Dependencies ================================================ -->
   
-  
-  <!-- Dependencies =============================================== -->
   <dependencies>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>nl.jqno.equalsverifier</groupId>
-      <artifactId>equalsverifier</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!-- Compile =================================================== -->
 
     <dependency>
       <groupId>org.dataconservancy.shared</groupId>
       <artifactId>dcs-shared-util</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-core</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -88,7 +87,21 @@
       <artifactId>cloning</artifactId>
       <scope>compile</scope>
     </dependency>
+    
+    <!-- Test ====================================================== -->
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>nl.jqno.equalsverifier</groupId>
+      <artifactId>equalsverifier</artifactId>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
-  
+
 </project>
