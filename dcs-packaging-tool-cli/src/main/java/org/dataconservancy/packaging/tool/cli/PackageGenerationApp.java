@@ -15,11 +15,16 @@
  */
 package org.dataconservancy.packaging.tool.cli;
 
-import java.io.*;
 
-
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
