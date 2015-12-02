@@ -13,48 +13,55 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dataconservancy.pkgtool</groupId>
   <artifactId>dcs-packaging-tool</artifactId>
   <version>0.10.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>DCS Packaging Tools</name>
-  
+
   <parent>
     <groupId>org.dataconservancy</groupId>
     <artifactId>project-pom</artifactId>
     <version>2.0.0-SNAPSHOT</version>
-    <relativePath></relativePath>
+    <relativePath/>
   </parent>
-  
+
   <!-- Modules  =================================================== -->
+  
   <modules>
- 	<module>dcs-packaging-tool-api</module>
- 	<module>dcs-packaging-tool-impl</module>
- 	<module>dcs-packaging-tool-cli</module>
- 	<module>dcs-packaging-tool-gui</module>
- 	<module>dcs-packaging-tool-model</module>
- 	<module>dcs-packaging-tool-model-builder</module>
- 	<module>dcs-packaging-tool-model-builder-properties</module>
- 	<module>dcs-packaging-tool-assemblies</module>
- 	<module>dcs-packaging-tool-profiles</module>
- 	<module>dcs-packaging-tool-ontologies</module>
+    <module>dcs-packaging-tool-api</module>
+    <module>dcs-packaging-tool-impl</module>
+    <module>dcs-packaging-tool-cli</module>
+    <module>dcs-packaging-tool-gui</module>
+    <module>dcs-packaging-tool-model</module>
+    <module>dcs-packaging-tool-model-builder</module>
+    <module>dcs-packaging-tool-model-builder-properties</module>
+    <module>dcs-packaging-tool-assemblies</module>
+    <module>dcs-packaging-tool-profiles</module>
+    <module>dcs-packaging-tool-ontologies</module>
     <module>dcs-packaging-tool-ser</module>
     <module>dcs-packaging-tool-integration</module>
   </modules>
-  
+
   <!-- Properties  ================================================ -->
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
   <!-- Build ====================================================== -->
+  
   <build>
 
     <pluginManagement>
+      
       <plugins>
 
         <plugin>
@@ -65,9 +72,9 @@
         </plugin>
 
         <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.2</version>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.2</version>
         </plugin>
 
         <plugin>
@@ -133,11 +140,13 @@
             </execution>
           </executions>
         </plugin>
+        
       </plugins>
 
     </pluginManagement>
 
     <plugins>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
@@ -161,16 +170,19 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-            <source>1.8</source>
-            <target>1.8</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
+      
     </plugins>
-  </build>
-  <!-- Dependencies =============================================== -->
-  
-  <dependencyManagement>
     
+  </build>
+  
+  <!-- Dependencies =============================================== -->
+
+  <dependencyManagement>
+
     <dependencies>
 
       <!-- DCS Packaging Tool Dependencies  -->
@@ -300,4 +312,5 @@
     <developerConnection>scm:git:https://github.com/DataConservancy/dcs.git</developerConnection>
     <url>https://github.com/DataConservancy/dcs/tree/master/dcs-packaging-tool</url>
   </scm>
+  
 </project>
