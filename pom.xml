@@ -65,6 +65,24 @@
       <plugins>
 
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-remote-resources-plugin</artifactId>
+          <configuration>
+            <resourceBundles>
+              <resourceBundle>org.apache:apache-jar-resource-bundle:1.4</resourceBundle>
+            </resourceBundles>
+          </configuration>
+          <executions>
+            <execution>
+              <id>license-resources</id>
+              <goals>
+                <goal>process</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <quiet>true</quiet>
@@ -173,6 +191,11 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
       </plugin>
       
     </plugins>
