@@ -21,7 +21,6 @@ import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl;
 import org.dataconservancy.packaging.tool.api.OpenPackageService;
-import org.dataconservancy.packaging.tool.impl.OpenPackageServiceImpl;
 import org.dataconservancy.packaging.tool.model.OpenedPackage;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
@@ -29,12 +28,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
 /**
  * Test the presenter for opening packages.
  */
 public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
+    private static final String PACKAGE_STATE_EXT=".dcp";
+    
     private OpenExistingPackagePresenterImpl presenter;
     private OpenExistingPackageViewImpl view;
     private OpenPackageService open_package_service;
@@ -66,7 +66,7 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
         when(controller.showOpenFileDialog(any())).thenReturn(opened_file);
         when(controller.showOpenDirectoryDialog(any())).thenReturn(opened_dir);
         when(controller.getFactory()).thenReturn(factory);
-        when(controller.getPackageStateFileExtension()).thenReturn("*.zip");
+        when(controller.getPackageStateFileExtension()).thenReturn("*" + PACKAGE_STATE_EXT);
         view = new OpenExistingPackageViewImpl(help);
 
         HeaderView headerView = new HeaderViewImpl();
@@ -107,7 +107,10 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testOpenPackageState() throws IOException {
-        view.getChoosePackageStateFileButton().fire();
+        opened_file = tmpfolder.newFile("test" + PACKAGE_STATE_EXT);
+        when(controller.showOpenFileDialog(any())).thenReturn(opened_file);
+        
+        view.getChoosePackageFileButton().fire();
 
         assertEquals(opened_file, presenter.getSelectedFile());
         assertEquals(FILE_TYPE.STATE_FILE, presenter.getSelectedFileType());
@@ -121,6 +124,9 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testOpenPackage() throws IOException {
+        opened_file = tmpfolder.newFile("test.tar.gz");
+        when(controller.showOpenFileDialog(any())).thenReturn(opened_file);
+        
         view.getChoosePackageFileButton().fire();
 
         assertEquals(opened_file, presenter.getSelectedFile());
@@ -151,8 +157,9 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
     @Test
     public void testContinueOnPackageState() throws Exception {
         pkg.setBaseDirectory(null);
+        opened_file = tmpfolder.newFile("test" + PACKAGE_STATE_EXT);
         
-        view.getChoosePackageStateFileButton().fire();
+        view.getChoosePackageFileButton().fire();
         view.getContinueButton().fire();
 
         verify(controller).setPackageState(any());
@@ -169,6 +176,8 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testContinueOnPackage() throws Exception {
+        opened_file = tmpfolder.newFile("test.tar.gz");
+        
         view.getChoosePackageFileButton().fire();
         view.getContinueButton().fire();
 

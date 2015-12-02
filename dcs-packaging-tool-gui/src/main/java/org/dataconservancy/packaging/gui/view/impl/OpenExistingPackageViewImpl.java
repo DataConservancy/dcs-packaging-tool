@@ -19,7 +19,6 @@ import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
-import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 
@@ -34,13 +33,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackagePresenterImpl> implements OpenExistingPackageView {
-
-    private Button choosePackageStateFileButton;
-    private TextField choosePackageStateFileTextField;
-
     private Button chooseExplodedPackageDirectoryButton;
     private TextField chooseExplodedPackageDirectoryTextField;
-
     private Button choosePackageFileButton;
     private TextField choosePackageFileTextField;
     private Button choosePackageStagingDirectoryButton;
@@ -69,28 +63,8 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         VBox optionVBox = new VBox(4);
         optionVBox.setAlignment(Pos.TOP_LEFT);
 
-        // Choose a package state
-        {
-            Label label = new Label(TextFactory.getText(Labels.LabelKey.SELECT_IN_PROGRESS_PACKAGE_FILE_LABEL));
-            optionVBox.getChildren().add(label);
-    
-            HBox hbox = new HBox(6);
-            hbox.getStyleClass().add(DIRECTORY_BOX);
-            hbox.setMaxWidth(420);
-    
-            choosePackageStateFileButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
-            choosePackageStateFileButton.setMinWidth(60);
-
-            choosePackageStateFileTextField = new TextField();
-            choosePackageStateFileTextField.setEditable(false);
-            choosePackageStateFileTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
-            choosePackageStateFileTextField.setPrefWidth(320);
-            
-            hbox.getChildren().addAll(choosePackageStateFileButton, choosePackageStateFileTextField);
-            optionVBox.getChildren().add(hbox);
-        }
         
-        // Choose a package and extraction directory
+        // Choose a package or state file and extraction directory
         {
             HBox package_hbox = new HBox(6);
             package_hbox.getStyleClass().add(DIRECTORY_BOX);
@@ -125,9 +99,9 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
             optionVBox.getChildren().addAll(package_label, package_hbox, extract_label, extract_hbox);
             
             // Indent from the left
-            VBox.setMargin(package_hbox, new Insets(0, 0, 0, 20));
-            VBox.setMargin(extract_hbox, new Insets(0, 0, 0, 20));
-            VBox.setMargin(extract_label, new Insets(0, 0, 0, 20));
+            //VBox.setMargin(package_hbox, new Insets(0, 0, 0, 20));
+            //VBox.setMargin(extract_hbox, new Insets(0, 0, 0, 20));
+            //VBox.setMargin(extract_label, new Insets(0, 0, 0, 20));
         }
         
         // Choose a exploded package
@@ -178,15 +152,6 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         }
 
         return progressDialogPopup;
-    }
-    @Override
-    public Button getChoosePackageStateFileButton() {
-        return choosePackageStateFileButton;
-    }
-
-    @Override
-    public TextField getChoosePackageStateFileTextField() {
-        return choosePackageStateFileTextField;
     }
 
     @Override

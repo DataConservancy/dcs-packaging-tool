@@ -28,23 +28,6 @@ import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
  * see the entire path. The text field however is not editable.
  */
 public interface OpenExistingPackageView extends View<OpenExistingPackagePresenterImpl> {
-
-    /**
-     * The button for choosing an in progress package state file.
-     * 
-     * @return The button for choosing the file.
-     */
-    Button getChoosePackageStateFileButton();
-
-    /**
-     * A text field that is used for displaying the currently selected package
-     * state file.
-     * 
-     * 
-     * @return The TextField to display the file.
-     */
-    TextField getChoosePackageStateFileTextField();
-
     /**
      * The button for choosing a content directory that is the location of the
      * package contents.
@@ -62,7 +45,7 @@ public interface OpenExistingPackageView extends View<OpenExistingPackagePresent
     TextField getChooseExplodedPackageDirectoryTextField();
 
     /**
-     * The button for choosing a serialized package.
+     * The button for choosing a serialized package or a package state.
      * 
      * @return The button for choosing the file
      */

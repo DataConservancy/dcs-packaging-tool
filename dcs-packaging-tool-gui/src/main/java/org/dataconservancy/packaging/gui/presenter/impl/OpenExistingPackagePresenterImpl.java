@@ -115,30 +115,12 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
             view.getChoosePackageStagingDirectoryTextField().setText(stagingDir.getPath());
         });
 
-        // User selects a package state file
-        view.getChoosePackageStateFileButton().setOnAction(event -> {
-            fileChooser.getExtensionFilters().clear();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-                    TextFactory.getText(Labels.LabelKey.PACKAGE_STATE_FILE_DESCRIPTION_LABEL), controller.getPackageStateFileExtension()));
-
-            File file = controller.showOpenFileDialog(fileChooser);
-
-            if (file== null) {
-                return;
-            }
-
-            clear();
-            view.getChoosePackageStateFileTextField().setText(file.getName());
-            view.getContinueButton().setDisable(false);
-            
-            selectedFile = file;
-            selectedFileType = FILE_TYPE.STATE_FILE;
-        });
-
-        // User selects an serialized package
+        // User selects an serialized package or a package state
         view.getChoosePackageFileButton().setOnAction(event -> {
             fileChooser.getExtensionFilters().clear();
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package File", "*.zip", "*.ZIP", "*.tar", "*.TAR", "*.gz", "*.GZ", "*.gzip", "*.GZIP"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                    TextFactory.getText(Labels.LabelKey.PACKAGE_STATE_FILE_DESCRIPTION_LABEL), controller.getPackageStateFileExtension()));
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
 
             File file = controller.showOpenFileDialog(fileChooser);
@@ -152,7 +134,15 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
             view.getContinueButton().setDisable(false);
             
             selectedFile = file;
-            selectedFileType = FILE_TYPE.PACKAGE;
+            
+            // Check if package or state file
+            String state_ext = controller.getPackageStateFileExtension().substring(1);
+            
+            if (selectedFile.getName().endsWith(state_ext)) {
+                selectedFileType = FILE_TYPE.STATE_FILE;    
+            } else {
+                selectedFileType = FILE_TYPE.PACKAGE;
+            }
         });
 
         // User selects an exploded package
@@ -201,7 +191,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
     public void clear() {
         clearError();
 
-        view.getChoosePackageStateFileTextField().setText("");
         view.getChooseExplodedPackageDirectoryTextField().setText("");
         view.getChoosePackageFileTextField().setText("");
         view.getChoosePackageStagingDirectoryTextField().setText(stagingDir.getPath());
