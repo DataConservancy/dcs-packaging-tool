@@ -31,9 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.DirectoryWalker;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.NameFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
+
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -73,9 +71,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
@@ -242,10 +242,13 @@ public class PackageGenerationTest {
         creator2_mbox.setStringValue("ethel@mertz.org");
         creator2.setComplexValue(Arrays.asList(creator2_name, creator2_mbox));
 
+        AtomicInteger collectionCount = new AtomicInteger(0);
+
         /* Add two creators to each collection */
         opened.getPackageTree().walk(node -> {
             if (node.getNodeType().getDomainTypes()
                     .contains(URI.create(NS_DCS_ONTOLOGY_BOM + "Collection"))) {
+                collectionCount.incrementAndGet();
                 profileService.addProperty(node, creator1);
                 profileService.addProperty(node, creator2);
             }
@@ -279,6 +282,18 @@ public class PackageGenerationTest {
         assertFalse(initialObjects.contains(creator1_name.getStringValue()));
         assertTrue(openedObjects.contains(creator1_name.getStringValue()));
         assertTrue(openedObjects.contains(creator2_name.getStringValue()));
+        assertEquals(2 * collectionCount.get(),
+                     opened.getPackageState()
+                             .getDomainObjectRDF()
+                             .listStatements(null,
+                                             opened.getPackageState()
+                                                     .getDomainObjectRDF()
+                                                     .getProperty(creator1
+                                                             .getPropertyType()
+                                                             .getDomainPredicate()
+                                                             .toString()),
+
+                                             (RDFNode) null).toSet().size());
         assertTrue(afterSaveAndReopenObjects.contains(creator1_name
                 .getStringValue()));
         assertTrue(afterSaveAndReopenObjects.contains(creator2_name
@@ -288,11 +303,74 @@ public class PackageGenerationTest {
         assertTrue(afterSaveAndReopenCustodialObjects.contains(creator2_name
                 .getStringValue()));
 
-        custodialDomainObjects(opened);
         assertNotEquals(domainObjectSizes(initialState),
                         domainObjectSizes(opened.getPackageState()));
         assertEquals(domainObjectSizes(opened.getPackageState()),
                      domainObjectSizes(afterSaveAndReopen.getPackageState()));
+
+        Model custodialAfterSaveAndReopen =
+                custodialDomainObjects(afterSaveAndReopen);
+
+        assertEquals(afterSaveAndReopen.getPackageState().getDomainObjectRDF()
+                .listStatements().toSet().size(), custodialAfterSaveAndReopen
+                .listStatements().toSet().size());
+    }
+
+    /*
+     * Verifies that all the links in the custodial domain objects resolve to
+     * something, and that all the files are linked to.
+     */
+    @Test
+    public void custodialDomainObjectReferenceTest() throws Exception {
+        PackageState initialState = initializer.initialize(DCS_PROFILE);
+
+        OpenedPackage opened =
+                packager.createPackage(initialState, folder.getRoot());
+
+        Path baseDir = opened.getBaseDirectory().getParentFile().toPath();
+
+        /*
+         * Opened package re-map bah URIs to files. We need the original bag
+         * URIs, so re-create them!
+         */
+        Set<String> fileLocations = new HashSet<>();
+        opened.getPackageTree().walk(node -> {
+            if (node.getFileInfo() != null && node.getFileInfo().isFile()) {
+                try {
+                    URI bagURIForFile =
+                            UriUtility.makeBagUriString(Paths.get(node
+                                                                .getFileInfo()
+                                                                .getLocation())
+                                                                .toFile(),
+                                                        baseDir.toFile());
+                    fileLocations.add(bagURIForFile.toString());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        assertFalse(fileLocations.isEmpty());
+
+        Model custodialDomainObjects = custodialDomainObjects(opened);
+
+        Set<URI> bagURIs = new HashSet<>();
+        custodialDomainObjects.listSubjects().mapWith(Resource::getURI)
+                .mapWith(URI::create).filterKeep(UriUtility::isBagUri)
+                .forEachRemaining(bagURIs::add);
+        custodialDomainObjects.listObjects().filterKeep(RDFNode::isURIResource)
+                .mapWith(RDFNode::asResource).mapWith(Resource::getURI)
+                .mapWith(URI::create).filterKeep(UriUtility::isBagUri)
+                .forEachRemaining(bagURIs::add);
+
+        bagURIs.forEach(bagURI -> {
+            fileLocations.remove(bagURI.toString());
+            File linkedFile =
+                    UriUtility.resolveBagUri(baseDir, bagURI).toFile();
+            assertTrue(linkedFile.exists());
+            assertTrue(linkedFile.isFile());
+        });
+
+        assertTrue(fileLocations.isEmpty());
     }
 
     @Test
@@ -417,16 +495,18 @@ public class PackageGenerationTest {
     }
 
     /**
-     * Insures the models from ModelResources are included in the final package.  Currently every
-     * model exposed by {@code ModelResources#RESOURCE_MAP} should have a serialization in the
-     * final package under the ONT directory per our spec.
+     * Insures the models from ModelResources are included in the final package.
+     * Currently every model exposed by {@code ModelResources#RESOURCE_MAP}
+     * should have a serialization in the final package under the ONT directory
+     * per our spec.
      *
      * @throws Exception
      */
     @Test
     public void testOntologiesIncluded() throws Exception {
         PackageState state = initializer.initialize(DCS_PROFILE);
-        OpenedPackage openedPackage = packager.createPackage(state, folder.getRoot());
+        OpenedPackage openedPackage =
+                packager.createPackage(state, folder.getRoot());
         List<File> models = new ArrayList<>();
         OntDirectoryWalker walker = new OntDirectoryWalker();
 
@@ -434,7 +514,10 @@ public class PackageGenerationTest {
 
         assertTrue(ModelResources.RESOURCE_MAP.size() > 0);
         assertEquals(ModelResources.RESOURCE_MAP.size(), models.size());
-        List<String> packageModelNames = models.stream().collect(Collectors.mapping(File::getName, Collectors.toList()));
+        List<String> packageModelNames =
+                models.stream()
+                        .collect(Collectors.mapping(File::getName,
+                                                    Collectors.toList()));
         ModelResources.RESOURCE_MAP.values().stream().forEach(resource -> {
             if (resource.startsWith("/")) {
                 resource = resource.substring(1, resource.length());
@@ -445,9 +528,9 @@ public class PackageGenerationTest {
     }
 
     /*
-         * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
-         * generic tree operations should be in a common library?
-         */
+     * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
+     * generic tree operations should be in a common library?
+     */
     private void buildContentRoots(Node node, Node newTree) throws IOException {
         if (node.getChildren() != null) {
             for (Node child : node.getChildren()) {
@@ -577,15 +660,18 @@ public class PackageGenerationTest {
         return domainObjects;
     }
 
-    private class OntDirectoryWalker extends DirectoryWalker<File> {
+    private class OntDirectoryWalker
+            extends DirectoryWalker<File> {
 
         public void doWalk(File baseDir, List<File> models) throws IOException {
             walk(baseDir, models);
         }
 
         @Override
-        protected void handleFile(File file, int depth, Collection<File> results) throws IOException {
-            if (file.getParentFile().getName().equals("ONT") && file.getName().endsWith(".ttl")) {
+        protected void handleFile(File file, int depth, Collection<File> results)
+                throws IOException {
+            if (file.getParentFile().getName().equals("ONT")
+                    && file.getName().endsWith(".ttl")) {
                 results.add(file);
             }
         }
