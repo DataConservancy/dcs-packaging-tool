@@ -69,6 +69,7 @@ public class Controller {
     private DomainProfileService domainProfileService;
     private URIGenerator uriGenerator;
 
+
     /**
      * Application-scope metadata
      */
@@ -334,10 +335,20 @@ public class Controller {
                 try (FileOutputStream fs = new FileOutputStream(packageStateFile)) {
                     packageStateSerializer.serialize(getPackageState(), fs);
                 }
-                packageStateFileChooser.setInitialDirectory(packageStateFile.getParentFile());
-                packageStateFileChooser.setInitialFileName(packageStateFile.getName());
+
+                setPackageStateFileChooserIntialChoice(packageStateFile);
             }
         }
+    }
+    
+    /**
+     * Set the file which the package state file chooser will be set to when next shown.
+     * 
+     * @param file
+     */
+    public void setPackageStateFileChooserIntialChoice(File file) {
+        packageStateFileChooser.setInitialDirectory(file.getParentFile());
+        packageStateFileChooser.setInitialFileName(file.getName());
     }
 
     public PackageState getPackageState() {
