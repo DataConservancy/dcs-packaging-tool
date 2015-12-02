@@ -16,7 +16,6 @@ import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
-import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.impl.PropertyFormatServiceImpl;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
@@ -24,7 +23,6 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyConstraint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
-import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,12 +32,14 @@ import java.util.stream.Collectors;
 public class ProfilePropertyBox extends VBox implements CssConstants {
     PropertyConstraint propertyConstraint;
     List<PropertyBox> propertyBoxes;
-    List<ProfilePropertyBox> subPropertyBoxes;
+
+    //This is a little ugly but needed to keep complex properties grouped properly together.
+    List<List<ProfilePropertyBox>> subPropertyBoxes;
+
     private final int prefWidth = 250;
     private DisciplineLoadingService disciplineLoadingService;
 
-    public ProfilePropertyBox(PropertyConstraint propertyConstraint, Node node,
-                              DomainProfileService profileService, DisciplineLoadingService disciplineLoadingService) {
+    public ProfilePropertyBox(PropertyConstraint propertyConstraint, List<Property> existingProperties, DisciplineLoadingService disciplineLoadingService) {
         PropertyFormatService formatService = new PropertyFormatServiceImpl();
 
         this.propertyConstraint = propertyConstraint;
@@ -76,7 +76,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         if (propertyConstraint.getPropertyType().getPropertyValueType().equals(PropertyValueType.COMPLEX)) {
             addNewButton.setText(TextFactory.format(Messages.MessageKey.ADD_NEW_MESSAGE, propertyConstraint.getPropertyType().getLabel()));
             subPropertyBoxes = new ArrayList<>();
-            createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener, propertyValuesBox);
+            createChildProfilePropertyBoxes(existingProperties, listener, propertyValuesBox);
             getChildren().add(propertyValuesBox);
 
             if (propertyConstraint.getMaximum() > 1 || propertyConstraint.getMaximum() == -1) {
@@ -84,10 +84,10 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
                 getChildren().add(addNewButton);
 
                 addNewButton.setOnAction(arg0 -> {
-                    createChildProfilePropertyBoxes(subPropertyBoxes, node, profileService, listener, propertyValuesBox);
+                    createChildProfilePropertyBoxes(null, listener, propertyValuesBox);
 
                     addNewButton.setDisable(true);
-                    requestFocusForNewGroup(subPropertyBoxes.get(subPropertyBoxes.size()-1));
+                    requestFocusForNewGroup(subPropertyBoxes.get(subPropertyBoxes.size()-1).get(0));
                 });
 
                 Separator groupSeparator = new Separator();
@@ -96,8 +96,6 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         } else {
 
             propertyBoxes = new ArrayList<>();
-
-            List<Property> existingProperties = profileService.getProperties(node, propertyConstraint.getPropertyType());
 
             if (existingProperties != null && !existingProperties.isEmpty()) {
                 for (Property property : existingProperties) {
@@ -182,20 +180,42 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         return new TextPropertyBox(initialValue, editable, null, "");
     }
 
-    private void createChildProfilePropertyBoxes(List<ProfilePropertyBox> nodePropertyBoxes, Node node, DomainProfileService profileService, GroupPropertyChangeListener listener, VBox propertyValueBox) {
+    private void createChildProfilePropertyBoxes(List<Property> existingProperties, GroupPropertyChangeListener listener, VBox propertyValueBox) {
         List<PropertyConstraint> sortedProperties = new ArrayList<>();
 
         //Get the property name key set and then create a sorted list from it.
         sortedProperties.addAll(propertyConstraint.getPropertyType().getComplexPropertyConstraints());
         sortProperties(sortedProperties);
 
-        for (PropertyConstraint subConstraint : sortedProperties) {
-            ProfilePropertyBox subProfilePropertyBox = new ProfilePropertyBox(subConstraint, node, profileService, disciplineLoadingService);
-            subProfilePropertyBox.getStyleClass().add(SUB_PROPERTY);
-            nodePropertyBoxes.add(subProfilePropertyBox);
-            propertyValueBox.getChildren().add(subProfilePropertyBox);
-            addChangeListenerToProfileBox(subProfilePropertyBox, listener);
+        if (existingProperties != null && !existingProperties.isEmpty()) {
+            //Loop through each individual complex property we don't want their sub properties combined.
+            for (Property existingProperty : existingProperties) {
+                List<ProfilePropertyBox> complexPropertyBoxList = new ArrayList<>();
+                //Then loop through all the sorted sub properties and add them.
+                for (PropertyConstraint subConstraint : sortedProperties) {
+                    List<Property> existingSubProperties = existingProperty.getComplexValue().stream().filter(existingSubProperty -> existingSubProperty.getPropertyType().equals(subConstraint.getPropertyType())).collect(Collectors.toList());
+                    ProfilePropertyBox subProfilePropertyBox = new ProfilePropertyBox(subConstraint, existingSubProperties, disciplineLoadingService);
+                    subProfilePropertyBox.getStyleClass().add(SUB_PROPERTY);
+                    complexPropertyBoxList.add(subProfilePropertyBox);
+                    propertyValueBox.getChildren().add(subProfilePropertyBox);
+                    addChangeListenerToProfileBox(subProfilePropertyBox, listener);
+                }
+
+                subPropertyBoxes.add(complexPropertyBoxList);
+            }
+        } else {
+            List<ProfilePropertyBox> complexPropertyBoxList = new ArrayList<>();
+            for (PropertyConstraint subConstraint : sortedProperties) {
+                ProfilePropertyBox subProfilePropertyBox = new ProfilePropertyBox(subConstraint, null, disciplineLoadingService);
+                subProfilePropertyBox.getStyleClass().add(SUB_PROPERTY);
+                complexPropertyBoxList.add(subProfilePropertyBox);
+                propertyValueBox.getChildren().add(subProfilePropertyBox);
+                addChangeListenerToProfileBox(subProfilePropertyBox, listener);
+            }
+
+            subPropertyBoxes.add(complexPropertyBoxList);
         }
+
     }
 
     //Sorts properties in the order of single value required, multi value required, optional single value, optional multi value
@@ -228,7 +248,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         return propertyBoxes.stream().map(PropertyBox::getValue).collect(Collectors.toList());
     }
 
-    public List<ProfilePropertyBox> getSubPropertyBoxes() {
+    public List<List<ProfilePropertyBox>> getSubPropertyBoxes() {
         return subPropertyBoxes;
     }
 
@@ -321,14 +341,17 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
             }
 
             if (subPropertyBoxes != null) {
-                for (ProfilePropertyBox profilePropertyBox : subPropertyBoxes) {
-                    for (PropertyBox propertyBox : profilePropertyBox.propertyBoxes) {
-                        if (propertyBox.getValue() != null) {
-                            if (propertyBox.getValue() instanceof String && propertyBox.getValueAsString().isEmpty()) {
+                for (List<ProfilePropertyBox> complexPropertyList : subPropertyBoxes) {
+                    for (ProfilePropertyBox profilePropertyBox : complexPropertyList) {
+                        for (PropertyBox propertyBox : profilePropertyBox.propertyBoxes) {
+                            if (propertyBox.getValue() != null) {
+                                if (propertyBox.getValue() instanceof String &&
+                                    propertyBox.getValueAsString().isEmpty()) {
+                                    return true;
+                                }
+                            } else {
                                 return true;
                             }
-                        } else {
-                            return true;
                         }
                     }
                 }

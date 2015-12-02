@@ -433,7 +433,8 @@ public class NodePropertyWindowBuilder implements CssConstants {
         }
 
         void addProperty(PropertyConstraint constraint, Node node) {
-            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, node, profileService, disciplineLoadingService);
+            List<Property> existingProperties = profileService.getProperties(node, constraint.getPropertyType());
+            ProfilePropertyBox profilePropertyBox = new ProfilePropertyBox(constraint, existingProperties, disciplineLoadingService);
             profilePropertyBox.getStyleClass().add(PROPERTY);
 
             nodePropertyBoxes.add(profilePropertyBox);

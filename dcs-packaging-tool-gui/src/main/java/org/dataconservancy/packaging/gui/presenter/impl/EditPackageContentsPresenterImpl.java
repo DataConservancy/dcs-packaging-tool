@@ -23,6 +23,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
+import org.apache.jena.ontology.Profile;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
@@ -264,6 +265,64 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         super.onBackPressed();
     }
 
+    private List<Property> getPropertiesFromBox(ProfilePropertyBox propertyBox) {
+        List<Property> properties = new ArrayList<>();
+        if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
+            PropertyValueType.COMPLEX) {
+
+            propertyBox.getValues().stream().filter(value -> value !=
+                null).forEach(value -> {
+                if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
+                    null) {
+                    switch (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType()) {
+                        case DATE_TIME:
+                            Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                            newProperty.setDateTimeValue(new DateTime(((LocalDate) value).getYear(), ((LocalDate) value).getMonthValue(), ((LocalDate) value).getDayOfMonth(), 0, 0, 0));
+                            properties.add(newProperty);
+                            break;
+                        case LONG:
+                            newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                            newProperty.setLongValue((Long) value);
+                            properties.add(newProperty);
+                            break;
+                        default:
+                            if (!((String) value).isEmpty()) {
+                                //Only save valid properties
+                                Validator validator = null;
+                                if (propertyBox.getPropertyConstraint().getPropertyType() !=
+                                    null && propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint() !=
+                                    null) {
+                                    validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
+                                }
+                                if (validator == null || validator.isValid((String) value)) {
+                                    newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                                    properties.add(newProperty);
+                                }
+                            }
+                    }
+                } else {
+                    if (value instanceof String) {
+                        if (!((String) value).isEmpty()) {
+                            //Only save valid properties
+                            Validator validator = null;
+                            if (propertyBox.getPropertyConstraint().getPropertyType() !=
+                                null && propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint() !=
+                                null) {
+                                validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
+                            }
+                            if (validator == null || validator.isValid((String) value)) {
+                                Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
+                                properties.add(newProperty);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        return properties;
+    }
+
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
         if (!propertyBox.getPropertyConstraint().getPropertyType().isReadOnly()) {
             //First remove all properties of the given type, to be replaced with the new ones
@@ -272,56 +331,19 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
             if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
                 PropertyValueType.COMPLEX) {
-
-
-                propertyBox.getValues().stream().filter(value -> value !=
-                    null).forEach(value -> {
-                    if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() != null) {
-                        switch (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType()) {
-                            case DATE_TIME:
-                                Property newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
-                                newProperty.setDateTimeValue(new DateTime(((LocalDate) value).getYear(), ((LocalDate) value).getMonthValue(), ((LocalDate) value).getDayOfMonth(), 0, 0, 0));
-                                controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
-                                break;
-                            case LONG:
-                                newProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
-                                newProperty.setLongValue((Long) value);
-                                controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
-                                break;
-                            default:
-                                if (!((String) value).isEmpty()) {
-                                    //Only save valid properties
-                                    Validator validator = null;
-                                    if (propertyBox.getPropertyConstraint().getPropertyType() != null
-                                        && propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint() != null) {
-                                        validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
-                                    }
-                                    if (validator == null || validator.isValid((String) value)) {
-                                        newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                                        controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
-                                    }
-                                }
-                        }
-                    } else {
-                        if (value instanceof String) {
-                            if (!((String) value).isEmpty()) {
-                                //Only save valid properties
-                                Validator validator = null;
-                                if (propertyBox.getPropertyConstraint().getPropertyType() != null
-                                    && propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint() != null) {
-                                    validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
-                                }
-                                if (validator == null || validator.isValid((String) value)) {
-                                    Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
-                                    controller.getDomainProfileService().addProperty(view.getPopupNode(), newProperty);
-                                }
-                            }
-                        }
-                    }
-                });
-
+                for (Property property : getPropertiesFromBox(propertyBox)) {
+                    controller.getDomainProfileService().addProperty(view.getPopupNode(), property);
+                }
             } else {
-                propertyBox.getSubPropertyBoxes().forEach(this::savePropertyFromBox);
+                for (List<ProfilePropertyBox> complexPropertyBoxes : propertyBox.getSubPropertyBoxes()) {
+                    Property newComplexProperty = new Property(propertyBox.getPropertyConstraint().getPropertyType());
+                    List<Property> subPropertyValues = new ArrayList<>();
+                    for (ProfilePropertyBox subPropertyBox : complexPropertyBoxes) {
+                        subPropertyValues.addAll(getPropertiesFromBox(subPropertyBox));
+                    }
+                    newComplexProperty.setComplexValue(subPropertyValues);
+                    controller.getDomainProfileService().addProperty(view.getPopupNode(), newComplexProperty);
+                }
             }
         }
     }
