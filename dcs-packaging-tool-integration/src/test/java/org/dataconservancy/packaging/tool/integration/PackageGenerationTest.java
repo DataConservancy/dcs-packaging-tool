@@ -370,7 +370,8 @@ public class PackageGenerationTest {
             assertTrue(linkedFile.isFile());
         });
 
-        assertTrue(fileLocations.isEmpty());
+        assertTrue("Expected no file locations but found: " + fileLocations.stream().collect(Collectors.joining("\n", "\n", "")),
+                fileLocations.isEmpty());
     }
 
     @Test
