@@ -12,8 +12,8 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
+import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.OpenExistingPackagePresenter;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
@@ -46,7 +46,6 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         bind();
 
         // Staging directory is working directory by default.
-        // TODO Configurable?
         stagingDir = new File(System.getProperty("user.dir"));
     }
 
@@ -119,7 +118,8 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
         // User selects a package state file
         view.getChoosePackageStateFileButton().setOnAction(event -> {
             fileChooser.getExtensionFilters().clear();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package State File (.zip)", controller.getPackageStateFileExtension()));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                    TextFactory.getText(Labels.LabelKey.PACKAGE_STATE_FILE_DESCRIPTION_LABEL), controller.getPackageStateFileExtension()));
 
             File file = controller.showOpenFileDialog(fileChooser);
 
@@ -325,7 +325,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
      * tests from needing to run on the JavaFX application thread.
      */
     private class AsyncPackageService implements LoadPackageService {
-
+        @SuppressWarnings("unused")
         private EventHandler<WorkerStateEvent> cancelledHandler;
         private EventHandler<WorkerStateEvent> successHandler;
 

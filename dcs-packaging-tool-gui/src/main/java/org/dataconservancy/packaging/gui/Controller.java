@@ -61,7 +61,7 @@ public class Controller {
     private File packageStateFile;
     private FileChooser packageStateFileChooser;
     private PackageStateSerializer packageStateSerializer;
-    private String packageStateFileExtension="*.zip";
+    private String packageStateFileExtension="*.dcp";
 
     private DomainProfileStore domainProfileStore;
     private IpmRdfTransformService ipmRdfTransformService;
@@ -96,7 +96,8 @@ public class Controller {
         toolVersion = new ApplicationVersion();
         ipmRdfTransformService = new IpmRdfTransformService();
         packageStateFileChooser = new FileChooser();
-        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package State File (.zip)", packageStateFileExtension));
+        packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                TextFactory.getText(Labels.LabelKey.PACKAGE_STATE_FILE_DESCRIPTION_LABEL), packageStateFileExtension));
     }
 
     public Factory getFactory() {

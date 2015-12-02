@@ -137,7 +137,8 @@ public class Labels {
         MISSING_PROPERTY_LEGEND("missingpropertylegend.label"),
         PROPERTY_VALIDATION_PROGRESS_LABEL("propertyvalidationprogress.label"),
         REQUIRED_PROPERTIES_EXPLANATION_LABEL("requiredpropertyexplanation.label"),
-        LOADING_PACKAGE_LABEL("loadingpackage.label");
+        LOADING_PACKAGE_LABEL("loadingpackage.label"),
+        PACKAGE_STATE_FILE_DESCRIPTION_LABEL("packagestatefiledescription.label");
 
         private String property;
 
