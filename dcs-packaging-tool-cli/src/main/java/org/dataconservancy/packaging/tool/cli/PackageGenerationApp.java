@@ -24,11 +24,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.nio.file.Paths;
-
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.io.IOUtils;
@@ -36,7 +37,6 @@ import org.apache.commons.lang.StringUtils;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.api.IPMService;
@@ -90,8 +90,15 @@ public class PackageGenerationApp {
 	 * 
 	 * Arguments
 	 */
-	@Argument(multiValued = true, index = 0, metaVar = "[infile]", usage = "domain profile file, omit to use stdin")
+	@Argument(required = true, index = 0, metaVar = "[content]", usage = "content root directory")
+    public File contentRootFile = null;
+
+    @Argument(required = true, index = 1, metaVar = "[profile]", usage = "domain profile file")
     public File domainProfileFile = null;
+
+    @Argument(required = false, index = 2, metaVar = "[metadata]", usage = "package metadata file")
+    public File packageMetadataFile = null;
+
 	/*
 	 * 
 	 * General Options
@@ -123,10 +130,6 @@ public class PackageGenerationApp {
 	/** Package Generation Params location */
 	@Option(name = "-g", aliases = { "--generation-params" }, metaVar = "<file>", usage = "package generation params file location")
 	public File packageGenerationParamsFile;
-
-    /**Content Location Root */
-    @Option(name = "-r", aliases = { "--content-root"}, usage = "content root location on the filesystem")
-    public String contentRootFile;
 
     /** Archive format **/
     @Option(name = "-a", aliases = { "--archiving-format"}, metaVar = "tar|zip", usage = "Archive format to use when creating the package.  Defaults to tar")
@@ -268,12 +271,12 @@ public class PackageGenerationApp {
         }
 
         Node tree = null;
-        if(this.contentRootFile != null) {
+        if(this.contentRootFile != null && this.contentRootFile.exists()) {
             try{
                 IPMService ipmService = appContext.getBean("ipmService", IPMService.class);
-                tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile));
+                tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile.getPath()));
             } catch (IOException e) {
-                System.err.println("Error opening the content root directory at " + contentRootFile);
+                System.err.println("Error opening the content root directory at " + contentRootFile.getPath());
             }
 
         } else {
@@ -284,13 +287,20 @@ public class PackageGenerationApp {
         DomainProfile profile = null;
         PackageState state = new PackageState();
 
+        //add package metadata to state
+        if(packageMetadataFile != null) {
+            state.setPackageMetadataList(readPackageMetadata());
+        }
+
+        //add package tree to state
         Model profileObjectModel = ModelFactory.createDefaultModel();
         URIGenerator uriGen = appContext.getBean("uriGenerator", SimpleURIGenerator.class);
         Model domainObjectModel = ModelFactory.createDefaultModel();
         DomainProfileObjectStore domainProfileObjectStore = new DomainProfileObjectStoreImpl(domainObjectModel, uriGen);
         DomainProfileService profileService = new DomainProfileServiceImpl(domainProfileObjectStore, uriGen);
 
-        if(this.domainProfileFile != null) {String domainProfilePath = domainProfileFile.getPath();
+        if(this.domainProfileFile != null && this.domainProfileFile.exists()) {
+            String domainProfilePath = domainProfileFile.getPath();
             try{
                 InputStream fileStream = new FileInputStream(domainProfileFile);
 
@@ -402,45 +412,29 @@ public class PackageGenerationApp {
         }
     }
 
-	/*
-	 * Fetch the package state files(s) based on the location specified in the
-	 * user. This will be the first value in the this.locations list (well,
-	 * technically "all except the last value", if multiple input
-	 * PackageDescription files are specified. It would be nice to handle STDIN
-	 * too (through the value '-' rather than file path).
-	 */
-/*	private PackageState getPackageState() {
-        PackageState packageState = new PackageState();
-
-        PackageStateSerializer packageStateSerializer = appContext.getBean("packageStateSerializer", PackageStateSerializer.class);
-
-        if (location == null || location.isEmpty()) {
-            try {
-                System.err.println("Reading Package State file from STDIN...");
-                if (debug) {
-                    log.debug("Loading state file from stdin.");
-                }
-                BufferedInputStream bio = new BufferedInputStream(System.in);
-                packageStateSerializer.deserialize(packageState, bio);
-            } catch (Exception e) {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_INPUT_ERROR, e);
+    private LinkedHashMap<String, List<String>> readPackageMetadata(){
+        Properties props = new Properties();
+        try{
+            InputStream fileStream = new FileInputStream(packageMetadataFile);
+            if (fileStream != null) {
+                props.load(fileStream);
+            } else {
+                System.err.println("Could not open file " + packageMetadataFile.getPath());
             }
-        } else {
-           try {
-                if (debug) {
-                    log.debug("Loading package state file: " + location);
-                }
-                FileInputStream fis = new FileInputStream(location);
-                BufferedInputStream  bio = new BufferedInputStream(fis);
-                packageStateSerializer.deserialize(packageState, bio);
-           } catch (FileNotFoundException e) {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
-           }
+        } catch (FileNotFoundException e) {
+               System.err.println("Could not open file " + packageMetadataFile.getPath());
+        } catch (IOException e) {
+            System.err.println("Error opening file " + packageMetadataFile.getPath());
         }
 
-		return packageState;
-	}
-  */
+        LinkedHashMap<String, List<String>> metadata = new LinkedHashMap<>();
+        List<String> valueList;
+        for (String key : props.stringPropertyNames()) {
+              valueList = Arrays.asList(props.getProperty(key).trim().split("\\s*,\\s*"));
+              metadata.put(key,valueList);
+        }
+        return metadata;
+    }
 
     /**
      * Create a PackageGenerationParameter for command line flags
