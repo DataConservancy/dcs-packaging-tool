@@ -277,9 +277,10 @@ public class PackageGenerationApp {
         DomainProfile profile = null;
         PackageState state = new PackageState();
 
-        Model objectModel = ModelFactory.createDefaultModel();
+        Model profileObjectModel = ModelFactory.createDefaultModel();
         URIGenerator uriGen = appContext.getBean("uriGenerator", SimpleURIGenerator.class);
-        DomainProfileObjectStore domainProfileObjectStore = new DomainProfileObjectStoreImpl(uriGen);
+        Model domainObjectModel = ModelFactory.createDefaultModel();
+        DomainProfileObjectStore domainProfileObjectStore = new DomainProfileObjectStoreImpl(domainObjectModel, uriGen);
         DomainProfileService profileService = new DomainProfileServiceImpl(domainProfileObjectStore, uriGen);
 
         if(this.domainProfileFile != null) {String domainProfilePath = domainProfileFile.getPath();
@@ -287,18 +288,18 @@ public class PackageGenerationApp {
                 InputStream fileStream = new FileInputStream(domainProfileFile);
 
                 if(domainProfilePath.endsWith(".ttl")) {
-                    objectModel.read(fileStream, null, "TTL");
+                    profileObjectModel.read(fileStream, null, "TTL");
                 } else if(domainProfilePath.endsWith(".xml")) {
-                    objectModel.read(fileStream, null, "RDF/XML");
+                    profileObjectModel.read(fileStream, null, "RDF/XML");
                 } else {
                     System.err.println("Domain profile must be a turtle file with name ending in .ttl, or an RDF/XML file " +
                             "with name ending in .xml");
                 }
 
                 DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
-                profile = domainProfileRdfTransformService.transformToProfile(objectModel);
-                System.out.println(profile.toString());
-                state.setDomainObjectRDF(objectModel);
+                profile = domainProfileRdfTransformService.transformToProfile(profileObjectModel);
+                //System.out.println(profile.toString());
+                state.setDomainObjectRDF(domainObjectModel);
                 DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
                 //domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
                 domainProfileStore.getPrimaryDomainProfiles().add(profile);
