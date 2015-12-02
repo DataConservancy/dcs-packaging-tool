@@ -129,7 +129,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>${dcs.project.commonsio.version}</version>
       <scope>compile</scope>
     </dependency>
 
