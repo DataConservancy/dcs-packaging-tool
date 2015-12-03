@@ -479,7 +479,7 @@
 }
 
 .TooltipImage {
-	-fx-image: url("../images/Button-info-icon-gray.png");
+	-fx-image: url("../images/tooltip.png");
 }
 
 .FormFieldsDivision {

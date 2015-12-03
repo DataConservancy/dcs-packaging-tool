@@ -285,6 +285,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         VBox fieldContainer = new VBox(4);
 
         HBox fieldLabelHbox = new HBox(4);
+        fieldLabelHbox.setAlignment(Pos.CENTER_LEFT);
         Label fieldLabel = new Label(packageMetadata.getLabel());
         fieldLabel.setPadding(new Insets(3, 0, 0, 0));
         fieldLabelHbox.getChildren().add(fieldLabel);
