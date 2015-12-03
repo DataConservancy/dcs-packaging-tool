@@ -56,14 +56,14 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-size:72px;font-style:oblique;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Sans Oblique"
+       style="font-size:72px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Segoe UI;-inkscape-font-specification:Segoe UI Bold;text-anchor:start;text-align:start;writing-mode:lr"
        x="321.80051"
        y="452.64594"
        id="text2985"
        sodipodi:linespacing="125%"
        inkscape:export-filename="C:\workspaces\dc-code\dcs-packaging-tool\dcs-packaging-tool-gui\src\main\resources\images\tooltip.png"
-       inkscape:export-xdpi="13.921451"
-       inkscape:export-ydpi="13.921451"><tspan
+       inkscape:export-xdpi="18.271904"
+       inkscape:export-ydpi="18.271904"><tspan
          sodipodi:role="line"
          id="tspan2987"
          x="321.80051"
@@ -78,7 +78,7 @@
        sodipodi:ry="48.57143"
        d="m 380,426.64789 a 47.142857,48.57143 0 1 1 -94.28571,0 47.142857,48.57143 0 1 1 94.28571,0 z"
        inkscape:export-filename="C:\workspaces\dc-code\dcs-packaging-tool\dcs-packaging-tool-gui\src\main\resources\images\tooltip.png"
-       inkscape:export-xdpi="13.921451"
-       inkscape:export-ydpi="13.921451" />
+       inkscape:export-xdpi="18.271904"
+       inkscape:export-ydpi="18.271904" />
   </g>
 </svg>
