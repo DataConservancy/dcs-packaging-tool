@@ -26,6 +26,7 @@
         |- DEPENDENCIES
         |- LICENSE
         |- NOTICE
+        |- THIRD-PARTY.txt
         |- bin
         |   |- dcs-package-tool-cli-standalone.jar
         |   |- dcs-package-tool-cli.jar
@@ -70,6 +71,7 @@
         <include>LICENSE</include>
         <include>NOTICE</include>
         <include>DEPENDENCIES</include>
+        <include>THIRD-PARTY.txt</include>
       </includes>
     </fileSet>
     
