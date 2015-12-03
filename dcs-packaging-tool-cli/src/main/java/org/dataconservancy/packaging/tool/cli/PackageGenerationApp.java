@@ -281,26 +281,24 @@ public class PackageGenerationApp {
             packageParams.overrideParams(flagParams);
         }
 
-        //we need to validate any specified file locations in the package generation paramsto make sure they exist
+        //we need to validate any specified file locations in the package generation params to make sure they exist
         validateLocationParameters(packageParams);
 
-        Node tree;
+        Node tree = null;
         if(this.contentRootFile != null) {
-            if(this.contentRootFile.exists()) {
+            if (this.contentRootFile.exists()) {
                 try {
                     IPMService ipmService = appContext.getBean("ipmService", IPMService.class);
                     tree = ipmService.createTreeFromFileSystem(Paths.get(contentRootFile.getPath()));
                 } catch (IOException e) {
                     log.error(e.getMessage());
-                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CONTENT_ROOT_CANT_OPEN);
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
                 }
             } else {
-               throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CONTENT_ROOT_CANT_OPEN);
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
             }
-
-        } else {
-            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CONTENT_ROOT_NOT_SPECIFIED);
         }
+
 
         //now we do what we have to do to create a package state
         DomainProfile profile;
@@ -311,7 +309,7 @@ public class PackageGenerationApp {
             if(packageMetadataFile.exists()) {
                 state.setPackageMetadataList(createPackageMetadata());
             } else {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_CANT_OPEN);
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
             }
         }
 
@@ -351,12 +349,8 @@ public class PackageGenerationApp {
                 } catch (RDFTransformException e) {
                     throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF, e);
                 } catch (IOException e) {
-                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_CANT_OPEN, e);
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
                 }
-
-
-        } else {
-           throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_DOMAIN_PROFILE_NOT_SPECIFIED);
         }
 
         if (this.pkgFormat != null) {
@@ -429,10 +423,10 @@ public class PackageGenerationApp {
         try(InputStream fileStream = new FileInputStream(packageMetadataFile)){
             props.load(fileStream);
         } catch (FileNotFoundException e) {
-             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN, e);
+             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
         } catch (IOException e) {
             log.error(e.getMessage());
-            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_METADATA_CANT_OPEN);
+            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
         }
 
         LinkedHashMap<String, List<String>> metadata = new LinkedHashMap<>();
@@ -486,11 +480,11 @@ public class PackageGenerationApp {
         //required, cannot be null
         String packageLocation = params.getParam(GeneralParameterNames.PACKAGE_LOCATION, 0);
         if (packageLocation == null || packageLocation.isEmpty()) {
-            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_LOCATION_NOT_SPECIFIED);
+            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
         } else {
             File packageLocationFile = new File(packageLocation);
             if (!packageLocationFile.exists()) {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_PACKAGE_LOCATION_CANT_OPEN);
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
             }
         }
 
@@ -500,7 +494,7 @@ public class PackageGenerationApp {
         if (packageStagingLocation != null && !packageStagingLocation.isEmpty()) {
             File packageStagingLocationFile = new File(packageStagingLocation);
             if (!packageStagingLocationFile.exists()) {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_STAGING_LOCATION_CANT_OPEN);
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
             }
         }
     }
