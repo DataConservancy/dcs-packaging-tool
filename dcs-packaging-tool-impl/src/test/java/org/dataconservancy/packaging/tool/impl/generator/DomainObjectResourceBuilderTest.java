@@ -23,7 +23,7 @@ import java.net.URL;
 
 import java.nio.file.Paths;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -480,7 +480,7 @@ public class DomainObjectResourceBuilderTest {
                 .getResource("/TestDomainObjects/2/2.ttl").toURI()).getParent()));
 
         Node child = new Node(URI.create("http://example.org/2/file"));
-        treeNode.setChildren(Arrays.asList(child));
+        treeNode.setChildren(Collections.singletonList(child));
         child.setParent(treeNode);
         child.setDomainObject(URI
                 .create("http://example.org/TestDomainObject/File1"));

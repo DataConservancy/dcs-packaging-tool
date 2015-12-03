@@ -18,7 +18,6 @@ package org.dataconservancy.dcs.util;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 import org.joda.time.DateTime;
@@ -241,6 +240,6 @@ public class DateUtilityTest {
     @Test
     public void testParseDateString_WithTimeOffset() {
         String dateTimeToParse = "2015-03-30T16:31:53+00:00";
-        DateTime dateTimeResult = DateUtility.parseDateString_WithTimeOffset(dateTimeToParse);
+        DateUtility.parseDateString_WithTimeOffset(dateTimeToParse);
     }
 }

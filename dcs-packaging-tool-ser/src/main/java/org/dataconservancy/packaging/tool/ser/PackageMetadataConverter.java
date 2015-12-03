@@ -26,7 +26,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

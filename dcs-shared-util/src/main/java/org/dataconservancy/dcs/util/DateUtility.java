@@ -187,7 +187,7 @@ public class DateUtility {
      * @return A DateTime object representing the date in the string, or null if the string isn't properly formatted. 
      */
     public static DateTime parseRfc822Date(String date) {
-        DateTime dateTime = null;
+        DateTime dateTime;
         try {
             dateTime = new DateTime(getDateFormat(RFC_822_FORMAT).parse(date).getTime()).withZone(DateTimeZone.forID("GMT"));
         } catch (ParseException e) {
@@ -203,7 +203,7 @@ public class DateUtility {
      * @return A DateTime object representing the date in the string, or null if the string isn't properly formatted. 
      */
     public static DateTime parseRfc850Date(String date) {
-        DateTime dateTime = null;
+        DateTime dateTime;
         try {
             dateTime = new DateTime(getDateFormat(RFC_850_FORMAT).parse(date).getTime()).withZone(DateTimeZone.forID("GMT"));
         } catch (ParseException e) {
@@ -219,7 +219,7 @@ public class DateUtility {
      * @return A DateTime object representing the date in the string, or null if the string isn't properly formatted. 
      */
     public static DateTime parseAscTime(String date) {
-        DateTime dateTime = null;
+        DateTime dateTime;
         try {
             
             Date parsedDate = getDateFormat(ASC_FORMAT).parse(date);

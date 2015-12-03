@@ -17,7 +17,6 @@ package org.dataconservancy.dcs.util.droid;
 
 
 import org.dataconservancy.dcs.model.DetectedFormat;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -107,7 +106,6 @@ public class DroidDriverTest extends BaseFileSetUpTest {
      */
     @Test
     public void testMimeAndPronomInSameFormatObject() {
-        File file = TAR_GZ_FILE;
         List<DetectedFormat> formats = dd.detectFormats(TAR_GZ_FILE);
         assertEquals(1, formats.size());
         DetectedFormat f = formats.get(0);

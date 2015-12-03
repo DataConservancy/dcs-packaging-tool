@@ -33,6 +33,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -85,7 +86,7 @@ public class TestPackageState {
                 Objects.appVersion.setBuildTimeStamp("1234");
 
                 Objects.metadata.put("foo", Arrays.asList("bar", "biz"));
-                Objects.metadata.put("baz", Arrays.asList("bar"));
+                Objects.metadata.put("baz", Collections.singletonList("bar"));
 
                 try {
                     Objects.tree.read(Resources.PACKAGE_TREE_RDF.getInputStream(), null);

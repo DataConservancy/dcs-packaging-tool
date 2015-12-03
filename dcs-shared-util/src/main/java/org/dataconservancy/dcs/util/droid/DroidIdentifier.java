@@ -24,11 +24,19 @@ import uk.gov.nationalarchives.droid.container.ole2.Ole2IdentifierEngine;
 import uk.gov.nationalarchives.droid.container.zip.ZipIdentifier;
 import uk.gov.nationalarchives.droid.container.zip.ZipIdentifierEngine;
 import uk.gov.nationalarchives.droid.core.BinarySignatureIdentifier;
-import uk.gov.nationalarchives.droid.core.interfaces.*;
-import uk.gov.nationalarchives.droid.core.interfaces.archive.*;
+import uk.gov.nationalarchives.droid.core.interfaces.IdentificationMethod;
+import uk.gov.nationalarchives.droid.core.interfaces.IdentificationRequest;
+import uk.gov.nationalarchives.droid.core.interfaces.IdentificationResult;
+import uk.gov.nationalarchives.droid.core.interfaces.IdentificationResultCollection;
+import uk.gov.nationalarchives.droid.core.interfaces.IdentificationResultImpl;
+import uk.gov.nationalarchives.droid.core.interfaces.RequestIdentifier;
+import uk.gov.nationalarchives.droid.core.interfaces.archive.ArchiveFormatResolver;
+import uk.gov.nationalarchives.droid.core.interfaces.archive.ArchiveFormatResolverImpl;
+import uk.gov.nationalarchives.droid.core.interfaces.archive.ContainerIdentifier;
+import uk.gov.nationalarchives.droid.core.interfaces.archive.ContainerIdentifierFactory;
+import uk.gov.nationalarchives.droid.core.interfaces.archive.ContainerIdentifierFactoryImpl;
 import uk.gov.nationalarchives.droid.core.interfaces.resource.FileSystemIdentificationRequest;
 import uk.gov.nationalarchives.droid.core.interfaces.resource.RequestMetaData;
-import uk.gov.nationalarchives.droid.core.interfaces.signature.SignatureManager;
 import uk.gov.nationalarchives.droid.core.signature.FileFormat;
 import uk.gov.nationalarchives.droid.core.signature.droid6.FFSignatureFile;
 
@@ -50,9 +58,7 @@ public class DroidIdentifier {
     private String signatureFilePath;
     private String containerSignatureFilePath;
     private BinarySignatureIdentifier droid;
-    private DroidSignatureFileManager fileManager;
     private ContainerIdentifierFactory containerIdentifierFactory;
-    private SignatureManager signatureManager;
     private ArchiveFormatResolver containerFormatResolver;
     private IdentificationRequest identificationRequest;
     private boolean initialized;
@@ -81,7 +87,7 @@ public class DroidIdentifier {
         droid.removeLowerPriorityHits(results);
         if (results.getResults() != null && results.getResults().isEmpty()) {
             // last resort check via file extension.
-            results = processExtensions(results);
+            results = processExtensions();
         }
         droid.checkForExtensionsMismatches(results, identificationRequest.getExtension());
         closeIdentificationRequest();
@@ -177,10 +183,9 @@ public class DroidIdentifier {
     /**
      * Tries to identify the file using its extension as a last resort. This should only be called as a last resort.
      * 
-     * @param results   the collection of identification results
      * @return processed results
      */
-    private IdentificationResultCollection processExtensions(IdentificationResultCollection results) {
+    private IdentificationResultCollection processExtensions() {
         return droid.matchExtensions(identificationRequest, false);
     }
 
@@ -261,7 +266,7 @@ public class DroidIdentifier {
      * Helper method that initializes DroidSignatureFile and sets signature files.
      */
     private void setSignatureFiles() {
-        fileManager = new DroidSignatureFileManager();
+        DroidSignatureFileManager fileManager = new DroidSignatureFileManager();
         
         File signatureFile = fileManager.getLatestSignatureFile();
         if (signatureFile != null) {

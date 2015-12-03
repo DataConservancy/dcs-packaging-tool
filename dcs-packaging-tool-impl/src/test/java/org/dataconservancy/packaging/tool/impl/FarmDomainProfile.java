@@ -115,7 +115,7 @@ public class FarmDomainProfile extends DomainProfile {
         farmer_property_type = new PropertyType();
         farmer_property_type.setDomainPredicate(URI.create("farm:hasFarmer"));
         farmer_property_type.setPropertyValueType(PropertyValueType.COMPLEX);
-        farmer_property_type.setComplexDomainTypes(Arrays.asList(URI.create("foaf:person")));
+        farmer_property_type.setComplexDomainTypes(Collections.singletonList(URI.create("foaf:person")));
         farmer_property_type.setComplexPropertyConstraints(Arrays.asList(name_constraint, mbox_constraint));        
 
         species_property_type = new PropertyType();
@@ -171,7 +171,7 @@ public class FarmDomainProfile extends DomainProfile {
         farm_node_type.setDescription("The domain of a benevolent dictator.");
         farm_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Farm"), URI.create("org:Organization")));
         farm_node_type.setPropertyConstraints(Arrays.asList(title_constraint, person_constraint));
-        farm_node_type.setDefaultPropertyValues(Arrays.asList());
+        farm_node_type.setDefaultPropertyValues(Collections.emptyList());
         farm_node_type.setParentConstraints(Arrays.asList(no_parent_constraint, farm_parent_constraint));
         farm_node_type.setFileAssociation(FileAssociation.DIRECTORY);
         farm_node_type.setDomainProfile(this);
@@ -179,10 +179,10 @@ public class FarmDomainProfile extends DomainProfile {
         barn_node_type.setIdentifier(URI.create("fdp:barn"));
         barn_node_type.setLabel("Barn");
         barn_node_type.setDescription("A place of rest and relaxation.");
-        barn_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Barn")));
-        barn_node_type.setPropertyConstraints(Arrays.asList());
-        barn_node_type.setDefaultPropertyValues(Arrays.asList());
-        barn_node_type.setParentConstraints(Arrays.asList(farm_parent_constraint));
+        barn_node_type.setDomainTypes(Collections.singletonList(URI.create("farm:Barn")));
+        barn_node_type.setPropertyConstraints(Collections.emptyList());
+        barn_node_type.setDefaultPropertyValues(Collections.emptyList());
+        barn_node_type.setParentConstraints(Collections.singletonList(farm_parent_constraint));
         barn_node_type.setPreferredParentType(farm_node_type);
         barn_node_type.setFileAssociation(FileAssociation.DIRECTORY);
         barn_node_type.setDomainProfile(this);
@@ -233,11 +233,11 @@ public class FarmDomainProfile extends DomainProfile {
         cow_node_type.setIdentifier(URI.create("fdp:cow"));
         cow_node_type.setLabel("Cow");
         cow_node_type.setDescription("A cow is a tasty and noble creature.");
-        cow_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Cow")));
+        cow_node_type.setDomainTypes(Collections.singletonList(URI.create("farm:Cow")));
         cow_node_type.setPropertyConstraints(
                 Arrays.asList(species_constraint, weight_constraint, breed_constraint, title_constraint));
-        cow_node_type.setDefaultPropertyValues(Arrays.asList(cow_species));
-        cow_node_type.setParentConstraints(Arrays.asList(barn_occ_parent_constraint));
+        cow_node_type.setDefaultPropertyValues(Collections.singletonList(cow_species));
+        cow_node_type.setParentConstraints(Collections.singletonList(barn_occ_parent_constraint));
         cow_node_type.setDomainProfile(this);
 
         Map<PropertyType, SuppliedProperty> supplied_media_properties = new HashMap<>();
@@ -258,9 +258,9 @@ public class FarmDomainProfile extends DomainProfile {
         media_node_type.setIdentifier(URI.create("fdp:media"));
         media_node_type.setLabel("Media");
         media_node_type.setDescription("Commemorative media of best tasting animals.");
-        media_node_type.setDomainTypes(Arrays.asList(URI.create("farm:Media")));
+        media_node_type.setDomainTypes(Collections.singletonList(URI.create("farm:Media")));
         media_node_type.setPropertyConstraints(Arrays.asList(title_constraint, size_constraint));
-        media_node_type.setDefaultPropertyValues(Arrays.asList());
+        media_node_type.setDefaultPropertyValues(Collections.emptyList());
         media_node_type.setParentConstraints(Arrays.asList(cow_data_parent_constraint, farm_data_parent_constraint, barn_data_parent_constraint));
         media_node_type.setSuppliedProperties(supplied_media_properties);
         media_node_type.setFileAssociation(FileAssociation.REGULAR_FILE);
@@ -279,7 +279,7 @@ public class FarmDomainProfile extends DomainProfile {
         cowToStockpileTransform.setDescription("Tranform a cow into a stockpile.");
         cowToStockpileTransform.setSourceNodeType(cow_node_type);
         // Cannot transform cow with a Media child
-        cowToStockpileTransform.setSourceChildConstraints(Arrays.asList(no_child_constraint));
+        cowToStockpileTransform.setSourceChildConstraints(Collections.singletonList(no_child_constraint));
         cowToStockpileTransform.setResultNodeType(stockpile_node_type);
 
         // Transform barn to farm
@@ -289,7 +289,7 @@ public class FarmDomainProfile extends DomainProfile {
         barnNoChildToFarmTransform.setLabel("Barn -> Farm (no media)");
         barnNoChildToFarmTransform.setDescription("Transform an empty barn into a farm.");
         barnNoChildToFarmTransform.setSourceNodeType(barn_node_type);
-        barnNoChildToFarmTransform.setSourceChildConstraints(Arrays.asList(no_child_constraint));
+        barnNoChildToFarmTransform.setSourceChildConstraints(Collections.singletonList(no_child_constraint));
         barnNoChildToFarmTransform.setResultNodeType(farm_node_type);
 
         // Media child
@@ -297,7 +297,7 @@ public class FarmDomainProfile extends DomainProfile {
         barnMediaChildToFarmTransform.setLabel("Barn -> Farm (with media)");
         barnMediaChildToFarmTransform.setDescription("Transform a barn with media into a farm.");
         barnMediaChildToFarmTransform.setSourceNodeType(barn_node_type);
-        barnMediaChildToFarmTransform.setSourceChildConstraints(Arrays.asList(media_constraint));
+        barnMediaChildToFarmTransform.setSourceChildConstraints(Collections.singletonList(media_constraint));
         barnMediaChildToFarmTransform.setResultNodeType(farm_node_type);
         
         // Transform trough with now child to cow in barn.
@@ -306,7 +306,7 @@ public class FarmDomainProfile extends DomainProfile {
         troughToCowTransform.setLabel("Trough -> Cow (in barn)");
         troughToCowTransform.setDescription("Transform a trough to a cow in a barn.");
         troughToCowTransform.setSourceNodeType(trough_node_type);
-        troughToCowTransform.setSourceChildConstraints(Arrays.asList(no_child_constraint));
+        troughToCowTransform.setSourceChildConstraints(Collections.singletonList(no_child_constraint));
         troughToCowTransform.setResultNodeType(cow_node_type);
         troughToCowTransform.setInsertParentNodeType(barn_node_type);
 
@@ -316,7 +316,7 @@ public class FarmDomainProfile extends DomainProfile {
         moveMediaFromCowToBarnTransform.setSourceNodeType(cow_node_type);
         moveMediaFromCowToBarnTransform.setMoveChildrenToParent(true);
         moveMediaFromCowToBarnTransform.setRemoveEmptyResult(true);
-        moveMediaFromCowToBarnTransform.setSourceChildConstraints(Arrays.asList(media_constraint));
+        moveMediaFromCowToBarnTransform.setSourceChildConstraints(Collections.singletonList(media_constraint));
         
         
         NodeTransform troughToStockpileTransform = new NodeTransform();
@@ -330,7 +330,7 @@ public class FarmDomainProfile extends DomainProfile {
         farmWithTroughToBarnWithStockpileTransform.setSourceNodeType(farm_node_type);
         farmWithTroughToBarnWithStockpileTransform.setSourceChildConstraints(Arrays.asList(trough_constraint, media_constraint));
         farmWithTroughToBarnWithStockpileTransform.setResultNodeType(barn_node_type);
-        farmWithTroughToBarnWithStockpileTransform.setResultChildTransforms(Arrays.asList(troughToStockpileTransform));
+        farmWithTroughToBarnWithStockpileTransform.setResultChildTransforms(Collections.singletonList(troughToStockpileTransform));
         
         setIdentifier(URI.create("http://example.com/farm"));
         setLabel("Farm");

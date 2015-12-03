@@ -649,12 +649,14 @@ public class BagItPackageAssembler implements PackageAssembler {
                 ((TarArchiveOutputStream) aos).setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             }
             // Get to putting all the files in the compressed output file
-            for (File f : bagBaseDir.listFiles()) {
-                //To support the cancelling of package creation we check here to see if the thread has been interrupted.
-                if (Thread.currentThread().isInterrupted()) {
-                    break;
+            if (bagBaseDir.listFiles() != null) {
+                for (File f : bagBaseDir.listFiles()) {
+                    //To support the cancelling of package creation we check here to see if the thread has been interrupted.
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
+                    }
+                    addFilesToArchive(aos, f);
                 }
-                addFilesToArchive(aos, f);
             }
             aos.close();
             fos.close();

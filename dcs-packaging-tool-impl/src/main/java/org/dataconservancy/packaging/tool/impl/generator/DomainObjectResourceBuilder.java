@@ -25,8 +25,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
 import org.apache.commons.collections.MapUtils;
@@ -69,8 +67,6 @@ class DomainObjectResourceBuilder
     public String BINARY_PATH = "bin/";
 
     PackageStateSerializer serializer;
-
-    ExecutorService exe = Executors.newCachedThreadPool();
 
     @SuppressWarnings("unchecked")
     Map<String, String> PREFIX_MAP = MapUtils.invertMap(Ontologies.PREFIX_MAP);
@@ -186,8 +182,7 @@ class DomainObjectResourceBuilder
                                  * We replace references to file location with
                                  * the binary URI
                                  */
-                                remap(state.domainObjects,
-                                      bare(node.getFileInfo().getLocation()
+                                remap(bare(node.getFileInfo().getLocation()
                                               .toString()),
                                       newFileLocation.toString(),
                                       originalResources,
@@ -222,8 +217,7 @@ class DomainObjectResourceBuilder
                      */
                     if (originalDomainObjectURI != null
                             && node.getDomainObject() != null) {
-                        remap(state.domainObjects,
-                              bare(originalDomainObjectURI.toString()),
+                        remap(bare(originalDomainObjectURI.toString()),
                               node.getDomainObject().toString(),
                               originalResources,
                               state.renamedResources);
@@ -291,8 +285,7 @@ class DomainObjectResourceBuilder
         }
     }
 
-    private static void remap(Model model,
-                              String oldBaseURI,
+    private static void remap(String oldBaseURI,
                               String newBaseURI,
                               TreeMap<String, Resource> resources,
                               Map<String, String> renameMap) {

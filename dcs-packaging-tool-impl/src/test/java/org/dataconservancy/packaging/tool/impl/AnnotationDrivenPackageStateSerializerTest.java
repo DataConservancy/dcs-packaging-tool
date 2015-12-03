@@ -105,16 +105,6 @@ public class AnnotationDrivenPackageStateSerializerTest {
     private ArchiveStreamFactory arxFactory;
 
     /**
-     * A mock ArchiveOutputStream
-     */
-    private ArchiveOutputStream arxOs;
-
-    /**
-     * A mock ArchiveEntry
-     */
-    private ArchiveEntry arxEntry;
-
-    /**
      * A live PackageState object, typically populated by objects in the
      * {@link AbstractXstreamTest.TestObjects} class.
      */
@@ -250,10 +240,13 @@ public class AnnotationDrivenPackageStateSerializerTest {
     public void setUp() throws Exception {
 
         /*
+          A mock ArchiveOutputStream
+         */
+        ArchiveOutputStream arxOs = mock(ArchiveOutputStream.class);
+
+        /*
          * Mock the classes related to archiving support
          */
-        arxEntry = mock(ArchiveEntry.class);
-        arxOs = mock(ArchiveOutputStream.class);
         arxFactory = mock(ArchiveStreamFactory.class);
         when(arxFactory.newArchiveOutputStream(any(OutputStream.class))).thenReturn(arxOs);
 

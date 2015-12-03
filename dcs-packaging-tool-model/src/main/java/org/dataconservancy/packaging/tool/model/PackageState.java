@@ -245,9 +245,7 @@ public class PackageState {
     private static Model copy(Model from) {
         Model extracted = ModelFactory.createDefaultModel();
 
-        from.listStatements(new SimpleSelector()).forEachRemaining(s -> {
-            extracted.add(s);
-        });
+        from.listStatements(new SimpleSelector()).forEachRemaining(extracted::add);
 
         return extracted;
     }

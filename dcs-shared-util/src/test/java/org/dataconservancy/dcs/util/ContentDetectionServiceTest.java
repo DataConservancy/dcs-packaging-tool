@@ -18,7 +18,6 @@ package org.dataconservancy.dcs.util;
 import org.dataconservancy.dcs.model.DetectedFormat;
 import org.dataconservancy.dcs.util.droid.BaseFileSetUpTest;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -218,7 +217,6 @@ public class ContentDetectionServiceTest extends BaseFileSetUpTest {
      */
     @Test
     public void testPropertiesAndResourceBundleInSync() throws Exception {
-        ContentDetectionService dcdsi = ContentDetectionService.getInstance();
         ClassLoader cl = ClassLoader.getSystemClassLoader();
         ResourceBundle bundle = ResourceBundle.getBundle("options", Locale.US, cl);
         String versionString = bundle.getString("version_no");

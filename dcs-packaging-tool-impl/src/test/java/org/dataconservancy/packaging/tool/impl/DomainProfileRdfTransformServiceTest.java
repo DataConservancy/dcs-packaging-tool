@@ -4,7 +4,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

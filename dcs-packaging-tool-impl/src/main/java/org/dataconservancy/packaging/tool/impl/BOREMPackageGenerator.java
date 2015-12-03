@@ -100,7 +100,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
 
         try {
             PackageAssembler assembler = assemblerFactory.newAssembler(params);
-            PackageModelBuilder builder = modelBuilderFactory.newBuilder(packageState, params);
+            PackageModelBuilder builder = modelBuilderFactory.newBuilder(params);
 
             if (assembler == null) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_OBJECT_INSTANTIATION_EXP, "Could not create " +

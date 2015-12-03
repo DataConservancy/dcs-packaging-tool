@@ -31,7 +31,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;

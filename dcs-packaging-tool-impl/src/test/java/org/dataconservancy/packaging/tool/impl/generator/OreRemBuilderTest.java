@@ -174,7 +174,7 @@ public class OreRemBuilderTest {
                         .collect(Collectors.toList());
         assertEquals(1, paths.size());
 
-        String content = null;
+        String content;
         try (InputStream in = new FileInputStream(paths.get(0).toFile())) {
             content = IOUtils.toString(in);
         }

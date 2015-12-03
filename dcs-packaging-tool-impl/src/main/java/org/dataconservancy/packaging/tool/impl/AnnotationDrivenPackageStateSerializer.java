@@ -268,13 +268,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
         if (archive) {
             try (ArchiveOutputStream aos = arxStreamFactory.newArchiveOutputStream(out)) {
-                propertyDescriptors.keySet().stream().forEach(streamId -> {
-                    try {
-                        serializeToArchive(state, streamId, aos);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e.getMessage(), e);
-                    }
-                });
+                propertyDescriptors.keySet().stream().forEach(streamId -> serializeToArchive(state, streamId, aos));
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -325,9 +319,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      * @param state    the package state object containing the identified stream
      * @param streamId the stream identifier for the content being serialized
      * @param aos      the archive output stream to serialize the stream to
-     * @throws IOException
      */
-    void serializeToArchive(PackageState state, StreamId streamId, ArchiveOutputStream aos) throws IOException {
+    void serializeToArchive(PackageState state, StreamId streamId, ArchiveOutputStream aos) {
 
         // when writing to an archive file:
         //   1. read the stream to be serialized, to get its properties
@@ -374,7 +367,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
                     propertyDescriptors.keySet().stream().map(Enum::name).collect(Collectors.joining(", "))));
         }
 
-        Object toSerialize = null;
+        Object toSerialize;
 
         try {
             toSerialize = pd.getReadMethod().invoke(state);
@@ -477,8 +470,8 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
      *                                encountered
      */
     void deserialize(PackageState state, StreamId streamId, ZipArchiveInputStream in) {
-        ArchiveEntry entry = null;
-        Object deserializedStream = null;
+        ArchiveEntry entry;
+        Object deserializedStream;
         boolean all = streamId == null;
 
         // deserialize the specified stream identifier (or all stream identifiers if streamId is null) from the
@@ -550,7 +543,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
 
         final byte[] signature = new byte[12];
         in.mark(signature.length);
-        int signatureLength = 0;
+        int signatureLength;
         try {
             signatureLength = IOUtils.readFully(in, signature);
             in.reset();

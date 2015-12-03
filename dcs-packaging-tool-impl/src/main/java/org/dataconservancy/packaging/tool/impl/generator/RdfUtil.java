@@ -94,7 +94,7 @@ public class RdfUtil {
                 .forEachRemaining(subjects::add);
 
         /* All traversable blank nodes are also included */
-        subjects.addAll(subjects.stream().map(s -> blankNodesReachableFrom(s))
+        subjects.addAll(subjects.stream().map(RdfUtil::blankNodesReachableFrom)
                 .flatMap(Collection::stream).collect(Collectors.toList()));
 
         return new SimpleSelector() {
@@ -133,9 +133,7 @@ public class RdfUtil {
     public static Model copy(Model from, Selector selector) {
         Model extracted = ModelFactory.createDefaultModel();
 
-        from.listStatements(selector).forEachRemaining(s -> {
-            extracted.add(s);
-        });
+        from.listStatements(selector).forEachRemaining(extracted::add);
 
         return extracted;
     }
@@ -150,9 +148,7 @@ public class RdfUtil {
         subject.getModel().listStatements(subject, null, (RDFNode) null)
                 .filterKeep(stmnt -> stmnt.getObject().isAnon())
                 .mapWith(stmnt -> stmnt.getObject().asResource())
-                .forEachRemaining(bnode -> {
-                    blankNodes.addAll(blankNodesReachableFrom(bnode));
-                });
+                .forEachRemaining(bnode -> blankNodes.addAll(blankNodesReachableFrom(bnode)));
 
         return blankNodes;
     }
@@ -162,7 +158,7 @@ public class RdfUtil {
      * portion.
      */
     public static String bare(String uri) {
-        String s = uri.toString() + "#";
+        String s = uri + "#";
         return s.substring(0, s.indexOf('#'));
     }
 
@@ -174,7 +170,7 @@ public class RdfUtil {
         Map<String, String> prefixes = new HashMap<>();
         model.listStatements()
                 .mapWith(stmt -> stmt.getPredicate().getNameSpace())
-                .filterKeep(ns -> PREFIX_MAP.containsKey(ns)).toSet()
+                .filterKeep(PREFIX_MAP::containsKey).toSet()
                 .forEach(ns -> prefixes.put(PREFIX_MAP.get(ns), ns));
 
         /*

@@ -22,49 +22,49 @@ import java.util.Map;
 /** Contains useful ontology constants like namespaces and prefixes. */
 public interface Ontologies {
 
-    public static final String NS_DCS_ONTOLOGY_BOM =
+    String NS_DCS_ONTOLOGY_BOM =
             "http://www.dataconservancy.org/business-object-model#";
 
-    public static final String NS_DCS_PKGTOOL_PROFILE =
+    String NS_DCS_PKGTOOL_PROFILE =
             "http://www.dataconservancy.org/ptg-prof/";
 
-    public static final String NS_DCS_PKGTOOL_PROFILE_BOM =
+    String NS_DCS_PKGTOOL_PROFILE_BOM =
             "http://dataconservancy.org/ptg-profiles/dcs-bo-1.0#";
 
-    public static final String NS_DCS_PKGTOOL_PROFILE_PCDM =
+    String NS_DCS_PKGTOOL_PROFILE_PCDM =
             "http://dataconservancy.org/ptg-profiles/PCDM-1.0#";
 
-    public static final String NS_DCS_TYPES =
+    String NS_DCS_TYPES =
             "http://dataconservancy.org/ns/types/";
 
-    public static final String NS_DCTERMS = "http://purl.org/dc/terms/";
+    String NS_DCTERMS = "http://purl.org/dc/terms/";
 
-    public static final String NS_FOAF = "http://xmlns.com/foaf/0.1/";
+    String NS_FOAF = "http://xmlns.com/foaf/0.1/";
 
-    public static final String NS_PCDM = "http://pcdm.org/models#";
+    String NS_PCDM = "http://pcdm.org/models#";
 
-    public static final String NS_ORE =
+    String NS_ORE =
             "http://www.openarchives.org/ore/terms/";
 
-    public static final String NS_RDF =
+    String NS_RDF =
             "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
-    public static final String NS_RDFS =
+    String NS_RDFS =
             "http://www.w3.org/2000/01/rdf-schema#";
 
-    public static final String NS_XSD = "http://www.w3.org/2001/XMLSchema#";
+    String NS_XSD = "http://www.w3.org/2001/XMLSchema#";
 
-    public static final String NS_DCAM = "http://purl.org/dc/dcam/";
+    String NS_DCAM = "http://purl.org/dc/dcam/";
 
-    public static final String NS_DCMITYPE = "http://purl.org/dc/dcmitype/";
+    String NS_DCMITYPE = "http://purl.org/dc/dcmitype/";
 
-    public static final String NS_DCELEMENTS = "http://purl.org/dc/elements/1.1/";
+    String NS_DCELEMENTS = "http://purl.org/dc/elements/1.1/";
 
-    public static final String NS_LDP = "http://www.w3.org/ns/ldp#";
+    String NS_LDP = "http://www.w3.org/ns/ldp#";
 
-    public static final String NS_OWL2 = "http://www.w3.org/2002/07/owl#";
+    String NS_OWL2 = "http://www.w3.org/2002/07/owl#";
 
-    public static final String NS_RDFG = "http://www.w3.org/2004/03/trix/rdfg-1/";
+    String NS_RDFG = "http://www.w3.org/2004/03/trix/rdfg-1/";
 
 
     /**
@@ -75,7 +75,7 @@ public interface Ontologies {
      * </p>
      */
     @SuppressWarnings("serial")
-    public static final Map<String, String> PREFIX_MAP =
+    Map<String, String> PREFIX_MAP =
             new HashMap<String, String>() {
 
                 {

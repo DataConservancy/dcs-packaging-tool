@@ -47,9 +47,8 @@ public class FilenameValidatorService {
      * @return a List of invalid file names, empty if all names are valid. Each entry in the list will have an invalid
      * character or reserved filename in the final path component. There will be one entry for each error to be fixed.
      * @throws IOException if the file at rootDirectoryPath cannot be found
-     * @throws InterruptedException if the walk is interrupted
      */
-    public final List<String> findInvalidFilenames(Path rootDirectoryPath) throws IOException, InterruptedException {
+    public final List<String> findInvalidFilenames(Path rootDirectoryPath) throws IOException {
         List<String> invalidFilenames = new ArrayList<>();
 
         List<Path> visitedPaths = new ArrayList<>();

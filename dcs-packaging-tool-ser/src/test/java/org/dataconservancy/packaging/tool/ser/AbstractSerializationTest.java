@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public abstract class AbstractSerializationTest {
         public static LinkedHashMap<String, List<String>> packageMetadata = new LinkedHashMap<String, List<String>>() {
             {
                 put("foo", Arrays.asList("bar", "biz"));
-                put("baz", Arrays.asList("bar"));
+                put("baz", Collections.singletonList("bar"));
             }
         };
 
@@ -100,7 +101,7 @@ public abstract class AbstractSerializationTest {
                     propertyThree.setStringValue("bar");
 
                     put(new URI("node:1"), Arrays.asList(propertyOne, propertyTwo));
-                    put(new URI("node:2"), Arrays.asList(propertyThree));
+                    put(new URI("node:2"), Collections.singletonList(propertyThree));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }

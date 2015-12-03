@@ -15,9 +15,11 @@
  */
 package org.dataconservancy.dcs.util;
 
-import java.lang.Class;import java.lang.Exception;import java.lang.RuntimeException;import java.lang.String;import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.Class;
+import java.lang.Exception;
+import java.lang.RuntimeException;
+import java.lang.String;
+import java.lang.reflect.Constructor;
 
 /**
  * Creates copies of DCS data model objects by reflectively invoking their copy constructor.

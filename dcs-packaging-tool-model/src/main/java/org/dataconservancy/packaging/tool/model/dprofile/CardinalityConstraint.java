@@ -45,7 +45,7 @@ public class CardinalityConstraint {
     }
     
     /**
-     * @param other 
+     * @param other The other object to be checked if it can equal this CardinalityConstraint.
      * @return Whether or not this object may be equal to the other
      */
     public boolean canEqual(Object other) {

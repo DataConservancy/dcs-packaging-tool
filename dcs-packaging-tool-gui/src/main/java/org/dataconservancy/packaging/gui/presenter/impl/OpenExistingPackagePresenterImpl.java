@@ -70,7 +70,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
             if (pkg.getBaseDirectory() == null) {
                 // Package state was loaded, go to next page.
                 
-                controller.setPackageStateFileChooserIntialChoice(selectedFile);
+                controller.setPackageStateFileChooserInitialChoice(selectedFile);
                 controller.goToNextPage();
             } else {
                 // Package was loaded, save state and go to next page.

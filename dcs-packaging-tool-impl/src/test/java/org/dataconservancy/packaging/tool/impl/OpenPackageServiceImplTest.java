@@ -35,8 +35,6 @@ public class OpenPackageServiceImplTest {
     public TemporaryFolder tmpfolder = new TemporaryFolder();
 
     private OpenPackageServiceImpl service;
-    private PackageStateSerializer serializer;
-    private IpmRdfTransformService rdftrans;
     private Node fake_package_tree;
     private String fake_file_path;
 
@@ -46,8 +44,8 @@ public class OpenPackageServiceImplTest {
         // file data/test.txt being the root of the tree in state. This means
         // the state in the actual package being tested against is not used.
 
-        rdftrans = new IpmRdfTransformService();
-        serializer = mock(PackageStateSerializer.class);
+        IpmRdfTransformService rdftrans = new IpmRdfTransformService();
+        PackageStateSerializer serializer = mock(PackageStateSerializer.class);
         service = new OpenPackageServiceImpl(serializer, rdftrans);
 
         PackageState fakestate = new PackageState();

@@ -16,8 +16,6 @@
 
 package org.dataconservancy.packaging.gui;
 
-import java.io.File;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
@@ -34,6 +32,8 @@ import org.kohsuke.args4j.CmdLineException;
 
 import javafx.scene.text.Font;
 
+import java.util.List;
+
 /**
  * Entry point for application.
  */
@@ -46,10 +46,7 @@ public class App extends Application {
     }
 
     public void start(Stage stage) throws Exception {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-                new String[]{"classpath*:org/dataconservancy/config/applicationContext.xml",
-                        "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml",
-                "classpath*:applicationContext.xml"});
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath*:org/dataconservancy/config/applicationContext.xml", "classpath*:org/dataconservancy/packaging/tool/ser/config/applicationContext.xml", "classpath*:applicationContext.xml");
 
         // min supported size is 800x600
         stage.setMinWidth(800);
@@ -63,7 +60,8 @@ public class App extends Application {
         CmdLineParser parser = new CmdLineParser(config);
 
         try {
-            parser.parseArgument(getParameters().getRaw().toArray(new String[0]));
+            List<String> raw = getParameters().getRaw();
+            parser.parseArgument(raw.toArray(new String[raw.size()]));
         } catch (CmdLineException e) {
             System.out.println(e.getMessage());
             log.error(e.getMessage());

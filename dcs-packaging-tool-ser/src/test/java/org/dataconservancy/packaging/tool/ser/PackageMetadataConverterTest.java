@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +50,7 @@ public class PackageMetadataConverterTest extends AbstractRoundTripConverterTest
     private LinkedHashMap<String, List<String>> testMap = new LinkedHashMap<String, List<String>>() {
         {
             put("foo", Arrays.asList("bar", "biz"));
-            put("baz", Arrays.asList("bar"));
+            put("baz", Collections.singletonList("bar"));
         }
     };
 

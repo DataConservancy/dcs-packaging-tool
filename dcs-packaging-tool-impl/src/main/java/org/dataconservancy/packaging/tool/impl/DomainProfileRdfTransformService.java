@@ -93,16 +93,10 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         DC_DP_NS_URI, "hasSourceType");
     public static final Property HAS_SOURCE_PARENT_CONSTRAINT = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasSourceParentConstraint");
-    public static final Property HAS_SOURCE_GRANDPARENT_CONSTRAINT = ResourceFactory.createProperty(
-        DC_DP_NS_URI, "hasSourceGrandparentConstraint");
     public static final Property HAS_SOURCE_CHILD_CONSTRAINT = ResourceFactory.createProperty(
         DC_DP_NS_URI, "hasSourceChildConstraint");
     public static final Property HAS_RESULT_NODE_TYPE = ResourceFactory.createProperty(
             DC_DP_NS_URI, "hasResultNodeType");
-    public static final Property HAS_RESULT_CHILD_NODE_TYPE = ResourceFactory.createProperty(
-            DC_DP_NS_URI, "hasResultChildNodeType");
-    public static final Property HAS_RESULT_PARENT_NODE_TYPE= ResourceFactory.createProperty(
-        DC_DP_NS_URI, "hasResultParentNodeType");
     public static final Property INSERT_PARENT_NODE_TYPE = ResourceFactory.createProperty(
         DC_DP_NS_URI, "insertParentNodeType");
     public static final Property MOVE_CHILDREN_TO_PARENT = ResourceFactory.createProperty(
@@ -445,8 +439,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         return valueResource;
     }
 
-    private Resource transformToRdf(Model model, PropertyCategory category)
-        throws RDFTransformException {
+    private Resource transformToRdf(Model model, PropertyCategory category) {
         Resource categoryResource = model.createResource();
         categoryResource.addProperty(RDF.type, PROPERTY_CATEGORY_TYPE);
 
@@ -600,7 +593,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
                             " to be a resource");
                 }
 
-                propertyCategories.add(transformToPropertyCategory(propertyCategoryNode.asResource(), model, profile));
+                propertyCategories.add(transformToPropertyCategory(propertyCategoryNode.asResource()));
             }
             profile.setPropertyCategories(propertyCategories);
         }
@@ -731,7 +724,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         return nodeType;
     }
 
-    private PropertyCategory transformToPropertyCategory(Resource resource, Model model, DomainProfile profile)
+    private PropertyCategory transformToPropertyCategory(Resource resource)
         throws RDFTransformException {
         PropertyCategory category = new PropertyCategory();
         if (resource.hasProperty(RDFS.label)) {
@@ -916,7 +909,7 @@ public class DomainProfileRdfTransformService implements PackageResourceMapConst
         }
 
         if (resource.hasProperty(HAS_PROPERTY_CATEGORY)) {
-            propertyType.setCategory(transformToPropertyCategory(resource.getPropertyResourceValue(HAS_PROPERTY_CATEGORY), model, profile));
+            propertyType.setCategory(transformToPropertyCategory(resource.getPropertyResourceValue(HAS_PROPERTY_CATEGORY)));
         }
         return propertyType;
     }

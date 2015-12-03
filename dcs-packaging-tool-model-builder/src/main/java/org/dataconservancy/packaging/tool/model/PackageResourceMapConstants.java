@@ -13,19 +13,18 @@
 package org.dataconservancy.packaging.tool.model;
 
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 public interface PackageResourceMapConstants {
     
-    public static final String DATACONS_NS_URI = "http://dataconservancy.org/ns/types/";
+    String DATACONS_NS_URI = "http://dataconservancy.org/ns/types/";
     
-    public static final Property HAS_ID = ResourceFactory.createProperty(DATACONS_NS_URI, "hasId");
+    Property HAS_ID = ResourceFactory.createProperty(DATACONS_NS_URI, "hasId");
     
-    public static final Property HAS_NAME = ResourceFactory.createProperty(DATACONS_NS_URI, "hasName");
+    Property HAS_NAME = ResourceFactory.createProperty(DATACONS_NS_URI, "hasName");
 
-    public static final Property IS_BYTE_STREAM = ResourceFactory.createProperty(DATACONS_NS_URI, "isByteStream");
+    Property IS_BYTE_STREAM = ResourceFactory.createProperty(DATACONS_NS_URI, "isByteStream");
     
-    public static final Property IS_IGNORED = ResourceFactory.createProperty(DATACONS_NS_URI, "isIgnored");
+    Property IS_IGNORED = ResourceFactory.createProperty(DATACONS_NS_URI, "isIgnored");
 
 }

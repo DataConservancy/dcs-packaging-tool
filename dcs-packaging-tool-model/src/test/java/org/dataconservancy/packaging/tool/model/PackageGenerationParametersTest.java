@@ -20,6 +20,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,8 +82,7 @@ public class PackageGenerationParametersTest {
         PackageGenerationParameters parameters = new PackageGenerationParameters();
 
         //Test add an empty list values:
-        List<String> paramValues = null;
-        parameters.addParam(BagItParameterNames.CONTACT_EMAIL, paramValues);
+        parameters.addParam(BagItParameterNames.CONTACT_EMAIL, Collections.emptyList());
     }
 
     /**

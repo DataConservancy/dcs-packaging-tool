@@ -26,7 +26,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 
 /**
  * The view that shows the package metadata screen. In this view, the user will be able to select a name for the package,

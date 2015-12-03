@@ -34,22 +34,18 @@ public class IPMServiceImpl implements IPMService {
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
-        try {
-            List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
-            if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
-                String invalidNames = "";
-                for (int i = 0; i < invalidNamesList.size(); i++) {
-                    invalidNames += invalidNamesList.get(i);
+        List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
+        if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
+            String invalidNames = "";
+            for (int i = 0; i < invalidNamesList.size(); i++) {
+                invalidNames += invalidNamesList.get(i);
 
-                    if (i + 1 < invalidNamesList.size()) {
-                        invalidNames += ", ";
-                    }
+                if (i + 1 < invalidNamesList.size()) {
+                    invalidNames += ", ";
                 }
-
-                throw new IOException("Error creating package tree the follow names were invalid: " + invalidNames);
             }
-        } catch (InterruptedException e) {
-            throw new IOException("Error creating package tree. " + e.getMessage());
+
+            throw new IOException("Error creating package tree the follow names were invalid: " + invalidNames);
         }
 
         visitedFiles.clear();

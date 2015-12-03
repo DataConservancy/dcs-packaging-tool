@@ -522,15 +522,13 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     private List<NodeType> get_possible_types(DomainProfile profile, Node node) {
         List<NodeType> result = new ArrayList<>();
 
-        for (NodeType type : profile.getNodeTypes()) {
-            if (may_be_type(node, type)) {
-                if (is_preferred_type(node, type)) {
-                    result.add(0, type);
-                } else {
-                    result.add(type);
-                }
+        profile.getNodeTypes().stream().filter(type -> may_be_type(node, type)).forEach(type -> {
+            if (is_preferred_type(node, type)) {
+                result.add(0, type);
+            } else {
+                result.add(type);
             }
-        }
+        });
 
         return result;
     }

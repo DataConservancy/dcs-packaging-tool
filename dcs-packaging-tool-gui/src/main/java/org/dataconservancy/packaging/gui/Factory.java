@@ -16,21 +16,24 @@
 
 package org.dataconservancy.packaging.gui;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javafx.stage.Stage;
-
-import org.dataconservancy.packaging.gui.presenter.*;
+import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
+import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
+import org.dataconservancy.packaging.gui.presenter.HomepagePresenter;
+import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
+import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePresenterImpl;
-import org.dataconservancy.packaging.gui.view.*;
+import org.dataconservancy.packaging.gui.view.CreateNewPackageView;
+import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
+import org.dataconservancy.packaging.gui.view.HeaderView;
+import org.dataconservancy.packaging.gui.view.HomepageView;
+import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
+import org.dataconservancy.packaging.gui.view.PackageGenerationView;
+import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.api.OpenPackageService;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
-import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.impl.BOREMPackageGenerator;
 import org.dataconservancy.packaging.tool.impl.TestPackageGenerator;
-import org.dataconservancy.packaging.tool.impl.generator.BagItPackageAssembler;
-import org.dataconservancy.packaging.tool.impl.generator.PackageAssemblerFactory;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
 
 /**

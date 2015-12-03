@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -28,7 +29,6 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
 
-import org.dataconservancy.packaging.tool.api.*;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.model.BagItParameterNames;
@@ -49,8 +49,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;

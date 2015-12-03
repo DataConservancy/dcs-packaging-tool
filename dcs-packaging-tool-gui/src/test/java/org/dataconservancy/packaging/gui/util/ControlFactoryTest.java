@@ -76,6 +76,6 @@ public class ControlFactoryTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testBadCreate(){
-         Control control = ControlFactory.createControl(null, initialValue, null);
+         ControlFactory.createControl(null, initialValue, null);
     }
 }

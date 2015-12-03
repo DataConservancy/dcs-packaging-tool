@@ -196,8 +196,8 @@ public class OpenPackageServiceImpl implements OpenPackageService {
             throw new IOException(String.format("Package state directory %s does not exist!", path.getPath()));
         }
 
-        if (path.listFiles().length != 1) {
-            throw new IOException(String.format("Package state directory %s must have exactly one file in it"));
+        if (path.listFiles() != null && path.listFiles().length != 1) {
+            throw new IOException(String.format("Package state directory %s must have exactly one file in it", path.listFiles()));
         }
 
         PackageState state = load_package_state(path.listFiles()[0]);

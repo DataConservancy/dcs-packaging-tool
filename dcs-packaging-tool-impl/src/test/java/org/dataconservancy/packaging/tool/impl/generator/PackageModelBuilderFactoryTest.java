@@ -52,10 +52,9 @@ public class PackageModelBuilderFactoryTest {
 
     @Test
     public void testGetNewBuilder() throws InstantiationException, IllegalAccessException {
-        PackageState desc = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, PackagingFormat.BOREM.toString());
-        PackageModelBuilder builder = underTest.newBuilder(desc, params);
+        PackageModelBuilder builder = underTest.newBuilder(params);
 
         assertNotNull(builder);
     }
@@ -63,20 +62,18 @@ public class PackageModelBuilderFactoryTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void testGetNewBuilderFailsIfNoFormatIdParameterSet() throws InstantiationException, IllegalAccessException {
-        PackageState state = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
 
-        underTest.newBuilder(state, params);
+        underTest.newBuilder(params);
     }
 
 
     @Test
     public void testGetNewAssemblerReturnsNullIfNoMatchingAssemblerFound() throws InstantiationException, IllegalAccessException {
-        PackageState desc = new PackageState();
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "not-a-real-builder");
 
-        PackageModelBuilder builder = underTest.newBuilder(desc ,params);
+        PackageModelBuilder builder = underTest.newBuilder(params);
 
         assertNull(builder);
     }

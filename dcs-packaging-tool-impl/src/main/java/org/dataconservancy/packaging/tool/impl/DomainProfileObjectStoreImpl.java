@@ -463,7 +463,7 @@ public class DomainProfileObjectStoreImpl implements DomainProfileObjectStore {
         StmtIterator iter = model.listStatements();
 
         while (iter.hasNext()) {
-            result.append(iter.next() + "\n");
+            result.append(iter.next().toString()).append("\n");
         }
 
         result.append("\n\n");

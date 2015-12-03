@@ -15,13 +15,19 @@
  */
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.ARCHIVING_FORMAT;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.COMPRESSION_FORMAT;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.PACKAGE_LOCATION;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.REM_SERIALIZATION_FORMAT;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.*;
 import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.XML;
-import static org.junit.Assert.*;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.values;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.TURTLE;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -48,7 +54,14 @@ import org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.api.PackageGenerationService;
 import org.dataconservancy.packaging.tool.impl.PackageImpl;
-import org.dataconservancy.packaging.tool.model.*;
+import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
+import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
+import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
+import org.dataconservancy.packaging.tool.model.ParametersBuildException;
+import org.dataconservancy.packaging.tool.model.PropertiesConfigurationParametersBuilder;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.junit.Before;
@@ -162,7 +175,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
             @Override
             public PackageGenerationParameters buildParameters(InputStream in)
-                    throws ParametersBuildException {
+                throws ParametersBuildException {
                 throw new ParametersBuildException("Bad params");
             }
 

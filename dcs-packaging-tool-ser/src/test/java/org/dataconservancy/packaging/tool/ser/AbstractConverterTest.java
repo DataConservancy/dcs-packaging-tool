@@ -20,10 +20,6 @@ package org.dataconservancy.packaging.tool.ser;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
-import org.junit.Before;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import static org.mockito.Mockito.mock;
 

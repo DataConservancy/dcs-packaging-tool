@@ -79,8 +79,8 @@ public class RdfUtilTest {
     @Test
     public void disjointResourcesTest() throws Exception {
         Model orig = ModelFactory.createDefaultModel();
-        int triple_count_2a = 0;
-        int triple_count_2b = 0;
+        int triple_count_2a;
+        int triple_count_2b;
 
         try (InputStream in =
                 RdfUtilTest.class.getResourceAsStream("/TestDomainObjects/2/2.ttl")) {

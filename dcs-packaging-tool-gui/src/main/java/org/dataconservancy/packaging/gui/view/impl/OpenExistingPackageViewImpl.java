@@ -22,7 +22,6 @@ import org.dataconservancy.packaging.gui.presenter.impl.OpenExistingPackagePrese
 import org.dataconservancy.packaging.gui.util.ProgressDialogPopup;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

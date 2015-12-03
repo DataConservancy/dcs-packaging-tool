@@ -18,13 +18,11 @@
 
 package org.dataconservancy.packaging.tool.impl;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ser.AbstractSerializationTest;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,12 +56,6 @@ public class TestBagUriResolution {
         transform.setDomainProfileStore(dps);
         packageTree = transform.transformToNode(AbstractSerializationTest.TestObjects.packageTreeRDFWithBagUris);
         assertNotNull(packageTree);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        Model m = transform.transformToRDF(packageTree);
-        //m.write(System.out);
     }
 
     @Test

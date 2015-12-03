@@ -336,7 +336,7 @@ public class Controller {
                     packageStateSerializer.serialize(getPackageState(), fs);
                 }
 
-                setPackageStateFileChooserIntialChoice(packageStateFile);
+                setPackageStateFileChooserInitialChoice(packageStateFile);
             }
         }
     }
@@ -344,9 +344,9 @@ public class Controller {
     /**
      * Set the file which the package state file chooser will be set to when next shown.
      * 
-     * @param file
+     * @param file The file that will be shown in the file picker.
      */
-    public void setPackageStateFileChooserIntialChoice(File file) {
+    public void setPackageStateFileChooserInitialChoice(File file) {
         packageStateFileChooser.setInitialDirectory(file.getParentFile());
         packageStateFileChooser.setInitialFileName(file.getName());
     }

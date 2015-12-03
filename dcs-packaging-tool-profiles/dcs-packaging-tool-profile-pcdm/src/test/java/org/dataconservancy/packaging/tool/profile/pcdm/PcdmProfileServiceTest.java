@@ -31,7 +31,6 @@ import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.impl.support.IpmTreeFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.Property;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
-import org.dataconservancy.packaging.tool.profile.pcdm.PCDMProfile;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

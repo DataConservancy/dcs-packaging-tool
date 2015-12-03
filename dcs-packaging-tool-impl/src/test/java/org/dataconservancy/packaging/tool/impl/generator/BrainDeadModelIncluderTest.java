@@ -20,16 +20,14 @@ package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
-import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.ontologies.ModelResources;
 import org.junit.Test;
 
 import java.io.InputStream;
 
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.*;
-import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.*;
-import static org.junit.Assert.*;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.REM_SERIALIZATION_FORMAT;
+import static org.dataconservancy.packaging.tool.model.GeneralParameterNames.SERIALIZATION_FORMAT.JSONLD;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;

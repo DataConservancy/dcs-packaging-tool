@@ -55,16 +55,13 @@ public class BrainDeadModelIncluder implements NodeVisitor {
      */
     @Override
     public void finish(PackageModelBuilderState state) {
-        RESOURCE_MAP.forEach((namespace, resourcePath) -> {
-            state.assembler.createResource(
-                    toPackagePath(resourcePath) + "." + determineSerialization(state.params, null)
-                            .getLang()
-                            .getFileExtensions()
-                            .get(0),
-                    PackageResourceType.ONTOLOGY,
-                    toInputStream(get(namespace), determineSerialization(state.params, null)));
-
-        });
+        RESOURCE_MAP.forEach((namespace, resourcePath) -> state.assembler.createResource(
+                toPackagePath(resourcePath) + "." + determineSerialization(state.params, null)
+                        .getLang()
+                        .getFileExtensions()
+                        .get(0),
+                PackageResourceType.ONTOLOGY,
+                toInputStream(get(namespace), determineSerialization(state.params, null))));
     }
 
     /**
@@ -105,7 +102,7 @@ public class BrainDeadModelIncluder implements NodeVisitor {
      * @return the file name with out the extention (including not having the ".")
      */
     private String stripExt(String fileName) {
-        int i = -1;
+        int i;
         if (fileName.length() > 0 && (i = fileName.lastIndexOf(".")) > -1) {
             return stripExt(fileName.substring(0, i));
         } else {

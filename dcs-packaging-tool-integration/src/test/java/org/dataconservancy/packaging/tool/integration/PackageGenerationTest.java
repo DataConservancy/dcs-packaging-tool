@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -394,7 +395,7 @@ public class PackageGenerationTest {
         property.setStringValue(nodeForProperty.toString());
 
         initialState.getUserSpecifiedProperties()
-                .put(nodeForProperty.getIdentifier(), Arrays.asList(property));
+                .put(nodeForProperty.getIdentifier(), Collections.singletonList(property));
 
         /* Now add a custom property. Unpack the tree, add, and re-pack */
         applyCustomProperties(initialState);
@@ -426,14 +427,12 @@ public class PackageGenerationTest {
         Node initialTree = ipm2rdf.transformToNode(state.getPackageTree());
 
         state.getUserSpecifiedProperties()
-                .forEach((nodeURI, properties) -> {
-                    initialTree.walk(node -> {
-                        if (node.getIdentifier().equals(nodeURI)) {
-                            properties.forEach(prop -> profileService
-                                    .addProperty(node, prop));
-                        }
-                    });
-                });
+                .forEach((nodeURI, properties) -> initialTree.walk(node -> {
+                    if (node.getIdentifier().equals(nodeURI)) {
+                        properties.forEach(prop -> profileService
+                                .addProperty(node, prop));
+                    }
+                }));
 
         state.setPackageTree(ipm2rdf.transformToRDF(initialTree));
     }
@@ -602,7 +601,7 @@ public class PackageGenerationTest {
     private Map<URI, Integer> domainObjectSizes(PackageState state)
             throws RDFTransformException {
         Map<URI, Integer> originalDomainObjectSizes =
-                new HashMap<URI, Integer>();
+                new HashMap<>();
 
         Model model = copy(state.getDomainObjectRDF(), new SimpleSelector());
 

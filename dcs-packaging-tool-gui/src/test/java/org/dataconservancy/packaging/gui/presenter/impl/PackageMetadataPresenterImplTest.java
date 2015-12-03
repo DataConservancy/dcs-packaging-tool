@@ -20,10 +20,8 @@ import javafx.scene.control.TextField;
 import org.dataconservancy.packaging.gui.BaseGuiTest;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Controller;
-import org.dataconservancy.packaging.gui.Page;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
 import org.dataconservancy.packaging.gui.view.HeaderView;
-import org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl;
 import org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
@@ -31,25 +29,19 @@ import org.dataconservancy.packaging.tool.impl.DomainProfileStoreJenaImpl;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
-import org.dataconservancy.packaging.tool.model.dprofile.NodeType;
 import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 
 /**
  * Test for the package metadata presenter implementation. Tests that validation for required fields works

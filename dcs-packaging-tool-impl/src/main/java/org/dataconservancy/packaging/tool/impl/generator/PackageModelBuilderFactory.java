@@ -19,7 +19,6 @@ package org.dataconservancy.packaging.tool.impl.generator;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
-import org.dataconservancy.packaging.tool.model.PackageState;
 
 import java.util.Map;
 
@@ -35,16 +34,11 @@ public class PackageModelBuilderFactory {
      * Provides an instance of {@link PackageModelBuilder} for assembling
      * packages.
      *
-     * @param desc
-     *        The package state to use for selecting the correct builder
      * @param params
      *        Package Generation Parameters
      * @return Fully configured PackageModelBulder.
-     * @throws IllegalAccessException if no builders have been set on the factory
-     * @throws InstantiationException if the params don't contain the package format id
      */
-    public PackageModelBuilder newBuilder(PackageState desc, PackageGenerationParameters params)
-            throws IllegalAccessException, InstantiationException {
+    public PackageModelBuilder newBuilder(PackageGenerationParameters params) {
 
         if (builders == null || builders.size() == 0) {
             throw new IllegalStateException("No builders have been set.");
