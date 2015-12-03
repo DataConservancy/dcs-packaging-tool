@@ -67,7 +67,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     }
 
     public Node display() {
-        // TODO: Must move bind() to constructor which will require putting domainProfileStore as constructor arg.
         bind();
 
         setExistingValues();
@@ -165,6 +164,11 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
     @Override
     public void onBackPressed() {
+        if (areAllFieldsEmpty()) {
+            controller.goToPreviousPage();
+            return;
+        }
+
         updatePackageState();
         if (Platform.isFxApplicationThread()) {
             view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
@@ -219,6 +223,26 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         }
     }
 
+    private boolean areAllFieldsEmpty() {
+        // Let's first fetch the static fields' values and update the PackageState with them.
+        if(view.getPackageNameField().getText() != null && !view.getPackageNameField().getText().isEmpty()) {
+            return false;
+        }
+
+        // Now let's go through the dynamic fields and update the package state.
+        for (Node node : view.getAllDynamicFields()) {
+            if (node instanceof TextField) {
+                if (((TextField) node).getText() != null && !((TextField) node).getText().isEmpty()) {
+                    return false;
+                }
+            } else if (node instanceof DatePicker) {
+                if (((DatePicker) node).getValue() != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     /**
      * Helper method that makes sure required fields are entered before letting the user move on to the next page.
      *
