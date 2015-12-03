@@ -92,7 +92,7 @@ public class PackageModelBuilderImpl
         try {
             builderState.pkgState = (PackageState) pstate.clone();
         } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("Error cloning package state", e);
+            throw new RuntimeException("Error cloning package state: " + e.getMessage(), e);
         }
 
         try {
@@ -108,7 +108,7 @@ public class PackageModelBuilderImpl
             visitors.forEach(v -> v.finish(builderState));
 
         } catch (Exception e) {
-            throw new RuntimeException("Error deserializing package tree", e);
+            throw new RuntimeException("Error deserializing package tree: " + e.getMessage(), e);
         }
     }
 
