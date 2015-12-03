@@ -46,6 +46,7 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -322,7 +323,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         } else {
 
             if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.DATE_TIME)) {
-                DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, null, packageMetadata.getHelpText());
+                DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, LocalDate.now(), packageMetadata.getHelpText());
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
