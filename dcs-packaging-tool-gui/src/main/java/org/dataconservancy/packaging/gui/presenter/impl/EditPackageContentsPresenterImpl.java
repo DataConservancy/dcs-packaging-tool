@@ -470,7 +470,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                                 child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> controller.getDomainProfileService().addProperty(child, inheritablePropertyValue));
                             }
                             if (child.getChildren() != null) {
-                                child.getChildren().forEach(this::applyMetadataInheritance);
+                                applyMetadataInheritance(child);
                             }
                         }
                     }
