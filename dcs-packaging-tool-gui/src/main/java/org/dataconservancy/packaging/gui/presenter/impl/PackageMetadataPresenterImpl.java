@@ -102,8 +102,10 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                         ((VBox) node).getChildren().add(new RemovableLabel(value, (VBox) node));
                     }
                 } else if (node instanceof DatePicker) {
-                    LocalDate localDate = ((DatePicker) node).getConverter().fromString(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
-                    ((DatePicker) node).setValue(localDate);
+                    DateTime date = DateUtility.parseDateString(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
+                    if (date != null) {
+                        ((DatePicker) node).setValue(LocalDate.of(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
+                    }
                 }
             });
         }
@@ -215,9 +217,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             } else if (node instanceof DatePicker) {
                 if (((DatePicker) node).getValue() != null) {
                     LocalDate date  = ((DatePicker) node).getValue();
-                    org.joda.time.LocalDate jodaDate = new org.joda.time.LocalDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-                    DateTime dateTime = jodaDate.toDateTimeAtCurrentTime();
-                    getController().getPackageState().addPackageMetadata(node.getId(), DateUtility.toCommonUSDate(dateTime));
+                    getController().getPackageState().addPackageMetadata(node.getId(), date.toString());
                 }
             }
         }
