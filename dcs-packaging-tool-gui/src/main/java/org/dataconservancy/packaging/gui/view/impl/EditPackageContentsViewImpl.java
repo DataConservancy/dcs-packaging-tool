@@ -661,7 +661,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     double y = getScene().getWindow().getY() + point.getY();
 
                     //X and Y are now the location of the menu, offset slightly in from that this ensures if the app is full screen we don't open right on the edge
-                    x -= 100;
+                    x -= 500;
+                    y -= 100;
 
                     artifactDetailsWindow.setX(x);
                     artifactDetailsWindow.setY(y);
