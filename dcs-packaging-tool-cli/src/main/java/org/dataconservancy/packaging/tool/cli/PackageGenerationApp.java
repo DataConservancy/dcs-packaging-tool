@@ -54,7 +54,6 @@ import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParametersBuilder;
-import org.dataconservancy.packaging.tool.model.PackageMetadataList;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
@@ -354,8 +353,10 @@ public class PackageGenerationApp {
         }
         //add domain profile to the metadata
         packageMetadataList.put(GeneralParameterNames.DOMAIN_PROFILE, Collections.singletonList(profile.getLabel()));
+        //set package state metadata
         state.setPackageMetadataList(packageMetadataList);
 
+        //set package state domain profile id list
         state.setDomainProfileIdList(Collections.singletonList(profile.getIdentifier()));
 
         domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
