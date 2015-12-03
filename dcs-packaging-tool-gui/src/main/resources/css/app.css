@@ -322,7 +322,7 @@
 }
 
 .EditPackageContentsViewArrowsImage {
-    -fx-image: url("../images/gray-arrows.png");
+    -fx-image: url("../images/menu.png");
 }
 
 .GoodUserInputImage {

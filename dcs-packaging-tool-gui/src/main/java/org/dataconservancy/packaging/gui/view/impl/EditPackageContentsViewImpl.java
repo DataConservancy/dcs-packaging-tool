@@ -228,21 +228,21 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         });
 
         //set up the columns for the artifact, its type and the options control
-        TreeTableColumn<Node, HBox> artifactColumn = new TreeTableColumn<>("Artifact");
-        artifactColumn.setResizable(false);
-        TreeTableColumn<Node, Label> typeColumn = new TreeTableColumn<>("Type");
+        TreeTableColumn<Node, HBox> packageResourceColumn = new TreeTableColumn<>(TextFactory.getText(LabelKey.PACKAGE_RESOURCE_LABEL));
+        packageResourceColumn.setResizable(false);
+        TreeTableColumn<Node, Label> typeColumn = new TreeTableColumn<>(TextFactory.getText(LabelKey.TYPE_LABEL));
         typeColumn.setResizable(false);
-        TreeTableColumn<Node, Label> optionsColumn = new TreeTableColumn<>("");
-        optionsColumn.setResizable(false);
+        TreeTableColumn<Node, Label> actionColumn = new TreeTableColumn<>(TextFactory.getText(LabelKey.ACTIONS_LABEL));
+        actionColumn.setResizable(false);
 
         //make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
         typeColumn.setPrefWidth(100); //make wide enough so that any displayed text will not truncate
-        optionsColumn.setPrefWidth(42); //make wide enough to comfortably fit image and vertical scroll bar
+        actionColumn.setPrefWidth(60); //make wide enough to comfortably fit image and vertical scroll bar
         //add 2 here to get rid of horizontal scroll bar
-        artifactColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + optionsColumn.getWidth() + 2));
+        packageResourceColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + actionColumn.getWidth() + 2));
 
         //For these cell factories p.getValue returns the TreeItem<Node> p.getValue.getValue returns the node.
-        artifactColumn.setCellValueFactory(p -> {
+        packageResourceColumn.setCellValueFactory(p -> {
             Node packageNode = p.getValue().getValue();
 
             HBox hbox = new HBox(3);
@@ -268,7 +268,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             }
 
             Label viewLabel = new Label();
-            viewLabel.setPrefWidth(artifactColumn.getWidth());
+            viewLabel.setPrefWidth(packageResourceColumn.getWidth());
             viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
 
             String labelText;
@@ -305,7 +305,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             return new ReadOnlyObjectWrapper<>(typeLabel);
         });
 
-        optionsColumn.setCellFactory(new Callback<TreeTableColumn<Node, Label>, TreeTableCell<Node, Label>>() {
+        actionColumn.setCellFactory(new Callback<TreeTableColumn<Node, Label>, TreeTableCell<Node, Label>>() {
             @Override
             public TreeTableCell<Node, Label> call(TreeTableColumn<Node, Label> param) {
                 return new TreeTableCell<Node, Label>() {
@@ -320,9 +320,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                             Button optionsLabel = new Button();
                             optionsLabel.getStyleClass().clear();
                             optionsLabel.getStyleClass().add(EDIT_PACKAGE_TREE_BUTTON);
+                            optionsLabel.setAlignment(Pos.CENTER);
                             ImageView image = new ImageView();
-                            image.setFitHeight(20);
-                            image.setFitWidth(20);
+                            image.setFitHeight(24);
+                            image.setFitWidth(6);
                             image.getStyleClass().add(ARROWS_IMAGE);
                             optionsLabel.setGraphic(image);
 
@@ -378,6 +379,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                                 }
                             });
                             setGraphic(optionsLabel);
+                            setAlignment(Pos.CENTER);
                             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                         }
                     }
@@ -385,9 +387,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             }
         });
 
-        artifactTree.getColumns().add(artifactColumn);
+        artifactTree.getColumns().add(packageResourceColumn);
         artifactTree.getColumns().add(typeColumn);
-        artifactTree.getColumns().add(optionsColumn);
+        artifactTree.getColumns().add(actionColumn);
 
         //set up row factory to allow for a little alternate row styling for ignored package artifacts
         artifactTree.setRowFactory(new Callback<TreeTableView<Node>, TreeTableRow<Node>>() {

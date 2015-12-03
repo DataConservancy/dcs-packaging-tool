@@ -138,7 +138,10 @@ public class Labels {
         PROPERTY_VALIDATION_PROGRESS_LABEL("propertyvalidationprogress.label"),
         REQUIRED_PROPERTIES_EXPLANATION_LABEL("requiredpropertyexplanation.label"),
         LOADING_PACKAGE_LABEL("loadingpackage.label"),
-        PACKAGE_STATE_FILE_DESCRIPTION_LABEL("packagestatefiledescription.label");
+        PACKAGE_STATE_FILE_DESCRIPTION_LABEL("packagestatefiledescription.label"),
+        ACTIONS_LABEL("actions.label"),
+        TYPE_LABEL("type.label"),
+        PACKAGE_RESOURCE_LABEL("packageresource.label");
 
         private String property;
 
