@@ -80,6 +80,7 @@
           <artifactId>javafx-maven-plugin</artifactId>
           <configuration>
             <mainClass>org.dataconservancy.packaging.gui.App</mainClass>
+            <additionalAppResources>${project.build.directory}/maven-shared-archive-resources</additionalAppResources>
           </configuration>
         </plugin>
 

@@ -42,6 +42,23 @@
   <!-- the jar archive will not be packed under a base directory -->
   <includeBaseDirectory>false</includeBaseDirectory>
   
+  <fileSets>
+    
+    <!-- Include the proper LICENSE, NOTICE, and DEPENDENCIES files in the distribution -->
+    <fileSet>
+      <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
+      <outputDirectory>META-INF</outputDirectory>
+      <includes>
+        <include>LICENSE</include>
+        <include>NOTICE</include>
+        <include>DEPENDENCIES</include>
+        <include>THIRD-PARTY.txt</include>
+      </includes>
+    </fileSet>
+    
+  </fileSets>
+  
+  
   <dependencySets>
     
     <!--

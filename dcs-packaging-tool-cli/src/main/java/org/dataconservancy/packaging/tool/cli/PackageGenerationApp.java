@@ -61,6 +61,7 @@ import org.dataconservancy.packaging.tool.model.ParametersBuildException;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
 import org.dataconservancy.packaging.tool.model.dprofile.DomainProfile;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
+import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -93,11 +94,8 @@ public class PackageGenerationApp {
 	@Argument(required = true, index = 0, metaVar = "[content]", usage = "content root directory")
     public File contentRootFile = null;
 
-    @Argument(required = true, index = 1, metaVar = "[profile]", usage = "domain profile file")
+    @Argument(required = false, index = 1, metaVar = "[profile]", usage = "domain profile file")
     public File domainProfileFile = null;
-
-    @Argument(required = false, index = 2, metaVar = "[metadata]", usage = "package metadata file")
-    public File packageMetadataFile = null;
 
 	/*
 	 * 
@@ -130,6 +128,10 @@ public class PackageGenerationApp {
 	/** Package Generation Params location */
 	@Option(name = "-g", aliases = { "--generation-params" }, metaVar = "<file>", usage = "package generation params file location")
 	public File packageGenerationParamsFile;
+
+    /** Package Metadata File location */
+    @Option(name = "-m", aliases = { "--package-metadata" }, metaVar = "<file>", usage = "package metadata file location")
+	public File packageMetadataFile;
 
     /** Archive format **/
     @Option(name = "-a", aliases = { "--archiving-format"}, metaVar = "tar|zip", usage = "Archive format to use when creating the package.  Defaults to tar")
@@ -251,7 +253,6 @@ public class PackageGenerationApp {
         }
 
         if (this.packageGenerationParamsFile != null) {
-
             try {
                 PackageGenerationParameters fileParams = parametersBuilder.
                         buildParameters(new FileInputStream(this.packageGenerationParamsFile));
@@ -304,14 +305,6 @@ public class PackageGenerationApp {
         DomainProfile profile;
         PackageState state = new PackageState();
 
-        //add package metadata to state
-        if(packageMetadataFile != null) {
-            if(packageMetadataFile.exists()) {
-                state.setPackageMetadataList(createPackageMetadata());
-            } else {
-                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
-            }
-        }
 
         //add package tree to state
         Model profileObjectModel = ModelFactory.createDefaultModel();
@@ -319,38 +312,64 @@ public class PackageGenerationApp {
         Model domainObjectModel = ModelFactory.createDefaultModel();
         DomainProfileObjectStore domainProfileObjectStore = new DomainProfileObjectStoreImpl(domainObjectModel, uriGen);
         DomainProfileService profileService = new DomainProfileServiceImpl(domainProfileObjectStore, uriGen);
+        DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
+        DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
+        IpmRdfTransformService ipm2rdf = appContext.getBean("ipmRdfTransformService", IpmRdfTransformService.class);
 
+        //set the domain object model on the state
+        state.setDomainObjectRDF(domainObjectModel);
+
+        //get started looking for package metadata, finish after we resolve the profile
+        LinkedHashMap<String, List<String>> packageMetadataList = createPackageMetadata();
+
+        //see if user specified a domain profile to use, else use default
         if(this.domainProfileFile != null) {
+            String domainProfilePath = domainProfileFile.getPath();
 
-                String domainProfilePath = domainProfileFile.getPath();
-
-                try (InputStream fileStream = new FileInputStream(domainProfileFile)) {
-                    if (domainProfilePath.endsWith(".ttl")) {
-                        profileObjectModel.read(fileStream, null, "TTL");
-                    } else if (domainProfilePath.endsWith(".xml")) {
-                        profileObjectModel.read(fileStream, null, "RDF/XML");
-                    } else {
-                        throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_BAD_DOMAIN_PROFILE_EXTENSION);
-                    }
-
-                    DomainProfileRdfTransformService domainProfileRdfTransformService = new DomainProfileRdfTransformService();
-                    profile = domainProfileRdfTransformService.transformToProfile(profileObjectModel);
-                    state.setDomainObjectRDF(domainObjectModel);
-                    DomainProfileStore domainProfileStore = appContext.getBean("domainProfileStore", DomainProfileStoreJenaImpl.class);
-                    domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
-                    IpmRdfTransformService ipm2rdf = appContext.getBean("ipmRdfTransformService", IpmRdfTransformService.class);
-                    ipm2rdf.setDomainProfileStore(domainProfileStore);
-
-                    if (!profileService.assignNodeTypes(profile, tree)) {
-                        throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_ASSIGN_NODE_TYPES);
-                    }
-
-                    state.setPackageTree(ipm2rdf.transformToRDF(tree));
-                } catch (RDFTransformException e) {
-                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF, e);
-                } catch (IOException e) {
-                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
+            try (InputStream fileStream = new FileInputStream(domainProfileFile)) {
+                if (domainProfilePath.endsWith(".ttl")) {
+                    profileObjectModel.read(fileStream, null, "TTL");
+                } else if (domainProfilePath.endsWith(".xml")) {
+                    profileObjectModel.read(fileStream, null, "RDF/XML");
+                } else {
+                    throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_BAD_DOMAIN_PROFILE_EXTENSION);
                 }
+                profile = domainProfileRdfTransformService.transformToProfile(profileObjectModel);
+            } catch (IOException e) {
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
+            } catch (RDFTransformException e) {
+                 throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF, e);
+            }
+
+        } else {
+            //use DCS domain profile as a default
+            profile = new DcsBOProfile();
+        }
+
+        //finish processing package metadata
+        //add package name to the metadata
+        if(packageName != null && !packageName.isEmpty()){
+            packageMetadataList.put(GeneralParameterNames.PACKAGE_NAME, Collections.singletonList(packageName.trim()));
+        }
+        //add domain profile to the metadata
+        packageMetadataList.put(GeneralParameterNames.DOMAIN_PROFILE, Collections.singletonList(profile.getLabel()));
+        //set package state metadata
+        state.setPackageMetadataList(packageMetadataList);
+
+        //set package state domain profile id list
+        state.setDomainProfileIdList(Collections.singletonList(profile.getIdentifier()));
+
+        domainProfileStore.setPrimaryDomainProfiles(Collections.singletonList(profile));
+        ipm2rdf.setDomainProfileStore(domainProfileStore);
+
+        if (!profileService.assignNodeTypes(profile, tree)) {
+            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_ASSIGN_NODE_TYPES);
+        }
+
+        try {
+            state.setPackageTree(ipm2rdf.transformToRDF(tree));
+        } catch (RDFTransformException e) {
+             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF, e);
         }
 
         if (this.pkgFormat != null) {
@@ -420,20 +439,20 @@ public class PackageGenerationApp {
 
     private LinkedHashMap<String, List<String>> createPackageMetadata(){
         Properties props = new Properties();
-        try(InputStream fileStream = new FileInputStream(packageMetadataFile)){
-            props.load(fileStream);
-        } catch (FileNotFoundException e) {
-             throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
+          if(this.packageMetadataFile != null) {
+            if(!this.packageMetadataFile.exists()){
+              throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
+            }
+            try (InputStream fileStream = new FileInputStream(this.packageMetadataFile)) {
+                props.load(fileStream);
+            } catch (FileNotFoundException e) {
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION, e);
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
+            }
         }
-
         LinkedHashMap<String, List<String>> metadata = new LinkedHashMap<>();
-        //add package name to the metadata
-        if(packageName != null && !packageName.isEmpty()){
-            metadata.put("Package-Name", Collections.singletonList(packageName.trim()));
-        }
 
         List<String> valueList;
         for (String key : props.stringPropertyNames()) {
