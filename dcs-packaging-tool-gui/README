@@ -1,4 +1,4 @@
-This module requires Maven 3, Oracle Java 7, and a classpath with JavaFX.
+This module requires Maven 3, Oracle Java 8, and a classpath with JavaFX.
 See http://zenjava.com/javafx/maven/fix-classpath.html for how to add JavaFX to the classpath.
 
 Useful goals:
