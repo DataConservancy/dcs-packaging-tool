@@ -66,22 +66,6 @@ public class PackageGeneratorAppTest {
     }
 
     @Test
-    public void testGoodRequiredFilePathArguments(){
-        //expected status here corresponds to not being able to transform the tree to RDF
-        //so we know the file name params were correctly specified on the command line
-        exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF.returnCode());
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath});
-    }
-
-        @Test
-    public void testGoodRequiredAndOptionalFilePathArgumentsSucceeds() {
-        //expected status here corresponds to not being able to transform the tree to RDF
-        //so we know the file name params were correctly specified on the command line
-        exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_CANT_TRANSFORM_TO_RDF.returnCode());
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, packageMetadataFilePath});
-        }
-
-    @Test
     public void testContentRootNotFound(){
         exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION.returnCode());
         PackageGenerationApp.main(new String[]{contentRootDirectoryPath + "moo", domainProfileFilePath});
@@ -100,45 +84,40 @@ public class PackageGeneratorAppTest {
     }
 
     @Test
-    public void testPackageMetadataFileNotFound(){
-        exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION.returnCode());
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, packageMetadataFilePath + "oink"});
-    }
-
-    @Test
     public void testNoArguments() {
         exit.expectSystemExitWithStatus(1);
         PackageGenerationApp.main(new String[]{});
     }
 
     @Test
-    public void testMissingDomainProfile() {
-        exit.expectSystemExitWithStatus(1);
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath});
+    public void testBadPackageGenerationParametersFilePath(){
+        exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION.returnCode());
+        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, "-g", "moo"});
     }
 
     @Test
-    public void testBadPackageGenerationParametersFilePath(){
+    public void testBadPackageMetadataParametersFilePath(){
         exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION.returnCode());
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, packageGenerationParametersFilePath, "-g", "moo"});
+        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, "-m", "baa"});
     }
+
 
     @Test
     public void testBadPackageLocationFilePath(){
         exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION.returnCode());
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, packageMetadataFilePath, "-l", "moo"});
+        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, "-l", "moo"});
     }
 
     @Test
     public void testBadPackageStagingLocationFilePath(){
         exit.expectSystemExitWithStatus(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION.returnCode());
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, packageMetadataFilePath, "--stage", "moo"});
+        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, "--stage", "moo"});
     }
 
     @Test
     public void testMissingArgumentAfterFlag(){
         exit.expectSystemExitWithStatus(1);
-        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, packageMetadataFilePath, "--stage"});
+        PackageGenerationApp.main(new String[]{contentRootDirectoryPath, domainProfileFilePath, "--stage"});
     }
 
 }
