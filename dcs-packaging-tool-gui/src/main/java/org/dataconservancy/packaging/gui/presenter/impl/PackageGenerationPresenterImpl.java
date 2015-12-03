@@ -299,11 +299,14 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         }
 
         //Before generating the package set any user defined properties on the model.
-        for (URI nodeId : controller.getPackageState().getUserSpecifiedProperties().keySet()) {
-            Node node = findNodeForId(controller.getPackageTree(), nodeId);
-            if (node != null) {
-                for (Property userDefinedProperty : controller.getPackageState().getUserSpecifiedProperties().get(nodeId)) {
-                    controller.getDomainProfileService().addProperty(node, userDefinedProperty);
+        if (controller.getPackageState().getUserSpecifiedProperties() != null &&
+            !controller.getPackageState().getUserSpecifiedProperties().keySet().isEmpty()) {
+            for (URI nodeId : controller.getPackageState().getUserSpecifiedProperties().keySet()) {
+                Node node = findNodeForId(controller.getPackageTree(), nodeId);
+                if (node != null) {
+                    for (Property userDefinedProperty : controller.getPackageState().getUserSpecifiedProperties().get(nodeId)) {
+                        controller.getDomainProfileService().addProperty(node, userDefinedProperty);
+                    }
                 }
             }
         }
