@@ -465,14 +465,15 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                 List<Property> inheritablePropertyValues = controller.getDomainProfileService().getProperties(node, inheritablePropertyType);
                 if (inheritablePropertyValues != null) {
                     for (Property inheritablePropertyValue : inheritablePropertyValues) {
-                        for (Node child : node.getChildren()) {
-                            if (!child.isIgnored() && child.getDomainObject() != null) {
-                                child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> controller.getDomainProfileService().addProperty(child, inheritablePropertyValue));
-                            }
+                        node.getChildren().stream().filter(child ->
+                                                               !child.isIgnored() &&
+                                                                   child.getDomainObject() !=
+                                                                       null).forEach(child -> {
+                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> controller.getDomainProfileService().addProperty(child, inheritablePropertyValue));
                             if (child.getChildren() != null) {
                                 applyMetadataInheritance(child);
                             }
-                        }
+                        });
                     }
                 }
             });
