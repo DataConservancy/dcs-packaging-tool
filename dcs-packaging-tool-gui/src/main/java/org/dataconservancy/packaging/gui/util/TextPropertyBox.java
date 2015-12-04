@@ -17,7 +17,6 @@
 package org.dataconservancy.packaging.gui.util;
 
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;

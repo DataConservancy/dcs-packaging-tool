@@ -20,12 +20,8 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * Created by jrm on 11/12/15.
- */
 public class FilenameValidatorTest {
 
-    ValidatorFactory vf = new ValidatorFactory();
     Validator fnv = ValidatorFactory.getValidator(PropertyValueHint.FILE_NAME);
 
     @Test

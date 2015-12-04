@@ -4,9 +4,6 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
-/**
- * Created by hvu on 10/16/15.
- */
 public class ApplicationVersionTest {
     @Test
     public void ApplicationVersionVerifier() {

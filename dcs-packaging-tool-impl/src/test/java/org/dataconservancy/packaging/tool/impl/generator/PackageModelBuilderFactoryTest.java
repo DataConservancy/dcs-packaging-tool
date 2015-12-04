@@ -20,7 +20,6 @@ import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageModelBuilder;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
-import org.dataconservancy.packaging.tool.model.PackageState;
 
 import org.junit.Before;
 import org.junit.Rule;

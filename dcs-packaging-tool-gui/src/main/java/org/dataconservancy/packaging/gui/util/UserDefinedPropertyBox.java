@@ -361,15 +361,15 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
             }
 
             propertyValueBox.getPropertyInput().setPrefWidth(250);
-            ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyValueListener);
-            ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyListener);
+            propertyValueBox.getPropertyInput().textProperty().addListener(emptyPropertyValueListener);
+            propertyValueBox.getPropertyInput().textProperty().addListener(emptyPropertyListener);
         });
 
         userDefinedPropertyValues.add(propertyValueBox);
         propertyValueBox.getPropertyInput().setPrefWidth(250);
 
-        ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyValueListener);
-        ((TextInputControl)propertyValueBox.getPropertyInput()).textProperty().addListener(emptyPropertyListener);
+        propertyValueBox.getPropertyInput().textProperty().addListener(emptyPropertyValueListener);
+        propertyValueBox.getPropertyInput().textProperty().addListener(emptyPropertyListener);
         emptyPropertyValueListener.fieldAdded();
         emptyPropertyListener.fieldAdded();
 

@@ -19,7 +19,6 @@ package org.dataconservancy.packaging.gui.view;
 import java.util.List;
 
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
-import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
 import javafx.scene.Node;

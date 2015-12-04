@@ -20,9 +20,6 @@ import org.junit.BeforeClass;
 import java.io.File;
 import java.net.URISyntaxException;
 
-/**
- * Created by hvu on 3/17/15.
- */
 public class BaseFileSetUpTest {
 
     protected static File JPG_FILE_NO_EXTENSION;

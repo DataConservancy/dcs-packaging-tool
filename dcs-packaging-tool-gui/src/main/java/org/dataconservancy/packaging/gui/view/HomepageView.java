@@ -19,9 +19,6 @@ package org.dataconservancy.packaging.gui.view;
 import javafx.scene.control.Button;
 import org.dataconservancy.packaging.gui.presenter.HomepagePresenter;
 
-/**
- * Created by pmeyer on 10/14/15.
- */
 public interface HomepageView extends View<HomepagePresenter> {
 
     /**
