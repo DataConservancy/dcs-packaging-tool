@@ -149,7 +149,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         this.internalProperties = internalProperties;
 
         nodesMissingFiles = new HashSet<>();
-        nodeContextMenu = new ContextMenu();
 
         //Sets the text of the footer controls.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -341,6 +340,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                             //When the options label is clicked show the context menu.
                             optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
                                 if (e.getButton() == MouseButton.PRIMARY) {
+                                    if (nodeContextMenu == null) {
+                                        nodeContextMenu = new ContextMenu();
+                                    }
                                     nodeContextMenu.getItems().clear();
 
                                     //Hide the old context menu
