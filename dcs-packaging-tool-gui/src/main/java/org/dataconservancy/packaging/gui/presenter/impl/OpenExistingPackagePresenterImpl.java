@@ -12,8 +12,8 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import org.apache.commons.lang.SystemUtils;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.OpenExistingPackagePresenter;
 import org.dataconservancy.packaging.gui.view.OpenExistingPackageView;
@@ -119,11 +119,12 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
 
         // User selects an serialized package or a package state
         view.getChoosePackageFileButton().setOnAction(event -> {
-            fileChooser.getExtensionFilters().clear();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package File", "*.zip", "*.ZIP", "*.tar", "*.TAR", "*.gz", "*.GZ", "*.gzip", "*.GZIP"));
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
-                    TextFactory.getText(Labels.LabelKey.PACKAGE_STATE_FILE_DESCRIPTION_LABEL), controller.getPackageStateFileExtension()));
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+            //Disables file extension filtering on mac since it doesn't seem to reliably work
+            if (!SystemUtils.IS_OS_MAC) {
+                fileChooser.getExtensionFilters().clear();
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Package File", "*.zip", "*.ZIP", "*.tar", "*.TAR", "*.gz", "*.GZ", "*.gzip", "*.GZIP", controller.getPackageStateFileExtension()));
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+            }
 
             File file = controller.showOpenFileDialog(fileChooser);
 
