@@ -228,7 +228,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                     return false;
                 }
             } else if (node instanceof DatePicker) {
-                if (((DatePicker) node).getValue() != null) {
+                if (((DatePicker) node).getValue() != null && !((DatePicker)node).getValue().equals(LocalDate.now())) {
                     return false;
                 }
             }
