@@ -1,6 +1,7 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -519,17 +520,22 @@ public class DomainProfileServiceImpl implements DomainProfileService {
     }
 
     // Return valid types for node with preferred types in front.
+    // Always return the list with same order for the same sets of valid and preferred types
+    
     private List<NodeType> get_possible_types(DomainProfile profile, Node node) {
         List<NodeType> result = new ArrayList<>();
 
-        profile.getNodeTypes().stream().filter(type -> may_be_type(node, type)).forEach(type -> {
+        // Sort based on node type identifier to guarantee order
+        Comparator<NodeType> cmp = (NodeType t1, NodeType t2) -> t1.getIdentifier().compareTo(t2.getIdentifier());
+        
+        profile.getNodeTypes().stream().sorted(cmp).filter(type -> may_be_type(node, type)).forEach(type -> {
             if (is_preferred_type(node, type)) {
                 result.add(0, type);
             } else {
                 result.add(type);
             }
         });
-
+        
         return result;
     }
 

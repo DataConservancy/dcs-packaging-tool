@@ -139,6 +139,10 @@ public interface DomainProfileService {
      * updated with the new type if they do. On failure, node types may be
      * assigned, but no domain objects will be modified.
      * 
+     * The assignment of node types is deterministic. The same tree with the
+     * same file system with the same profile will produce the same assignment
+     * of node types.
+     * 
      * @param profile
      *            The profile used to assign types to the nodes.
      * @param node

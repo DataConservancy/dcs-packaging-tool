@@ -214,7 +214,7 @@ public class DomainProfileServiceImplTest {
 
         assertTrue(success);
 
-        // Only valid assignment is meda for leaf
+        // Only valid assignment is media for leaf
         // Inner nodes can be farm, barn, or cow.
 
         root.walk(n -> {
@@ -235,6 +235,38 @@ public class DomainProfileServiceImplTest {
         assertTrue(service.validateTree(root));
     }
 
+    /**
+     * Test that type assignment is the same regardless of the order of node types in the domain profile.
+     */
+    @Test
+    public void testDeterministicTypeAssignement() {
+        Node root = ipmfact.createTwoDirectoryTree();
+        Node child = root.getChildren().get(0);
+        
+        root.walk(Node::clearNodeTypes);
+        
+        // Must remove barn parent preference so that farm could be assigned to child
+        profile.getBarnNodeType().setPreferredParentType(null);
+        
+        profile.setNodeTypes(Arrays.asList(profile.getBarnNodeType(), profile.getFarmNodeType()));
+        
+        assertTrue(service.assignNodeTypes(profile, root));
+        assertTrue(service.validateTree(root));
+
+        NodeType root_type = root.getNodeType();
+        NodeType child_type = child.getNodeType();
+        
+        profile.setNodeTypes(Arrays.asList(profile.getFarmNodeType(), profile.getBarnNodeType()));
+        
+        root.walk(Node::clearNodeTypes);
+        
+        assertTrue(service.assignNodeTypes(profile, root));
+        assertTrue(service.validateTree(root));
+
+        assertEquals(root_type, root.getNodeType());
+        assertEquals(child_type, child.getNodeType());
+    }
+    
     /**
      * Test validating properties on a Cow in the Farm domain profile.
      */
