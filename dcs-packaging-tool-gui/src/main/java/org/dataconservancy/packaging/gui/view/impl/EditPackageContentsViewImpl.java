@@ -238,6 +238,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         //make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
         typeColumn.setPrefWidth(100); //make wide enough so that any displayed text will not truncate
         actionColumn.setPrefWidth(60); //make wide enough to comfortably fit image and vertical scroll bar
+        actionColumn.setMinWidth(60);
         //add 2 here to get rid of horizontal scroll bar
         packageResourceColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + actionColumn.getWidth() + 2));
 
