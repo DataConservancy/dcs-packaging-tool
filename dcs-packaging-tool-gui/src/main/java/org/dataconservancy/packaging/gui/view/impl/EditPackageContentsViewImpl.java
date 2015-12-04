@@ -318,6 +318,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                             setGraphic(null);
                         } else {
                             Button optionsLabel = new Button();
+                            optionsLabel.setPrefHeight(25);
+                            optionsLabel.setPrefWidth(50);
                             optionsLabel.getStyleClass().clear();
                             optionsLabel.getStyleClass().add(EDIT_PACKAGE_TREE_BUTTON);
                             optionsLabel.setAlignment(Pos.CENTER);
