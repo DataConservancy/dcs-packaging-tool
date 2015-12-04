@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
+import org.dataconservancy.packaging.tool.impl.support.C14NValidator;
 import org.dataconservancy.packaging.tool.impl.support.Validator;
 import org.dataconservancy.packaging.tool.impl.support.ValidatorFactory;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
@@ -89,6 +90,10 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case EMAIL:
                     case URI:
                     case FILE_NAME:
+                        if (validator instanceof C14NValidator) {
+                            String c14nValue = ((C14NValidator) validator).canonicalize(newValue);
+                            textPropertyBox.getPropertyInput().setText(c14nValue);
+                        }
                         textPropertyBox.getChildren().remove(validationLabel);
                         validationImageLabel.setGraphic(successImage);
                         validationImageLabel.setVisible(true);
