@@ -116,7 +116,6 @@ public class Labels {
         PACKAGE_OUTPUT_DIRECTORY_LABEL("packageoutputdirectory.label"),
         SELECT_ONE_OPTION_LABEL("selectoneoption.label"),
         WARNING_POPUP_TITLE("warningpopup.title"),
-        ALL_FIELDS_CLEAR_WARNING_MESSAGE("allfieldsclearwarning.message"),
         ADD_FILE_ITEM_LABEL("addfileitem.label"),
         ADD_FOLDER_ITEM_LABEL("addfolderitem.label"),
         REFRESH_ITEM_LABEL("refreshitem.label"),

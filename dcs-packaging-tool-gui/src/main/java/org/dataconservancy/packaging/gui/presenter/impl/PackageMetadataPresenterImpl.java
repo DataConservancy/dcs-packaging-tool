@@ -172,15 +172,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         }
 
         updatePackageState();
-        if (Platform.isFxApplicationThread()) {
-            view.getWarningPopup().setCancelEventHandler(event -> view.getWarningPopup().hide());
-            view.getWarningPopup().setConfirmEventHandler(event -> {
-                view.getWarningPopup().hide();
-                super.onBackPressed();
-            });
-
-            view.showWarningPopup();
-        }
+        super.onBackPressed();
     }
 
     /**

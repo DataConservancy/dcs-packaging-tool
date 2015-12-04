@@ -96,18 +96,6 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     List<Node> getAllDynamicFields();
 
     /**
-     * shows the warning popup if user is going back to the beginning.
-     *
-     */
-    void showWarningPopup();
-
-    /**
-     * gets the warning popup.
-     * @return the warning popup
-     */
-    WarningPopup getWarningPopup();
-
-    /**
      * Allows the presenter to know whether the form needs to be drawn or not.
      * @return boolean true or false
      */

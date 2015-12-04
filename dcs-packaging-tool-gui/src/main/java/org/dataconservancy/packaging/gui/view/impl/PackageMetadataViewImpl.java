@@ -34,7 +34,6 @@ import javafx.scene.layout.VBox;
 
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
@@ -236,39 +235,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     @Override
     public List<Node> getAllDynamicFields() {
         return this.allDynamicFields;
-    }
-
-    @Override
-    public void showWarningPopup() {
-
-        if (warningPopup == null) {
-            warningPopup = new WarningPopup();
-        }
-
-        warningPopup.setTitleText(TextFactory.getText(Labels.LabelKey.WARNING_POPUP_TITLE));
-        warningPopup.setMoveable(true);
-        warningPopup.setMessage(TextFactory.getText(Labels.LabelKey.ALL_FIELDS_CLEAR_WARNING_MESSAGE));
-
-        if (getScene() != null && getScene().getWindow() != null) {
-            double x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 - 150;
-            double y = getScene().getWindow().getY() + getScene().getHeight() / 2.0 - 150;
-            warningPopup.setOwner(getScene().getWindow());
-            warningPopup.show(x, y);
-            warningPopup.hide();
-
-            //Get the content width and height to property center the popup.
-            x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 - warningPopup.getWidth() / 2.0;
-            y = getScene().getWindow().getY() + getScene().getHeight() / 2.0 - warningPopup.getHeight() / 2.0;
-            warningPopup.setOwner(getScene().getWindow());
-            warningPopup.show(x, y);
-        }
-
-
-    }
-
-    @Override
-    public WarningPopup getWarningPopup() {
-        return warningPopup;
     }
 
     @Override
