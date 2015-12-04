@@ -120,7 +120,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
      * @return The text input control for the PropertyBox.
      */
     @Override
-    public Control getPropertyInput() {
+    public TextInputControl getPropertyInput() {
         return propertyInput;
     }
 
