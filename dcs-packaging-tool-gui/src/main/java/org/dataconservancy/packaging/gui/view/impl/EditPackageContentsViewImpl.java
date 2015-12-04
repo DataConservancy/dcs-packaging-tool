@@ -224,8 +224,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         artifactTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (artifactDetailsWindow != null && artifactDetailsWindow.isShowing()) {
-                presenter.saveCurrentNode();
-                showNodePropertiesWindow(newValue.getValue(), null);
+                //If new value is null it means the node has been removed, so close the window
+                if (newValue == null) {
+                    artifactDetailsWindow.close();
+                } else {
+                    presenter.saveCurrentNode();
+                    showNodePropertiesWindow(newValue.getValue(), null);
+                }
+
             }
         });
 
