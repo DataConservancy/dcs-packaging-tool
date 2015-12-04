@@ -142,12 +142,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private ProgressDialogPopup validationProgressPopup;
 
     private Set<URI> nodesMissingFiles;
+    private ContextMenu nodeContextMenu;
 
     public EditPackageContentsViewImpl (final InternalProperties internalProperties, final Help help) {
         super();
         this.internalProperties = internalProperties;
 
         nodesMissingFiles = new HashSet<>();
+        nodeContextMenu = new ContextMenu();
 
         //Sets the text of the footer controls.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -334,8 +336,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                             optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
                                 if (e.getButton() == MouseButton.PRIMARY) {
                                     //artifactTree.getSelectionModel().s
+                                    //Hide the old context menu
+                                    if(nodeContextMenu.isShowing()) {
+                                        nodeContextMenu.hide();
+                                        nodeContextMenu.getItems().clear();
+                                    }
                                     errorLabel.setVisible(false);
-                                    final ContextMenu contextMenu = new ContextMenu();
+                                    nodeContextMenu.setAutoHide(true);
 
                                     ObservableList<TreeItem<Node>> selectedItems = artifactTree.getSelectionModel().getSelectedItems();
 
@@ -372,13 +379,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
                                     //If all items are ignored we give the option to unignore otherwise we give the option to ignore
                                     if (allIgnored) {
-                                        contextMenu.getItems().add(createIgnoreMenuItem(selectedItems, true));
+                                        nodeContextMenu.getItems().add(createIgnoreMenuItem(selectedItems, true));
                                     } else {
-                                        contextMenu.getItems().addAll(createMenuItemList(selectedItems, possibleTransforms, optionsLabel, hasIgnored));
+                                        nodeContextMenu.getItems().addAll(createMenuItemList(selectedItems, possibleTransforms, optionsLabel, hasIgnored));
                                         //optionsLabel.setContextMenu(contextMenu);
                                     }
 
-                                    contextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
+                                    nodeContextMenu.show(optionsLabel, e.getScreenX(), e.getScreenY());
                                 }
                             });
                             setGraphic(optionsLabel);
