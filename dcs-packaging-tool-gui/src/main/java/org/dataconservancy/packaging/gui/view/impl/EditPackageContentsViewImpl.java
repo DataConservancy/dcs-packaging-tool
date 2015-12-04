@@ -335,11 +335,11 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                             //When the options label is clicked show the context menu.
                             optionsLabel.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
                                 if (e.getButton() == MouseButton.PRIMARY) {
-                                    //artifactTree.getSelectionModel().s
+                                    nodeContextMenu.getItems().clear();
+
                                     //Hide the old context menu
                                     if(nodeContextMenu.isShowing()) {
                                         nodeContextMenu.hide();
-                                        nodeContextMenu.getItems().clear();
                                     }
                                     errorLabel.setVisible(false);
                                     nodeContextMenu.setAutoHide(true);
