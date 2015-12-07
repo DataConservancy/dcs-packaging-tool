@@ -114,7 +114,7 @@ public class PackageMetadataService {
                     all.add(pm);
                 }
             } catch (JAXBException e) {
-                log.error("Error processing package metadata from file " + packageMetadataParametersFilePath);
+                log.error("Error processing package metadata from file " + packageMetadataParametersFilePath, e);
             }
         }
     }
