@@ -59,23 +59,30 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         selectOneOptionLabel.getStyleClass().add(FORM_FIELDS_DIVISION_CLASS);
         infoVBox.getChildren().addAll(selectOneOptionLabel, new Separator(Orientation.HORIZONTAL));
         
-        VBox optionVBox = new VBox(4);
+        VBox optionVBox = new VBox(80);
         optionVBox.setAlignment(Pos.TOP_LEFT);
 
         
         // Choose a package or state file and extraction directory
         {
+            VBox openPackageVBox = new VBox(12);
+            VBox packageVBox = new VBox(4);
+
             HBox package_hbox = new HBox(6);
             package_hbox.getStyleClass().add(DIRECTORY_BOX);
             package_hbox.setMaxWidth(420);
-            
+
+            VBox extractVBox = new VBox(4);
             HBox extract_hbox = new HBox(6);
             extract_hbox.getStyleClass().add(DIRECTORY_BOX);
             extract_hbox.setMaxWidth(420);
-            
+
             Label package_label = new Label(TextFactory.getText(Labels.LabelKey.SELECT_PACKAGE_FILE_LABEL));
+            packageVBox.getChildren().addAll(package_label, package_hbox);
+
             Label extract_label = new Label(TextFactory.getText(Labels.LabelKey.SELECT_STAGING_DIRECTORY));
-            
+            extractVBox.getChildren().addAll(extract_label, extract_hbox);
+
             choosePackageStagingDirectoryButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
             choosePackageStagingDirectoryButton.setMinWidth(60);
             
@@ -91,11 +98,14 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
             choosePackageFileTextField.setEditable(false);
             choosePackageFileTextField.getStyleClass().add(INVISBILE_TEXT_FIELD);
             choosePackageFileTextField.setPrefWidth(320);
-            
+            choosePackageStagingDirectoryButton.disableProperty().bind(choosePackageFileTextField.textProperty().isEmpty());
+            choosePackageStagingDirectoryTextField.disableProperty().bind(choosePackageFileTextField.textProperty().isEmpty());
+
             package_hbox.getChildren().addAll(choosePackageFileButton, choosePackageFileTextField);
             extract_hbox.getChildren().addAll(choosePackageStagingDirectoryButton, choosePackageStagingDirectoryTextField);
             
-            optionVBox.getChildren().addAll(package_label, package_hbox, extract_label, extract_hbox);
+            openPackageVBox.getChildren().addAll(packageVBox, extractVBox);
+            optionVBox.getChildren().add(openPackageVBox);
             
             // Indent from the left
             //VBox.setMargin(package_hbox, new Insets(0, 0, 0, 20));
@@ -105,8 +115,9 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         
         // Choose a exploded package
         {
+            VBox explodedPackageVBox = new VBox(4);
             Label label = new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_DIRECTORY_LABEL));
-            optionVBox.getChildren().add(label);
+            explodedPackageVBox.getChildren().add(label);
 
             HBox hbox = new HBox(6);
             hbox.getStyleClass().add(DIRECTORY_BOX);
@@ -121,7 +132,8 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
             chooseExplodedPackageDirectoryTextField.setPrefWidth(320);
             
             hbox.getChildren().addAll(chooseExplodedPackageDirectoryButton, chooseExplodedPackageDirectoryTextField);
-            optionVBox.getChildren().add(hbox);
+            explodedPackageVBox.getChildren().add(hbox);
+            optionVBox.getChildren().add(explodedPackageVBox);
         }
         
         content.getChildren().addAll(infoVBox, optionVBox);
