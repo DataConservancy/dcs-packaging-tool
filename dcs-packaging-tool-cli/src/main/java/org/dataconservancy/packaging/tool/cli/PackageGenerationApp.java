@@ -211,6 +211,7 @@ public class PackageGenerationApp {
 			System.err.println();
 			System.exit(1);
 		} catch (PackageToolException e){
+			e.printStackTrace();
             System.err.println(e.getMessage());
             System.exit(e.getCode());
         }
@@ -283,6 +284,9 @@ public class PackageGenerationApp {
         }
 
         //we need to validate any specified file locations in the package generation params to make sure they exist
+        if (packageParams.getParam(GeneralParameterNames.PACKAGE_LOCATION) == null) {
+        	packageParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, System.getProperty("java.io.tmpdir"));
+        }
         validateLocationParameters(packageParams);
 
         Node tree = null;
@@ -503,6 +507,7 @@ public class PackageGenerationApp {
         } else {
             File packageLocationFile = new File(packageLocation);
             if (!packageLocationFile.exists()) {
+            	System.err.println(packageLocation);
                 throw new PackageToolException(PackagingToolReturnInfo.CMD_LINE_FILE_NOT_FOUND_EXCEPTION);
             }
         }
