@@ -193,7 +193,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             List<URI> domainProfileIdList = new ArrayList<>();
             domainProfileIdList.add(domainProfileIdMap.get(domainProfileName));
             getController().getPackageState().setDomainProfileIdList(domainProfileIdList);
-            getController().getPackageState().addPackageMetadata(GeneralParameterNames.DOMAIN_PROFILE, domainProfileName);
+            domainProfileIdList.forEach(profileId ->
+                    getController().getPackageState().addPackageMetadata(
+                            GeneralParameterNames.DOMAIN_PROFILE, profileId.toString()));
         }
 
         // Now let's go through the dynamic fields and update the package state.
