@@ -41,11 +41,8 @@ public class PackageMetadata {
     private String defaultValue;
     private PropertyValueHint validationType;
     private String helpText;
-    @XmlElement(name = "editable")
     private boolean isEditable;
-    @XmlElement(name = "repeatable")
     private boolean isRepeatable;
-    @XmlElement(name = "visible")
     private boolean isVisible;
     private Requiredness requiredness;
 
