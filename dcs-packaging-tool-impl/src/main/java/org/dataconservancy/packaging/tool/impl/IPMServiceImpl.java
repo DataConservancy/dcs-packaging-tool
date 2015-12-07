@@ -244,12 +244,9 @@ public class IPMServiceImpl implements IPMService {
                 if (existingNode.getParent() != null && existingNode.getParent().getFileInfo() == null) {
                     checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
                 } else if (existingNode.getParent() != null && comparisonNode.getParent() == null) {
-                    //In the event we refreshed on a sub node, the sub node is the root of the comparison tree,
-                    //so we'll compare the file system parents
-                    Path comparisonNodePath = Paths.get(comparisonNode.getFileInfo().getLocation());
-                    if (existingNode.getParent().getFileInfo().getLocation().equals(comparisonNodePath.getParent().toUri())) {
-                        checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
-                    }
+                    //In the event we refreshed on a sub node, the sub node is the root of the comparison tree so it's options are limited we can simply check for update.
+                    //Note that this is only true because in the GUI currently you can't refresh a node whose file content is missing.
+                    checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
                 } else if ((existingNode.getParent() == null && comparisonNode.getParent() == null) || existingNode.getParent().getFileInfo().getLocation().equals(comparisonNode.getParent().getFileInfo().getLocation())) {
                     //If both nodes are root or the node's parent location is the same then we consider it the same
                     checkFileUpdate(location, existingNode, comparisonNode, nodeMap, comparisonLocationMap);
