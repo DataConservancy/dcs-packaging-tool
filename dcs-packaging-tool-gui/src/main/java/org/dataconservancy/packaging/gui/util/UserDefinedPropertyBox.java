@@ -213,6 +213,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         //Either set the starting value to the passed in property type or the first property type in the starting group.
         if (startingPropertyType != null) {
             propertyTypeComboBox.setValue(startingPropertyType);
+            propertyTypeComboBox.getItems().addAll(startingVocabulary.getPropertyTypes());
         } else if (startingVocabulary != null) {
             if (startingVocabulary.getPropertyTypes() != null && !startingVocabulary.getPropertyTypes().isEmpty()) {
                 propertyTypeComboBox.getItems().addAll(startingVocabulary.getPropertyTypes());
@@ -427,7 +428,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
             while (userDefinedPropertyVocabulary == null && groupIterator.hasNext()) {
                 UserDefinedPropertyVocabulary group = groupIterator.next();
                 for (PropertyType possibleRelationship : group.getPropertyTypes()) {
-                    if (relationship == possibleRelationship) {
+                    if (relationship.equals(possibleRelationship)) {
                         userDefinedPropertyVocabulary = group;
                         break;
                     }
