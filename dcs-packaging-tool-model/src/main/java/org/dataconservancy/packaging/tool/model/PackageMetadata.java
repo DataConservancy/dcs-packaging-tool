@@ -18,6 +18,7 @@ package org.dataconservancy.packaging.tool.model;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -37,13 +38,11 @@ public class PackageMetadata {
 
     private String name;
     private String label;
+    private String defaultValue;
     private PropertyValueHint validationType;
     private String helpText;
-    @XmlAttribute(name = "editable")
     private boolean isEditable;
-    @XmlAttribute(name = "repeatable")
     private boolean isRepeatable;
-    @XmlAttribute(name = "visible")
     private boolean isVisible;
     private Requiredness requiredness;
 
@@ -136,6 +135,14 @@ public class PackageMetadata {
         this.requiredness = requiredness;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -151,6 +158,12 @@ public class PackageMetadata {
         if (label != null ? !label.equals(that.label) : that.label != null) return false;
         if (requiredness != that.requiredness) return false;
         if (validationType != that.validationType) return false;
+        if (defaultValue == null && that.defaultValue != null) {
+            return false;
+        }
+        if (defaultValue != null && !defaultValue.equals(that.defaultValue)) {
+            return false;
+        }
 
         return true;
     }
@@ -165,6 +178,7 @@ public class PackageMetadata {
         result = 31 * result + (isRepeatable ? 1 : 0);
         result = 31 * result + (isVisible ? 1 : 0);
         result = 31 * result + (requiredness != null ? requiredness.hashCode() : 0);
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
         return result;
     }
 }

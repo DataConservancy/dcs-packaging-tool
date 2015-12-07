@@ -290,10 +290,12 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.DATE_TIME)) {
                 DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, LocalDate.now(), packageMetadata.getHelpText());
+                datePicker.setId(packageMetadata.getName());
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
-                TextPropertyBox propertyBox = new TextPropertyBox("", packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
+                String initialValue = packageMetadata.getDefaultValue() != null ? packageMetadata.getDefaultValue() : "";
+                TextPropertyBox propertyBox = new TextPropertyBox(initialValue, packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
                 propertyBox.getPropertyInput().setId(packageMetadata.getName());
                 allDynamicFields.add(propertyBox.getPropertyInput());
 

@@ -113,7 +113,8 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Bag-Count</name>
         <label>Bag Count</label>
         <requiredness>RECOMMENDED</requiredness>
-        <editable>true</editable>
+        <defaultValue>1 of 1</defaultValue>
+        <editable>false</editable>
         <visible>true</visible>
         <helpText>Sequence number of a given bag within a bag group. The format is "&lt;n&gt; of &lt;m&gt;", where &lt;n&gt; is the sequence number within the group and &lt;m&gt; is the total number of bags in the group. If the latter is not known, the value of &lt;m&gt; should be '?'. "Bag-Count: 1 of 1" should be specified if the entire package will be captured in a single bag. This mechanism allows a package to be split across multiple bags.</helpText>
     </packageMetadata>
