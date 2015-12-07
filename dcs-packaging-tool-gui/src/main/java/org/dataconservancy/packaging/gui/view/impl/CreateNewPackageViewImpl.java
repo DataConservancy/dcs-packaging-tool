@@ -20,11 +20,15 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
+import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
@@ -69,9 +73,19 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         //Create the controls for choosing a base directory to generate a pacakge from.
         VBox baseDirectorySelectionFields = new VBox(4);
         baseDirectorySelectionFields.setAlignment(Pos.TOP_LEFT);
-        
+
+        HBox baseDirectoryLabelAndTooltip = new HBox(4);
         Label chooseBaseDirectoryLabel = new Label(TextFactory.getText(LabelKey.BASE_DIRECTORY_LABEL));
-        baseDirectorySelectionFields.getChildren().add(chooseBaseDirectoryLabel);
+        ImageView tooltipImage = new ImageView();
+        tooltipImage.getStyleClass().add(TOOLTIP_IMAGE);
+        Tooltip tooltip = new Tooltip(TextFactory.getText(LabelKey.BASE_DIRECTORY_TOOLTIP));
+        tooltip.setPrefWidth(350);
+        tooltip.setWrapText(true);
+        Tooltip.install(tooltipImage, tooltip);
+        baseDirectoryLabelAndTooltip.getChildren().add(chooseBaseDirectoryLabel);
+        baseDirectoryLabelAndTooltip.getChildren().add(tooltipImage);
+
+        baseDirectorySelectionFields.getChildren().add(baseDirectoryLabelAndTooltip);
         
         HBox baseDirectorySelector = new HBox(6);
         baseDirectorySelector.getStyleClass().add(DIRECTORY_BOX);

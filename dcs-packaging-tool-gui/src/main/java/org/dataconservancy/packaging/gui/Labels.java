@@ -140,7 +140,8 @@ public class Labels {
         PACKAGE_STATE_FILE_DESCRIPTION_LABEL("packagestatefiledescription.label"),
         ACTIONS_LABEL("actions.label"),
         TYPE_LABEL("type.label"),
-        PACKAGE_RESOURCE_LABEL("packageresource.label");
+        PACKAGE_RESOURCE_LABEL("packageresource.label"),
+        BASE_DIRECTORY_TOOLTIP("basedirectory.tooltip");
 
         private String property;
 
