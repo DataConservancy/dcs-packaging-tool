@@ -15,6 +15,8 @@
  */
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.TextFactory;
@@ -77,11 +79,32 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
             extract_hbox.getStyleClass().add(DIRECTORY_BOX);
             extract_hbox.setMaxWidth(420);
 
+            HBox packageLabelAndTooltip = new HBox(4);
             Label package_label = new Label(TextFactory.getText(Labels.LabelKey.SELECT_PACKAGE_FILE_LABEL));
-            packageVBox.getChildren().addAll(package_label, package_hbox);
+            packageLabelAndTooltip.getChildren().add(package_label);
 
+            ImageView packageTooltipImage = new ImageView();
+            packageTooltipImage.getStyleClass().add(TOOLTIP_IMAGE);
+            Tooltip packageTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.PACKAGE_SELECTION_TOOLTIP));
+            packageTooltip.setPrefWidth(350);
+            packageTooltip.setWrapText(true);
+            Tooltip.install(packageTooltipImage, packageTooltip);
+            packageLabelAndTooltip.getChildren().add(packageTooltipImage);
+
+            packageVBox.getChildren().addAll(packageLabelAndTooltip, package_hbox);
+
+            HBox extractLabelAndTooltip = new HBox(4);
             Label extract_label = new Label(TextFactory.getText(Labels.LabelKey.SELECT_STAGING_DIRECTORY));
-            extractVBox.getChildren().addAll(extract_label, extract_hbox);
+
+            ImageView extractTooltipImage = new ImageView();
+            extractTooltipImage.getStyleClass().add(TOOLTIP_IMAGE);
+            Tooltip extractDirectoryTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.EXTRACT_DIRECTORY_TOOLTIP));
+            extractDirectoryTooltip.setPrefWidth(350);
+            extractDirectoryTooltip.setWrapText(true);
+            Tooltip.install(extractTooltipImage, extractDirectoryTooltip);
+
+            extractLabelAndTooltip.getChildren().addAll(extract_label, extractTooltipImage);
+            extractVBox.getChildren().addAll(extractLabelAndTooltip, extract_hbox);
 
             choosePackageStagingDirectoryButton = new Button(TextFactory.getText(Labels.LabelKey.BROWSE_BUTTON));
             choosePackageStagingDirectoryButton.setMinWidth(60);
@@ -116,8 +139,19 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         // Choose a exploded package
         {
             VBox explodedPackageVBox = new VBox(4);
+
+            HBox explodedLabelAndTooltip = new HBox(4);
             Label label = new Label(TextFactory.getText(Labels.LabelKey.PACKAGE_DIRECTORY_LABEL));
-            explodedPackageVBox.getChildren().add(label);
+
+            ImageView explodedTooltipImage = new ImageView();
+            explodedTooltipImage.getStyleClass().add(TOOLTIP_IMAGE);
+            Tooltip explodedTooltip = new Tooltip(TextFactory.getText(Labels.LabelKey.EXPLODED_PACKAGE_TOOLTIP));
+            explodedTooltip.setPrefWidth(350);
+            explodedTooltip.setWrapText(true);
+            Tooltip.install(explodedTooltipImage, explodedTooltip);
+
+            explodedLabelAndTooltip.getChildren().addAll(label, explodedTooltipImage);
+            explodedPackageVBox.getChildren().add(explodedLabelAndTooltip);
 
             HBox hbox = new HBox(6);
             hbox.getStyleClass().add(DIRECTORY_BOX);

@@ -141,7 +141,10 @@ public class Labels {
         ACTIONS_LABEL("actions.label"),
         TYPE_LABEL("type.label"),
         PACKAGE_RESOURCE_LABEL("packageresource.label"),
-        BASE_DIRECTORY_TOOLTIP("basedirectory.tooltip");
+        BASE_DIRECTORY_TOOLTIP("basedirectory.tooltip"),
+        PACKAGE_SELECTION_TOOLTIP("packageselection.tooltip"),
+        EXTRACT_DIRECTORY_TOOLTIP("packageextraction.tooltip"),
+        EXPLODED_PACKAGE_TOOLTIP("explodedpackage.tooltip");
 
         private String property;
 
