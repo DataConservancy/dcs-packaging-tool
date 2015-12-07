@@ -51,7 +51,7 @@ public class PCDMProfile
         extends DomainProfile {
 
     private static final String PCDM_PROFILE_ID =
-            "http//dataconservancy.org/ptg-profiles/PCDM-1.0";
+            "http://dataconservancy.org/ptg-profiles/PCDM-1.0";
 
     /* PCDM Objects */
 

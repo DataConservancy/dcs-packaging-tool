@@ -56,7 +56,7 @@ public class DcsBOProfile
         extends DomainProfile {
 
     private static final String BO_PROFILE_ID =
-            "http//dataconservancy.org/ptg-profiles/dcs-bo-1.0";
+            "http://dataconservancy.org/ptg-profiles/dcs-bo-1.0";
 
     /* Business objects */
 

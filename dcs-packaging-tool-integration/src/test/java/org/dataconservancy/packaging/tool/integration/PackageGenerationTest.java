@@ -102,7 +102,7 @@ public class PackageGenerationTest {
     }
 
     URI DCS_PROFILE = URI
-            .create("http//dataconservancy.org/ptg-profiles/dcs-bo-1.0");
+            .create("http://dataconservancy.org/ptg-profiles/dcs-bo-1.0");
 
     private DcsBOProfile bop = new DcsBOProfile();
 
