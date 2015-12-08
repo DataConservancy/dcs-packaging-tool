@@ -89,6 +89,7 @@
               <dcs.package.tool.package.dir>${project.build.testOutputDirectory}/generated-packages</dcs.package.tool.package.dir>
               <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
               <dcs.package.tool.test.content>${project.basedir}/src/test/resources</dcs.package.tool.test.content>
+              <logback.configurationFile>${project.basedir}/src/test/resources/logback-test.xml}</logback.configurationFile>
             </systemPropertyVariables>
           </configuration>
         </plugin>

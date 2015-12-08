@@ -65,11 +65,11 @@
     <appender-ref ref="SPRING"/>
 </logger>
 
-<logger name="org.dataconservancy.ui" additivity="true" level="INFO">
+<logger name="org.dataconservancy.packaging.tool.gui" additivity="true" level="INFO">
     <appender-ref ref="GUI"/>
 </logger>
 
-<logger name="org.dataconservancy.packaging" additivity = "true" level="INFO">
+<logger name="org.dataconservancy.packaging.tool" additivity = "true" level="INFO">
     <appender-ref ref="PACKAGING"/>
 </logger>
 
