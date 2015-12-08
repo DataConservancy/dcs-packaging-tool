@@ -226,15 +226,18 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         });
 
         outputDirectory = new File("./");
-        view.getSelectOutputDirectoryButton().fire();
-        assertFalse(view.getErrorLabel().isVisible());
+        try {
+            view.getSelectOutputDirectoryButton().fire();
+        } catch (PackageToolException e) {
+            assertFalse(view.getErrorLabel().isVisible());
 
-        view.getContinueButton().fire();
+            view.getContinueButton().fire();
 
-        assertTrue(view.getErrorLabel().isVisible());
-        assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR)
-                + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(),
-                view.getErrorLabel().getText());
+            assertTrue(view.getErrorLabel().isVisible());
+            assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR)
+                            + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(),
+                    view.getErrorLabel().getText());
+        }
     }
 
     /**
@@ -262,7 +265,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         pkgParams.addParam(GeneralParameterNames.PACKAGE_NAME, controller.getPackageState().getPackageName());
         pkgParams.addParam(GeneralParameterNames.ARCHIVING_FORMAT, "tar");
         pkgParams.addParam(GeneralParameterNames.COMPRESSION_FORMAT, "gz");
-        pkgParams.addParam(REM_SERIALIZATION_FORMAT, "xml");
+        pkgParams.addParam(REM_SERIALIZATION_FORMAT, "XML");
         pkgParams.addParam(PACKAGE_LOCATION, packageLocation.getAbsolutePath());
 
         presenter.setTestBackgroundService();

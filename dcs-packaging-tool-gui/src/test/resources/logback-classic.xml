@@ -62,7 +62,7 @@
         <appender-ref ref="MODULE"/>
     </root>
 
-    <logger name="org.dataconservancy.packaging.tool.gui" level="WARN">
+    <logger name="org.dataconservancy.packaging.tool.gui" level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="MODULE"/>
     </logger>
