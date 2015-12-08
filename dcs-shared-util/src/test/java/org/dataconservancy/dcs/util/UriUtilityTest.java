@@ -16,7 +16,9 @@
 package org.dataconservancy.dcs.util;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URI;
@@ -31,7 +33,9 @@ import static org.junit.Assert.fail;
 
 
 public class UriUtilityTest {
-
+    @Rule
+    public TemporaryFolder tmpfolder = new TemporaryFolder();
+    
     // Check that a URI with the http scheme is detected as an http url
     @Test
     public void uriWithHttpSchemeIsOk() throws URISyntaxException {
@@ -225,10 +229,7 @@ public class UriUtilityTest {
 
     @Test
     public void testResolveBagUriPlatformSpecific() throws Exception {
-        File baseDir = File.createTempFile("UriUtilityTest-", "ResolveBagUriPlatformSpecific");
-        assertTrue(FileUtils.deleteQuietly(baseDir));
-        assertTrue(baseDir.mkdir());
-        assertTrue(baseDir.isDirectory());
+        File baseDir = tmpfolder.newFolder();
 
         // bag://my-bag/data/file.txt
         URI bagUri = new URI(UriUtility.BAG_URI_SCHEME, "my-bag", "/data/file.txt", null, null);
