@@ -38,6 +38,7 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +90,23 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             if (getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE) != null &&
                 !getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).isEmpty() &&
                 !Util.isEmptyOrNull(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0))) {
-                view.getDomainProfilesComboBox().setValue(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
+                URI domainProfileURI = null;
+                try {
+                    domainProfileURI = new URI(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
+                } catch (URISyntaxException e) {
+                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.DOMAIN_PROFILE_PARSE_ERROR));
+                    view.getErrorLabel().setVisible(true);
+                    view.scrollToTop();
+                }
+
+                if (domainProfileURI != null) {
+                    for (Map.Entry<String, URI> idEntry : domainProfileIdMap.entrySet()) {
+                        if (idEntry.getValue().equals(domainProfileURI)) {
+                            view.getDomainProfilesComboBox().setValue(idEntry.getKey());
+                            break;
+                        }
+                    }
+                }
             }
 
             view.getAllDynamicFields().stream().filter(node ->

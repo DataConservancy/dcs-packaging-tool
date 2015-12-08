@@ -45,7 +45,8 @@ public class Errors {
         UNIGNORE_ERROR("unignoretype.error"),
         INVALID_TREE_ERROR("invalidtree.error"),
         MISSING_PROPERTY_ERROR("missingproperty.error"),
-        MISSING_FILES_ERROR("filesmissing.error");
+        MISSING_FILES_ERROR("filesmissing.error"),
+        DOMAIN_PROFILE_PARSE_ERROR("domainprofileparse.error");
 
 
         private String property;
