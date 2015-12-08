@@ -46,10 +46,10 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
 import org.dataconservancy.packaging.tool.model.SupportedMimeTypes;
-import org.joda.time.DateTime;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,11 +67,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -98,10 +102,13 @@ public class BagItPackageAssembler implements PackageAssembler {
 
     private final static String ENCODING = "UTF-8";
     private final static String VERSION = "0.97";
+    private final static String PROFILE_ID = "http://dataconservancy.org/formats/data-conservancy-pkg-1.0";
 
     private static PackageChecksumService checksumService = new PackageChecksumServiceImpl();
 
     private PackageGenerationParameters params = null;
+
+    private Map<String, List<String>> packageMetadata = null;
 
     private File bagBaseDir = null;
     private File payloadDir = null;
@@ -157,9 +164,6 @@ public class BagItPackageAssembler implements PackageAssembler {
      * <ul>
      * <li>package-name</li>
      * <li>Bag-It-Profile-Identifier</li>
-     * <li>Contact-Name</li>
-     * <li>Contact-Phone</li>
-     * <li>Contact-Email</li>
      * </ul>
      * <p>
      * Optional with defaults parameters:
@@ -175,9 +179,13 @@ public class BagItPackageAssembler implements PackageAssembler {
      * {@link #addParameter(String, String) addParameter} method.
      *
      * @param params The parameters object containing whatever is needed for the assembler.
+     * @param packageMetadata contains BagIt metadata used to populate the {@code bag-info.txt}
      */
     @Override
-    public void init(PackageGenerationParameters params) {
+    public void init(PackageGenerationParameters params, Map<String, List<String>> packageMetadata) {
+
+        this.packageMetadata = packageMetadata;
+
         //Checking for required parameters
         this.params = params;
 
@@ -405,7 +413,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                         dataFiles.add(newFile);
                         break;
                     case ORE_REM:
-                        params.addParam(BagItParameterNames.PACKAGE_MANIFEST, relativeURI.toString());
+                        packageMetadata.put(BagItParameterNames.PACKAGE_MANIFEST, Collections.singletonList(relativeURI.toString()));
                     case ONTOLOGY:
                     case METADATA:
                     case PACKAGE_STATE:
@@ -481,8 +489,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         File finalFile;
         Package pkg = null;
 
-        Set<String> paramNames = params.getKeys();
-        if(!paramNames.contains(BagItParameterNames.PACKAGE_MANIFEST)){
+        if(!packageMetadata.containsKey(BagItParameterNames.PACKAGE_MANIFEST)){
             throw new PackageToolException(PackagingToolReturnInfo.PKG_FILE_NOT_FOUND_EXCEPTION, "A PackageManifest file was not supplied to the assembler");
         }
         try {
@@ -597,20 +604,32 @@ public class BagItPackageAssembler implements PackageAssembler {
             String newLine = System.getProperty("line.separator");
             String lineFormat = "%s: %s ";
 
-            Set<String> bagInfoFields = params.getKeys();
+            if (!packageMetadata.containsKey(BagItParameterNames.BAGIT_PROFILE_ID)) {
+                packageMetadata.put(BagItParameterNames.BAGIT_PROFILE_ID, Collections.singletonList(PROFILE_ID));
+            }
+
+            packageMetadata.put(BagItParameterNames.PAYLOAD_OXUM, Collections.singletonList(
+                    FileUtils.sizeOfDirectory(payloadDir) + "." + dataFiles.size()));
+            packageMetadata.put(BagItParameterNames.BAG_SIZE, Collections.singletonList(
+                    FileUtils.byteCountToDisplaySize(FileUtils.sizeOfDirectory(bagBaseDir))));
+
+            // DC-2197: The field names are sorted so that we can more easily test; field value ordering is preserved
+            TreeSet<String> bagInfoFields = packageMetadata.keySet().stream()
+                    .collect(Collectors.toCollection(
+                            (Supplier<TreeSet<String>>) () -> new TreeSet<>(String::compareTo)));
+
             for (String field : bagInfoFields) {
-                List<String> fieldValues = params.getParam(field);
+                // DC-2197: Bag values are preserved in the order they were input, so that fields with multiple
+                // values (Contact-Name, Contact-Email, Contact-Phone) can align.  The values for the first
+                // Contact-Name, Contact-Email, and Content-Phone all go together; the values for the second
+                // Contact-Name, Contact-Email, and Content-Phone all go together, etc.
+                List<String> fieldValues = packageMetadata.get(field);
                 for (String value : fieldValues) {
                     writer.write(String.format(lineFormat, field, value) + newLine);
                 }
             }
 
-            writer.write(String.format(lineFormat, BagItParameterNames.BAG_SIZE,
-                    FileUtils.byteCountToDisplaySize(FileUtils.sizeOfDirectory(bagBaseDir))) + newLine);
-            writer.write(String.format(lineFormat, BagItParameterNames.PAYLOAD_OXUM,
-                    FileUtils.sizeOfDirectory(payloadDir) + "." + dataFiles.size()) + newLine);
             writer.write(String.format(lineFormat, BagItParameterNames.BAGGING_DATE, (new DateTime().toDate()) + newLine));
-
             writer.close();
         } catch (IOException e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_IO_EXCEPTION, e,

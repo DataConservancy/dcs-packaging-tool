@@ -20,6 +20,7 @@ import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,7 +45,8 @@ public class PackageAssemblerFactory {
      * @throws IllegalAccessException if the parameter list doesn't contain a package format id
      * @throws InstantiationException if there are no assemblers are set on the factory
      */
-    public PackageAssembler newAssembler(PackageGenerationParameters params) throws IllegalAccessException, InstantiationException {
+    public PackageAssembler newAssembler(PackageGenerationParameters params, Map<String, List<String>> packageMetadata)
+            throws IllegalAccessException, InstantiationException {
         if (assemblers == null || assemblers.size() == 0) {
             throw new IllegalStateException("No assemblers have been set.");
         }
@@ -61,7 +63,7 @@ public class PackageAssemblerFactory {
             if (assemblerId.equals(formatId)) {
                 Class<? extends PackageAssembler> assemblerClass = assemblers.get(assemblerId);
                 PackageAssembler assembler = assemblerClass.newInstance();
-                assembler.init(params);
+                assembler.init(params, packageMetadata);
                 return assembler;
             }
         }

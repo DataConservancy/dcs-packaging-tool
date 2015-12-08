@@ -22,6 +22,8 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -29,7 +31,7 @@ import java.net.URI;
  */
 public class MockPackageAssembler implements PackageAssembler {
     @Override
-    public void init(PackageGenerationParameters params) {
+    public void init(PackageGenerationParameters params, Map<String, List<String>> metadata) {
     }
 
     @Override

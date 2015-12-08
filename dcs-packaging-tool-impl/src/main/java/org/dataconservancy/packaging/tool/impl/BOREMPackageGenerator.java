@@ -99,7 +99,7 @@ public class BOREMPackageGenerator implements PackageGenerator {
         }
 
         try {
-            PackageAssembler assembler = assemblerFactory.newAssembler(params);
+            PackageAssembler assembler = assemblerFactory.newAssembler(params, packageState.getPackageMetadataList());
             PackageModelBuilder builder = modelBuilderFactory.newBuilder(params);
 
             if (assembler == null) {

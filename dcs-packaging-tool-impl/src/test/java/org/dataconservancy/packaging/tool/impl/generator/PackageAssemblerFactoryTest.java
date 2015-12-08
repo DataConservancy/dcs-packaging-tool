@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -49,7 +51,7 @@ public class PackageAssemblerFactoryTest {
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "test");
 
-        PackageAssembler assembler = underTest.newAssembler(params);
+        PackageAssembler assembler = underTest.newAssembler(params, new HashMap<>());
 
         assertNotNull(assembler);
     }
@@ -59,7 +61,7 @@ public class PackageAssemblerFactoryTest {
     public void testGetNewAssemblerFailsIfNoFormatIdParameterSet() throws InstantiationException, IllegalAccessException {
         PackageGenerationParameters params = new PackageGenerationParameters();
 
-        underTest.newAssembler(params);
+        underTest.newAssembler(params, new HashMap<>());
     }
 
 
@@ -68,7 +70,7 @@ public class PackageAssemblerFactoryTest {
         PackageGenerationParameters params = new PackageGenerationParameters();
         params.addParam(GeneralParameterNames.PACKAGE_FORMAT_ID, "not-a-real-assembler");
 
-        PackageAssembler assembler = underTest.newAssembler(params);
+        PackageAssembler assembler = underTest.newAssembler(params, new HashMap<>());
 
         assertNull(assembler);
     }

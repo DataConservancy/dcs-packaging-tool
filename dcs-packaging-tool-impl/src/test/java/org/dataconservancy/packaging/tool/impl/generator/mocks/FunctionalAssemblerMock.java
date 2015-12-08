@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -45,7 +46,7 @@ public class FunctionalAssemblerMock
     }
 
     @Override
-    public void init(PackageGenerationParameters params) {
+    public void init(PackageGenerationParameters params, Map<String, List<String>> metadata) {
 
     }
 

@@ -19,12 +19,16 @@ package org.dataconservancy.packaging.tool.integration;
 import java.io.File;
 import java.io.IOException;
 
+import java.io.InputStream;
 import java.net.URI;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +37,7 @@ import java.util.Set;
 
 import org.apache.commons.io.DirectoryWalker;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -40,6 +45,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.SimpleSelector;
 
+import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -68,6 +74,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.schlichtherle.io.FileInputStream;
 
+import static org.dataconservancy.packaging.tool.model.BagItParameterNames.BAGIT_PROFILE_ID;
+import static org.dataconservancy.packaging.tool.model.BagItParameterNames.PACKAGE_MANIFEST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -77,7 +85,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
@@ -532,6 +542,56 @@ public class PackageGenerationTest {
 
     }
 
+    /**
+     * Insures that package generation results in a BagIt bag-info.txt file, that
+     * the file contains the required metadata fields per our spec, and that any and all
+     * package metadata fields on the package state are serialized to bag-info.txt.
+     *
+     * The ordering of values for multi-valued metadata fields are preserved.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testVerifyBagInfoContents() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        // Add some package metadata; we'll check to make sure it appears
+        // in the serialized package in 'bag-info.txt'
+
+        state.addPackageMetadata("singleValue", "foo");
+        state.addPackageMetadata("multiValue", "buzz");
+        state.addPackageMetadata("multiValue", "bar");
+        state.addPackageMetadata("multiValue", "baz");
+
+        OpenedPackage openedPackage =
+                packager.createPackage(state, folder.getRoot());
+
+        File bagInfo = new File(openedPackage.getBaseDirectory(), "bag-info.txt");
+        assertTrue("Expected bag-info.txt file to exist: " + bagInfo, bagInfo.exists());
+
+        Map<String, List<String>> result = parseBagItKeyValuesFile(bagInfo);
+
+        // Required fields per our 1.0 spec (note these do not appear in package metadata)
+        assertTrue("Missing expected BagIt metadata field " + BAGIT_PROFILE_ID + " in " + bagInfo,
+                result.containsKey(BAGIT_PROFILE_ID));
+        assertEquals("http://dataconservancy.org/formats/data-conservancy-pkg-1.0",
+                result.get(BAGIT_PROFILE_ID).get(0));
+
+        assertTrue("Missing expected BagIt metadata field " + PACKAGE_MANIFEST + " in " + bagInfo,
+                result.containsKey(PACKAGE_MANIFEST));
+        assertEquals("bag://TestPackage/META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM/ORE-REM.ttl",
+                result.get(PACKAGE_MANIFEST).get(0));
+
+        // Package Metadata from the state is included
+        assertEquals("foo", result.get("singleValue").get(0));
+
+        // Order of multi-valued metadata elements should be preserved
+        assertTrue(result.containsKey("multiValue"));
+        assertTrue(result.get("multiValue").get(0).equals("buzz"));
+        assertTrue(result.get("multiValue").get(1).equals("bar"));
+        assertTrue(result.get("multiValue").get(2).equals("baz"));
+    }
+
     /*
      * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
      * generic tree operations should be in a common library?
@@ -663,6 +723,41 @@ public class PackageGenerationTest {
                 });
 
         return domainObjects;
+    }
+
+    /**
+     * Reads in any BagIt file that uses a ':' to delimit a keyword and value pair.
+     *
+     * @param bagItFile the file to read
+     * @return a Map keyed by the keywords, with the List of values as they appear in the file
+     * @throws IOException
+     */
+    private Map<String, List<String>> parseBagItKeyValuesFile(File bagItFile) throws IOException {
+        Map<String, List<String>> result = new HashMap<>();
+
+        // Used to track state; a streams no-no.  Probably should do this the old-fashioned way.
+        BitSet bitSet = new BitSet(1);
+        bitSet.set(0);
+        StringBuilder key = new StringBuilder();
+
+        Files.lines(bagItFile.toPath(), Charset.forName("UTF-8"))
+                .flatMap(line ->
+                        Stream.of(line.substring(0, line.indexOf(":")), line.substring(line.indexOf(":") + 1).trim()))
+                .forEach(token -> {
+                    if (bitSet.get(0)) {
+                        // key
+                        key.delete(0, key.length());
+                        result.putIfAbsent(token, new ArrayList<>());
+                        key.append(token);
+                        bitSet.clear(0);
+                    } else {
+                        // value
+                        result.get(key.toString()).add(token);
+                        bitSet.set(0);
+                    }
+                });
+
+        return result;
     }
 
     private class OntDirectoryWalker

@@ -21,6 +21,8 @@ import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import java.io.InputStream;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Assembles some packaging model into physical form.
@@ -37,8 +39,9 @@ public interface PackageAssembler {
      * work needs to be done.
      * @param params The parameters object containing whatever is needed for the assembler
      *               to function properly.
+     * @param packageMetadata metadata about the package and its contents
      */
-    void init(PackageGenerationParameters params);
+    void init(PackageGenerationParameters params, Map<String, List<String>> packageMetadata);
 
     /**
      * Reserve (create a name, and potentially storage location for) a resource.
