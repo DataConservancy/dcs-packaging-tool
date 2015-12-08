@@ -16,7 +16,6 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -31,7 +30,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
+import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -40,11 +39,11 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
-import org.dataconservancy.packaging.gui.util.WarningPopup;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +69,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private VBox bottomContent;
 
     private List<Node> allDynamicFields;
-    private WarningPopup warningPopup;
     private boolean formAlreadyDrawn = false;
     private Set<String> failedValidation;
 
@@ -83,10 +81,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
         content = new VBox();
-
-        if (Platform.isFxApplicationThread()) {
-            warningPopup = new WarningPopup();
-        }
 
         //Set up the text for the controls in the footer.
         getContinueButton().setText(TextFactory.getText(LabelKey.SAVE_AND_CONTINUE_BUTTON));
@@ -113,12 +107,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         // setup static fields
         HBox topRow = new HBox(40);
 
-        //since we want this field to be valitatable, we create a PackageMetadata
+        //since we want this field to be validatable, we create a PackageMetadata
         //object to pass to createFieldsView
         PackageMetadata packageNameMetadata = new PackageMetadata();
         packageNameMetadata.setName(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL));
         packageNameMetadata.setLabel(packageNameMetadata.getName().replace("-"," "));
         packageNameMetadata.setEditable(true);
+        packageNameMetadata.setHelpText(TextFactory.getText(LabelKey.PACKAGE_NAME_TOOLTIP));
         packageNameMetadata.setValidationType(PropertyValueHint.FILE_NAME);
 
         VBox packageNameEntryFields = createFieldsView(packageNameMetadata);
@@ -127,8 +122,20 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         topRow.getChildren().add(packageNameEntryFields);
 
         VBox domainProfileVBox = new VBox(4);
+
+        HBox domainProfileLabelAndTooltipBox = new HBox(4);
         Label domainProfileLabel = new Label(TextFactory.getText(LabelKey.SELECT_DOMAIN_PROFILE_LABEL));
-        domainProfileVBox.getChildren().add(domainProfileLabel);
+        domainProfileLabelAndTooltipBox.getChildren().add(domainProfileLabel);
+
+        ImageView domainProfileToolTipImage = new ImageView();
+        domainProfileToolTipImage.getStyleClass().add(TOOLTIP_IMAGE);
+        Tooltip domainProfileToolTip = new Tooltip(TextFactory.getText(LabelKey.DOMAIN_PROFILE_TOOLTIP));
+        domainProfileToolTip.setPrefWidth(350);
+        domainProfileToolTip.setWrapText(true);
+        Tooltip.install(domainProfileToolTipImage, domainProfileToolTip);
+        domainProfileLabelAndTooltipBox.getChildren().add(domainProfileToolTipImage);
+
+        domainProfileVBox.getChildren().add(domainProfileLabelAndTooltipBox);
         domainProfilesComboBox = new ComboBox<>();
         domainProfilesComboBox.setPrefWidth(267);
         domainProfileVBox.getChildren().add(domainProfilesComboBox);

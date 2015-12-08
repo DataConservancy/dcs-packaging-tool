@@ -144,7 +144,9 @@ public class Labels {
         BASE_DIRECTORY_TOOLTIP("basedirectory.tooltip"),
         PACKAGE_SELECTION_TOOLTIP("packageselection.tooltip"),
         EXTRACT_DIRECTORY_TOOLTIP("packageextraction.tooltip"),
-        EXPLODED_PACKAGE_TOOLTIP("explodedpackage.tooltip");
+        EXPLODED_PACKAGE_TOOLTIP("explodedpackage.tooltip"),
+        PACKAGE_NAME_TOOLTIP("packagename.tooltip"),
+        DOMAIN_PROFILE_TOOLTIP("domainprofile.tooltip");
 
         private String property;
 

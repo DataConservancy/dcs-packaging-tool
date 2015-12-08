@@ -34,6 +34,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Contact-Name</name>
         <label>Contact Name</label>
         <requiredness>REQUIRED</requiredness>
+        <helpText>The name of the person to contact with inquiries about this package.</helpText>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
@@ -42,6 +43,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <label>Contact Phone</label>
         <requiredness>RECOMMENDED</requiredness>
         <validationType>PHONE_NUMBER</validationType>
+        <helpText>The phone number of the person to contact with inquiries about this package.</helpText>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
@@ -50,6 +52,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <label>Contact Email</label>
         <requiredness>REQUIRED</requiredness>
         <validationType>EMAIL</validationType>
+        <helpText>The email address of the person to contact with inquiries about this package.</helpText>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
@@ -57,7 +60,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Keyword</name>
         <label>Keyword</label>
         <requiredness>OPTIONAL</requiredness>
-        <helpText>A keyword string</helpText>
+        <helpText>Any keywords that help to describe the contents of the package.</helpText>
         <repeatable>true</repeatable>
         <editable>true</editable>
         <visible>true</visible>
@@ -99,6 +102,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Source-Organization</name>
         <label>Source Organization</label>
         <requiredness>OPTIONAL</requiredness>
+        <helpText>The name of the organization that produced either the package, or the package contents.</helpText>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
@@ -106,6 +110,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Organization-Address</name>
         <label>Organization Address</label>
         <requiredness>OPTIONAL</requiredness>
+        <helpText>The address of the organization that produced either the package, or the package contents.</helpText>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
@@ -149,6 +154,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <requiredness>RECOMMENDED</requiredness>
         <visible>true</visible>
         <validationType>DATE_TIME</validationType>
+        <helpText>The date this package was produced.</helpText>
     </packageMetadata>
     <packageMetadata>
         <name>Bag-Size</name>
