@@ -63,7 +63,7 @@
     
     <!--
       Include all runtime dependencies in the assembled jar, in unpacked form.
-      Include the dcs-package-tool-cli (projectArtifact) jar as well.
+      Include the dcs-packaging-tool-cli (projectArtifact) jar as well.
     -->
     <dependencySet>
       <outputDirectory>/</outputDirectory>

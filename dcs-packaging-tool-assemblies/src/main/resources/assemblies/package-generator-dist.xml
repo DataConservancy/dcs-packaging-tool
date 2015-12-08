@@ -18,18 +18,18 @@
   xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
 
   <!--
-    This assembly produces a binary distribution of the dcs-package-tool-cli
+    This assembly produces a binary distribution of the dcs-packaging-tool-cli
     module.  The distribution has a directory structure with a base directory
     named 'dcs-package-tool-cli-dist', with the following structure:
 
-        dcs-package-tool-cli-dist
+        dcs-packaging-tool-cli-dist
         |- DEPENDENCIES
         |- LICENSE
         |- NOTICE
         |- THIRD-PARTY.txt
         |- bin
-        |   |- dcs-package-tool-cli-standalone.jar
-        |   |- dcs-package-tool-cli.jar
+        |   |- dcs-packaging-tool-cli-standalone.jar
+        |   |- dcs-packaging-tool-cli.jar
         |   `- pkg-gen.sh
         `- lib
             |- aopalliance-1.0.jar
@@ -38,7 +38,7 @@
             |- ...
             `- xmlunit-1.3.jar    
     
-    The 'lib' directory contains all runtime dependenencies of the 'dcs-package-tool-cli' project.
+    The 'lib' directory contains all runtime dependenencies of the 'dcs-packaging-tool-cli' project.
     The 'bin' directory contains the standalone cli jar (produced by the 
     package-generator-standalone.xml assembly), the cli jar itself, and a shell script which is 
     a wrapper for executing the standalone cli jar.
@@ -140,7 +140,7 @@
     <!-- Include the cli jar file (not the standalone jar) in the bin directory -->
     <dependencySet>
       <includes>
-        <include>org.dataconservancy.packaging:dcs-package-tool-cli</include>
+        <include>org.dataconservancy.packaging:dcs-packaging-tool-cli</include>
       </includes>      
       <outputDirectory>bin/</outputDirectory>
       <directoryMode>0755</directoryMode>
