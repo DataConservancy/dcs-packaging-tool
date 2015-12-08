@@ -156,6 +156,8 @@ public class RdfUtil {
     /**
      * Get a bare (non-hashed) version of a URI, by stripping off any hash
      * portion.
+     * @param uri the URI
+     * @return  the stripped version of the URI
      */
     public static String bare(String uri) {
         String s = uri + "#";

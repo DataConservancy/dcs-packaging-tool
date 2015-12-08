@@ -32,6 +32,7 @@ public interface PackageModelBuilder {
     /**
      * Produce an initializsed builder based on the specified parameters.
      * @param params The parameters used to initialize a specific instance of the builder object
+     * @return the builder
      */
     PackageModelBuilder newInstance(PackageGenerationParameters params);
 

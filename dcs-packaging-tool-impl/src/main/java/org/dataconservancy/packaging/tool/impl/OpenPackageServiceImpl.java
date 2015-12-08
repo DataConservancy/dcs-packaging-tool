@@ -88,6 +88,8 @@ public class OpenPackageServiceImpl implements OpenPackageService {
      * @param is
      *            Archive file.
      * @return Name of package base directory in dest_dir
+     * @throws ArchiveException if there is an error creating the ArchiveInputStream
+     * @throws IOException  if there is more than one package root
      */
     protected String extract(File dest_dir, InputStream is) throws ArchiveException, IOException {
         // Apache commons compress requires buffered input streams

@@ -36,6 +36,7 @@ public interface PackageGenerator {
 	 *            a state object containing information about the package and its custodial content
 	 * @param params
 	 *            Package Generation parameters used in generating the package.
+	 * @return the package
 	 * @throws RuntimeException
 	 *             if there is a problem generating the package.
 	 */

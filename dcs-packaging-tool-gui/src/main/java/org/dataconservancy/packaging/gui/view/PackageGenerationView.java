@@ -56,6 +56,8 @@ public interface PackageGenerationView extends View<PackageGenerationPresenter> 
     
     /**
      * Shows a popup when package generation was successful.
+     * @param packageName the name of the package to display in the popup
+     * @param location the path for the location of the package
      */
     void showSuccessPopup(String packageName, String location);
 

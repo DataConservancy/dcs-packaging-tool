@@ -30,18 +30,20 @@ import java.io.InputStream;
 public interface Package {
     
 	/** Return bytes of serialized package 
-	 * 
-	 *  @throws FileNotFoundException 
+	 *  @return the input stream
+	 *  @throws FileNotFoundException if the file is not found
 	 */
 	InputStream serialize() throws FileNotFoundException;
 
 	/**
 	 * Suggested filename (excluding path)
+	 * @return the file name excluding path
 	 */
 	String getPackageName();
 
 	/**
 	 * MIME type of the resulting package serialization
+	 * @return the MIME type
 	 */
 	String getContentType();
 	

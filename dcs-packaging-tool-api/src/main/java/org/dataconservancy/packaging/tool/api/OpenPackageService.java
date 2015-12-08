@@ -18,7 +18,7 @@ public interface OpenPackageService {
      * @param file
      *            Package state file
      * @return Opened package with base directory set to null.
-     * @throws IOException
+     * @throws IOException if we cannot open the file
      */
     OpenedPackage openPackageState(File file) throws IOException;
 
@@ -30,7 +30,7 @@ public interface OpenPackageService {
      * @param file
      *            Serialized package.
      * @return Opened package.
-     * @throws IOException
+     * @throws IOException if we cannot open the serialized package file
      */
     OpenedPackage openPackage(File staging_dir, File file) throws IOException;
 
@@ -40,7 +40,7 @@ public interface OpenPackageService {
      * @param dir
      *            Directory of the uncompressed package
      * @return Opened package.
-     * @throws IOException
+     * @throws IOException if we cannot open the file
      */
     OpenedPackage openExplodedPackage(File dir) throws IOException;
 }

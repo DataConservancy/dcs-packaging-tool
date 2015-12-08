@@ -79,6 +79,7 @@ public interface EditPackageContentsPresenter extends Presenter {
     /**
      * Gets a list of possible child node types for the given node. This is used to determine if a file or folder picker should be present for the add.
      * @param node The node to get the possible child types for.
+     * @return the list of possible node types
      */
     List<NodeType> getPossibleChildTypes(Node node);
 
@@ -98,6 +99,8 @@ public interface EditPackageContentsPresenter extends Presenter {
 
     /**
      * Toggles the ignored state of a list of tree items and their children and redraws the tree.
+     * @param nodesToIgnore the nodes to toggle
+     * @param ignored the boolean value indicating whether to ignore
      */
     void toggleItemIgnore(final ObservableList<TreeItem<Node>> nodesToIgnore, boolean ignored);
 }

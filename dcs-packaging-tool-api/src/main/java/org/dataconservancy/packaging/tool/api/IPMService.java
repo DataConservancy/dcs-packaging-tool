@@ -71,6 +71,7 @@ public interface IPMService {
      * with the existing tree structure.
      * @param node The node to refresh.
      * @return A map of the nodes and their status after comparison.
+     * @throws IOException  if we cannot build teh comparison tree
      */
     Map<Node, NodeComparison> refreshTreeContent(Node node) throws IOException;
 }

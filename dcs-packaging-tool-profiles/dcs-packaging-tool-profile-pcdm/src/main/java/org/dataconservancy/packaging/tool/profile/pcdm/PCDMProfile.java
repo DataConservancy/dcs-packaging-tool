@@ -287,7 +287,7 @@ public class PCDMProfile
      *        Expects two arguments args[0] is the name of a file, and args[1]
      *        is a RIOT name for a serialization format (an {@link RDFFormat},
      *        e.g. TURTLE_PRETTY).
-     * @throws Exception
+     * @throws Exception if we can't write the serialized profile to the file
      */
     public static void main(String[] args) throws Exception {
         DomainProfileRdfTransformService xform =

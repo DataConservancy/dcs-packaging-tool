@@ -24,6 +24,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
@@ -556,6 +557,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
      * may be (de)serialized by this implementation.
+     * @return the Map containing the Marshaller and Unmarshaller implementation
      */
     public Map<StreamId, StreamMarshaller> getMarshallerMap() {
         return marshallerMap;
@@ -564,6 +566,7 @@ public class AnnotationDrivenPackageStateSerializer implements PackageStateSeria
     /**
      * A Map containing the Marshaller and Unmarshaller implementation for each field in PackageState that
      * may be (de)serialized by this implementation.
+     * @param marshallerMap the marshaller map
      */
     public void setMarshallerMap(Map<StreamId, StreamMarshaller> marshallerMap) {
         this.marshallerMap = marshallerMap;

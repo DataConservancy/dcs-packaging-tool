@@ -41,6 +41,7 @@ public class PackageAssemblerFactory {
      * 
      * @param params
      *        Package Generation Parameters.
+     * @param packageMetadata the package metadata
      * @return PackageAssembler ready for adding package resources to.
      * @throws IllegalAccessException if the parameter list doesn't contain a package format id
      * @throws InstantiationException if there are no assemblers are set on the factory
