@@ -1,0 +1,9 @@
+Package: dc-package-tool
+Version: 0.10.0
+Section: utils
+Maintainer: Data Conservancy <dc-ird@googlegroups.com>
+Priority: optional
+Architecture: amd64
+Provides: dc-package-tool
+Description: GUI for describing data and generating data packages from file system.
+Installed-Size: 188600

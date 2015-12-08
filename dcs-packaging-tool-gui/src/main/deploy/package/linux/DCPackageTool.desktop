@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=DC Package Tool
+Comment=GUI for describing data and generating data packages from file system.
+Exec=/opt/DCPackageTool/DCPackageTool
+Icon=/opt/DCPackageTool/DCPackageTool.png
+Terminal=false
+Type=Application
+Categories=Applications;
