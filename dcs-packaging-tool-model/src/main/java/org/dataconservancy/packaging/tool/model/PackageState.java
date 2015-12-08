@@ -113,6 +113,7 @@ public class PackageState {
 
     /**
      * Returns the set of metadata fields used to describe this package.
+     * @return the set of metadata fields
      */
     public Set<String> getMetadataFields() {
         return packageMetadataList.keySet();
@@ -120,6 +121,8 @@ public class PackageState {
 
     /**
      * Returns list of values for package metadata named {@code fieldName}
+     * @param fieldName the name of teh field
+     * @return the list of values for package metadata with the supplied name
      */
     public List<String> getPackageMetadataValues(String fieldName) {
         return packageMetadataList.get(fieldName);
@@ -159,6 +162,7 @@ public class PackageState {
 
     /**
      * Returns version information about the tool used to create this package.
+     * @return the version information
      */
     public ApplicationVersion getCreationToolVersion() {
         return creationToolVersion;
@@ -219,7 +223,7 @@ public class PackageState {
      * it is <em>not</em> ok for {@code Object.clone()} to perform a field-by-field copy (i.e. a shallow copy).
      *
      * @return a deep copy of this object
-     * @throws CloneNotSupportedException
+     * @throws CloneNotSupportedException if cloning is not supported
      */
     @Override
     public final Object clone() throws CloneNotSupportedException {

@@ -62,6 +62,7 @@ public class PackageMetadata {
      * Returns the type of validation ({@link org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint})
      * that should be performed on the field's value. These types include: {@code NONE}, {@code EMAIL}, {@code PHONE_NUMBER},
      * {@code DATE}, {@code URL}, {@code FILENAME}.
+     * @return the validationType
      */
     public PropertyValueHint getValidationType() {
         return validationType;
@@ -126,6 +127,7 @@ public class PackageMetadata {
 
     /**
      * Indicated whether this package metadata field is {@code REQUIRED}, {@code RECOMMENDED} or {@code OPTIONAL}
+     * @return the requiredness
      */
     public Requiredness getRequiredness() {
         return requiredness;

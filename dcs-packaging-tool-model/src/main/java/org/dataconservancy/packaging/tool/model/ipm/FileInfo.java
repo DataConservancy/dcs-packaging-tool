@@ -76,6 +76,8 @@ public class FileInfo {
      * Constructor to use when loading existing file information.
      * @param path The path of the File info
      * @param fileAttributes The basic file attibutes of the file.
+     * @param formats The list of formats
+     * @param checksums The checksum map
      */
     public FileInfo(Path path, BasicFileAttributes fileAttributes, List<String> formats, Map<Algorithm, String> checksums) {
         location = path.toUri();
