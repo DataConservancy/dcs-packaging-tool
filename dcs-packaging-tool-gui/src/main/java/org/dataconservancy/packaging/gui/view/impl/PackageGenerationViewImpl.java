@@ -122,8 +122,10 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         packagingSection.getChildren().add(packagingOptionsLabel);
         packagingSection.getChildren().add(new Separator(Orientation.HORIZONTAL));
 
-        HBox packagingOptions = new HBox(40);
-        packagingOptions.setAlignment(Pos.TOP_LEFT);
+        VBox packagingOptionsSection = new VBox(32);
+
+        HBox packagingOptionsRowOne = new HBox(100);
+        packagingOptionsRowOne.setAlignment(Pos.TOP_LEFT);
 
         //Create a vbox for the archiving options.
         VBox archivingOptions = new VBox(10);
@@ -152,7 +154,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         explodedArchiveButton.setUserData("exploded");
         archivingOptions.getChildren().add(explodedArchiveButton);
 
-        packagingOptions.getChildren().add(archivingOptions);
+        packagingOptionsRowOne.getChildren().add(archivingOptions);
         
         //Create a vbox for the compression options.
         VBox compressionOptions = new VBox(10);
@@ -188,7 +190,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         gZipCompressionButton.setSelected(true);
         gZipCompressionButton.setUserData("gz");
 
-        packagingOptions.getChildren().add(compressionOptions);
+        packagingOptionsRowOne.getChildren().add(compressionOptions);
 
         //Create a vbox for the serialization options.
         VBox serializationOptions = new VBox(10);
@@ -218,7 +220,10 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         turtleRadioButton.setSelected(false);
         serializationOptions.getChildren().add(turtleRadioButton);
 
-        packagingOptions.getChildren().add(serializationOptions);
+        packagingOptionsRowOne.getChildren().add(serializationOptions);
+
+        HBox packagingOptionsRowTwo = new HBox(60);
+        packagingOptionsRowTwo.setAlignment(Pos.TOP_LEFT);
 
         //Create a vbox for the checksum options.
         VBox checksumOptions = new VBox(10);
@@ -226,16 +231,17 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         Label checksumLabel = new Label(TextFactory.getText(LabelKey.CHECKSUM_LABEL));
         checksumOptions.getChildren().add(checksumLabel);
-        
+
         md5CheckBox = new CheckBox(TextFactory.getText(LabelKey.MD5_CHECKBOX));
         checksumOptions.getChildren().add(md5CheckBox);
-        
+
         sha1CheckBox = new CheckBox(TextFactory.getText(LabelKey.SHA1_CHECKBOX));
         checksumOptions.getChildren().add(sha1CheckBox);
-        
-        packagingOptions.getChildren().add(checksumOptions);
-        
-        packagingSection.getChildren().add(packagingOptions);
+
+        packagingOptionsRowTwo.getChildren().add(checksumOptions);
+
+        packagingOptionsSection.getChildren().addAll(packagingOptionsRowOne, packagingOptionsRowTwo);
+        packagingSection.getChildren().add(packagingOptionsSection);
 
         content.getChildren().add(packagingSection);
 
