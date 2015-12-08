@@ -32,6 +32,11 @@ import java.util.List;
 public class XStreamMarshallerFactory {
 
     /**
+     * The encoding used by Spring OXM code paths when reading and writing using XStream.
+     */
+    private String encoding = "UTF-8";
+
+    /**
      * Encapsulates the properties of a "local" XStream converter: the class it is defined on, the field containing
      * the instance to be converted, and the Converter itself.
      */
@@ -43,7 +48,9 @@ public class XStreamMarshallerFactory {
      * @return a new instance
      */
     public XStreamMarshaller newInstance() {
-        return new ConfiguredXStreamMarshaller();
+        ConfiguredXStreamMarshaller m = new ConfiguredXStreamMarshaller();
+        m.setEncoding(encoding);
+        return m;
     }
 
     /**
@@ -62,6 +69,26 @@ public class XStreamMarshallerFactory {
 
     public void setLocalConverters(List<LocalConverterHolder> localConverters) {
         this.localConverters = localConverters;
+    }
+
+    /**
+     * The encoding used when writing to and reading from streams.  By default this is set to {@code UTF-8}.  All
+     * {@code XStreamMarshaller} instances produced by this factory will have their encoding set.
+     *
+     * @return the character encoding used by XStreamMarshallers when reading from or writing to streams
+     */
+    public String getEncoding() {
+        return encoding;
+    }
+
+    /**
+     * The encoding used when writing to and reading from streams.  By default this is set to {@code UTF-8}.  All
+     * {@code XStreamMarshaller} instances produced by this factory will have their encoding set.
+     *
+     * @param encoding the character encoding used by XStreamMarshallers when reading from or writing to streams
+     */
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 
     public class ConfiguredXStreamMarshaller extends XStreamMarshaller {
