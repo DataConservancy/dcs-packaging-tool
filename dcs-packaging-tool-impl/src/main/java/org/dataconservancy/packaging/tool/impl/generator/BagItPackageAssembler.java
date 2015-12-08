@@ -49,7 +49,6 @@ import org.dataconservancy.packaging.tool.model.SupportedMimeTypes;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -629,7 +628,6 @@ public class BagItPackageAssembler implements PackageAssembler {
                 }
             }
 
-            writer.write(String.format(lineFormat, BagItParameterNames.BAGGING_DATE, (new DateTime().toDate()) + newLine));
             writer.close();
         } catch (IOException e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_IO_EXCEPTION, e,
