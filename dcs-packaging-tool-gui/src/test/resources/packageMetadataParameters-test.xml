@@ -60,25 +60,30 @@
     <packageMetadata>
         <name>Editable-Metadata</name>
         <label>Editable Metadata</label>
+        <requiredness>OPTIONAL</requiredness>
         <editable>true</editable>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Visible-Metadata</name>
         <label>Visible Metadata</label>
+        <requiredness>OPTIONAL</requiredness>
         <visible>true</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Invisible-Metadata</name>
         <label>Invisible Metadata</label>
+        <requiredness>OPTIONAL</requiredness>
         <visible>false</visible>
     </packageMetadata>
     <packageMetadata>
         <name>Missing-Booleans</name>
         <label>Missing Booleans</label>
+         <requiredness>OPTIONAL</requiredness>
     </packageMetadata>
     <packageMetadata>
         <name>Missing-Enums</name>
         <label>Missing Enums</label>
+        <requiredness>OPTIONAL</requiredness>
     </packageMetadata>
 </packageMetadataList>
