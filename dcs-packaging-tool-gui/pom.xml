@@ -20,10 +20,6 @@
   <packaging>jar</packaging>
   <name>Package Tool GUI</name>
 
-  <organization>
-    <name>Data Conservancy &lt;dc-ird@googlegroups.com&gt;</name>
-  </organization>
-
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>
     <artifactId>dcs-packaging-tool</artifactId>
