@@ -16,27 +16,8 @@
 
 package org.dataconservancy.packaging.tool.integration;
 
-import java.io.File;
-import java.io.IOException;
-
-import java.io.InputStream;
-import java.net.URI;
-
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import de.schlichtherle.io.FileInputStream;
 import org.apache.commons.io.DirectoryWalker;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -44,15 +25,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.SimpleSelector;
-
-import org.dataconservancy.packaging.tool.model.BagItParameterNames;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-
 import org.dataconservancy.dcs.util.UriUtility;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
@@ -68,32 +40,49 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ontologies.ModelResources;
 import org.dataconservancy.packaging.tool.profile.DcsBOProfile;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import de.schlichtherle.io.FileInputStream;
-
-import static org.dataconservancy.packaging.tool.model.BagItParameterNames.BAGIT_PROFILE_ID;
-import static org.dataconservancy.packaging.tool.model.BagItParameterNames.PACKAGE_MANIFEST;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
+import static org.dataconservancy.packaging.tool.model.BagItParameterNames.BAGIT_PROFILE_ID;
+import static org.dataconservancy.packaging.tool.model.BagItParameterNames.PACKAGE_MANIFEST;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_DCS_ONTOLOGY_BOM;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 @ContextConfiguration({
         "classpath*:org/dataconservancy/config/applicationContext.xml",
@@ -592,6 +581,35 @@ public class PackageGenerationTest {
         assertTrue(result.get("multiValue").get(2).equals("baz"));
     }
 
+
+    /**
+     * Insures that unicode package metadata will end up in bag-info.txt.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUtf8BagInfoContents() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        // Add some package metadata that contains unicode
+        String literal = "S\u00ED Se\u00F1or!";
+
+        state.addPackageMetadata("unicodeString", literal);
+
+        OpenedPackage openedPackage =
+                packager.createPackage(state, folder.getRoot());
+
+        File bagInfo = new File(openedPackage.getBaseDirectory(), "bag-info.txt");
+
+        ByteArrayOutputStream fileContents = new ByteArrayOutputStream();
+        IOUtils.copy(new java.io.FileInputStream(bagInfo), fileContents);
+        assertTrue(contains(literal.getBytes(Charset.forName("UTF-8")), fileContents));
+
+        Map<String, List<String>> result = parseBagItKeyValuesFile(bagInfo);
+        assertTrue(result.containsKey("unicodeString"));
+        assertEquals(literal, result.get("unicodeString").get(0));
+    }
+
     /*
      * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
      * generic tree operations should be in a common library?
@@ -758,6 +776,33 @@ public class PackageGenerationTest {
                 });
 
         return result;
+    }
+
+    private boolean contains(byte[] candidates, ByteArrayOutputStream sink) {
+        byte[] sinkBytes = sink.toByteArray();
+
+        OUTER:
+        for (int i = 0; i < sinkBytes.length; i++) {
+            for (int m = 0; m < candidates.length; m++) {
+                if ((0x000000FF & candidates[m]) == (0x000000FF & sinkBytes[i])) {
+                    if (m + 1 < candidates.length && i + 1 < sinkBytes.length) {
+                        if ((0x000000FF & candidates[m + 1]) == (0x000000FF & sinkBytes[i + 1])) {
+                            return true;
+                        } else {
+                            m = 0;
+                            continue OUTER;
+                        }
+                    } else if (m + 1 >= candidates.length) {
+                        // we've exhausted candidate bytes
+                        return true;
+                    }
+                } else {
+                    continue OUTER;
+                }
+            }
+        }
+
+        return false;
     }
 
     private class OntDirectoryWalker
