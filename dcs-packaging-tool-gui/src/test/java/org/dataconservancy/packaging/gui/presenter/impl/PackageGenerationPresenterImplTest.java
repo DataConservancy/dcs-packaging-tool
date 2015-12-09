@@ -142,7 +142,16 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
      */
     @Test
     public void testFormInputCollectedCorrectly() {
+        // Mock the PackageGenerationService to do nothing.
+        PackageGenerationService mockGenerationSvc = mock(PackageGenerationService.class);
 
+        // Update the Controller mock to return an non-null File
+        when(controller.showOpenDirectoryDialog(any())).thenReturn(outputDirectory);
+
+        presenter.setTestBackgroundService();
+        presenter.setPackageGenerationService(mockGenerationSvc);
+        
+        
         presenter.display();
         view.getArchiveToggleGroup().getToggles().get(1).setSelected(true);
         String archiveChoice = view.getArchiveToggleGroup().getToggles().get(1).getUserData().toString();
@@ -160,7 +169,6 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         assertTrue(params.getParam(GeneralParameterNames.COMPRESSION_FORMAT).contains(compressionChoice));
         assertEquals(1, params.getParam(REM_SERIALIZATION_FORMAT).size());
         assertEquals(params.getParam(REM_SERIALIZATION_FORMAT).get(0), serializationChoice);
-        System.out.println("test");
     }
 
     /**
@@ -204,7 +212,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         presenter.display();
         testFile = tmpfolder.newFile("test");
 
-        presenter.setTestBackgroundService();
+
         presenter.setPackageGenerationParametersBuilder(new PackageGenerationParametersBuilder() {
 
             @Override
