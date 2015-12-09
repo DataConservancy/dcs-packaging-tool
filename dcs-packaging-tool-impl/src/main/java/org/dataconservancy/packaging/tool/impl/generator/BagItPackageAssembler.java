@@ -436,10 +436,8 @@ public class BagItPackageAssembler implements PackageAssembler {
     public void putResource(URI uri, InputStream content) {
         URI resolvableURI = fileURIMap.get(uri);
         File newFile = new File(resolvableURI);
-        try {
-            OutputStream fileOS = new FileOutputStream(newFile);
+        try (OutputStream fileOS = new FileOutputStream(newFile)) {
             IOUtils.copy(content, fileOS);
-            fileOS.close();
         } catch (FileNotFoundException e) {
             throw new PackageToolException(PackagingToolReturnInfo.PKG_FILE_NOT_FOUND_EXCEPTION, e);
         } catch (IOException e) {
