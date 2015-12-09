@@ -19,7 +19,14 @@
 package org.dataconservancy.packaging.tool.impl;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.dataconservancy.packaging.tool.model.PackageState;
+import org.dataconservancy.packaging.tool.model.dprofile.Property;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
+import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 import org.dataconservancy.packaging.tool.model.ser.Serialize;
 import org.dataconservancy.packaging.tool.model.ser.StreamId;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
@@ -37,14 +44,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.beans.PropertyDescriptor;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.dataconservancy.packaging.tool.impl.TestPackageState.V1.Objects;
 import static org.dataconservancy.packaging.tool.impl.TestPackageState.V1.Resources;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -241,5 +257,192 @@ public class PackageStateSerializationIT {
         underTest.serialize(state, StreamId.USER_SPECIFIED_PROPERTIES, new FileOutputStream(new File(baseDir, "userprops-v1.ser")));
 
         underTest.serialize(state, new FileOutputStream(new File(baseDir, "fullstate-v1.ser")));
+    }
+
+    /**
+     * Insures that unicode characters can be round-tripped through package state serialization using the platform
+     * default encoding.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testPlatformEncodingRoundTrip() throws Exception {
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        String unicodeString = "S\u00EDSe\u00F1or!";
+
+        // Package name with a unicode string
+        state.setPackageName(unicodeString);
+
+        // Package metadata with a unicode string
+        LinkedHashMap<String, List<String>> packageMetadata = new LinkedHashMap<>();
+        packageMetadata.put("foo", Collections.singletonList(unicodeString));
+        state.setPackageMetadataList(packageMetadata);
+
+        // A String user-defined property value with a unicode string
+        Map<URI, List<Property>> userProps = new HashMap<>();
+        PropertyType type = new PropertyType();
+        type.setPropertyValueType(PropertyValueType.STRING);
+        Property property = new Property(type);
+        property.setStringValue(unicodeString);
+        userProps.put(URI.create("http://a/uri"), Collections.singletonList(property));
+        state.setUserSpecifiedProperties(userProps);
+
+
+        // A IPM node with a unicode string
+        Model ipm = ModelFactory.createDefaultModel();
+        Statement s = ipm.createStatement(ipm.createResource("foo:s"), ipm.createProperty("foo:p"), ipm.createResource(unicodeString));
+        ipm.add(s);
+        state.setPackageTree(ipm);
+
+        // A domain object with a unicode string
+        Model objects = ModelFactory.createDefaultModel();
+        s = objects.createStatement(objects.createResource("bar:s"), objects.createProperty("bar:p"), objects.createResource(unicodeString));
+        objects.add(s);
+        state.setDomainObjectRDF(objects);
+
+        // Serialize the state.
+        underTest.serialize(state, sink);
+
+        // Deserialize it to a new PackageState instance
+        PackageState deserializedPs = new PackageState();
+        underTest.deserialize(deserializedPs, new ByteArrayInputStream(sink.toByteArray()));
+
+        // Make sure our characters are there.
+        assertEquals(unicodeString, deserializedPs.getPackageName());
+        assertEquals(unicodeString, deserializedPs.getPackageMetadataList().get("foo").get(0));
+        assertEquals(unicodeString, deserializedPs.getUserSpecifiedProperties().get(URI.create("http://a/uri")).get(0).getStringValue());
+
+        Model objectsPrime = deserializedPs.getDomainObjectRDF();
+        assertFalse(objects == objectsPrime);
+        assertTrue(objectsPrime.listObjectsOfProperty(objectsPrime.createProperty("bar:p")).next().toString().endsWith(unicodeString));
+
+        Model ipmPrime = deserializedPs.getPackageTree();
+        assertFalse(ipm == ipmPrime);
+        assertTrue(ipmPrime.listObjectsOfProperty(ipmPrime.createProperty("foo:p")).next().toString().endsWith(unicodeString));
+    }
+
+    /**
+     * As configured in production, the {@link AnnotationDrivenPackageStateSerializer} should be encoding characters
+     * using UTF-8, no matter what the platform default is.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUtf8Encoding() throws Exception {
+        PackageState deserializedState = null;
+        ByteArrayOutputStream sink = new ByteArrayOutputStream();
+        String unicodeString = "S\u00EDSe\u00F1or!";
+        byte[] unicodeBytes = unicodeString.getBytes(Charset.forName("UTF-8"));
+
+        // We will not configure this to archive, so that the serialized stream will
+        // not be placed in a zip entry; this makes searching through the sink for a
+        // byte sequence more robust.
+
+        // TODO this test method should really be somewhere else; or the PackageStateSerializer should expose a setArchive(boolean) method.
+        if (!(underTest instanceof AnnotationDrivenPackageStateSerializer)) {
+            fail("Expected an instance of AnnotationDrivenPackageStateSerializer");
+        }
+        ((AnnotationDrivenPackageStateSerializer)underTest).setArchive(false);
+
+        // Package name with a unicode string
+        state.setPackageName(unicodeString);
+
+        underTest.serialize(state, StreamId.PACKAGE_NAME, sink);
+        assertTrue(contains(unicodeBytes, sink));
+        deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, StreamId.PACKAGE_NAME, new ByteArrayInputStream(sink.toByteArray()));
+        assertEquals(unicodeString, deserializedState.getPackageName());
+
+        sink.reset();
+        deserializedState = null;
+
+        // Package metadata with a unicode string
+        LinkedHashMap<String, List<String>> packageMetadata = new LinkedHashMap<>();
+        packageMetadata.put("foo", Collections.singletonList(unicodeString));
+        state.setPackageMetadataList(packageMetadata);
+
+        underTest.serialize(state, StreamId.PACKAGE_METADATA, sink);
+        assertTrue(contains(unicodeBytes, sink));
+        deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, StreamId.PACKAGE_METADATA, new ByteArrayInputStream(sink.toByteArray()));
+        assertEquals(unicodeString, deserializedState.getPackageMetadataList().get("foo").get(0));
+
+        sink.reset();
+        deserializedState = null;
+
+        // A String user-defined property value with a unicode string
+        Map<URI, List<Property>> userProps = new HashMap<>();
+        PropertyType type = new PropertyType();
+        type.setPropertyValueType(PropertyValueType.STRING);
+        Property property = new Property(type);
+        property.setStringValue(unicodeString);
+        userProps.put(URI.create("http://a/uri"), Collections.singletonList(property));
+        state.setUserSpecifiedProperties(userProps);
+
+        underTest.serialize(state, StreamId.USER_SPECIFIED_PROPERTIES, sink);
+        assertTrue(contains(unicodeBytes, sink));
+        deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, StreamId.USER_SPECIFIED_PROPERTIES, new ByteArrayInputStream(sink.toByteArray()));
+        assertEquals(unicodeString, deserializedState.getUserSpecifiedProperties().get(URI.create("http://a/uri")).get(0).getStringValue());
+
+        sink.reset();
+        deserializedState = null;
+
+        // A IPM node with a unicode string
+        Model ipm = ModelFactory.createDefaultModel();
+        Statement s = ipm.createStatement(ipm.createResource("foo:s"), ipm.createProperty("foo:p"), ipm.createResource(unicodeString));
+        ipm.add(s);
+        state.setPackageTree(ipm);
+
+        underTest.serialize(state, StreamId.PACKAGE_TREE, sink);
+        assertTrue(contains(unicodeBytes, sink));
+        deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, StreamId.PACKAGE_TREE, new ByteArrayInputStream(sink.toByteArray()));
+        assertTrue(deserializedState.getPackageTree().listObjectsOfProperty(ResourceFactory.createProperty("foo:p")).next().toString().endsWith(unicodeString));
+
+        sink.reset();
+        deserializedState = null;
+
+        // A domain object with a unicode string
+        Model objects = ModelFactory.createDefaultModel();
+        s = objects.createStatement(objects.createResource("bar:s"), objects.createProperty("bar:p"), objects.createResource(unicodeString));
+        objects.add(s);
+        state.setDomainObjectRDF(objects);
+
+        underTest.serialize(state, StreamId.DOMAIN_OBJECTS, sink);
+        assertTrue(contains(unicodeBytes, sink));
+        deserializedState = new PackageState();
+        underTest.deserialize(deserializedState, StreamId.DOMAIN_OBJECTS, new ByteArrayInputStream(sink.toByteArray()));
+        assertTrue(deserializedState.getDomainObjectRDF().listObjectsOfProperty(ResourceFactory.createProperty("bar:p")).next().toString().endsWith(unicodeString));
+
+        sink.reset();
+        deserializedState = null;
+    }
+
+    private boolean contains(byte[] candidates, ByteArrayOutputStream sink) {
+        byte[] sinkBytes = sink.toByteArray();
+
+        OUTER:
+        for (int i = 0; i < sinkBytes.length; i++) {
+            for (int m = 0; m < candidates.length; m++) {
+                if ((0x000000FF & candidates[m]) == (0x000000FF & sinkBytes[i])) {
+                    if (m + 1 < candidates.length && i + 1 < sinkBytes.length) {
+                        if ((0x000000FF & candidates[m+1]) == (0x000000FF & sinkBytes[i+1])) {
+                            return true;
+                        } else {
+                            m = 0;
+                            continue OUTER;
+                        }
+                    } else if (m + 1 >= candidates.length) {
+                        // we've exhausted candidate bytes
+                        return true;
+                    }
+                } else {
+                    continue OUTER;
+                }
+            }
+        }
+
+        return false;
     }
 }
