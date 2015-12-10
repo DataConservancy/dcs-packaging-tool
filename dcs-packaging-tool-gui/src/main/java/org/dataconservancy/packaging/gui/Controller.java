@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.gui;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -62,6 +64,7 @@ public class Controller {
     private FileChooser packageStateFileChooser;
     private PackageStateSerializer packageStateSerializer;
     private String packageStateFileExtension="*.dcp";
+    private StringProperty defaultStateFileName;
 
     private DomainProfileStore domainProfileStore;
     private IpmRdfTransformService ipmRdfTransformService;
@@ -95,6 +98,8 @@ public class Controller {
         previousPages = new Stack<>();
         pageStack = new Stack<>();
         toolVersion = new ApplicationVersion();
+        defaultStateFileName = new SimpleStringProperty("");
+
         ipmRdfTransformService = new IpmRdfTransformService();
         packageStateFileChooser = new FileChooser();
         packageStateFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
@@ -145,7 +150,6 @@ public class Controller {
         initializeDomainStoreAndServices();
 
         packageStateFile = null;
-        packageStateFileChooser.setInitialFileName(packageStateFileExtension);
         packageTree = null;
 
         if (clear) {
@@ -329,6 +333,7 @@ public class Controller {
                 packageState.setPackageTree(ipmRdfTransformService.transformToRDF(packageTree));
             }
             if(packageStateFile == null){
+                packageStateFileChooser.setInitialFileName(defaultStateFileName.getValue());
                packageStateFile = showSaveFileDialog(packageStateFileChooser);
             }
             if (packageStateFile != null) {
@@ -412,6 +417,10 @@ public class Controller {
 
     public void setPackageTree(Node packageTree) {
         this.packageTree = packageTree;
+    }
+
+    public StringProperty getDefaultStateFileName() {
+        return defaultStateFileName;
     }
 
     /**
