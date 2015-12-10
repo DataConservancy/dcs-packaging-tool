@@ -143,6 +143,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <name>Rights-URI</name>
         <label>Rights URI</label>
         <requiredness>OPTIONAL</requiredness>
+        <validationType>URI</validationType>
         <repeatable>true</repeatable>
         <editable>true</editable>
         <visible>true</visible>
