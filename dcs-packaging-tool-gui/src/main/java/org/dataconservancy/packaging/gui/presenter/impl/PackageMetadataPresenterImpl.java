@@ -76,6 +76,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         if (controller.getPackageTree() != null) {
             view.getDomainProfilesComboBox().setDisable(true);
         }
+
+        controller.getDefaultStateFileName().bind(view.getPackageNameField().textProperty());
+
         return view.asNode();
     }
 
