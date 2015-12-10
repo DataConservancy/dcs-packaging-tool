@@ -66,6 +66,12 @@
     <!-- Compile =================================================== -->
 
     <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.dataconservancy.shared</groupId>
       <artifactId>dcs-shared-util</artifactId>
       <scope>compile</scope>
