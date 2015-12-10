@@ -268,14 +268,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             exclaimTooltip.setFont(Font.font(12));
             Tooltip.install(exclaimLabel, exclaimTooltip);
 
-            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
-                hbox.getChildren().add(exclaimLabel);
-                nodesMissingFiles.add(packageNode.getIdentifier());
-            } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
-                nodesMissingFiles.remove(packageNode.getIdentifier());
-            }
+            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode) && !packageNode.isIgnored()) {
+                            hbox.getChildren().add(exclaimLabel);
+                            nodesMissingFiles.add(packageNode.getIdentifier());
+                        } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
+                            nodesMissingFiles.remove(packageNode.getIdentifier());
+                        }
 
-            Label viewLabel = new Label();
+                        Label viewLabel = new Label();
             viewLabel.setPrefWidth(packageResourceColumn.getWidth());
             viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
 
@@ -785,18 +785,26 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         warningPopup.setContent(content);
 
-        //Quickly display the popup so we can measure the content
-        double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
-        double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
-        warningPopup.setOwner(getScene().getWindow());
-        warningPopup.show(x, y);
-        warningPopup.hide();
+        if (Platform.isFxApplicationThread()) {
+            //Quickly display the popup so we can measure the content
+            double x =
+                getScene().getWindow().getX() + getScene().getWidth() / 2.0 -
+                    150;
+            double y =
+                getScene().getWindow().getY() + getScene().getHeight() / 2.0 -
+                    150;
+            warningPopup.setOwner(getScene().getWindow());
+            warningPopup.show(x, y);
+            warningPopup.hide();
 
-        //Get the content width and height to property center the popup.
-        x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - content.getWidth()/2.0;
-        y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - content.getHeight()/2.0;
-        warningPopup.setOwner(getScene().getWindow());
-        warningPopup.show(x, y);
+            //Get the content width and height to property center the popup.
+            x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 -
+                content.getWidth() / 2.0;
+            y = getScene().getWindow().getY() + getScene().getHeight() / 2.0 -
+                content.getHeight() / 2.0;
+            warningPopup.setOwner(getScene().getWindow());
+            warningPopup.show(x, y);
+        }
 
     }
 
