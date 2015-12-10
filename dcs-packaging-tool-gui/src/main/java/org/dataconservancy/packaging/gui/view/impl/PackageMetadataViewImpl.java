@@ -30,7 +30,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.Help;
 import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
@@ -43,7 +42,6 @@ import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 
-import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;

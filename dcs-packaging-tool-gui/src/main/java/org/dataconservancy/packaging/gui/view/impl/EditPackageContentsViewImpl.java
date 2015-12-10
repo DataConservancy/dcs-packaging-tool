@@ -216,6 +216,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         //The main element of the view a tree of all the package artifacts.
         artifactTree = new TreeTableView<>();
+
         artifactTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //disable column sorting in the view
@@ -242,11 +243,11 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         TreeTableColumn<Node, Label> actionColumn = new TreeTableColumn<>(TextFactory.getText(LabelKey.ACTIONS_LABEL));
         actionColumn.setResizable(false);
 
-        //make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
-        typeColumn.setPrefWidth(100); //make wide enough so that any displayed text will not truncate
-        actionColumn.setPrefWidth(60); //make wide enough to comfortably fit image and vertical scroll bar
-        actionColumn.setMinWidth(60);
-        //add 2 here to get rid of horizontal scroll bar
+        // make the last two columns fixed width, and the first column variable, so that increasing window width widens the first column
+        typeColumn.setPrefWidth(100); // make wide enough so that any displayed text will not truncate
+        actionColumn.setPrefWidth(100); //make wide enough to comfortably fit image and vertical scroll bar
+        
+        // Dynamically resize resource column to take up space, add 2 here to get rid of horizontal scroll bar
         packageResourceColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + actionColumn.getWidth() + 2));
 
         //For these cell factories p.getValue returns the TreeItem<Node> p.getValue.getValue returns the node.
@@ -268,14 +269,14 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             exclaimTooltip.setFont(Font.font(12));
             Tooltip.install(exclaimLabel, exclaimTooltip);
 
-            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode)) {
-                hbox.getChildren().add(exclaimLabel);
-                nodesMissingFiles.add(packageNode.getIdentifier());
-            } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
-                nodesMissingFiles.remove(packageNode.getIdentifier());
-            }
+            if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode) && !packageNode.isIgnored()) {
+                            hbox.getChildren().add(exclaimLabel);
+                            nodesMissingFiles.add(packageNode.getIdentifier());
+                        } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
+                            nodesMissingFiles.remove(packageNode.getIdentifier());
+                        }
 
-            Label viewLabel = new Label();
+                        Label viewLabel = new Label();
             viewLabel.setPrefWidth(packageResourceColumn.getWidth());
             viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
 
@@ -785,18 +786,26 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         warningPopup.setContent(content);
 
-        //Quickly display the popup so we can measure the content
-        double x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - 150;
-        double y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - 150;
-        warningPopup.setOwner(getScene().getWindow());
-        warningPopup.show(x, y);
-        warningPopup.hide();
+        if (Platform.isFxApplicationThread()) {
+            //Quickly display the popup so we can measure the content
+            double x =
+                getScene().getWindow().getX() + getScene().getWidth() / 2.0 -
+                    150;
+            double y =
+                getScene().getWindow().getY() + getScene().getHeight() / 2.0 -
+                    150;
+            warningPopup.setOwner(getScene().getWindow());
+            warningPopup.show(x, y);
+            warningPopup.hide();
 
-        //Get the content width and height to property center the popup.
-        x = getScene().getWindow().getX() + getScene().getWidth()/2.0 - content.getWidth()/2.0;
-        y = getScene().getWindow().getY() + getScene().getHeight()/2.0 - content.getHeight()/2.0;
-        warningPopup.setOwner(getScene().getWindow());
-        warningPopup.show(x, y);
+            //Get the content width and height to property center the popup.
+            x = getScene().getWindow().getX() + getScene().getWidth() / 2.0 -
+                content.getWidth() / 2.0;
+            y = getScene().getWindow().getY() + getScene().getHeight() / 2.0 -
+                content.getHeight() / 2.0;
+            warningPopup.setOwner(getScene().getWindow());
+            warningPopup.show(x, y);
+        }
 
     }
 
