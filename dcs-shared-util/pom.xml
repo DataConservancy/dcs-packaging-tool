@@ -35,7 +35,7 @@
   <parent>
     <groupId>org.dataconservancy</groupId>
     <artifactId>project-pom</artifactId>
-    <version>1</version>
+    <version>3</version>
   </parent>
 
   <!-- Build  ===================================================== -->
@@ -171,6 +171,13 @@
     </dependency>
 
     <!-- Runtime Dependencies ===================================== -->
+
+    <!-- DC-2204 -->
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Despite what dependency:analyze says, this artifact is needed -->
     <dependency>

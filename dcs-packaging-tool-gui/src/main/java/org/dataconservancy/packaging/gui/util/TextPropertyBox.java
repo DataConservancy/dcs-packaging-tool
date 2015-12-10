@@ -42,7 +42,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     private BooleanProperty isValid;
     /**
      * Creates a validating property box for a property, with an initial String value
-     * @param initialValue the intial value of the property
+     * @param initialValue the initial value of the property
      * @param isEditable  indicates whether the text input control should be user-editable
      * @param helpText the help text for the field if any exists
      * @param validationType indicates the ValidationType of validator that should be supplied to
