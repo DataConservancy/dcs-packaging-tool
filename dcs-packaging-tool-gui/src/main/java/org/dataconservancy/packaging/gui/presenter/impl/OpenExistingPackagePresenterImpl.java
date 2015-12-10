@@ -86,7 +86,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
             if (workerStateEvent.getSource().getMessage() == null ||
                     workerStateEvent.getSource().getMessage().isEmpty()) {
                 Throwable e = workerStateEvent.getSource().getException();
-                showError(TextFactory.format(ErrorKey.PACKAGE_STATE_LOAD_ERROR));
+                showError(TextFactory.format(ErrorKey.PACKAGE_STATE_LOAD_ERROR, e.getMessage()));
                 log.error(e.getMessage());
             } else {
                 showError(workerStateEvent.getSource().getMessage());

@@ -162,6 +162,8 @@ public class OpenPackageServiceImpl implements OpenPackageService {
 
             try (OutputStream os = new FileOutputStream(file)) {
                 IOUtils.copyLarge(ais, os, 0, entry.getSize());
+            } catch (IOException e) {
+                throw new IOException("Couldn't create " + file.toString() + ". Please make sure you have write access for the extract directory.");
             }
         }
 
