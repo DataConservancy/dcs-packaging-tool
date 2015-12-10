@@ -25,7 +25,7 @@ public class ValidationAwareEventHandler implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent event) {
-        if (isValid.getValue()) {
+        if (isValid.getValue() && control.getText() != null && !control.getText().isEmpty()) {
             String text = control.getText();
             RemovableLabel removableLabel = new RemovableLabel(text, parentContainer);
             parentContainer.getChildren().add(removableLabel);
