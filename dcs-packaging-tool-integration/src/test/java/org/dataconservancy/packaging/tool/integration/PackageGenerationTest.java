@@ -49,6 +49,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.gov.nationalarchives.utf8.validator.Utf8Validator;
+import uk.gov.nationalarchives.utf8.validator.ValidationException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -83,6 +85,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @ContextConfiguration({
         "classpath*:org/dataconservancy/config/applicationContext.xml",
@@ -610,10 +613,45 @@ public class PackageGenerationTest {
         assertEquals(literal, result.get("unicodeString").get(0));
     }
 
-    /*
-     * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
-     * generic tree operations should be in a common library?
+    /**
+     * Insures non-binary content are encoded in UTF-8
+     *
+     * @throws Exception
      */
+    @Test
+    public void testUtf8BagContents() throws Exception {
+        PackageState state = initializer.initialize(DCS_PROFILE);
+        OpenedPackage openedPackage =
+                packager.createPackage(state, folder.getRoot());
+
+        List<File> characterFiles = new ArrayList<>();
+        new CharacterDirectoryWalker().doWalk(openedPackage.getBaseDirectory(), characterFiles);
+        assertTrue("Found no character files in package!", characterFiles.size() > 0);
+
+        StringBuilder errors = new StringBuilder();
+        Utf8Validator utf8Validator = new Utf8Validator(((message, byteOffset) -> {
+            if (errors.length() > 0) {
+                return;  // only log the first error.
+            }
+            errors.append("byte offset ").append(byteOffset).append(" ").append(message).append("\n");
+        }));
+
+        characterFiles.forEach(f -> {
+            try {
+                utf8Validator.validate(f);
+                if (errors.length() > 0) {
+                    fail("Package file " + f + " contains non-UTF8 characters (is it binary?): " + errors.toString());
+                }
+            } catch (IOException | ValidationException e) {
+                fail("UTF-8 validation of " + f + " failed unexpectedly: " + e.getMessage());
+            }
+        });
+    }
+
+    /*
+         * TODO: Copied verbatim from EditPackageContentPresenterImpl - maybe these
+         * generic tree operations should be in a common library?
+         */
     private void buildContentRoots(Node node, Node newTree) throws IOException {
         if (node.getChildren() != null) {
             for (Node child : node.getChildren()) {
@@ -805,6 +843,9 @@ public class PackageGenerationTest {
         return false;
     }
 
+    /**
+     * Naive class that collects all Turtle serializations that are in the 'ONT' directory.
+     */
     private class OntDirectoryWalker
             extends DirectoryWalker<File> {
 
@@ -819,6 +860,32 @@ public class PackageGenerationTest {
                     && file.getName().endsWith(".ttl")) {
                 results.add(file);
             }
+        }
+    }
+
+    /**
+     * Naive implementation that attempts to exclude directories in a package that are known to contain binary content.
+     * The remaining directories will be scannded, and files collected for processing.
+     */
+    private class CharacterDirectoryWalker
+            extends DirectoryWalker<File> {
+
+        public void doWalk(File baseDir, List<File> results) throws IOException {
+            walk(baseDir, results);
+        }
+
+        @Override
+        protected boolean handleDirectory(File directory, int depth, Collection<File> results) throws IOException {
+            if (directory.getName().equals("bin") || directory.getName().equals("STATE")) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void handleFile(File file, int depth, Collection<File> results) throws IOException {
+            results.add(file);
         }
     }
 }

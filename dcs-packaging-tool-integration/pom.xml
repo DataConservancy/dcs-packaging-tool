@@ -41,6 +41,12 @@
       <artifactId>spring-context</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>uk.gov.nationalarchives</groupId>
+      <artifactId>utf8-validator</artifactId>
+      <scope>test</scope>
+    </dependency>
     
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
