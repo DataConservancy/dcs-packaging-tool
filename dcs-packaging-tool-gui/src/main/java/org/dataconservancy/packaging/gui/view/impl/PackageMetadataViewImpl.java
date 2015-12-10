@@ -38,6 +38,7 @@ import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
+import org.dataconservancy.packaging.gui.util.ValidationAwareEventHandler;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
@@ -282,13 +283,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
             TextField textField = (TextField) ControlFactory.createControl(TextFactory.getText(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
 
-            if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.URL)) {
-                // TODO: this may have to be done via a button
+            if (packageMetadata.getValidationType() != null) {
                 TextPropertyBox propertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
                 fieldContainer.getChildren().add(propertyBox);
+                ((ValidationAwareEventHandler)textField.onActionProperty().getValue()).setValidProperty(propertyBox.isValid());
+            } else {
+                fieldContainer.getChildren().add(textField);
             }
 
-            fieldContainer.getChildren().add(textField);
             fieldContainer.getChildren().add(parentContainer);
 
         } else {
