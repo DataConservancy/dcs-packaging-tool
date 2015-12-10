@@ -34,6 +34,7 @@ import org.dataconservancy.packaging.tool.impl.DomainProfileObjectStoreImpl;
 import org.dataconservancy.packaging.tool.impl.DomainProfileServiceImpl;
 import org.dataconservancy.packaging.tool.impl.IpmRdfTransformService;
 import org.dataconservancy.packaging.tool.impl.URIGenerator;
+import org.dataconservancy.packaging.tool.impl.support.FilenameValidator;
 import org.dataconservancy.packaging.tool.model.ApplicationVersion;
 import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.RDFTransformException;
@@ -98,7 +99,7 @@ public class Controller {
         previousPages = new Stack<>();
         pageStack = new Stack<>();
         toolVersion = new ApplicationVersion();
-        defaultStateFileName = new SimpleStringProperty("");
+        defaultStateFileName = new SimpleStringProperty(packageStateFileExtension);
 
         ipmRdfTransformService = new IpmRdfTransformService();
         packageStateFileChooser = new FileChooser();
@@ -333,8 +334,13 @@ public class Controller {
                 packageState.setPackageTree(ipmRdfTransformService.transformToRDF(packageTree));
             }
             if(packageStateFile == null){
-                packageStateFileChooser.setInitialFileName(defaultStateFileName.getValue());
-               packageStateFile = showSaveFileDialog(packageStateFileChooser);
+                FilenameValidator validator = new FilenameValidator();
+                if (validator.isValid(defaultStateFileName.getValue())) {
+                    packageStateFileChooser.setInitialFileName(defaultStateFileName.getValue());
+                } else {
+                    packageStateFileChooser.setInitialFileName(packageStateFileExtension);
+                }
+                packageStateFile = showSaveFileDialog(packageStateFileChooser);
             }
             if (packageStateFile != null) {
                 try (FileOutputStream fs = new FileOutputStream(packageStateFile)) {
