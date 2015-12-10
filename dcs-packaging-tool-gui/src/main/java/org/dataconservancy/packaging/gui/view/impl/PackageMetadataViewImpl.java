@@ -46,9 +46,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueHint;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of the view that displays the controls for package metadata.
@@ -69,13 +67,14 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     private List<Node> allDynamicFields;
     private boolean formAlreadyDrawn = false;
-    private Set<String> failedValidation;
+    //for purposes of validation
+    private List<TextPropertyBox> allPropertyBoxes;
 
     public PackageMetadataViewImpl(Help help) {
         super();
         
         allDynamicFields = new ArrayList<>();
-        failedValidation = new HashSet<>();
+        allPropertyBoxes = new ArrayList<>();
 
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
@@ -287,6 +286,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 TextPropertyBox propertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
                 fieldContainer.getChildren().add(propertyBox);
                 ((ValidationAwareEventHandler)textField.onActionProperty().getValue()).setValidProperty(propertyBox.isValid());
+                allPropertyBoxes.add(propertyBox);
             } else {
                 fieldContainer.getChildren().add(textField);
             }
@@ -305,7 +305,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
                 TextPropertyBox propertyBox = new TextPropertyBox(initialValue, packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
                 propertyBox.getPropertyInput().setId(packageMetadata.getName());
                 allDynamicFields.add(propertyBox.getPropertyInput());
-
+                allPropertyBoxes.add(propertyBox);
                 //sorry for this hack, need to set this value here
                 if(packageMetadata.getName().equals(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL))){
                     packageNameField = (TextField) propertyBox.getPropertyInput();
@@ -333,8 +333,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public boolean hasFailedValidation(String fieldName) {
-        return failedValidation.contains(fieldName);
+    public boolean areAllFieldsValid() {
+        for(TextPropertyBox tpb : allPropertyBoxes) {
+            if (!tpb.isValid().getValue()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

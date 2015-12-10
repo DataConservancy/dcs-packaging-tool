@@ -161,8 +161,16 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     @Override
     public void onContinuePressed() {
         updatePackageState();
-        if (validateRequiredFields()) {
-            if (Platform.isFxApplicationThread()) {
+
+        if(!validateRequiredFields()){
+            view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
+            view.getErrorLabel().setVisible(true);
+            view.scrollToTop();
+        } else if(!view.areAllFieldsValid()) {
+            view.getErrorLabel().setVisible(false);
+            view.scrollToTop();
+        } else  {
+             if (Platform.isFxApplicationThread()) {
                 try {
                     getController().savePackageStateFile();
                 } catch (IOException | RDFTransformException e) {
@@ -174,10 +182,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
             view.getErrorLabel().setVisible(false);
             super.onContinuePressed();
-        } else {
-            view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
-            view.getErrorLabel().setVisible(true);
-            view.scrollToTop();
         }
     }
 
@@ -264,9 +268,6 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         //first check the editable required fields
         for (PackageMetadata reqField : packageMetadataService.getRequiredPackageMetadata()) {
             if (reqField.isEditable() && getController().getPackageState().getPackageMetadataValues(reqField.getName()) == null) {
-                return false;
-            }
-            else if (view.hasFailedValidation(reqField.getName())) {
                 return false;
             }
         }

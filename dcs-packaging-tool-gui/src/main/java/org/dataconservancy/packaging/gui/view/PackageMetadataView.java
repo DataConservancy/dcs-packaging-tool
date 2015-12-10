@@ -102,8 +102,7 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
 
     /**
      * Given a field name, it tells the presenter whether it's failed GUI validation or not.
-     * @param fieldName The name of the field that failed validation
      * @return true or false
      */
-    boolean hasFailedValidation(String fieldName);
+    boolean areAllFieldsValid();
 }
