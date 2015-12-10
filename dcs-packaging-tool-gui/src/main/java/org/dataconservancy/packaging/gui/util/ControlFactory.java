@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -202,12 +204,7 @@ public class ControlFactory implements CssConstants {
                         }
                     }
                 });
-                ((TextField) control).setOnAction(event -> {
-                    String text = ((TextField) control).getText();
-                    RemovableLabel removableLabel = new RemovableLabel(text, parentContainer);
-                    parentContainer.getChildren().add(removableLabel);
-                    ((TextField) control).clear();
-                });
+                ((TextField) control).setOnAction(new ValidationAwareEventHandler((TextField)control, parentContainer));
                 break;
 
             default:
