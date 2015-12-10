@@ -865,7 +865,7 @@ public class PackageGenerationTest {
 
     /**
      * Naive implementation that attempts to exclude directories in a package that are known to contain binary content.
-     * The remaining directories will be scannded, and files collected for processing.
+     * The remaining directories will be scanned, and files collected for processing.
      */
     private class CharacterDirectoryWalker
             extends DirectoryWalker<File> {
