@@ -1,7 +1,5 @@
 package org.dataconservancy.packaging.gui.util;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -11,9 +9,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import org.dataconservancy.packaging.gui.App;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.joda.time.DateTime;
 
@@ -214,11 +209,4 @@ public class ControlFactory implements CssConstants {
         return control;
     }
 
-    private static double computeTextHeight(String text, double wrappingWidth) {
-        Text helper = new Text();
-        helper.setText(text);
-        helper.setFont(Font.loadFont(App.class.getResource("/fonts/OpenSans-Regular.ttf").toExternalForm(), 14));
-        helper.setWrappingWidth((int)wrappingWidth);
-        return helper.getLayoutBounds().getHeight();
-    }
 }
