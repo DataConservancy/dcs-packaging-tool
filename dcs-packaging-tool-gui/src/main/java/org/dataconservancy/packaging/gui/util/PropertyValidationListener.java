@@ -15,6 +15,8 @@
  */
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -41,6 +43,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
     private PropertyValueHint validationType;
     private ImageView successImage;
     private ImageView failureImage;
+    private SimpleBooleanProperty isValid;
 
     /**
      * A validation listener for a property box.
@@ -53,6 +56,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
         this.validationImageLabel = new Label();
         this.successImage = createSuccessImageView();
         this.failureImage = createFailureImageView();
+        isValid = new SimpleBooleanProperty(true);
     }
 
     public void updateValidationType(PropertyValueHint validationType) {
@@ -97,12 +101,13 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                         textPropertyBox.getChildren().remove(validationLabel);
                         validationImageLabel.setGraphic(successImage);
                         validationImageLabel.setVisible(true);
+                        isValid.setValue(true);
                         break;
                 }
             } else {
                 validationImageLabel.setGraphic(failureImage);
                 validationImageLabel.setVisible(true);
-
+                isValid.setValue(false);
                 switch (validationType) {
                     case PHONE_NUMBER:
                         validationLabel.setText(TextFactory.format(Messages.MessageKey.PHONE_VALIDATION_FAILURE, newValue));
@@ -129,7 +134,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
             validationImageLabel.setVisible(false);
             validationImageLabel.setGraphic(null);
             textPropertyBox.getChildren().remove(validationLabel);
-
+            isValid.setValue(true);
         }
     }
 
@@ -152,4 +157,8 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
         image.getStyleClass().add(BAD_INPUT_IMAGE);
         return image;
     }
-}
+
+    public BooleanProperty isValid() {
+        return isValid;
+    }
+ }
