@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextInputControl;
@@ -47,5 +49,10 @@ public class NumericPropertyBox extends HBox implements PropertyBox {
     @Override
     public Node getView() {
         return this;
+    }
+
+    @Override
+    public BooleanProperty isValid() {
+        return new SimpleBooleanProperty(true);
     }
 }

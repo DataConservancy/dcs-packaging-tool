@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -37,7 +39,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     private HBox propertyInputBox = new HBox(4);
     private Label validationImageLabel = new Label();
     private PropertyValidationListener validationListener = null;
-
+    private BooleanProperty isValid;
     /**
      * Creates a validating property box for a property, with an initial String value
      * @param initialValue the intial value of the property
@@ -47,6 +49,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
                             the text control input
      */
     public TextPropertyBox(Object initialValue, boolean isEditable, PropertyValueHint validationType, String helpText) {
+        isValid = new SimpleBooleanProperty(true);
         createPropertyValueWidget(isEditable, initialValue, helpText, validationType);
 
         propertyInputBox.getChildren().add(propertyInput);
@@ -63,8 +66,10 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     //TODO: This should really go away, but is here to support repeatable box in the PackageMetadata view.
     public TextPropertyBox(TextField textField, PropertyValueHint validationType){
         propertyInput = textField;
+        isValid = new SimpleBooleanProperty(true);
         if(validationType != null) {
             validationListener = new PropertyValidationListener(this, validationType);
+            isValid.bind(validationListener.isValid());
             propertyInput.textProperty().addListener(validationListener);
         }
         propertyInputBox.getChildren().add(propertyInput);
@@ -83,6 +88,7 @@ public class TextPropertyBox extends VBox implements PropertyBox {
             propertyInput = (TextInputControl) ControlFactory.createControl(ControlType.TEXT_FIELD, initialValue, helpText);
             validationListener = new PropertyValidationListener(this, valueHint);
             propertyInput.textProperty().addListener(validationListener);
+            isValid.bind(validationListener.isValid());
             propertyInput.setEditable(editable);
         }
 
@@ -131,6 +137,11 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     @Override
     public Node getView() {
         return this;
+    }
+
+    @Override
+    public BooleanProperty isValid() {
+        return isValid;
     }
 }
 

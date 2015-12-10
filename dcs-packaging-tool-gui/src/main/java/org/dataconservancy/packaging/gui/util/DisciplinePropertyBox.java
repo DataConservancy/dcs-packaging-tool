@@ -15,6 +15,8 @@
  */
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
@@ -129,5 +131,10 @@ public class DisciplinePropertyBox extends HBox implements PropertyBox {
     @Override
     public Node getView() {
         return this;
+    }
+
+    @Override
+    public BooleanProperty isValid() {
+        return new SimpleBooleanProperty(true);
     }
 }

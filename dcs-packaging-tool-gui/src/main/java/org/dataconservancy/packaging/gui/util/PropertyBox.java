@@ -1,5 +1,7 @@
 package org.dataconservancy.packaging.gui.util;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
@@ -35,4 +37,6 @@ public interface PropertyBox {
      * @return The JavaFx node that makes up the view for the property box.
      */
     Node getView();
+
+    BooleanProperty isValid();
 }
