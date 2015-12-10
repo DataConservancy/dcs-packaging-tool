@@ -1,6 +1,8 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -47,6 +49,11 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
 
         // Staging directory is working directory by default.
         stagingDir = new File(System.getProperty("user.dir"));
+
+        //If we can't write to the current working directory switch to the java temp dir which we should have write access to
+        if (!Files.isWritable(FileSystems.getDefault().getPath(stagingDir.getPath()))) {
+            stagingDir = new File(System.getProperty("java.io.tmpdir"));
+        }
     }
 
     private void bind() {
