@@ -3,7 +3,6 @@ package org.dataconservancy.packaging.gui.util;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.HBox;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
