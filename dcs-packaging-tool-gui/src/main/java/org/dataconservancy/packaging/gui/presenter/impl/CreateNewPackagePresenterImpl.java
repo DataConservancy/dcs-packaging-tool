@@ -129,7 +129,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
                 view.getErrorLabel().setVisible(true);
             }
         } catch (Exception e) {
-            view.getErrorLabel().setText(TextFactory.format(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE, e.getMessage()));
+            view.getErrorLabel().setText(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE + "\n" + e.getMessage());
             view.getErrorLabel().setVisible(true);
             log.error(e.getMessage());
         }

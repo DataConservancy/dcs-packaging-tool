@@ -41,11 +41,11 @@ public class IPMServiceImpl implements IPMService {
                 invalidNames += invalidNamesList.get(i);
 
                 if (i + 1 < invalidNamesList.size()) {
-                    invalidNames += ", ";
+                    invalidNames += "\n";
                 }
             }
 
-            throw new IOException("Error creating package tree the follow names were invalid: " + invalidNames);
+            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe follow names were invalid:\n\n" + invalidNames);
         }
 
         visitedFiles.clear();
