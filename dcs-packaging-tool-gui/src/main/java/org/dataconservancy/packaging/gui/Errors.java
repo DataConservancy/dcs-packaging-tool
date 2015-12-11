@@ -46,7 +46,8 @@ public class Errors {
         INVALID_TREE_ERROR("invalidtree.error"),
         MISSING_PROPERTY_ERROR("missingproperty.error"),
         MISSING_FILES_ERROR("filesmissing.error"),
-        DOMAIN_PROFILE_PARSE_ERROR("domainprofileparse.error");
+        DOMAIN_PROFILE_PARSE_ERROR("domainprofileparse.error"),
+        SOME_FIELDS_INVALID("invalidfields.error");
 
 
         private String property;

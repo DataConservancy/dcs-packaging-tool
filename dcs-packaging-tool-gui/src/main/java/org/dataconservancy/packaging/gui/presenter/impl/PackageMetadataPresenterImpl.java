@@ -170,7 +170,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.getErrorLabel().setVisible(true);
             view.scrollToTop();
         } else if(!view.areAllFieldsValid()) {
-            view.getErrorLabel().setVisible(false);
+            view.getErrorLabel().setText(TextFactory.getText(ErrorKey.SOME_FIELDS_INVALID));
+            view.getErrorLabel().setVisible(true);
             view.scrollToTop();
         } else  {
              if (Platform.isFxApplicationThread()) {
