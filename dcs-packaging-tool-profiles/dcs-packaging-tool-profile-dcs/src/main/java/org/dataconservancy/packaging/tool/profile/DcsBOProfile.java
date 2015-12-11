@@ -724,19 +724,53 @@ public class DcsBOProfile
     }
 
     private void setSuppliedValues() {
-        Map<PropertyType, SuppliedProperty> supplied = new HashMap<>();
-
-        supplied.put(hasCreateDate, SuppliedProperty.FILE_CREATED_DATE);
-        supplied.put(hasModifiedDate, SuppliedProperty.FILE_MODIFIED_DATE);
-        supplied.put(hasTitle, SuppliedProperty.FILE_NAME);
-        supplied.put(hasSize, SuppliedProperty.FILE_SIZE);
-        supplied.put(hasFormat, SuppliedProperty.FILE_FORMAT_URI);
-
-        project.setSuppliedProperties(supplied);
-        collection.setSuppliedProperties(supplied);
-        dataItem.setSuppliedProperties(supplied);
-        file.setSuppliedProperties(supplied);
-        metadata.setSuppliedProperties(supplied);
+        // File and  metadata
+        
+        {
+            Map<PropertyType, SuppliedProperty> supplied = new HashMap<>();
+        
+            supplied.put(hasSize, SuppliedProperty.FILE_SIZE);
+            supplied.put(hasCreateDate, SuppliedProperty.FILE_CREATED_DATE);
+            supplied.put(hasModifiedDate, SuppliedProperty.FILE_MODIFIED_DATE);        
+            supplied.put(hasFormat, SuppliedProperty.FILE_FORMAT_URI);
+            supplied.put(hasTitle, SuppliedProperty.FILE_NAME);
+            
+            file.setSuppliedProperties(supplied);
+            metadata.setSuppliedProperties(supplied);
+        }
+        
+        // Collection
+        
+        {
+            Map<PropertyType, SuppliedProperty> supplied = new HashMap<>();
+        
+            supplied.put(hasCreateDate, SuppliedProperty.FILE_CREATED_DATE);
+            supplied.put(hasTitle, SuppliedProperty.FILE_NAME);
+            
+            collection.setSuppliedProperties(supplied);            
+        }
+        
+        // Data item
+        
+        {
+            Map<PropertyType, SuppliedProperty> supplied = new HashMap<>();
+        
+            supplied.put(hasCreateDate, SuppliedProperty.FILE_CREATED_DATE);
+            supplied.put(hasModifiedDate, SuppliedProperty.FILE_MODIFIED_DATE);        
+            supplied.put(hasTitle, SuppliedProperty.FILE_NAME);
+            
+            dataItem.setSuppliedProperties(supplied);
+        }
+        
+        // Project
+        
+        {
+            Map<PropertyType, SuppliedProperty> supplied = new HashMap<>();
+        
+            supplied.put(hasTitle, SuppliedProperty.FILE_NAME);
+            
+            project.setSuppliedProperties(supplied);
+        }
     }
 
     private static PropertyConstraint exactlyOne(PropertyType prop) {
