@@ -116,7 +116,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
     public void testContinueWithoutPackageName() {
         presenter.display();
 
-        view.getPackageNameField().setText(null);
+        view.getPackageNameField().getPropertyInput().setText(null);
         //view.addDomainProfileLabel("Some Domain");
         for (PackageMetadata pm : service.getRequiredPackageMetadata()) {
             view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> ((TextField) node).setText("Some Text"));
@@ -136,7 +136,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
     public void testContinueWithoutDynamicRequiredFields() {
         presenter.display();
 
-        view.getPackageNameField().setText("Some name");
+        view.getPackageNameField().getPropertyInput().setText("Some name");
 
         assertEquals(0, view.getErrorLabel().getText().length());
         assertFalse(showNextPage);
