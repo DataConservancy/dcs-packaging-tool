@@ -19,12 +19,12 @@ package org.dataconservancy.packaging.gui.view;
 import java.util.List;
 
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
+import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 
 /**
  * The view that shows the package metadata screen. In this view, the user will be able to select a name for the package,
@@ -33,11 +33,11 @@ import javafx.scene.control.TextField;
 public interface PackageMetadataView extends View<PackageMetadataPresenter> {
 
     /**
-     * A text field that is used for entering the package name.
+     * A TextPropertyBox that is used for entering the package name.
      *
-     * @return The text field for entering the package name.
+     * @return The TextPropertyBox for entering the package name.
      */
-    TextField getPackageNameField();
+    TextPropertyBox getPackageNameField();
 
     /**
      * A drop down list view with a list of domain profiles

@@ -21,7 +21,6 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
@@ -37,6 +36,8 @@ import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.ControlFactory;
 import org.dataconservancy.packaging.gui.util.ControlType;
+import org.dataconservancy.packaging.gui.util.DatePropertyBox;
+import org.dataconservancy.packaging.gui.util.PropertyBox;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.gui.util.ValidationAwareEventHandler;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
@@ -54,7 +55,7 @@ import java.util.List;
 public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresenter> implements PackageMetadataView {
 
     //Controls for setting the package name and output directory
-    private TextField packageNameField;
+    private TextPropertyBox packageNameField;
 
     //The value of the combobox domain profiles
     private ComboBox<String> domainProfilesComboBox;
@@ -67,14 +68,11 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     private List<Node> allDynamicFields;
     private boolean formAlreadyDrawn = false;
-    //for purposes of validation
-    private List<TextPropertyBox> allPropertyBoxes;
 
     public PackageMetadataViewImpl(Help help) {
         super();
         
         allDynamicFields = new ArrayList<>();
-        allPropertyBoxes = new ArrayList<>();
 
         contentScrollPane = new ScrollPane();
         contentScrollPane.setFitToWidth(true);
@@ -111,6 +109,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         packageNameMetadata.setName(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL));
         packageNameMetadata.setLabel(packageNameMetadata.getName().replace("-"," "));
         packageNameMetadata.setEditable(true);
+        packageNameMetadata.setVisible(true);
         packageNameMetadata.setHelpText(TextFactory.getText(LabelKey.PACKAGE_NAME_TOOLTIP));
         packageNameMetadata.setValidationType(PropertyValueHint.FILE_NAME);
 
@@ -152,7 +151,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     }
 
     @Override
-    public TextField getPackageNameField() {
+    public TextPropertyBox getPackageNameField() {
         return packageNameField;
     }
 
@@ -221,17 +220,13 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     @Override
     public void clearAllFields() {
-        packageNameField.clear();
+        packageNameField.clearValue();
         domainProfilesComboBox.getItems().clear();
         domainProfilesComboBox.setDisable(false);
         for (Node node : allDynamicFields) {
-            if (node instanceof TextField) {
-                ((TextField) node).clear();
-            }
-            if (node instanceof DatePicker) {
-                ((DatePicker) node).setValue(null);
-            }
-            if (node instanceof VBox) {
+            if (node instanceof PropertyBox) {
+                ((PropertyBox) node).clearValue();
+            } else if (node instanceof VBox) {
                 ((VBox) node).getChildren().clear();
             }
         }
@@ -275,40 +270,39 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         fieldContainer.getChildren().add(fieldLabelHbox);
 
         if (packageMetadata.isRepeatable()) {
+            //TODO: This all needs to go this is ridiculous - BMB
             VBox parentContainer = new VBox();
             parentContainer.getStyleClass().add(VBOX_BORDER);
             parentContainer.setId(packageMetadata.getName());
             allDynamicFields.add(parentContainer);
 
             TextField textField = (TextField) ControlFactory.createControl(TextFactory.getText(LabelKey.TYPE_VALUE_AND_ENTER_PROMPT), packageMetadata.getHelpText(), parentContainer, ControlType.TEXT_FIELD_W_REMOVABLE_LABEL);
-
-            if (packageMetadata.getValidationType() != null) {
-                TextPropertyBox propertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
-                fieldContainer.getChildren().add(propertyBox);
-                ((ValidationAwareEventHandler)textField.onActionProperty().getValue()).setValidProperty(propertyBox.isValid());
-                allPropertyBoxes.add(propertyBox);
-            } else {
-                fieldContainer.getChildren().add(textField);
-            }
+            TextPropertyBox propertyBox = new TextPropertyBox(textField, packageMetadata.getValidationType());
+            //This is used by the presenter to determine if this text property box has a corresponding "repeatable field vbox"
+            propertyBox.setUserData("repeatable");
+            propertyBox.setId(packageMetadata.getName());
+            ((ValidationAwareEventHandler)textField.onActionProperty().getValue()).setValidProperty(propertyBox.isValid());
+            fieldContainer.getChildren().add(propertyBox);
+            allDynamicFields.add(propertyBox);
 
             fieldContainer.getChildren().add(parentContainer);
 
         } else {
 
             if (packageMetadata.getValidationType() != null && packageMetadata.getValidationType().equals(PropertyValueHint.DATE_TIME)) {
-                DatePicker datePicker = (DatePicker) ControlFactory.createControl(ControlType.DATE_PICKER, LocalDate.now(), packageMetadata.getHelpText());
+                DatePropertyBox datePicker = new DatePropertyBox(LocalDate.now(), packageMetadata.isEditable(), packageMetadata.getHelpText());
                 datePicker.setId(packageMetadata.getName());
                 allDynamicFields.add(datePicker);
                 fieldContainer.getChildren().add(datePicker);
             } else {
                 String initialValue = packageMetadata.getDefaultValue() != null ? packageMetadata.getDefaultValue() : "";
                 TextPropertyBox propertyBox = new TextPropertyBox(initialValue, packageMetadata.isEditable(), packageMetadata.getValidationType(), packageMetadata.getHelpText());
-                propertyBox.getPropertyInput().setId(packageMetadata.getName());
-                allDynamicFields.add(propertyBox.getPropertyInput());
-                allPropertyBoxes.add(propertyBox);
+                propertyBox.setId(packageMetadata.getName());
+                allDynamicFields.add(propertyBox);
+
                 //sorry for this hack, need to set this value here
                 if(packageMetadata.getName().equals(TextFactory.getText(LabelKey.PACKAGE_NAME_LABEL))){
-                    packageNameField = (TextField) propertyBox.getPropertyInput();
+                    packageNameField = propertyBox;
                 }
                 fieldContainer.getChildren().add(propertyBox);
             }
@@ -334,8 +328,9 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
     @Override
     public boolean areAllFieldsValid() {
-        for(TextPropertyBox tpb : allPropertyBoxes) {
-            if (!tpb.isValid().getValue()) {
+        for(Node field : allDynamicFields) {
+            if (field instanceof PropertyBox)
+            if (!((PropertyBox)field).isValid().getValue()) {
                 return false;
             }
         }

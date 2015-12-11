@@ -27,7 +27,10 @@ import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.services.PackageMetadataService;
+import org.dataconservancy.packaging.gui.util.DatePropertyBox;
+import org.dataconservancy.packaging.gui.util.PropertyBox;
 import org.dataconservancy.packaging.gui.util.RemovableLabel;
+import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.gui.view.PackageMetadataView;
 import org.dataconservancy.packaging.tool.api.DomainProfileStore;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
@@ -77,7 +80,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.getDomainProfilesComboBox().setDisable(true);
         }
 
-        controller.getDefaultStateFileName().bind(view.getPackageNameField().textProperty());
+        controller.getDefaultStateFileName().bind(view.getPackageNameField().getPropertyInput().textProperty());
 
         return view.asNode();
     }
@@ -87,7 +90,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.clearAllFields();
 
             if (!Util.isEmptyOrNull(getController().getPackageState().getPackageName())) {
-                view.getPackageNameField().setText(getController().getPackageState().getPackageName());
+                view.getPackageNameField().getPropertyInput().setText(getController().getPackageState().getPackageName());
             }
 
             if (getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE) != null &&
@@ -115,17 +118,17 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             view.getAllDynamicFields().stream().filter(node ->
                                                            getController().getPackageState().getPackageMetadataValues(node.getId()) !=
                                                                null).forEach(node -> {
-                if (node instanceof TextField) {
-                    ((TextField) node).setText(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
-                } else if (node instanceof VBox) {
-                    for (String value : getController().getPackageState().getPackageMetadataValues(node.getId())) {
-                        ((VBox) node).getChildren().add(new RemovableLabel(value, (VBox) node));
+                if (node instanceof TextPropertyBox) {
+                    if (node.getUserData() == null || !((String)node.getUserData()).equalsIgnoreCase("repeatable")) {
+                        ((TextPropertyBox) node).getPropertyInput().setText(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
                     }
-                } else if (node instanceof DatePicker) {
+                } else if (node instanceof DatePropertyBox) {
                     DateTime date = DateUtility.parseDateString(getController().getPackageState().getPackageMetadataValues(node.getId()).get(0));
                     if (date != null) {
-                        ((DatePicker) node).setValue(LocalDate.of(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
+                        ((DatePropertyBox) node).getPropertyInput().setValue(LocalDate.of(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
                     }
+                } else if (node instanceof VBox) {
+                    getController().getPackageState().getPackageMetadataValues(node.getId()).stream().filter(value -> !Util.isEmptyOrNull(value)).forEach(value -> ((VBox) node).getChildren().add(new RemovableLabel(value, (VBox) node)));
                 }
             });
         }
@@ -206,7 +209,9 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     private void updatePackageState() {
 
         // Let's first fetch the static fields' values and update the PackageState with them.
-        getController().getPackageState().setPackageName(view.getPackageNameField().getText());
+        if (view.getPackageNameField().isValid().getValue() && !Util.isEmptyOrNull(view.getPackageNameField().getValueAsString())) {
+            getController().getPackageState().setPackageName((String) view.getPackageNameField().getValue());
+        }
 
         // Clear the package metadata list and reset the values based on the current state of form
         getController().getPackageState().setPackageMetadataList(new LinkedHashMap<>());
@@ -225,26 +230,20 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
 
         // Now let's go through the dynamic fields and update the package state.
         for (Node node : view.getAllDynamicFields()) {
-            if (node instanceof TextField) {
-                if (((TextField) node).getText() != null && !((TextField) node).getText().isEmpty()) {
-                    getController().getPackageState().addPackageMetadata(node.getId(), ((TextField) node).getText());
+            if (node instanceof PropertyBox) {
+                PropertyBox propertyBox = (PropertyBox) node;
+                if (propertyBox.isValid().getValue() && !Util.isEmptyOrNull(propertyBox.getValueAsString())) {
+                    getController().getPackageState().addPackageMetadata(node.getId(), propertyBox.getValueAsString());
                 }
             } else if (node instanceof VBox) {
-                for (Node removableLabel : ((VBox) node).getChildren()) {
-                    getController().getPackageState().addPackageMetadata(node.getId(), ((RemovableLabel) removableLabel).getLabel().getText());
-                }
-            } else if (node instanceof DatePicker) {
-                if (((DatePicker) node).getValue() != null) {
-                    LocalDate date  = ((DatePicker) node).getValue();
-                    getController().getPackageState().addPackageMetadata(node.getId(), date.toString());
-                }
+                ((VBox) node).getChildren().stream().filter(removableLabel -> removableLabel instanceof RemovableLabel).forEach(removableLabel -> getController().getPackageState().addPackageMetadata(node.getId(), ((RemovableLabel) removableLabel).getLabel().getText()));
             }
         }
     }
 
     private boolean areAllFieldsEmpty() {
         // Let's first fetch the static fields' values and update the PackageState with them.
-        if(view.getPackageNameField().getText() != null && !view.getPackageNameField().getText().isEmpty()) {
+        if(view.getPackageNameField().getValue() != null && !((String)view.getPackageNameField().getValue()).isEmpty()) {
             return false;
         }
 

@@ -154,6 +154,7 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <label>Bagging Date</label>
         <requiredness>RECOMMENDED</requiredness>
         <visible>true</visible>
+        <editable>true</editable>
         <validationType>DATE_TIME</validationType>
         <helpText>The date this package was produced.</helpText>
     </packageMetadata>
