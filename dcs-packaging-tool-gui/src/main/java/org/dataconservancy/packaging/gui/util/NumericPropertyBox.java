@@ -55,4 +55,9 @@ public class NumericPropertyBox extends HBox implements PropertyBox {
     public BooleanProperty isValid() {
         return new SimpleBooleanProperty(true);
     }
+
+    @Override
+    public void clearValue() {
+        propertyInput.clear();
+    }
 }

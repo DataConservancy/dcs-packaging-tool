@@ -137,4 +137,12 @@ public class DisciplinePropertyBox extends HBox implements PropertyBox {
     public BooleanProperty isValid() {
         return new SimpleBooleanProperty(true);
     }
+
+    @Override
+    public void clearValue() {
+        if (disciplineSelectionBox.getItems() != null && !disciplineSelectionBox.getItems().isEmpty()) {
+            disciplineSelectionBox.setValue(disciplineSelectionBox.getItems().get(0));
+        }
+
+    }
 }

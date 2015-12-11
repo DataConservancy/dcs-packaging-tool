@@ -38,5 +38,14 @@ public interface PropertyBox {
      */
     Node getView();
 
+    /**
+     * A boolean property that reflects whether or not the value in the property box is valid.
+     * @return True if the property is valid, or has no corresponding validator, false otherwise.
+     */
     BooleanProperty isValid();
+
+    /**
+     * Clears any values from this property box.
+     */
+    void clearValue();
 }

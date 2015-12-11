@@ -143,5 +143,10 @@ public class TextPropertyBox extends VBox implements PropertyBox {
     public BooleanProperty isValid() {
         return isValid;
     }
+
+    @Override
+    public void clearValue() {
+        propertyInput.clear();
+    }
 }
 

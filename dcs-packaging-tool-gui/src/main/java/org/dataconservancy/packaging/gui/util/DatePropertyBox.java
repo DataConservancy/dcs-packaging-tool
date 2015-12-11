@@ -8,6 +8,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.layout.HBox;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 
+import java.time.LocalDate;
+
 public class DatePropertyBox extends HBox implements PropertyBox {
 
     DatePicker propertyInput;
@@ -29,7 +31,7 @@ public class DatePropertyBox extends HBox implements PropertyBox {
     }
 
     @Override
-    public Control getPropertyInput() {
+    public DatePicker getPropertyInput() {
         return propertyInput;
     }
 
@@ -51,5 +53,10 @@ public class DatePropertyBox extends HBox implements PropertyBox {
     @Override
     public BooleanProperty isValid() {
         return new SimpleBooleanProperty(true);
+    }
+
+    @Override
+    public void clearValue() {
+        propertyInput.setValue(LocalDate.now());
     }
 }
