@@ -335,11 +335,14 @@ public class Controller {
             }
             if(packageStateFile == null){
                 FilenameValidator validator = new FilenameValidator();
-                if (validator.isValid(defaultStateFileName.getValue())) {
-                    packageStateFileChooser.setInitialFileName(defaultStateFileName.getValue());
-                } else {
-                    packageStateFileChooser.setInitialFileName(packageStateFileExtension);
+                String defaultFileName = packageStateFileExtension;
+                if (!defaultStateFileName.getValueSafe().isEmpty() && validator.isValid(defaultStateFileName.getValue())) {
+                    defaultFileName = defaultStateFileName.getValue();
+                    if (!defaultStateFileName.getValue().endsWith(".dcp")) {
+                        defaultFileName += ".dcp";
+                    }
                 }
+                packageStateFileChooser.setInitialFileName(defaultFileName);
                 packageStateFile = showSaveFileDialog(packageStateFileChooser);
             }
             if (packageStateFile != null) {
