@@ -1,7 +1,7 @@
 <rdf:RDF
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:j.0="http://dataconservancy.org/ns/types/"
-    xmlns:j.1="http://www.dataconservancy.org/internal-package-model/" >
+    xmlns:j.1="http://dataconservancy.org/internal-package-model/" >
   <rdf:Description rdf:nodeID="A0">
     <j.1:hasFileInfo rdf:nodeID="A1"/>
     <j.1:hasDomainObject>urn:uuid:8455c040-26c7-4a97-a1e9-9238ddcf6ca7</j.1:hasDomainObject>
@@ -9,14 +9,14 @@
     <j.1:hasParent rdf:nodeID="A2"/>
     <j.1:hasNodeType>fdp:media</j.1:hasNodeType>
     <j.0:hasId>test:1,1</j.0:hasId>
-    <rdf:type rdf:resource="http://www.dataconservancy.org/internal-package-model/IPMNode"/>
+    <rdf:type rdf:resource="http://dataconservancy.org/internal-package-model/IPMNode"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A3">
     <j.1:hasLocation>file:///2/0</j.1:hasLocation>
     <j.1:hasCreatedDate rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000</j.1:hasCreatedDate>
     <j.1:isDirectory rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</j.1:isDirectory>
     <j.0:isByteStream rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.0:isByteStream>
-    <rdf:type rdf:resource="http://www.dataconservancy.org/internal-package-model/FileInfo"/>
+    <rdf:type rdf:resource="http://dataconservancy.org/internal-package-model/FileInfo"/>
     <j.1:hasSHA1Checksum>54321</j.1:hasSHA1Checksum>
     <j.1:hasFormat>application/octet-stream</j.1:hasFormat>
     <j.1:hasModifiedDate rdf:datatype="http://www.w3.org/2001/XMLSchema#long">2000000</j.1:hasModifiedDate>
@@ -35,7 +35,7 @@
     <j.1:hasModifiedDate rdf:datatype="http://www.w3.org/2001/XMLSchema#long">2000000</j.1:hasModifiedDate>
     <j.1:hasCreatedDate rdf:datatype="http://www.w3.org/2001/XMLSchema#long">10000000</j.1:hasCreatedDate>
     <j.1:isDirectory rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</j.1:isDirectory>
-    <rdf:type rdf:resource="http://www.dataconservancy.org/internal-package-model/FileInfo"/>
+    <rdf:type rdf:resource="http://dataconservancy.org/internal-package-model/FileInfo"/>
     <j.1:hasMD5Checksum>12345</j.1:hasMD5Checksum>
     <j.1:hasSHA1Checksum>54321</j.1:hasSHA1Checksum>
     <j.0:hasName>PGALXY</j.0:hasName>
@@ -49,7 +49,7 @@
     <j.1:hasSize rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</j.1:hasSize>
     <j.1:hasLocation>file:///1/0</j.1:hasLocation>
     <j.0:hasName>BSUKF</j.0:hasName>
-    <rdf:type rdf:resource="http://www.dataconservancy.org/internal-package-model/FileInfo"/>
+    <rdf:type rdf:resource="http://dataconservancy.org/internal-package-model/FileInfo"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A6">
     <j.1:hasFileInfo rdf:nodeID="A3"/>
@@ -58,7 +58,7 @@
     <j.1:hasParent rdf:nodeID="A2"/>
     <j.1:hasNodeType>fdp:media</j.1:hasNodeType>
     <j.0:hasId>test:1,0</j.0:hasId>
-    <rdf:type rdf:resource="http://www.dataconservancy.org/internal-package-model/IPMNode"/>
+    <rdf:type rdf:resource="http://dataconservancy.org/internal-package-model/IPMNode"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A2">
     <j.1:hasFileInfo rdf:nodeID="A7"/>
@@ -68,7 +68,7 @@
     <j.1:isRoot rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</j.1:isRoot>
     <j.1:hasNodeType>fdp:farm</j.1:hasNodeType>
     <j.0:hasId>test:0,0</j.0:hasId>
-    <rdf:type rdf:resource="http://www.dataconservancy.org/internal-package-model/IPMNode"/>
+    <rdf:type rdf:resource="http://dataconservancy.org/internal-package-model/IPMNode"/>
   </rdf:Description>
   <rdf:Description rdf:nodeID="A5">
     <rdf:rest rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"/>
