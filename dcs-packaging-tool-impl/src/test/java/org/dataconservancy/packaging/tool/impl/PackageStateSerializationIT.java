@@ -177,6 +177,8 @@ public class PackageStateSerializationIT {
         underTest.deserialize(deserializedState, new BufferedInputStream(corruptStream.getInputStream()));
         SerializeEqualsTester.serializeEquals(state, deserializedState);
 
+        // TODO this test method should really be somewhere else; or the PackageStateSerializer should expose a
+        // setFailOnChecksumMismatch(boolean) method.
         if (underTest instanceof AnnotationDrivenPackageStateSerializer) {
             ((AnnotationDrivenPackageStateSerializer)underTest).setFailOnChecksumMismatch(true);
             try {
