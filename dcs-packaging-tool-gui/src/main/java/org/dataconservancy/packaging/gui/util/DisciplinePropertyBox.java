@@ -38,12 +38,12 @@ public class DisciplinePropertyBox extends HBox implements PropertyBox {
 
     private ComboBox<String> disciplineSelectionBox;
 
-    public DisciplinePropertyBox(String value, boolean editable, DisciplineLoadingService service, int prefWidth) {
+    public DisciplinePropertyBox(String value, boolean editable, DisciplineLoadingService service) {
         setAlignment(Pos.TOP_LEFT);
         setSpacing(30);
 
         final Map<String, List<String>> disciplineMap = service.getAllDisciplines();
-        getChildren().add(createDisciplineSelectors(disciplineMap, editable, findDisciplineGroup(value, service.getAllDisciplines()), value, prefWidth));
+        getChildren().add(createDisciplineSelectors(disciplineMap, editable, findDisciplineGroup(value, service.getAllDisciplines()), value));
     }
 
     private String findDisciplineGroup(String discipline, Map<String, List<String>> disciplineMap) {
@@ -59,7 +59,7 @@ public class DisciplinePropertyBox extends HBox implements PropertyBox {
         return groupName;
     }
 
-    private VBox createDisciplineSelectors(final Map<String, List<String>> availableDisciplines, boolean editable, String disciplineGroup, String disciplineValue, int prefWidth) {
+    private VBox createDisciplineSelectors(final Map<String, List<String>> availableDisciplines, boolean editable, String disciplineGroup, String disciplineValue) {
         VBox disciplineSelectors = new VBox(8);
 
         ComboBox<String> disciplineGroupBox = new ComboBox<>();
@@ -73,7 +73,7 @@ public class DisciplinePropertyBox extends HBox implements PropertyBox {
             disciplineGroupBox.setValue(disciplineGroup);
         }
 
-        disciplineGroupBox.setPrefWidth(prefWidth);
+        disciplineGroupBox.setPrefWidth(1600);
         disciplineGroupBox.setDisable(!editable);
 
         disciplineSelectors.getChildren().add(disciplineGroupBox);
@@ -89,7 +89,7 @@ public class DisciplinePropertyBox extends HBox implements PropertyBox {
             disciplineSelectionBox.setValue(disciplineValue);
         }
 
-        disciplineSelectionBox.setPrefWidth(prefWidth);
+        disciplineSelectionBox.setPrefWidth(1600);
         disciplineSelectionBox.setDisable(!editable);
         disciplineSelectors.getChildren().add(disciplineSelectionBox);
 

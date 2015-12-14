@@ -20,6 +20,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -97,6 +98,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
         Label userPropertyDefinitionLabel = new Label(TextFactory.getText(Labels.LabelKey.USER_PROPERTY_DEFINITION_LABEL));
         getChildren().add(userPropertyDefinitionLabel);
+        setPadding(new Insets(0, 24, 0, 0));
 
         //Create a box for the namespace selection elements
         final HBox namespaceBox = new HBox(15);
@@ -308,6 +310,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         Label typeLabel = new Label();
         typeLabel.textProperty().bind(targetType);
         typeLabel.setPrefWidth(100);
+        typeLabel.setMinWidth(100);
         valueInputBox.getChildren().add(typeLabel);
 
         //Create a button that allows for adding a new property value field box.
@@ -317,6 +320,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         //If there aren't any values already just create an empty box to specify one.
         if (values == null || values.isEmpty()) {
             PropertyBox propertyValueBox = createPropertyValueBox("", emptyPropertyValueListener, addNewPropertyListener);
+            propertyValueBox.getPropertyInput().setPrefWidth(1600);
             propertyValuesBox.getChildren().add(propertyValueBox.getView());
         } else {
             empty = false;
@@ -324,6 +328,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
             for (String value : values) {
                 PropertyBox propertyValueBox = createPropertyValueBox(value, emptyPropertyValueListener, addNewPropertyListener);
+                propertyValueBox.getPropertyInput().setPrefWidth(1600);
                 if (((TextInputControl)propertyValueBox.getPropertyInput()).getText().isEmpty()) {
                     empty = true;
                 }

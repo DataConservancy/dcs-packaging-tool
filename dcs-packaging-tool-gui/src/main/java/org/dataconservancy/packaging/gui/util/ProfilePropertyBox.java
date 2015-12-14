@@ -2,6 +2,7 @@ package org.dataconservancy.packaging.gui.util;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -36,7 +37,6 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
     //This is a little ugly but needed to keep complex properties grouped properly together.
     List<List<ProfilePropertyBox>> subPropertyBoxes;
 
-    private final int prefWidth = 250;
     private DisciplineLoadingService disciplineLoadingService;
 
     public ProfilePropertyBox(PropertyConstraint propertyConstraint, List<Property> existingProperties, DisciplineLoadingService disciplineLoadingService) {
@@ -48,6 +48,8 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         setSpacing(6);
 
         HBox propertyLabelAndValueBox = new HBox(12);
+        propertyLabelAndValueBox.setPadding(new Insets(0, 24, 0, 0));
+
         propertyLabelAndValueBox.setAlignment(Pos.CENTER_LEFT);
         Label propertyNameLabel = new Label(propertyConstraint.getPropertyType().getLabel());
 
@@ -56,6 +58,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         }
 
         propertyNameLabel.setPrefWidth(100);
+        propertyNameLabel.setMinWidth(100);
         propertyNameLabel.setWrapText(true);
         propertyLabelAndValueBox.getChildren().add(propertyNameLabel);
 
@@ -110,8 +113,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
                         value = formatService.formatPropertyValue(property);
                     }
                     PropertyBox propertyBox = generatePropertyBox(value, editable, property.getPropertyType());
-
-                    propertyBox.getPropertyInput().setPrefWidth(prefWidth);
+                    propertyBox.getPropertyInput().setPrefWidth(1600);
 
                     propertyBoxes.add(propertyBox);
                     propertyValuesBox.getChildren().add(propertyBox.getView());
@@ -122,7 +124,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
                 }
             } else {
                 PropertyBox propertyBox = generatePropertyBox("", editable, propertyConstraint.getPropertyType());
-                propertyBox.getPropertyInput().setPrefWidth(prefWidth);
+                propertyBox.getPropertyInput().setPrefWidth(1600);
 
                 propertyBoxes.add(propertyBox);
                 addChangeListenerToPropertyFields(propertyBox, listener);
@@ -138,7 +140,8 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
 
                 addNewButton.setOnAction(arg0 -> {
                     PropertyBox propertyBox = generatePropertyBox("", editable, propertyConstraint.getPropertyType());
-                    propertyBox.getPropertyInput().setPrefWidth(prefWidth);
+                    propertyBox.getPropertyInput().setPrefWidth(1600);
+
                     propertyValuesBox.getChildren().add(propertyBox.getView());
 
                     propertyBoxes.add(propertyBox);
@@ -168,7 +171,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
                     if (propertyType.getPropertyValueHint() != null) {
                         switch (propertyType.getPropertyValueHint()) {
                             case DCS_DISCIPLINE:
-                                return new DisciplinePropertyBox((String) initialValue, editable, disciplineLoadingService, prefWidth);
+                                return new DisciplinePropertyBox((String) initialValue, editable, disciplineLoadingService);
                             default:
                                 return new TextPropertyBox(initialValue, editable, propertyType.getPropertyValueHint(), "");
                         }
