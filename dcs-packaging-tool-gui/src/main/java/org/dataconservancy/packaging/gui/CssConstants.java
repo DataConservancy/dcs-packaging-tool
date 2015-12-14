@@ -67,4 +67,5 @@ public interface CssConstants {
     String EDIT_PACKAGE_TREE_MENU = "EditPackageContentsView-MenuItem";
     String REQUIRED_PROPERTY = "RequiredProperty";
     String REQUIRED_PROPERTY_EXPLANATION = "RequiredPropertyExplanation";
+    String NO_FILE_ENTITY = "NoFileEntityText";
 }

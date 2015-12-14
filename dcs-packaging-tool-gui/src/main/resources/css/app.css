@@ -541,4 +541,7 @@
         10, 0.0, 4, 4);
 }
 
+.NoFileEntityText {
+    -fx-font-style: italic;
+}
 
