@@ -16,8 +16,6 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
