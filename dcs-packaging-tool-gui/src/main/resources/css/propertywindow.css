@@ -89,6 +89,12 @@
      	1, 0.0, 0, 0);
 }
 
+.combo-box:focused {
+    -fx-background-color: #FFDFA3;
+    -fx-effect: dropshadow( one-pass-box , #D8A74E,
+        10, 0.0, 4, 4);
+}
+
 .PackageToolPopup .hyperlink {
    	-fx-text-fill: #316a93;
    	-fx-border-width: 0;
@@ -179,4 +185,3 @@
 .RequiredPropertyExplanation {
     -fx-font-size: 12;
 }
-

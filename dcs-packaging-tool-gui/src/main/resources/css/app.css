@@ -535,4 +535,10 @@
     -fx-background-color: #FFDFA3;
 }
 
+.combo-box:focused {
+    -fx-background-color: #FFDFA3;
+    -fx-effect: dropshadow( one-pass-box , #D8A74E,
+        10, 0.0, 4, 4);
+}
+
 

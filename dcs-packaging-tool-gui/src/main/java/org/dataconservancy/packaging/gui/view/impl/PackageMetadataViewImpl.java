@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -135,6 +137,17 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         domainProfileVBox.getChildren().add(domainProfileLabelAndTooltipBox);
         domainProfilesComboBox = new ComboBox<>();
         domainProfilesComboBox.setPrefWidth(267);
+
+        //This code ensures that if the user tabs over the domain property field the dropdown list is shown.
+        domainProfilesComboBox.focusedProperty().addListener((observable, oldFocus, newFocus) -> {
+            if (newFocus) {
+                domainProfilesComboBox.show();
+            } else {
+                domainProfilesComboBox.hide();
+            }
+
+        });
+
         domainProfileVBox.getChildren().add(domainProfilesComboBox);
 
         topRow.getChildren().add(domainProfileVBox);
