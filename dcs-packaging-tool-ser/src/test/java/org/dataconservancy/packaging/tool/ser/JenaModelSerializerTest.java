@@ -42,7 +42,7 @@ public class JenaModelSerializerTest {
     /**
      * An example namespace to test with.
      */
-    private final String IPM_NS = "http://www.dataconservancy.org/internal-package-model#";
+    private final String IPM_NS = "http://dataconservancy.org/internal-package-model#";
 
     /**
      * Serializer under test

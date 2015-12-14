@@ -38,7 +38,7 @@ import org.joda.time.DateTime;
  * Transforms DomainProfile and related classes to RDF and back.
  */
 public class DomainProfileRdfTransformService implements PackageResourceMapConstants {
-    public static final String DC_DP_NS_URI = "http://www.dataconservancy.org/ptg-prof/";
+    public static final String DC_DP_NS_URI = "http://dataconservancy.org/ptg-prof/";
     public static final Resource DP_TYPE = ResourceFactory.createResource(
         DC_DP_NS_URI + "DomainProfile");
     public static final Resource NODE_TYPE_TYPE = ResourceFactory.createResource(

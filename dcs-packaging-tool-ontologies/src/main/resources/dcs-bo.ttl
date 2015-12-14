@@ -1,11 +1,11 @@
-@prefix bom: <http://www.dataconservancy.org/business-object-model#> .
+@prefix bom: <http://dataconservancy.org/business-object-model#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<http://www.dataconservancy.org/business-object-model> a owl:Ontology ;
+<http://dataconservancy.org/business-object-model> a owl:Ontology ;
     dcterms:modified "2015-11-03"^^xsd:date ;
     dcterms:publisher <http://www.dataconservancy.org/> ;
     dcterms:title "Data Conservancy Business Object Model Ontology"@en ;

@@ -3,20 +3,20 @@
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
-    <!ENTITY imp "http://www.dataconservancy.org/internal-package-model#" >
+    <!ENTITY imp "http://dataconservancy.org/internal-package-model#" >
   ]>
 
 <rdf:RDF
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   xmlns:owl="http://www.w3.org/2002/07/owl#"
-  xmlns:imp="http://www.dataconservancy.org/internal-package-model#"
-  xml:base="http://www.dataconservancy.org/internal-package-model#"
+  xmlns:imp="http://dataconservancy.org/internal-package-model#"
+  xml:base="http://dataconservancy.org/internal-package-model#"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <owl:Ontology rdf:about="">
     <owl:versionIRI>
-      http://www.dataconservancy.org/internal-package-model/moo
+      http://dataconservancy.org/internal-package-model/moo
     </owl:versionIRI>
     <rdfs:comment>Internal Package Model ontology for the DCS Packaging Tool</rdfs:comment>
   </owl:Ontology>

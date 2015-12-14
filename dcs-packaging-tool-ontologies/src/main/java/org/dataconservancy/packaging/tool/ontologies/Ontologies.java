@@ -23,10 +23,10 @@ import java.util.Map;
 public interface Ontologies {
 
     String NS_DCS_ONTOLOGY_BOM =
-            "http://www.dataconservancy.org/business-object-model#";
+            "http://dataconservancy.org/business-object-model#";
 
     String NS_DCS_PKGTOOL_PROFILE =
-            "http://www.dataconservancy.org/ptg-prof/";
+            "http://dataconservancy.org/ptg-prof/";
 
     String NS_DCS_PKGTOOL_PROFILE_BOM =
             "http://dataconservancy.org/ptg-profiles/dcs-bo-1.0#";
