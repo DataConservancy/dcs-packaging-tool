@@ -270,13 +270,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             Tooltip.install(exclaimLabel, exclaimTooltip);
 
             if (packageNode.getFileInfo() != null && !ipmService.checkFileInfoIsAccessible(packageNode) && !packageNode.isIgnored()) {
-                            hbox.getChildren().add(exclaimLabel);
-                            nodesMissingFiles.add(packageNode.getIdentifier());
-                        } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
-                            nodesMissingFiles.remove(packageNode.getIdentifier());
-                        }
+                hbox.getChildren().add(exclaimLabel);
+                nodesMissingFiles.add(packageNode.getIdentifier());
+            } else if (nodesMissingFiles.contains(packageNode.getIdentifier())){
+                nodesMissingFiles.remove(packageNode.getIdentifier());
+            }
 
-                        Label viewLabel = new Label();
+            Label viewLabel = new Label();
             viewLabel.setPrefWidth(packageResourceColumn.getWidth());
             viewLabel.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS);
 
