@@ -669,8 +669,13 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 artifactDetailsScene.setRoot(propertiesPane);
             }
 
-            artifactDetailsWindow.setTitle(
-                packageNode.getFileInfo().getName() + " Properties");
+            String windowTitle = "";
+            if (packageNode.getFileInfo() != null) {
+                windowTitle += packageNode.getFileInfo().getName() + " ";
+            }
+
+            windowTitle += "Properties";
+            artifactDetailsWindow.setTitle(windowTitle);
             artifactDetailsWindow.setScene(artifactDetailsScene);
 
             if (!artifactDetailsWindow.isShowing()) {
