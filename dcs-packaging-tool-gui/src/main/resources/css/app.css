@@ -542,6 +542,7 @@
 }
 
 .NoFileEntityText {
+    -fx-font-family: OpenSans-Regular;
     -fx-font-style: italic;
 }
 

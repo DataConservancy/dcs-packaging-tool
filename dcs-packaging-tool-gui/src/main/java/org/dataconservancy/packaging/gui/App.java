@@ -55,6 +55,8 @@ public class App extends Application {
         factory.setStage(stage);
 
         Font.loadFont(App.class.getResource("/fonts/OpenSans-Regular.ttf").toExternalForm(), 14);
+        Font.loadFont(App.class.getResource("/fonts/OpenSans-Italic.ttf").toExternalForm(), 14);
+        Font.loadFont(App.class.getResource("/fonts/OpenSans-Bold.ttf").toExternalForm(), 14);
 
         Configuration config = factory.getConfiguration();
         CmdLineParser parser = new CmdLineParser(config);
