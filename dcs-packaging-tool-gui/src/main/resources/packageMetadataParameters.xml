@@ -24,8 +24,8 @@ v1.0. In addition to the name, the following properties can be used to describe 
         <visible>false</visible>
     </packageMetadata>
     <packageMetadata>
-        <name>Package-Manifest</name>
-        <label>Package Manifest</label>
+        <name>Resource-Manifest</name>
+        <label>Resource Manifest</label>
         <requiredness>RECOMMENDED</requiredness>
         <editable>false</editable>
         <visible>false</visible>

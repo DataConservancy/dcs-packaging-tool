@@ -47,5 +47,5 @@ public class BagItParameterNames extends GeneralParameterNames{
      * Addtional element names
      */
     public static final String BAGIT_PROFILE_ID = "BagIt-Profile-Identifier";
-    public static final String PACKAGE_MANIFEST = "Package-Manifest";
+    public static final String PACKAGE_MANIFEST = "Resource-Manifest";
 }
