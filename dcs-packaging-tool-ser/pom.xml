@@ -79,7 +79,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.dataconservancy.pkgtool</groupId>
-          <artifactId>dcs-shared-util</artifactId>
+          <artifactId>dcs-packaging-tool-shared</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

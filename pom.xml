@@ -292,13 +292,6 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!-- Support dependencies -->
-      <dependency>
-        <groupId>org.dataconservancy.shared</groupId>
-        <artifactId>dcs-shared-util</artifactId>
-        <version>1.0-SNAPSHOT</version>
-      </dependency>
-
     </dependencies>
 
   </dependencyManagement>
