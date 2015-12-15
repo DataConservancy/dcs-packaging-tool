@@ -47,6 +47,7 @@
     <module>dcs-packaging-tool-ontologies</module>
     <module>dcs-packaging-tool-ser</module>
     <module>dcs-packaging-tool-integration</module>
+    <module>dcs-shared-util</module>
   </modules>
 
   <!-- Properties  ================================================ -->
