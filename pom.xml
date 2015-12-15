@@ -174,8 +174,32 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
-      </plugin>      
-      
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <show>protected</show>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <version>1.0-beta-2</version>
+        <configuration>
+          <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
+          <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
+          <content>${project.reporting.outputDirectory}/apidocs</content>
+          <skipDeletedFiles>true</skipDeletedFiles>
+          <pubScmUrl>scm:git:https://github.com/DataConservancy/dcs-packaging-tool.git</pubScmUrl>
+          <scmBranch>gh-pages</scmBranch>
+        </configuration>
+      </plugin>
+
     </plugins>
     
   </build>
