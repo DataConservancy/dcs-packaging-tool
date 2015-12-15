@@ -571,7 +571,7 @@ public class PackageGenerationTest {
 
         assertTrue("Missing expected BagIt metadata field " + PACKAGE_MANIFEST + " in " + bagInfo,
                 result.containsKey(PACKAGE_MANIFEST));
-        assertEquals("bag://TestPackage/META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM/ORE-REM.ttl",
+        assertEquals("bag://TestPackage/META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM/ORE-REM.ttl",
                 result.get(PACKAGE_MANIFEST).get(0));
 
         // Package Metadata from the state is included
@@ -749,7 +749,7 @@ public class PackageGenerationTest {
         /* Lame, hardcoded for now */
         URI remURI =
                 URI.create(String
-                        .format("bag://%s/META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM/ORE-REM.ttl",
+                        .format("bag://%s/META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM/ORE-REM.ttl",
                                 Packager.PACKAGE_NAME));
 
         Path baseDir = pkg.getBaseDirectory().getParentFile().toPath();

@@ -294,7 +294,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package info directory
-        pkgInfoDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/PKG-INFO");
+        pkgInfoDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/PKG-INFO");
         if (!pkgInfoDir.exists()) {
             log.info("Creating package structure dir :" + pkgInfoDir.getPath());
             boolean isDirCreated = pkgInfoDir.mkdirs();
@@ -305,7 +305,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the ontology directory
-        ontologyDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/ONT");
+        ontologyDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/ONT");
         if (!ontologyDir.exists()) {
             log.info("Creating ontology dir :" + ontologyDir.getPath());
             boolean isDirCreated = ontologyDir.mkdirs();
@@ -327,7 +327,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package state directory
-        stateDir = new File(bagBaseDir, "META-INF/org.dataconservancy.bagit/STATE");
+        stateDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/STATE");
         if (!stateDir.exists()) {
             log.info("Creating Package State dir :" + stateDir.getPath());
             boolean isDirCreated = stateDir.mkdirs();

@@ -99,10 +99,10 @@ public class BagItPackageAssemblerTest {
     String contactPhone;
     String checksumAlg;
 
-    String stateDir = "META-INF/org.dataconservancy.bagit/STATE";
-    String pkgInfoDir = "META-INF/org.dataconservancy.bagit/PKG-INFO";
-    String remDir = "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM";
-    String ontologyDir = "META-INF/org.dataconservancy.bagit/ONT";
+    String stateDir = "META-INF/org.dataconservancy.packaging/STATE";
+    String pkgInfoDir = "META-INF/org.dataconservancy.packaging/PKG-INFO";
+    String remDir = "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM";
+    String ontologyDir = "META-INF/org.dataconservancy.packaging/ONT";
     String RemURI;
 
     Map<String, List<String>> packageMetadata = new HashMap<>();
@@ -413,16 +413,16 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
         assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/STATE" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
     }
 
     /**
@@ -510,16 +510,16 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
         assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/STATE" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
     }
 
     /**
@@ -584,16 +584,16 @@ public class BagItPackageAssemblerTest {
         String bagFilePath = packageName + pathSep;
         assertTrue(files.contains(bagFilePath + "bagit.txt"));
         assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep +"org.dataconservancy.bagit" + pathSep + "PKG-INFO" + pathSep +"metadataFile.txt"));
+        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep +"org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep +"metadataFile.txt"));
         assertTrue(files.contains(bagFilePath + "data" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
         assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
         assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO"+ pathSep ));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/PKG-INFO/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/STATE" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.bagit/ONT" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO"+ pathSep ));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
+        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
     }
 
     /**

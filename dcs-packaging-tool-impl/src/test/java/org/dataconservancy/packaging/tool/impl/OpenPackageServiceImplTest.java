@@ -29,7 +29,7 @@ public class OpenPackageServiceImplTest {
     private static final String PACKAGE_ZIP_RESOURCE = "fakebag.zip";
     private static final String PACKAGE_TAR_RESOURCE = "fakebag.tar";
     private static final String PACKAGE_TAR_GZ_RESOURCE = "fakebag.tar.gz";
-    private static final String PACKAGE_STATE_RESOURCE = "fakebag/META-INF/org.dataconservancy.bagit/STATE";
+    private static final String PACKAGE_STATE_RESOURCE = "fakebag/META-INF/org.dataconservancy.packaging/STATE";
 
     @Rule
     public TemporaryFolder tmpfolder = new TemporaryFolder();

@@ -34,7 +34,7 @@ import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
  */
 public class OpenPackageServiceImpl implements OpenPackageService {
     // Location of package state file in package base directory
-    private final static String PACKAGE_STATE_PATH = "META-INF/org.dataconservancy.bagit/STATE";
+    private final static String PACKAGE_STATE_PATH = "META-INF/org.dataconservancy.packaging/STATE";
 
     private PackageStateSerializer package_state_serializer;
     private IpmRdfTransformService ipm_transform_service;
