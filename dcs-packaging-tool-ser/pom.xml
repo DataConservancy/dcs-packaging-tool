@@ -78,7 +78,7 @@
           <artifactId>jena-arq</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.dataconservancy.shared</groupId>
+          <groupId>org.dataconservancy.pkgtool</groupId>
           <artifactId>dcs-shared-util</artifactId>
         </exclusion>
       </exclusions>

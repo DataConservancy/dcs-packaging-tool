@@ -47,7 +47,7 @@
     <module>dcs-packaging-tool-ontologies</module>
     <module>dcs-packaging-tool-ser</module>
     <module>dcs-packaging-tool-integration</module>
-    <module>dcs-shared-util</module>
+    <module>dcs-packaging-tool-shared</module>
   </modules>
 
   <!-- Properties  ================================================ -->
@@ -187,6 +187,12 @@
     <dependencies>
 
       <!-- DCS Packaging Tool Dependencies  -->
+      <dependency>
+        <groupId>org.dataconservancy.pkgtool</groupId>
+        <artifactId>dcs-packaging-tool-shared</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
 
       <dependency>
         <groupId>org.dataconservancy.pkgtool</groupId>

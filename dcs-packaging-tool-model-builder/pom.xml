@@ -61,7 +61,7 @@
       <scope>compile</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.dataconservancy.shared</groupId>
+          <groupId>org.dataconservancy.pkgtool</groupId>
           <artifactId>dcs-shared-util</artifactId>
         </exclusion>
       </exclusions>

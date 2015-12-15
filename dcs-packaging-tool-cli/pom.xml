@@ -187,7 +187,6 @@
     <dependency>
       <groupId>org.dataconservancy.pkgtool</groupId>
       <artifactId>dcs-packaging-tool-profile-dcs</artifactId>
-      <version>0.10.1-SNAPSHOT</version>
     </dependency>
 
 
