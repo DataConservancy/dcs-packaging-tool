@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -72,6 +73,7 @@ public class App extends Application {
         }
 
         Controller controller = factory.getController();
+        controller.setApplicationHostServices(getHostServices());
 
         controller.startApp();
 
@@ -91,5 +93,9 @@ public class App extends Application {
         stage.setTitle("DC Package Tool");
         stage.setScene(scene);
         stage.show();
+
+
     }
+
+
 }
