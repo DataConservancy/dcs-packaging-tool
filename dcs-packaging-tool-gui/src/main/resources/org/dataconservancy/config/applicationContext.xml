@@ -98,18 +98,22 @@
   <!-- VIEWS -->
   <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
     <property name="headerView" ref="headerView"/>
+    <property name="wikiLink" value="${packageToolWikiLink}"/>
   </bean>
 
   <bean id="packageMetadataView" class="org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl">
     <property name="headerView" ref="headerView"/>
+    <property name="wikiLink" value="${packageToolWikiLink}"/>
   </bean>
 
   <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
     <property name="headerView" ref="headerView"/>
+    <property name="wikiLink" value="${packageToolWikiLink}"/>
   </bean>
 
   <bean id="packageGenerationView" class="org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl">
     <property name="headerView" ref="headerView"/>
+    <property name="wikiLink" value="${packageToolWikiLink}"/>
   </bean>
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
@@ -118,6 +122,7 @@
   <!--  <constructor-arg ref="disciplineService"/>  -->
     <property name="ipmService" ref="ipmService"/>
     <property name="headerView" ref="headerView"/>
+    <property name="wikiLink" value="${packageToolWikiLink}"/>
   </bean>
   
   <bean id="headerView" class="org.dataconservancy.packaging.gui.view.impl.HeaderViewImpl">
@@ -125,6 +130,7 @@
 
   <bean id="openExistingPackageView" class="org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl">
     <property name="headerView" ref="headerView"/>
+    <property name="wikiLink" value="${packageToolWikiLink}"/>
   </bean>
 
   <!-- PRESENTERS -->

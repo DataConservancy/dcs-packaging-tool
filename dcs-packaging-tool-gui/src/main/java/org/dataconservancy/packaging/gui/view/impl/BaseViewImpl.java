@@ -49,6 +49,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     protected Button saveButton;
     protected Label packageName;
     protected HeaderView headerView;
+    private String wikiLink;
     protected Popup helpPopup;
     protected Popup aboutPopup;
     private Node aboutContent;
@@ -233,7 +234,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
 
                 Hyperlink packageToolWikiLink = new Hyperlink("See the tool's wiki site for more details.");
                 packageToolWikiLink.setOnAction(event -> presenter.getController().getApplicationHostServices().
-                        showDocument("https://wiki.library.jhu.edu/display/DCSDOCPKG/Package+Tools+Documentation+Home"));
+                        showDocument(wikiLink));
 
                 defaultAboutContent.getChildren().add(aboutText);
                 defaultAboutContent.getChildren().add(packageToolWikiLink);
@@ -278,7 +279,11 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public void setHeaderView(HeaderView headerView) {
         this.headerView = headerView;
     }
-    
+
+    public void setWikiLink(String wikiLink) {
+        this.wikiLink = wikiLink;
+    }
+
     @Override
     public Hyperlink getHeaderViewAboutLink() {
         return headerView.getAboutLink();
