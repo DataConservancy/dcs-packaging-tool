@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>DCS Packaging Tools &#x2013; About</title>
+    <title>DCS Packaging Tools &#x2013; Reactor Dependency Convergence</title>
     <style type="text/css" media="all">
       @import url("./css/maven-base.css");
       @import url("./css/maven-theme.css");
@@ -99,8 +99,8 @@
                           <a href="integration.html" title="Continuous Integration">Continuous Integration</a>
             </li>
                       <li class="none">
-                          <a href="dependency-convergence.html" title="Dependency Convergence">Dependency Convergence</a>
-            </li>
+            <strong>Dependency Convergence</strong>
+          </li>
                       <li class="none">
                           <a href="dependency-info.html" title="Dependency Information">Dependency Information</a>
             </li>
@@ -111,8 +111,8 @@
                           <a href="distribution-management.html" title="Distribution Management">Distribution Management</a>
             </li>
                       <li class="none">
-            <strong>About</strong>
-          </li>
+                          <a href="index.html" title="About">About</a>
+            </li>
                       <li class="none">
                           <a href="issue-tracking.html" title="Issue Tracking">Issue Tracking</a>
             </li>
@@ -153,54 +153,56 @@
     <div id="bodyColumn">
       <div id="contentBox">
         <div class="section">
-<h2><a name="About_DCS_Packaging_Tools"></a>About DCS Packaging Tools</h2><a name="About_DCS_Packaging_Tools"></a>
-<p>Maven 3 project POM for the Data Conservancy</p>
+<h2><a name="Reactor_Dependency_Convergence"></a>Reactor Dependency Convergence</h2>
+<table border="0" class="bodyTable"><caption>
+  <b>Legend:</b>
+</caption>
+<tr class="a">
+<td><img alt="error" src="images/icon_error_sml.gif" /></td>
+<td>At least one dependency has a differing version of the dependency or has SNAPSHOT dependencies.</td></tr></table><br />
+<table border="0" class="bodyTable"><caption>
+  <b>Statistics:</b>
+</caption>
+<tr class="b">
+<th>Number of modules:</th>
+<td>16</td></tr>
+<tr class="a">
+<th>Number of dependencies (NOD):</th>
+<td>96</td></tr>
+<tr class="b">
+<th>Number of unique artifacts (NOA):</th>
+<td>97</td></tr>
+<tr class="a">
+<th>Number of version-conflicting artifacts (NOC):</th>
+<td>1</td></tr>
+<tr class="b">
+<th>Number of SNAPSHOT artifacts (NOS):</th>
+<td>0</td></tr>
+<tr class="a">
+<th>Convergence (NOD/NOA):</th>
+<td><img alt="error" src="images/icon_error_sml.gif" />&#160;<b>98 %</b></td></tr>
+<tr class="b">
+<th>Ready for release (100 % convergence and no SNAPSHOTS):</th>
+<td><img alt="error" src="images/icon_error_sml.gif" />&#160;<b>Error</b><br />You do not have 100 % convergence.</td></tr></table></div>
 <div class="section">
-<h3><a name="Project_Modules"></a>Project Modules</h3><a name="Project_Modules"></a>
-<p>This project has declared the following modules:</p>
+<h3><a name="Dependencies_used_in_modules"></a>Dependencies used in modules</h3>
+<div class="section">
+<h4><a name="org.objenesis:objenesis"></a>org.objenesis:objenesis</h4>
 <table border="0" class="bodyTable">
 <tr class="a">
-<th>Name</th>
-<th>Description</th></tr>
+<td><img alt="error" src="images/icon_error_sml.gif" /></td>
+<td>
+<table border="0" class="bodyTable">
 <tr class="b">
-<td><a href="dcs-packaging-tool-api/index.html">Package Tool API</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td width="25%">1.2</td>
+<td>
+<ol style="list-style-type: decimal">
+<li>org.dataconservancy.pkgtool:dcs-packaging-tool-impl:jar:1.0.2-SNAPSHOT<br />\-&#160;org.dataconservancy.pkgtool:dcs-packaging-tool-model:jar:1.0.2-SNAPSHOT:compile<br />&#160;&#160;&#160;\-&#160;uk.com.robust-it:cloning:jar:1.9.0:compile<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.objenesis:objenesis:jar:1.2:compile<br /></li><br /></ol></td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-impl/index.html">Package Tool API Implementation</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="b">
-<td><a href="dcs-packaging-tool-cli/index.html">Package Tool Command Line</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="a">
-<td><a href="dcs-packaging-tool-gui/index.html">Package Tool GUI</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="b">
-<td><a href="dcs-packaging-tool-model/index.html">Package Tool Model</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="a">
-<td><a href="dcs-packaging-tool-model-builder/index.html">Package Tool Model Builder</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="b">
-<td><a href="dcs-packaging-tool-model-builder-properties/index.html">Package Tool Model Builder using Properties Configuration</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="a">
-<td><a href="dcs-packaging-tool-assemblies/index.html">Package Tool Maven Assemblies</a></td>
-<td>Maven assemblies for creating Packaging Tool distributions</td></tr>
-<tr class="b">
-<td><a href="dcs-packaging-tool-profiles/index.html">dcs-packaging-tool-profiles</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="a">
-<td><a href="dcs-packaging-tool-ontologies/index.html">dcs-packaging-tool-ontologies</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="b">
-<td><a href="dcs-packaging-tool-ser/index.html">Package Tool Serialization</a></td>
-<td>Serialization routines for the packaging tool</td></tr>
-<tr class="a">
-<td><a href="dcs-packaging-tool-integration/index.html">dcs-packaging-tool-integration</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
-<tr class="b">
-<td><a href="dcs-packaging-tool-shared/index.html">Data Conservancy Shared Utilties Parent POM</a></td>
-<td>Shared Utility Code for various DCS modules</td></tr></table></div></div>
+<td width="25%">2.1</td>
+<td>
+<ol style="list-style-type: decimal">
+<li>org.dataconservancy.pkgtool:dcs-packaging-tool-impl:jar:1.0.2-SNAPSHOT<br />\-&#160;org.powermock:powermock-module-junit4:jar:1.6.2:test<br />&#160;&#160;&#160;\-&#160;org.powermock:powermock-module-junit4-common:jar:1.6.2:test<br />&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;org.powermock:powermock-reflect:jar:1.6.2:test<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;\-&#160;(org.objenesis:objenesis:jar:2.1:test - omitted for conflict with 1.2)<br /></li><br /></ol></td></tr></table></td></tr></table></div></div>
       </div>
     </div>
     <div class="clear">

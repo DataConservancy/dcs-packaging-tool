@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>DCS Packaging Tools &#x2013; About</title>
+    <title>DCS Packaging Tools &#x2013; Project Plugin Management</title>
     <style type="text/css" media="all">
       @import url("./css/maven-base.css");
       @import url("./css/maven-theme.css");
@@ -111,8 +111,8 @@
                           <a href="distribution-management.html" title="Distribution Management">Distribution Management</a>
             </li>
                       <li class="none">
-            <strong>About</strong>
-          </li>
+                          <a href="index.html" title="About">About</a>
+            </li>
                       <li class="none">
                           <a href="issue-tracking.html" title="Issue Tracking">Issue Tracking</a>
             </li>
@@ -126,8 +126,8 @@
                           <a href="modules.html" title="Project Modules">Project Modules</a>
             </li>
                       <li class="none">
-                          <a href="plugin-management.html" title="Plugin Management">Plugin Management</a>
-            </li>
+            <strong>Plugin Management</strong>
+          </li>
                       <li class="none">
                           <a href="plugins.html" title="Project Plugins">Project Plugins</a>
             </li>
@@ -153,54 +153,136 @@
     <div id="bodyColumn">
       <div id="contentBox">
         <div class="section">
-<h2><a name="About_DCS_Packaging_Tools"></a>About DCS Packaging Tools</h2><a name="About_DCS_Packaging_Tools"></a>
-<p>Maven 3 project POM for the Data Conservancy</p>
-<div class="section">
-<h3><a name="Project_Modules"></a>Project Modules</h3><a name="Project_Modules"></a>
-<p>This project has declared the following modules:</p>
+<h2><a name="Project_Plugin_Management"></a>Project Plugin Management</h2><a name="Project_Plugin_Management"></a>
 <table border="0" class="bodyTable">
 <tr class="a">
-<th>Name</th>
-<th>Description</th></tr>
+<th>GroupId</th>
+<th>ArtifactId</th>
+<th>Version</th></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-api/index.html">Package Tool API</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>com.zenjava</td>
+<td><a class="externalLink" href="https://github.com/javafx-maven-plugin/javafx-maven-plugin">javafx-maven-plugin</a></td>
+<td>8.2.0</td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-impl/index.html">Package Tool API Implementation</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-antrun-plugin/">maven-antrun-plugin</a></td>
+<td>1.8</td></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-cli/index.html">Package Tool Command Line</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/archetype/maven-archetype-plugin">maven-archetype-plugin</a></td>
+<td>2.2</td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-gui/index.html">Package Tool GUI</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-assembly-plugin/">maven-assembly-plugin</a></td>
+<td>2.5.3</td></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-model/index.html">Package Tool Model</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-clean-plugin/">maven-clean-plugin</a></td>
+<td>2.6.1</td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-model-builder/index.html">Package Tool Model Builder</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-compiler-plugin/">maven-compiler-plugin</a></td>
+<td>3.2</td></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-model-builder-properties/index.html">Package Tool Model Builder using Properties Configuration</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-dependency-plugin/">maven-dependency-plugin</a></td>
+<td>2.10</td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-assemblies/index.html">Package Tool Maven Assemblies</a></td>
-<td>Maven assemblies for creating Packaging Tool distributions</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-deploy-plugin/">maven-deploy-plugin</a></td>
+<td>2.8.2</td></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-profiles/index.html">dcs-packaging-tool-profiles</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/enforcer/maven-enforcer-plugin">maven-enforcer-plugin</a></td>
+<td>1.4</td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-ontologies/index.html">dcs-packaging-tool-ontologies</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/surefire/maven-failsafe-plugin">maven-failsafe-plugin</a></td>
+<td>2.18.1</td></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-ser/index.html">Package Tool Serialization</a></td>
-<td>Serialization routines for the packaging tool</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-install-plugin/">maven-install-plugin</a></td>
+<td>2.5.2</td></tr>
 <tr class="a">
-<td><a href="dcs-packaging-tool-integration/index.html">dcs-packaging-tool-integration</a></td>
-<td>Maven 3 project POM for the Data Conservancy</td></tr>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-jar-plugin/">maven-jar-plugin</a></td>
+<td>2.5</td></tr>
 <tr class="b">
-<td><a href="dcs-packaging-tool-shared/index.html">Data Conservancy Shared Utilties Parent POM</a></td>
-<td>Shared Utility Code for various DCS modules</td></tr></table></div></div>
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-javadoc-plugin/">maven-javadoc-plugin</a></td>
+<td>2.10.1</td></tr>
+<tr class="a">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugin-tools/maven-plugin-plugin">maven-plugin-plugin</a></td>
+<td>3.4</td></tr>
+<tr class="b">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-project-info-reports-plugin/">maven-project-info-reports-plugin</a></td>
+<td>2.8</td></tr>
+<tr class="a">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/maven-release/maven-release-plugin/">maven-release-plugin</a></td>
+<td>2.5.3</td></tr>
+<tr class="b">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-remote-resources-plugin/">maven-remote-resources-plugin</a></td>
+<td>1.5</td></tr>
+<tr class="a">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-resources-plugin/">maven-resources-plugin</a></td>
+<td>2.7</td></tr>
+<tr class="b">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/scm/maven-scm-plugin/">maven-scm-plugin</a></td>
+<td>1.9.4</td></tr>
+<tr class="a">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-shade-plugin/">maven-shade-plugin</a></td>
+<td>2.3</td></tr>
+<tr class="b">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-site-plugin/">maven-site-plugin</a></td>
+<td>3.4</td></tr>
+<tr class="a">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-source-plugin/">maven-source-plugin</a></td>
+<td>2.4</td></tr>
+<tr class="b">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/surefire/maven-surefire-plugin">maven-surefire-plugin</a></td>
+<td>2.18.1</td></tr>
+<tr class="a">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/surefire/maven-surefire-report-plugin">maven-surefire-report-plugin</a></td>
+<td>2.18.1</td></tr>
+<tr class="b">
+<td>org.apache.maven.plugins</td>
+<td><a class="externalLink" href="http://maven.apache.org/plugins/maven-war-plugin/">maven-war-plugin</a></td>
+<td>2.6</td></tr>
+<tr class="a">
+<td>org.codehaus.mojo</td>
+<td><a class="externalLink" href="http://mojo.codehaus.org/build-helper-maven-plugin">build-helper-maven-plugin</a></td>
+<td>1.9.1</td></tr>
+<tr class="b">
+<td>org.codehaus.mojo</td>
+<td><a class="externalLink" href="http://mojo.codehaus.org/buildnumber-maven-plugin">buildnumber-maven-plugin</a></td>
+<td>1.2</td></tr>
+<tr class="a">
+<td>org.codehaus.mojo</td>
+<td><a class="externalLink" href="http://mojo.codehaus.org/jaxb2-maven-plugin/">jaxb2-maven-plugin</a></td>
+<td>1.6</td></tr>
+<tr class="b">
+<td>org.codehaus.mojo</td>
+<td><a class="externalLink" href="http://mojo.codehaus.org/license-maven-plugin">license-maven-plugin</a></td>
+<td>1.8</td></tr>
+<tr class="a">
+<td>org.jacoco</td>
+<td>http://jacoco-maven-plugin</td>
+<td>0.7.2.201409121644</td></tr>
+<tr class="b">
+<td>org.mortbay.jetty</td>
+<td><a class="externalLink" href="http://www.eclipse.org/jetty/jetty-parent/jetty-integration-project/jetty-maven-plugin">jetty-maven-plugin</a></td>
+<td>8.1.16.v20140903</td></tr></table></div>
       </div>
     </div>
     <div class="clear">
