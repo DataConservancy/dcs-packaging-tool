@@ -91,6 +91,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
     }
 
     public javafx.scene.Node display() {
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
+
         //Clear out any values from the previous run
         view.getErrorLabel().setText("");
         view.getCurrentOutputDirectoryTextField().setText("");

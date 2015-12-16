@@ -60,7 +60,6 @@ import org.dataconservancy.dcs.util.DisciplineLoadingService;
 import org.dataconservancy.packaging.gui.Configuration;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Help;
-import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.Messages;
@@ -144,7 +143,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     private Set<URI> nodesMissingFiles;
     private ContextMenu nodeContextMenu;
 
-    public EditPackageContentsViewImpl (final InternalProperties internalProperties, final Help help) {
+    public EditPackageContentsViewImpl (final InternalProperties internalProperties) {
         super();
         this.internalProperties = internalProperties;
 
@@ -466,8 +465,6 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         refreshPopupPositiveButton.getStyleClass().add(CLICKABLE);
         refreshPopupNegativeButton = new Button(TextFactory.getText(LabelKey.REJECT_BUTTON));
         refreshPopupNegativeButton.getStyleClass().add(CLICKABLE);
-        
-        setHelpPopupContent(help.get(HelpKey.PACKAGE_DESCRIPTION_HELP));
     }
 
     @Override
@@ -483,6 +480,11 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public CheckBox getFullPathCheckBox(){
         return fullPath;
+    }
+
+    @Override
+    public String getHelpText() {
+        return TextFactory.getText(Help.HelpKey.EDIT_PACKAGE_CONTENTS_HELP);
     }
 
     //Create the menu items for the selected rows in the tree view.

@@ -25,10 +25,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javafx.scene.text.Text;
 import org.dataconservancy.packaging.gui.Help;
-import org.dataconservancy.packaging.gui.Help.HelpKey;
-import org.dataconservancy.packaging.gui.Labels;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.CreateNewPackagePresenter;
@@ -51,7 +48,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     private ProgressDialogPopup progressIndicatorPopUp;
     private VBox content;
 
-    public CreateNewPackageViewImpl(Help help) {
+    public CreateNewPackageViewImpl() {
         super();
 
         getContinueButton().setText(TextFactory.getText(LabelKey.CONTINUE_BUTTON));
@@ -105,8 +102,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
         packageSelectionFields.getChildren().add(baseDirectorySelectionFields);   
 
         content.getChildren().add(packageSelectionFields);
-        
-        setHelpPopupContent(help.get(HelpKey.CREATE_NEW_PACKAGE_HELP));
     }
 
     @Override
@@ -122,6 +117,11 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     @Override
     public TextField getChooseContentDirectoryTextField() {
         return currentBaseDirectory;
+    }
+
+    @Override
+    public String getHelpText() {
+        return TextFactory.getText(Help.HelpKey.CREATE_NEW_PACKAGE_HELP);
     }
 
     @Override

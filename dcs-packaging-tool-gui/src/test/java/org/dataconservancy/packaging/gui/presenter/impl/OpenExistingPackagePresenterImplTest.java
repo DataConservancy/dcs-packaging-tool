@@ -67,7 +67,7 @@ public class OpenExistingPackagePresenterImplTest extends BaseGuiTest {
         when(controller.showOpenDirectoryDialog(any())).thenReturn(opened_dir);
         when(controller.getFactory()).thenReturn(factory);
         when(controller.getPackageStateFileExtension()).thenReturn("*" + PACKAGE_STATE_EXT);
-        view = new OpenExistingPackageViewImpl(help);
+        view = new OpenExistingPackageViewImpl();
 
         HeaderView headerView = new HeaderViewImpl();
         factory.setHeaderView(headerView);

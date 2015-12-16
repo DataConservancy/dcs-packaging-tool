@@ -28,7 +28,6 @@ import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.Errors.ErrorKey;
 import org.dataconservancy.packaging.gui.InternalProperties;
 import org.dataconservancy.packaging.gui.Labels;
-import org.dataconservancy.packaging.gui.Messages;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
@@ -96,6 +95,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     }
 
     public javafx.scene.Node display() {
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
 
         view.setupWindowBuilder();
 

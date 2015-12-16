@@ -31,7 +31,7 @@ public class CreateNewPackageViewImplTest extends BaseGuiTest {
 
     @Before
     public void setup() {
-        view = new CreateNewPackageViewImpl(help);
+        view = new CreateNewPackageViewImpl();
     }
     
     /**

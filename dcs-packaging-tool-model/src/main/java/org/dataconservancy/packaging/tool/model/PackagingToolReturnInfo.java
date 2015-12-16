@@ -46,7 +46,7 @@ public enum PackagingToolReturnInfo {
     PKG_DESC_RDF_TRANSFORM_EXCEPTION (302, "RDF Transform Exception"),
     PKG_DESC_IO_EXCEPTION (303, "Package serialization IO Exception"),
     PKG_DESC_UNSUPPORTED_ENCODING_EXCEPTION (304, "Unsupported Encoding Exception"),
-    PKG_VALIDATION_FAIL (305, "PackageDescription validation failed"),
+    PKG_VALIDATION_FAIL (305, "Package validation failed"),
 
     /* exceptions relating to package assembler */
     PKG_ASSEMBLER_URI_GENERATION_EXP (401, "Failed to generate file URI."),

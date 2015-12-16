@@ -78,13 +78,7 @@ public interface View<T extends Presenter> {
      * Shows the about popup linked to in the header.
      */
     void showAboutPopup();
-    
-    /**
-     * Allows for customizing the help popup contents
-     * @param content A node representing the contents the help popup should display.
-     */
-    void setHelpPopupContent(Node content);
-    
+
     /**
      * Allows for customizing the about popup content
      * @param content A node representing the contents the about popup should display.

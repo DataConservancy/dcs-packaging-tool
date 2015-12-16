@@ -41,14 +41,18 @@ public class HomepagePresenterImpl extends BasePresenterImpl implements Homepage
             getController().setCreateNewPackage(true);
             getController().goToNextPage();
         });
+
         view.getOpenExistingPackageButton().setOnAction(event -> {
             getController().setCreateNewPackage(false);
             getController().goToNextPage();
         });
+
     }
 
     @Override
     public Node display() {
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
+
         return view.asNode();
     }
 

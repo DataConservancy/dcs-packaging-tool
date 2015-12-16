@@ -58,7 +58,7 @@ public class HomepagePresenterImplTest extends BaseGuiTest {
 
         factory.setController(controller);
 
-        view = new HomepageViewImpl(help);
+        view = new HomepageViewImpl();
         HeaderView header = new HeaderViewImpl();
         view.setHeaderView(header);
         presenter = new HomepagePresenterImpl(view);

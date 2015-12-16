@@ -127,7 +127,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         controller.setPackageTree(project);
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
-        view = new EditPackageContentsViewImpl(internalProperties, help);
+        view = new EditPackageContentsViewImpl(internalProperties);
         view.setIpmService(ipmService);
 
         HeaderView headerView = new HeaderViewImpl();
@@ -144,7 +144,7 @@ public class EditPackageContentsPresenterImplTest extends BaseGuiTest {
         controller.setCreateNewPackage(true);
         controller.getPageStack().clear();
         controller.getPageStack().push(Page.GENERATE_PACKAGE);
-        PackageGenerationViewImpl packageGenerationView = new PackageGenerationViewImpl(help);
+        PackageGenerationViewImpl packageGenerationView = new PackageGenerationViewImpl();
         packageGenerationView.setHeaderView(headerView);
         factory.setPackageGenerationPresenter(new PackageGenerationPresenterImpl(packageGenerationView));
     }

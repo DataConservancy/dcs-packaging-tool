@@ -47,10 +47,8 @@ public abstract class BasePresenterImpl implements Presenter {
     
     private void bind() {
         view.getHeaderViewAboutLink().setOnAction(arg0 -> view.showAboutPopup());
-        
-        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
 
-        view.getCancelLink().setOnAction(event -> onBackPressed());
+        view.getCancelLink().setOnAction(event -> BasePresenterImpl.this.onBackPressed());
 
         view.getContinueButton().setOnAction(event -> onContinuePressed());
     }

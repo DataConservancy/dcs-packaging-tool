@@ -43,9 +43,6 @@ public abstract class BaseGuiTest {
 
     @Autowired
     protected Factory factory;
-    
-    @Autowired
-    protected Help help;
 /*
     @Before
     public void generalSetup() {

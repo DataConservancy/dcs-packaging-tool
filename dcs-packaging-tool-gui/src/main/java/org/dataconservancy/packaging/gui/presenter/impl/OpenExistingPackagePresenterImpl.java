@@ -210,7 +210,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
     @Override
     public Node display() {
         clear();
-
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
         return view.asNode();
     }
 

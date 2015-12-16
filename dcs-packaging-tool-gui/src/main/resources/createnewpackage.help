@@ -1,1 +1,1 @@
-The first step to creating a new package is to select the base directory of the content you would like to package
+Click the “Browse” button to begin selecting a directory which, along with its contents, will be automatically mapped into package resources using the previously selected domain profile.  You will have the option to modify these automated mappings (as well as to add new files or ignore existing ones) on the next screen. After making your selection, proceed to edit the contents of the package by clicking the "Continue" button.

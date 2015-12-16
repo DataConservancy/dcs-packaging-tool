@@ -35,16 +35,6 @@ public class GeneralParameterNames {
     public static final String EXTERNAL_PROJECT_ID = "External-Project-Id";
 	public static final String DOMAIN_PROFILE = "Domain-Profile";
 
-	/**
-	 * Parameter to indicate whether a PackageDescription shall be validated
-	 * before processing.
-	 * <p>
-	 * This is a boolean, so acceptable values are "true" or "false",
-	 * non-case-sensitive (i.e. "True", "true", or "TRUE" are all valid values.
-	 * </p>
-	 */
-	public static final String VALIDATE_PACKAGE_DESCRIPTION = "Validate-Package-Description";
-
     /**
      * Possible values for the {@link #REM_SERIALIZATION_FORMAT} parameter. This is a list
      * of supported serialization formats for RDF data (ORE-ReM, domain objects, etc)

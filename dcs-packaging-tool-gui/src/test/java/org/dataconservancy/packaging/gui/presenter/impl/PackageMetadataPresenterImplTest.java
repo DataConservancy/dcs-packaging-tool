@@ -87,7 +87,7 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
         };
 
-        view = new PackageMetadataViewImpl(help);
+        view = new PackageMetadataViewImpl();
 
         HeaderView header = new HeaderViewImpl();
         view.setHeaderView(header);

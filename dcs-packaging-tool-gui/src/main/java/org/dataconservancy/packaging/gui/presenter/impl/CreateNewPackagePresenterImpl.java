@@ -143,6 +143,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     }
 
     public javafx.scene.Node display() {
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
         return view.asNode();
     }
 

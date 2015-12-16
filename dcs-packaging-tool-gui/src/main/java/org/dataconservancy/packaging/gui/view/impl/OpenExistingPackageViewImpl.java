@@ -42,7 +42,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
     private TextField choosePackageStagingDirectoryTextField;
     private ProgressDialogPopup progressDialogPopup;
 
-    public OpenExistingPackageViewImpl(Help help) {
+    public OpenExistingPackageViewImpl() {
         super();
 
         getContinueButton().setText(TextFactory.getText(Labels.LabelKey.CONTINUE_BUTTON));
@@ -171,8 +171,6 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         }
         
         content.getChildren().addAll(infoVBox, optionVBox);
-
-        setHelpPopupContent(help.get(Help.HelpKey.OPEN_EXISTING_PACKAGE));
     }
 
     @Override
@@ -197,6 +195,11 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
         }
 
         return progressDialogPopup;
+    }
+
+    @Override
+    public String getHelpText() {
+        return TextFactory.getText(Help.HelpKey.OPEN_EXISTING_PACKAGE);
     }
 
     @Override

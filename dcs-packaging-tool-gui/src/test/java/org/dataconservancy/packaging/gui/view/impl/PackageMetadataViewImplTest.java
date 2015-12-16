@@ -41,7 +41,7 @@ public class PackageMetadataViewImplTest extends BaseGuiTest {
     @Before
     public void setup() throws IOException {
 
-        view = new PackageMetadataViewImpl(help);
+        view = new PackageMetadataViewImpl();
         service = new PackageMetadataService(configuration);
 
     }

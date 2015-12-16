@@ -97,29 +97,24 @@
 
   <!-- VIEWS -->
   <bean id="homepageView" class="org.dataconservancy.packaging.gui.view.impl.HomepageViewImpl">
-    <constructor-arg ref="help"/>
     <property name="headerView" ref="headerView"/>
   </bean>
 
   <bean id="packageMetadataView" class="org.dataconservancy.packaging.gui.view.impl.PackageMetadataViewImpl">
-    <constructor-arg ref="help"/>    
     <property name="headerView" ref="headerView"/>
   </bean>
 
   <bean id="createNewPackageView" class="org.dataconservancy.packaging.gui.view.impl.CreateNewPackageViewImpl">
-    <constructor-arg ref="help"/>    
     <property name="headerView" ref="headerView"/>
   </bean>
 
   <bean id="packageGenerationView" class="org.dataconservancy.packaging.gui.view.impl.PackageGenerationViewImpl">
-    <constructor-arg ref="help"/>    
     <property name="headerView" ref="headerView"/>
   </bean>
 
   <bean id="editPackageContentsView" class="org.dataconservancy.packaging.gui.view.impl.EditPackageContentsViewImpl">
     <constructor-arg ref="internalProperties"/>
     <!-- <constructor-arg value="classpath:/userProperties.json"/> -->
-    <constructor-arg ref="help"/>
   <!--  <constructor-arg ref="disciplineService"/>  -->
     <property name="ipmService" ref="ipmService"/>
     <property name="headerView" ref="headerView"/>
@@ -129,7 +124,6 @@
   </bean>
 
   <bean id="openExistingPackageView" class="org.dataconservancy.packaging.gui.view.impl.OpenExistingPackageViewImpl">
-    <constructor-arg ref="help"/>
     <property name="headerView" ref="headerView"/>
   </bean>
 

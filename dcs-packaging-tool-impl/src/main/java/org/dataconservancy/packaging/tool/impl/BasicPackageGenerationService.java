@@ -41,9 +41,6 @@ import org.dataconservancy.packaging.tool.model.PackageToolException;
  * {@link #generatePackage(PackageState, PackageGenerationParameters)}
  * </p>
  * <dl>
- * <dt>{@link GeneralParameterNames#VALIDATE_PACKAGE_DESCRIPTION}</dt>
- * <dd>If "True", the PackageDescription will be pre-validated before the
- * generator is run, if "False", it will not.</dd>
  * <dt>{@link GeneralParameterNames#PACKAGE_FORMAT_ID}</dt>
  * <dd>ID of the packaging format that shall be generated. An exception will be
  * thrown if there are no configured generators that produce the desired

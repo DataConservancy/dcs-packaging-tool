@@ -118,7 +118,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         factory.setController(controller);
 
         // For this test, we want a new Presenter and view for each test so that the status message is checked properly
-        view = new PackageGenerationViewImpl(help);
+        view = new PackageGenerationViewImpl();
 
         HeaderView headerView = new HeaderViewImpl();
         view.setHeaderView(headerView);

@@ -35,7 +35,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import org.dataconservancy.packaging.gui.Help;
-import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageGenerationPresenter;
@@ -94,7 +93,7 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
     private ScrollPane contentScrollPane;
 
-    public PackageGenerationViewImpl(Help help) {
+    public PackageGenerationViewImpl() {
         super();
         
         contentScrollPane = new ScrollPane();
@@ -298,8 +297,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         cancelOverwriteButton = new Button(TextFactory.getText(LabelKey.CANCEL_BUTTON));
         okOverwriteButton = new Button(TextFactory.getText(LabelKey.OK_BUTTON));
-
-        setHelpPopupContent(help.get(HelpKey.PACKAGE_GENERATION_HELP));         
     }
 
     @Override
@@ -316,8 +313,13 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     public ToggleGroup getCompressionToggleGroup() {
         return compressionToggleGroup;
     }
-    
-    @Override 
+
+    @Override
+    public String getHelpText() {
+        return TextFactory.getText(Help.HelpKey.PACKAGE_GENERATION_HELP);
+    }
+
+    @Override
     public ToggleGroup getArchiveToggleGroup() {
         return archiveToggleGroup;
     }

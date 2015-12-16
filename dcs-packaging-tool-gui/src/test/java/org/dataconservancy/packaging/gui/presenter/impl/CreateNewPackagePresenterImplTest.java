@@ -120,7 +120,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
             controller.setFactory(factory);
             factory.setController(controller);
 
-            view = new CreateNewPackageViewImpl(help);
+            view = new CreateNewPackageViewImpl();
 
             view.setHeaderView(header);
             presenter = new CreateNewPackagePresenterImpl(view);

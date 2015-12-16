@@ -30,7 +30,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.dataconservancy.packaging.gui.Help;
-import org.dataconservancy.packaging.gui.Help.HelpKey;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
@@ -69,7 +68,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     private List<Node> allDynamicFields;
     private boolean formAlreadyDrawn = false;
 
-    public PackageMetadataViewImpl(Help help) {
+    public PackageMetadataViewImpl() {
         super();
         
         allDynamicFields = new ArrayList<>();
@@ -157,8 +156,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         bottomContent = new VBox(5);
 
         content.getChildren().add(bottomContent);
-        
-        setHelpPopupContent(help.get(HelpKey.PACKAGE_METADATA_HELP));
     }
 
     @Override
@@ -183,6 +180,10 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         domainProfilesComboBox.setValue(profileNames.get(0));
     }
 
+    @Override
+    public String getHelpText() {
+        return TextFactory.getText(Help.HelpKey.PACKAGE_METADATA_HELP);
+    }
 
     @Override
     public void setupRequiredFields(List<PackageMetadata> requiredPackageMetadataList) {

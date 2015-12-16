@@ -11,6 +11,7 @@ public class TextFactory {
     private Labels labels;
     private Messages messages;
     private Errors errors;
+    private Help help;
 
     private static TextFactory instance;
 
@@ -23,6 +24,9 @@ public class TextFactory {
 
         ResourceBundle errorResource = ResourceBundle.getBundle("bundles/errors");
         errors = new Errors(errorResource);
+
+        ResourceBundle helpResource = ResourceBundle.getBundle("bundles/help");
+        help = new Help(helpResource);
     }
 
     /**
@@ -41,6 +45,8 @@ public class TextFactory {
             return instance.messages.get((Messages.MessageKey)key);
         } else if (key instanceof Errors.ErrorKey) {
             return instance.errors.get((Errors.ErrorKey) key);
+        } else if (key instanceof Help.HelpKey) {
+            return  instance.help.get((Help.HelpKey) key);
         }
 
         return "";
@@ -63,6 +69,8 @@ public class TextFactory {
             return instance.messages.format((Messages.MessageKey)key, args);
         } else if (key instanceof Errors.ErrorKey) {
             return instance.errors.format((Errors.ErrorKey) key, args);
+        } else if (key instanceof Help.HelpKey) {
+            return instance.help.format((Help.HelpKey) key, args);
         }
 
         return "";

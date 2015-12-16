@@ -71,6 +71,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     }
 
     public Node display() {
+        view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
+
         bind();
 
         setExistingValues();

@@ -54,7 +54,7 @@ public interface EditPackageContentsPresenter extends Presenter {
     void changeType(List<Node> nodes, NodeTransform transform);
 
     /**
-     * Rerun the ontology service on the PackageDescription and redisplay the resulting PackageTree.
+     * Redisplays the package tree.
      */
     void rebuildTreeView();
 

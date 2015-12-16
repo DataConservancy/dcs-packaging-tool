@@ -40,9 +40,8 @@ public class Help {
         PACKAGE_METADATA_HELP("packagemetadata.help"),
         PACKAGE_GENERATION_HELP("packagegeneration.help"), 
         CREATE_NEW_PACKAGE_HELP("createnewpackage.help"), 
-        PACKAGE_DESCRIPTION_HELP("packagedescription.help"),
+        EDIT_PACKAGE_CONTENTS_HELP("editpackagecontents.help"),
         OPEN_EXISTING_PACKAGE("openexistingpackage.help");
-
 
         private String property;
 
@@ -78,7 +77,17 @@ public class Help {
         
         
     }
-    
+
+    public String format(HelpKey key, Object... args) {
+        if (!bundle.containsKey(key.getProperty())) {
+            log.error("Error getting help file. " + key.getProperty() + " resource does not exist.");
+
+            throw new IllegalArgumentException("No such resource: " + key.getProperty());
+        }
+
+        return String.format(bundle.getLocale(), key.getProperty(), args);
+    }
+
     public String get(String property) {
         String helpText = "";
 

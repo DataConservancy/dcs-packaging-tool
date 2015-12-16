@@ -35,7 +35,7 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
     private Button createNewPackageButton;
     private Button openExistingPackageButton;
 
-    public HomepageViewImpl(Help help) {
+    public HomepageViewImpl() {
         super();
         createNewPackageButton = new Button(TextFactory.getText(Labels.LabelKey.CREATE_NEW_PACKAGE));
         openExistingPackageButton = new Button(TextFactory.getText(Labels.LabelKey.OPEN_EXISTING_PACKAGE));
@@ -51,7 +51,6 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
         content.getChildren().add(openExistingPackageButton);
 
         setCenter(content);
-        setHelpPopupContent(help.get(Help.HelpKey.HOMEPAGE_HELP));
     }
 
     @Override
@@ -62,5 +61,10 @@ public class HomepageViewImpl extends BaseViewImpl<HomepagePresenter> implements
     @Override
     public Button getOpenExistingPackageButton() {
         return openExistingPackageButton;
+    }
+
+    @Override
+    public String getHelpText() {
+        return TextFactory.getText(Help.HelpKey.HOMEPAGE_HELP);
     }
 }

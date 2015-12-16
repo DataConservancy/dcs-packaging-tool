@@ -63,7 +63,7 @@ public class EditPackageContentsViewImplTest extends BaseGuiTest {
         DcBoIpmFactory boFactory = new DcBoIpmFactory();
         project = boFactory.createSmallLinearTree();
 
-        view = new EditPackageContentsViewImpl(internalProperties, help);
+        view = new EditPackageContentsViewImpl(internalProperties);
         HeaderView headerView = new HeaderViewImpl();
         view.setIpmService(ipmService);
         view.setHeaderView(headerView);

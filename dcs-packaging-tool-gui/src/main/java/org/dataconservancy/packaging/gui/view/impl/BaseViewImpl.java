@@ -16,9 +16,6 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
-import javafx.application.HostServices;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,13 +30,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Popup;
+import org.dataconservancy.dcs.util.Util;
 import org.dataconservancy.packaging.gui.CssConstants;
 import org.dataconservancy.packaging.gui.Labels.LabelKey;
 import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.View;
-
 
 /**
  * Base view that handles controls and view elements that are the same across all views.
@@ -54,7 +51,6 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     protected HeaderView headerView;
     protected Popup helpPopup;
     protected Popup aboutPopup;
-    private Node helpContent;
     private Node aboutContent;
     protected Label errorLabel;
 
@@ -134,6 +130,9 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         return saveButton;
     }
 
+    public String getHelpText() {
+        return "";
+    }
 
     @Override
     public void showHelpPopup() {
@@ -170,7 +169,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
 
             helpPopup.getContent().add(popupHelpView);
 
-            if (helpContent == null) {
+            if (Util.isEmptyOrNull(getHelpText())) {
                 VBox defaultHelpContent = new VBox();
                 defaultHelpContent.setPrefHeight(200);
                 defaultHelpContent.setPrefWidth(200);
@@ -180,6 +179,10 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
                 defaultHelpContent.getChildren().add(helpText);
                 popupHelpView.setCenter(defaultHelpContent);
             } else {
+                Label helpContent = new Label(getHelpText());
+                helpContent.setMaxWidth(300);
+                helpContent.setWrapText(true);
+                helpContent.setTextAlignment(TextAlignment.LEFT);
                 helpContent.getStyleClass().add(PACKAGE_TOOL_POPUP_CONTENT_CLASS);
                 popupHelpView.setCenter(helpContent);
             }
@@ -188,19 +191,10 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         helpPopup.show(scene.getWindow(), x, y);
     }
 
-    public void setHelpPopupContent(String msg) {
-        Label helpText = new Label(msg);
-        helpText.setMaxWidth(300);
-        helpText.setWrapText(true);
-        helpText.setTextAlignment(TextAlignment.CENTER);
-
-        setHelpPopupContent(helpText);
-    }
-
     @Override
     public void showAboutPopup() {
         Scene scene = headerView.getAboutLink().getScene();
-
+        
         Point2D point = headerView.getAboutLink().localToScene(0.0,  0.0);
         double x = scene.getWindow().getX() + point.getX();
         double y = scene.getWindow().getY() + point.getY();
@@ -238,14 +232,8 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
                 aboutText.setWrapText(true);
 
                 Hyperlink packageToolWikiLink = new Hyperlink("See the tool's wiki site for more details.");
-                packageToolWikiLink.setOnAction(new EventHandler<ActionEvent>() {
-
-                    @Override
-                    public void handle(ActionEvent event) {
-                        presenter.getController().getApplicationHostServices().
-                                showDocument("https://wiki.library.jhu.edu/display/DCSDOCPKG/Package+Tools+Documentation+Home");
-                    }
-                });
+                packageToolWikiLink.setOnAction(event -> presenter.getController().getApplicationHostServices().
+                        showDocument("https://wiki.library.jhu.edu/display/DCSDOCPKG/Package+Tools+Documentation+Home"));
 
                 defaultAboutContent.getChildren().add(aboutText);
                 defaultAboutContent.getChildren().add(packageToolWikiLink);
@@ -278,13 +266,8 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
             popupAboutView.setBottom(versionFooter);
 
         }
-
+        
         aboutPopup.show(scene.getWindow(), x, y);
-    }
-
-    @Override
-    public void setHelpPopupContent(Node content) {
-        helpContent = content;
     }
 
     @Override
@@ -295,7 +278,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public void setHeaderView(HeaderView headerView) {
         this.headerView = headerView;
     }
-
+    
     @Override
     public Hyperlink getHeaderViewAboutLink() {
         return headerView.getAboutLink();
@@ -305,7 +288,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public Hyperlink getHeaderViewHelpLink() {
         return headerView.getHelpLink();
     }
-
+    
     @Override
     public Label getErrorLabel(){ return errorLabel;}
 }
