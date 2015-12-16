@@ -16,6 +16,7 @@
 
 package org.dataconservancy.packaging.gui;
 
+import javafx.application.HostServices;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
@@ -86,11 +87,16 @@ public class Controller {
     private PackageToolPopup crossPageProgressIndicatorPopUp;
     private Page currentPage;
     private Stack<Page> previousPages;
-
     private Stack<Page> pageStack;
 
     /* For handling file dialog mutex locks as a MacOS bug workaround DC-1624 */
     private final ConcurrentHashMap<Object, Semaphore> locks = new ConcurrentHashMap<>();
+
+    /**
+     * Handle for application host services - used in launching a website from the application using default browser
+     * when a hyperlink is clicked
+     */
+    private HostServices applicationHostServices;
 
 
     public Controller() {
@@ -354,10 +360,10 @@ public class Controller {
             }
         }
     }
-    
+
     /**
      * Set the file which the package state file chooser will be set to when next shown.
-     * 
+     *
      * @param file The file that will be shown in the file picker.
      */
     public void setPackageStateFileChooserInitialChoice(File file) {
@@ -415,7 +421,7 @@ public class Controller {
     public void setPackageStateSerializer(PackageStateSerializer packageStateSerializer){
         this.packageStateSerializer = packageStateSerializer;
     }
-    
+
     public PackageStateSerializer getPackageStateSerializer() {
         return packageStateSerializer;
     }
@@ -492,4 +498,13 @@ public class Controller {
     public void setUriGenerator(URIGenerator uriGenerator) {
         this.uriGenerator = uriGenerator;
     }
+
+    public HostServices getApplicationHostServices() {
+        return applicationHostServices;
+    }
+
+    public void setApplicationHostServices(HostServices applicationHostServices) {
+        this.applicationHostServices = applicationHostServices;
+    }
+
 }

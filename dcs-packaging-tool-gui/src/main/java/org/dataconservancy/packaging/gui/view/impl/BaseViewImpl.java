@@ -16,6 +16,9 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.application.HostServices;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -36,6 +39,7 @@ import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.view.HeaderView;
 import org.dataconservancy.packaging.gui.view.View;
+
 
 /**
  * Base view that handles controls and view elements that are the same across all views.
@@ -63,7 +67,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         BorderPane footerView = new BorderPane();
         footerView.getStyleClass().add(VIEW_FOOTER_CLASS);
         footerView.setPrefHeight(48);
-        
+
         //Sets the name of the package in the footer.
         packageName = new Label();
         packageName.getStyleClass().add(PACKAGE_NAME_LABEL);
@@ -71,22 +75,22 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         packageName.setPrefHeight(48);
         packageName.setMaxWidth(300);
         footerView.setLeft(packageName);
-        
+
         HBox footerControls = new HBox();
         footerControls.setSpacing(24);
         footerControls.setAlignment(Pos.CENTER_RIGHT);
         footerControls.setMinWidth(300);
-        
+
         cancelLink = new Hyperlink();
         footerControls.getChildren().add(cancelLink);
-        
+
         saveButton = new Button();
         saveButton.setVisible(false);
         saveButton.setPrefWidth(7*rem);
         saveButton.getStyleClass().add(CLICKABLE);
         footerControls.getChildren().add(saveButton);
-        
-        continueButton = new Button();  
+
+        continueButton = new Button();
         continueButton.setPrefWidth(10*rem);
         continueButton.getStyleClass().add(CLICKABLE);
         footerControls.getChildren().add(continueButton);
@@ -96,9 +100,9 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         errorLabel.setVisible(false);
         errorLabel.setWrapText(true);
         errorLabel.setMaxWidth(600);
-        
+
         footerView.setRight(footerControls);
-        
+
         setBottom(footerView);
     }
 
@@ -109,7 +113,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public void setPresenter(T presenter) {
         this.presenter = presenter;
     }
-    
+
     @Override
     public Button getContinueButton() {
         return continueButton;
@@ -124,17 +128,17 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public Label getPackageNameLabel() {
         return packageName;
     }
-    
+
     @Override
     public Button getSaveButton() {
         return saveButton;
     }
 
-    
+
     @Override
     public void showHelpPopup() {
         Scene scene = headerView.getHelpLink().getScene();
-        
+
         Point2D point = headerView.getHelpLink().localToScene(0.0,  0.0);
         double x = scene.getWindow().getX() + point.getX();
         double y = scene.getWindow().getY() + point.getY();
@@ -189,14 +193,14 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         helpText.setMaxWidth(300);
         helpText.setWrapText(true);
         helpText.setTextAlignment(TextAlignment.CENTER);
-        
+
         setHelpPopupContent(helpText);
     }
-    
+
     @Override
     public void showAboutPopup() {
         Scene scene = headerView.getAboutLink().getScene();
-        
+
         Point2D point = headerView.getAboutLink().localToScene(0.0,  0.0);
         double x = scene.getWindow().getX() + point.getX();
         double y = scene.getWindow().getY() + point.getY();
@@ -232,7 +236,19 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
 
                 Label aboutText = new Label(TextFactory.getText(LabelKey.BASIC_ABOUT_TEXT));
                 aboutText.setWrapText(true);
+
+                Hyperlink packageToolWikiLink = new Hyperlink("See the tool's wiki site for more details.");
+                packageToolWikiLink.setOnAction(new EventHandler<ActionEvent>() {
+
+                    @Override
+                    public void handle(ActionEvent event) {
+                        presenter.getController().getApplicationHostServices().
+                                showDocument("https://wiki.library.jhu.edu/display/DCSDOCPKG/Package+Tools+Documentation+Home");
+                    }
+                });
+
                 defaultAboutContent.getChildren().add(aboutText);
+                defaultAboutContent.getChildren().add(packageToolWikiLink);
                 defaultAboutContent.getStyleClass().add(PACKAGE_TOOL_POPUP_CONTENT_CLASS);
                 popupAboutView.setCenter(defaultAboutContent);
 
@@ -262,7 +278,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
             popupAboutView.setBottom(versionFooter);
 
         }
-        
+
         aboutPopup.show(scene.getWindow(), x, y);
     }
 
@@ -279,7 +295,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public void setHeaderView(HeaderView headerView) {
         this.headerView = headerView;
     }
-    
+
     @Override
     public Hyperlink getHeaderViewAboutLink() {
         return headerView.getAboutLink();
@@ -289,7 +305,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public Hyperlink getHeaderViewHelpLink() {
         return headerView.getHelpLink();
     }
-    
+
     @Override
     public Label getErrorLabel(){ return errorLabel;}
 }
