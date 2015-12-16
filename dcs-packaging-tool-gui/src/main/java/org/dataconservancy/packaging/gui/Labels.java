@@ -146,7 +146,8 @@ public class Labels {
         EXTRACT_DIRECTORY_TOOLTIP("packageextraction.tooltip"),
         EXPLODED_PACKAGE_TOOLTIP("explodedpackage.tooltip"),
         PACKAGE_NAME_TOOLTIP("packagename.tooltip"),
-        DOMAIN_PROFILE_TOOLTIP("domainprofile.tooltip");
+        DOMAIN_PROFILE_TOOLTIP("domainprofile.tooltip"),
+        GRAPH_SERIALIZATION_TOOLTIP("graphserialization.tooltip");
 
         private String property;
 

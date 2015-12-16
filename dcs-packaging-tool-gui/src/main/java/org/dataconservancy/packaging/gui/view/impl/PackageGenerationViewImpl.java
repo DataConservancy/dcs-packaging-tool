@@ -28,6 +28,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -196,8 +198,17 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         VBox serializationOptions = new VBox(10);
         serializationOptions.setAlignment(Pos.TOP_LEFT);
 
+        HBox serializationLabelAndTooltipBox = new HBox(4);
+        ImageView serializationTooltipImage = new ImageView();
+        serializationTooltipImage.getStyleClass().add(TOOLTIP_IMAGE);
+        Tooltip serializationTooltip = new Tooltip(TextFactory.getText(LabelKey.GRAPH_SERIALIZATION_TOOLTIP));
+        serializationTooltip.setPrefWidth(350);
+        serializationTooltip.setWrapText(true);
+        Tooltip.install(serializationTooltipImage, serializationTooltip);
+
         Label serializationLabel = new Label(TextFactory.getText(LabelKey.SERIALIZATION_FORMAT_LABEL));
-        serializationOptions.getChildren().add(serializationLabel);
+        serializationLabelAndTooltipBox.getChildren().addAll(serializationLabel, serializationTooltipImage);
+        serializationOptions.getChildren().add(serializationLabelAndTooltipBox);
 
         //Create a toggle group for the compression options.
         serializationToggleGroup = new ToggleGroup();
