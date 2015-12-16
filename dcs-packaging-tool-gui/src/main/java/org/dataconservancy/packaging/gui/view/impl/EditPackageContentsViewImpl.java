@@ -288,7 +288,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 }
                 viewLabel.setText(labelText);
             } else {
-                viewLabel.setText(TextFactory.getText(LabelKey.NO_BACKING_FILE_LABEL));
+                viewLabel.setText("[" + TextFactory.getText(LabelKey.NO_BACKING_FILE_LABEL) + "]");
                 viewLabel.getStyleClass().add(NO_FILE_ENTITY);
             }
 
