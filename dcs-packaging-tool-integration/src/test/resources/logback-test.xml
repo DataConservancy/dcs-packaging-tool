@@ -27,7 +27,7 @@
     </appender>
 
     <appender name="MODULE" class="ch.qos.logback.core.FileAppender">
-        <file>target/logs/dcs-packaging-tool-iintegration.log</file>
+        <file>target/logs/dcs-packaging-tool-integration.log</file>
         <append>true</append>
         <encoder>
             <pattern>%-3p [%t]: %c{3}@%L %d %m %n</pattern>
