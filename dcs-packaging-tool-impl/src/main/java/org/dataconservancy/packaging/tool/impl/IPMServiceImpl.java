@@ -112,7 +112,8 @@ public class IPMServiceImpl implements IPMService {
 
             //If the file is hidden or starts with a "." set it to ignored.
             //The "." semantics are carried over from the old rules based approach.
-            if (Files.isHidden(path.toRealPath()) || path.toRealPath().getFileName().toString().startsWith(".")) {
+            //but do not ignore the root node in any case
+            if (parent != null && (Files.isHidden(path.toRealPath()) || path.toRealPath().getFileName().toString().startsWith("."))) {
                 node.setIgnored(true);
             }
 
