@@ -26,6 +26,7 @@ import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.paint.Color;
 import org.apache.commons.io.IOUtils;
@@ -209,10 +210,22 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
                 //when we select zip or exploded as our archiving format, we must select 'none' as our compression
                 if (archiveExtension.equals("zip") || archiveExtension.equals("exploded")) {
-                    // TODO select 'none' as compression and then disable the toggle?
+                    //select 'none' as compression and then disable the toggles
                     Toggle noCompressionToggle = getNoCompressionToggle();
                     if (noCompressionToggle != null && noCompressionToggle != view.getCompressionToggleGroup().getSelectedToggle()) {
                         view.getCompressionToggleGroup().selectToggle(noCompressionToggle);
+                    }
+                    for (Toggle tb : view.getCompressionToggleGroup().getToggles()) {
+                        if (tb instanceof RadioButton) {
+                            ((RadioButton) tb).setDisable(true);
+                        }
+                    }
+                } else {
+                    //re-enable the toggles
+                    for (Toggle tb : view.getCompressionToggleGroup().getToggles()) {
+                        if (tb instanceof RadioButton) {
+                            ((RadioButton) tb).setDisable(false);
+                        }
                     }
                 }
             }
