@@ -1,0 +1,4 @@
+org.dataconservancy.dcs.model
+org.dataconservancy.dcs.util
+org.dataconservancy.dcs.util.droid
+org.dataconservancy.model.builder.xstream
