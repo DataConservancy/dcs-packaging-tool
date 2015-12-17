@@ -181,7 +181,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
                 popupHelpView.setCenter(defaultHelpContent);
             } else {
                 Label helpContent = new Label(getHelpText());
-                helpContent.setMaxWidth(300);
+                helpContent.setMaxWidth(600);
                 helpContent.setWrapText(true);
                 helpContent.setTextAlignment(TextAlignment.LEFT);
                 helpContent.getStyleClass().add(PACKAGE_TOOL_POPUP_CONTENT_CLASS);
