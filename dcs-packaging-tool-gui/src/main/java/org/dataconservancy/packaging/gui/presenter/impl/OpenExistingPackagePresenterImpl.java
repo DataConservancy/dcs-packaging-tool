@@ -203,7 +203,7 @@ public class OpenExistingPackagePresenterImpl extends BasePresenterImpl implemen
 
         view.getChooseExplodedPackageDirectoryTextField().setText("");
         view.getChoosePackageFileTextField().setText("");
-        view.getChoosePackageStagingDirectoryTextField().setText(stagingDir.getPath());
+        view.getChoosePackageStagingDirectoryTextField().setText(System.getProperty("user.home"));
         view.getContinueButton().setDisable(true);
     }
 
