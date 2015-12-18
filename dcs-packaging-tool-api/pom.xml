@@ -20,6 +20,7 @@
   <artifactId>dcs-packaging-tool-api</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool API</name>
+  <description>Interfaces for the Packaging Tool Services</description>
   
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>

@@ -53,6 +53,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <site.basedir>${project.basedir}</site.basedir>
   </properties>
 
   <!-- Build ====================================================== -->
@@ -203,9 +204,11 @@
         <artifactId>maven-site-plugin</artifactId>
         <version>3.4</version>
         <configuration>
-           <stagingDirectory>${session.executionRootDirectory}/stage</stagingDirectory>
+          <stagingDirectory>${session.executionRootDirectory}/stage</stagingDirectory>
+          <siteDirectory>${session.executionRootDirectory}/src/site</siteDirectory>
         </configuration>
       </plugin>
+
     </plugins>
     
   </build>

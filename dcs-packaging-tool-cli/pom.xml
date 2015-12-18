@@ -20,6 +20,7 @@
   <artifactId>dcs-packaging-tool-cli</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool Command Line</name>
+  <description>Implementation of the packaging command line tools.</description>
 
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>

@@ -20,7 +20,8 @@
   <artifactId>dcs-packaging-tool-model-builder-properties</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool Model Builder using Properties Configuration</name>
-  
+  <description>Builder for the Configuration Model</description>
+
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>
     <artifactId>dcs-packaging-tool</artifactId>
