@@ -1,0 +1,8 @@
+org.dataconservancy.packaging.gui
+org.dataconservancy.packaging.gui.model
+org.dataconservancy.packaging.gui.presenter
+org.dataconservancy.packaging.gui.presenter.impl
+org.dataconservancy.packaging.gui.services
+org.dataconservancy.packaging.gui.util
+org.dataconservancy.packaging.gui.view
+org.dataconservancy.packaging.gui.view.impl
