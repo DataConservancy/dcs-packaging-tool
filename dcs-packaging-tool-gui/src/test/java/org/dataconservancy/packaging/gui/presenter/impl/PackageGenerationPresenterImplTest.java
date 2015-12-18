@@ -197,8 +197,8 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         presenter.display();
 
-        assertTrue(view.getErrorLabel().isVisible());
-        assertEquals(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR), view.getErrorLabel().getText());
+        assertTrue(view.getErrorTextArea().isVisible());
+        assertEquals(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR), view.getErrorTextArea().getText());
     }
 
     /**
@@ -237,14 +237,14 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         try {
             view.getSelectOutputDirectoryButton().fire();
         } catch (PackageToolException e) {
-            assertFalse(view.getErrorLabel().isVisible());
+            assertFalse(view.getErrorTextArea().isVisible());
 
             view.getContinueButton().fire();
 
-            assertTrue(view.getErrorLabel().isVisible());
+            assertTrue(view.getErrorTextArea().isVisible());
             assertEquals(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR)
                             + " " + PackagingToolReturnInfo.PKG_UNEXPECTED_PACKAGING_FORMAT.stringMessage(),
-                    view.getErrorLabel().getText());
+                    view.getErrorTextArea().getText());
         }
     }
 
@@ -299,13 +299,13 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
 
         outputDirectory = packageLocation;
 
-        view.getErrorLabel().setVisible(false);
+        view.getErrorTextArea().setVisible(false);
         view.getSelectOutputDirectoryButton().fire();
 
         view.getContinueButton().fire();
 
         assertTrue(createdFile.exists());
-        assertFalse(view.getErrorLabel().isVisible());
+        assertFalse(view.getErrorTextArea().isVisible());
 
         //Clean up the newly created file
         if (!createdFile.delete()) {
@@ -366,7 +366,7 @@ public class PackageGenerationPresenterImplTest extends BaseGuiTest {
         view.getSelectOutputDirectoryButton().fire();
         view.getContinueButton().fire();
 
-        assertFalse(view.getErrorLabel().isVisible());
+        assertFalse(view.getErrorTextArea().isVisible());
 
         verify(controller).showOpenDirectoryDialog(any(DirectoryChooser.class));
         verify(mockGenerationSvc).generatePackage(any(PackageState.class), any(PackageGenerationParameters.class));

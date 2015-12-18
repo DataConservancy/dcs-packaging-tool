@@ -16,6 +16,7 @@
 
 package org.dataconservancy.packaging.gui.presenter.impl;
 
+import javafx.scene.control.TextArea;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.InternalProperties;
@@ -76,7 +77,7 @@ public abstract class BasePresenterImpl implements Presenter {
         try {
             getController().savePackageStateFile();
         } catch (IOException | RDFTransformException e) {
-            view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+            view.getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToPreviousPage();
     }
@@ -85,7 +86,7 @@ public abstract class BasePresenterImpl implements Presenter {
         try {
             getController().savePackageStateFile();
         } catch (IOException | RDFTransformException e) {
-            view.getErrorLabel().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+            view.getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToNextPage();
     }
@@ -96,20 +97,20 @@ public abstract class BasePresenterImpl implements Presenter {
      * @param msg The message to display to the user.
      */
     public void showError(String msg) {
-        Label label = view.getErrorLabel(); 
+        TextArea textArea = view.getErrorTextArea();
         
-        label.setText(msg);
-        label.setTextFill(Color.RED);
-        label.setVisible(true);
+        textArea.setText(msg);
+       // label.setTextFill(Color.RED);
+        textArea.setVisible(true);
     }
     
     /**
      * Clear the message in the view error label and hide it.
      */
     public void clearError() {
-        Label label = view.getErrorLabel(); 
+        TextArea textArea = view.getErrorTextArea();
         
-        label.setText("");
-        label.setVisible(false);
+        textArea.setText("");
+        textArea.setVisible(false);
     }
 }

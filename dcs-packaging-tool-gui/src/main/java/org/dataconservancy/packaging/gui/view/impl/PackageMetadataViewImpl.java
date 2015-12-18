@@ -89,7 +89,7 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
 
         //Create a label to show any status messages at the top of the screen.
         HBox status = new HBox();
-        status.getChildren().add(errorLabel);
+        status.getChildren().add(errorTextArea);
         status.setAlignment(Pos.TOP_CENTER);
 
         content.getChildren().add(status);

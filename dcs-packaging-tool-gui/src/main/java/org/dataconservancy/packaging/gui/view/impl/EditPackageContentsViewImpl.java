@@ -177,7 +177,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(buttonBar);
 
         //Creates the error message that appears at the top of the screen.
-        content.getChildren().add(errorLabel);
+        content.getChildren().add(errorTextArea);
 
         //Creates the file chooser that's used to save the package description to a file.
         packageStateFileChooser = new FileChooser();
@@ -350,7 +350,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                                     if(nodeContextMenu.isShowing()) {
                                         nodeContextMenu.hide();
                                     }
-                                    errorLabel.setVisible(false);
+                                    errorTextArea.setVisible(false);
                                     nodeContextMenu.setAutoHide(true);
 
                                     ObservableList<TreeItem<Node>> selectedItems = artifactTree.getSelectionModel().getSelectedItems();

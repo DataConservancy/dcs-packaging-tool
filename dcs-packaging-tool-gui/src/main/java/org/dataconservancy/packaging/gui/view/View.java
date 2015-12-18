@@ -18,6 +18,7 @@ package org.dataconservancy.packaging.gui.view;
 
 import javafx.scene.Node;
 
+import javafx.scene.control.TextArea;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 
 import javafx.scene.control.Label;
@@ -107,6 +108,6 @@ public interface View<T extends Presenter> {
      * Returns the error label to report problems back to the user
      * @return label
      */
-    Label getErrorLabel();
+    TextArea getErrorTextArea();
 
 }

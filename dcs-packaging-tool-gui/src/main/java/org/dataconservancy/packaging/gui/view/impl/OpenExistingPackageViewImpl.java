@@ -54,7 +54,7 @@ public class OpenExistingPackageViewImpl extends BaseViewImpl<OpenExistingPackag
 
         setCenter(content);
         content.setAlignment(Pos.TOP_CENTER);
-        content.getChildren().add(errorLabel);
+        content.getChildren().add(errorTextArea);
              
         VBox infoVBox = new VBox(4);
         Label selectOneOptionLabel = new Label(TextFactory.getText(Labels.LabelKey.SELECT_ONE_OPTION_LABEL));

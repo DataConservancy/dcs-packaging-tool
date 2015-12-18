@@ -45,7 +45,7 @@ public class IPMServiceImpl implements IPMService {
                 }
             }
 
-            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe follow names were invalid:\n\n" + invalidNames);
+            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + invalidNames);
         }
 
         visitedFiles.clear();

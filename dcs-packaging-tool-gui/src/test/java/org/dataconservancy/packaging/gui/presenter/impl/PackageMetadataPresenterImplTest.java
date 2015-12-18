@@ -122,11 +122,11 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
             view.getAllDynamicFields().stream().filter(node -> node.getId().equals(pm.getName())).filter(node -> node instanceof TextField).forEach(node -> ((TextField) node).setText("Some Text"));
         }
 
-        assertEquals(0, view.getErrorLabel().getText().length());
+        assertEquals(0, view.getErrorTextArea().getText().length());
         assertFalse(showNextPage);
         view.getContinueButton().fire();
         assertFalse(showNextPage);
-        assertTrue(view.getErrorLabel().getText().length() > 0);
+        assertTrue(view.getErrorTextArea().getText().length() > 0);
     }
 
     /**
@@ -138,11 +138,11 @@ public class PackageMetadataPresenterImplTest extends BaseGuiTest {
 
         view.getPackageNameField().getPropertyInput().setText("Some name");
 
-        assertEquals(0, view.getErrorLabel().getText().length());
+        assertEquals(0, view.getErrorTextArea().getText().length());
         assertFalse(showNextPage);
         view.getContinueButton().fire();
         assertFalse(showNextPage);
-        assertTrue(view.getErrorLabel().getText().length() > 0);
+        assertTrue(view.getErrorTextArea().getText().length() > 0);
 
     }
 

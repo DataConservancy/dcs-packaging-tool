@@ -16,6 +16,8 @@
 
 package org.dataconservancy.packaging.gui.view.impl;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -25,6 +27,9 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -54,7 +59,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     protected Popup helpPopup;
     protected Popup aboutPopup;
     private Node aboutContent;
-    protected Label errorLabel;
+    protected TextArea errorTextArea;
 
     final double rem = javafx.scene.text.Font.getDefault().getSize();
 
@@ -93,11 +98,11 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         continueButton.getStyleClass().add(CLICKABLE);
         footerControls.getChildren().add(continueButton);
 
-        errorLabel=new Label();
-        errorLabel.setTextFill(Color.RED);
-        errorLabel.setVisible(false);
-        errorLabel.setWrapText(true);
-        errorLabel.setMaxWidth(600);
+        errorTextArea=new TextArea();
+        errorTextArea.setWrapText(true);
+        errorTextArea.setEditable(false);
+        errorTextArea.setPrefRowCount(6);
+        errorTextArea.getStyleClass().add(ERROR_TEXT_AREA);
 
         footerView.setRight(footerControls);
 
@@ -296,5 +301,5 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     }
     
     @Override
-    public Label getErrorLabel(){ return errorLabel;}
+    public TextArea getErrorTextArea(){ return errorTextArea;}
 }

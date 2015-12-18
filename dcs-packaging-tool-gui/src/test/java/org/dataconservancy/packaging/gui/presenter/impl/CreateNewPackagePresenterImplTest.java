@@ -167,7 +167,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
         IOException exception = new IOException(exceptionMsg);
         presenter.displayExceptionMessage(exception);
         assertFalse(showNextPage);
-        assertTrue(view.getErrorLabel().getText().contains(exceptionMsg));
+        assertTrue(view.getErrorTextArea().getText().contains(exceptionMsg));
     }
 
     private class ExecuteContinueRule implements TestRule {
@@ -224,7 +224,7 @@ public class CreateNewPackagePresenterImplTest extends BaseGuiTest {
                     view.getChooseContentDirectoryButton().fire();
                     assertTrue(showDirectoryDialog);
 
-                    assertEquals(0, view.getErrorLabel().getText().length());
+                    assertEquals(0, view.getErrorTextArea().getText().length());
                     assertFalse(showNextPage);
                     view.getContinueButton().fire();
                 } catch (Exception e) {

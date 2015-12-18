@@ -19,6 +19,7 @@ package org.dataconservancy.packaging.gui.view.impl;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -60,7 +61,7 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
 
         setCenter(content);
         content.setAlignment(Pos.TOP_CENTER);
-        content.getChildren().add(errorLabel);
+        content.getChildren().add(errorTextArea);
 
         //Create a vbox that will display the options for generating a package, either selecting a base directory or
         //choosing an existing package description. 
@@ -110,8 +111,8 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     }
 
     @Override
-    public Label getErrorLabel() {
-        return errorLabel;
+    public TextArea getErrorTextArea() {
+        return errorTextArea;
     }
 
     @Override

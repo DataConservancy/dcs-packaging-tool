@@ -18,13 +18,13 @@ package org.dataconservancy.packaging.gui.view;
 
 import java.util.List;
 
+import javafx.scene.control.TextArea;
 import org.dataconservancy.packaging.gui.presenter.PackageMetadataPresenter;
 import org.dataconservancy.packaging.gui.util.TextPropertyBox;
 import org.dataconservancy.packaging.tool.model.PackageMetadata;
 
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 
 /**
  * The view that shows the package metadata screen. In this view, the user will be able to select a name for the package,
@@ -77,10 +77,10 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
 
     /**
-     * Gets the label that is used to show any error message at the top.
-     * @return the errorLabel
+     * Gets the TextArea that is used to show any error message at the top.
+     * @return the errorTextArea
      */
-    Label getErrorLabel();
+    TextArea getErrorTextArea();
 
     /**
      * Clears all the fields

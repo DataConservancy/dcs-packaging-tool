@@ -102,8 +102,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 try {
                     domainProfileURI = new URI(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
                 } catch (URISyntaxException e) {
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.DOMAIN_PROFILE_PARSE_ERROR));
-                    view.getErrorLabel().setVisible(true);
+                    view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.DOMAIN_PROFILE_PARSE_ERROR));
+                    view.getErrorTextArea().setVisible(true);
                     view.scrollToTop();
                 }
 
@@ -158,8 +158,8 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             try{
                getController().savePackageStateFile();
             } catch (IOException | RDFTransformException e){
-                view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
-                view.getErrorLabel().setVisible(true);
+                view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                view.getErrorTextArea().setVisible(true);
                 view.scrollToTop();
             }
         });
@@ -171,25 +171,25 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         updatePackageState();
 
         if(!validateRequiredFields()){
-            view.getErrorLabel().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
-            view.getErrorLabel().setVisible(true);
+            view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
+            view.getErrorTextArea().setVisible(true);
             view.scrollToTop();
         } else if(!view.areAllFieldsValid()) {
-            view.getErrorLabel().setText(TextFactory.getText(ErrorKey.SOME_FIELDS_INVALID));
-            view.getErrorLabel().setVisible(true);
+            view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.SOME_FIELDS_INVALID));
+            view.getErrorTextArea().setVisible(true);
             view.scrollToTop();
         } else  {
              if (Platform.isFxApplicationThread()) {
                 try {
                     getController().savePackageStateFile();
                 } catch (IOException | RDFTransformException e) {
-                    view.getErrorLabel().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
-                    view.getErrorLabel().setVisible(true);
+                    view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
+                    view.getErrorTextArea().setVisible(true);
                     view.scrollToTop();
                 }
             }
 
-            view.getErrorLabel().setVisible(false);
+            view.getErrorTextArea().setVisible(false);
             super.onContinuePressed();
         }
     }
