@@ -189,15 +189,23 @@
         <artifactId>maven-scm-publish-plugin</artifactId>
         <version>1.0-beta-2</version>
         <configuration>
-          <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
-          <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
-          <content>${project.reporting.outputDirectory}/apidocs</content>
+          <checkoutDirectory>${project.basedir}/site</checkoutDirectory>
+          <checkinComment>Publishing maven site for ${project.artifactId}:${project.version}</checkinComment>
+          <content>${session.executionRootDirectory}/stage/project-pom/dcs-packaging-tool</content>
           <skipDeletedFiles>true</skipDeletedFiles>
           <pubScmUrl>scm:git:https://github.com/DataConservancy/dcs-packaging-tool.git</pubScmUrl>
           <scmBranch>gh-pages</scmBranch>
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.4</version>
+        <configuration>
+           <stagingDirectory>${session.executionRootDirectory}/stage</stagingDirectory>
+        </configuration>
+      </plugin>
     </plugins>
     
   </build>
