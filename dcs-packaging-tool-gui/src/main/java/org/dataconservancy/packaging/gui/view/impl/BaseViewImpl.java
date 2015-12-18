@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -54,6 +55,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     protected Popup aboutPopup;
     private Node aboutContent;
     protected Label errorLabel;
+    protected ScrollPane errorPane;
 
     final double rem = javafx.scene.text.Font.getDefault().getSize();
 
@@ -97,6 +99,9 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         errorLabel.setVisible(false);
         errorLabel.setWrapText(true);
         errorLabel.setMaxWidth(600);
+
+        errorPane = new ScrollPane();
+        errorPane.setContent(errorLabel);
 
         footerView.setRight(footerControls);
 
