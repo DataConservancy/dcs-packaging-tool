@@ -525,7 +525,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 itemList.add(addFileItem);
                 addFileItem.setOnAction(event -> {
                     File file = presenter.getController().showOpenFileDialog(new FileChooser());
-                    presenter.addToTree(packageNode, file.toPath());
+                    if (file != null) {
+                        presenter.addToTree(packageNode, file.toPath());
+                    }
                 });
             }
 
@@ -535,7 +537,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                 itemList.add(addDirItem);
                 addDirItem.setOnAction(event -> {
                     File file = presenter.getController().showOpenDirectoryDialog(new DirectoryChooser());
-                    presenter.addToTree(packageNode, file.toPath());
+                    if (file != null) {
+                        presenter.addToTree(packageNode, file.toPath());
+                    }
                 });
             }
 
