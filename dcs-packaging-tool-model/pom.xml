@@ -20,6 +20,7 @@
   <artifactId>dcs-packaging-tool-model</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool Model</name>
+  <description>Models used to support the Packaging Tool</description>
 
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>

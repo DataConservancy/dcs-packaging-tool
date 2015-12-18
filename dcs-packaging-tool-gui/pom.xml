@@ -19,6 +19,7 @@
   <artifactId>dcs-packaging-tool-gui</artifactId>
   <packaging>jar</packaging>
   <name>Package Tool GUI</name>
+  <description>Code for the Package Tool GUI</description>
 
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>
