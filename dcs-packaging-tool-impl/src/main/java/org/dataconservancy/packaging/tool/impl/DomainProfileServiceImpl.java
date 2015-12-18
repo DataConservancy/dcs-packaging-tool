@@ -536,6 +536,15 @@ public class DomainProfileServiceImpl implements DomainProfileService {
             }
         });
         
+        // If node already has a valid type assigned, prefer it.
+        
+        NodeType cur_type = node.getNodeType();
+        
+        if (cur_type != null && result.contains(cur_type)) {
+            result.remove(cur_type);
+            result.add(0, cur_type);
+        }
+        
         return result;
     }
 

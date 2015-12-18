@@ -143,6 +143,10 @@ public interface DomainProfileService {
      * same file system with the same profile will produce the same assignment
      * of node types.
      * 
+     * There are likely many possible valid assignments for each tree. Hints in the domain profile may
+     * introduce a bias towards one choice or another. If nodes already have types assigned which are valid,
+     * those types are preferred.
+     * 
      * @param profile
      *            The profile used to assign types to the nodes.
      * @param node

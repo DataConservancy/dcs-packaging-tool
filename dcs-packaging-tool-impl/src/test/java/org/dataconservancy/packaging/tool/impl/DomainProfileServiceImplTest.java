@@ -658,10 +658,10 @@ public class DomainProfileServiceImplTest {
     }
     
     /**
-     * Test the ability to delete domain objects of nodes.
+     * Test the ability to remove domain objects of nodes.
      */
     @Test
-    public void testDeleteDomainObjects() {
+    public void testRemoveDomainObjects() {
         Node root = ipmfact.createSimpleTree3();
         
         root.walk(store::updateObject);
@@ -678,9 +678,47 @@ public class DomainProfileServiceImplTest {
         
         assertTrue(service.validateTree(root));
         
-        root.walk(store::deleteObject);
+        root.walk(service::removeDomainObject);
         
         assertEquals(0, model.size());
         assertFalse(service.validateTree(root));
     }
+    
+    /**
+     * Test that type assignment prefers an already assigned type.
+     */
+    @Test
+    public void testPreferAlreadyAssignedType() {
+        Node root = ipmfact.createSimpleTree();
+        Node barn = root.getChildren().get(0);
+        Node cow = barn.getChildren().get(0);
+        Node media = cow.getChildren().get(0);
+        
+        // Check that a valid assignment is preserved
+        
+        assertEquals(root.getNodeType(), profile.getFarmNodeType());
+        assertEquals(barn.getNodeType(), profile.getBarnNodeType());
+        assertEquals(cow.getNodeType(), profile.getCowNodeType());
+        assertEquals(media.getNodeType(), profile.getMediaNodeType());
+
+        assertTrue(service.assignNodeTypes(profile, root));
+        
+        assertEquals(root.getNodeType(), profile.getFarmNodeType());
+        assertEquals(barn.getNodeType(), profile.getBarnNodeType());
+        assertEquals(cow.getNodeType(), profile.getCowNodeType());
+        assertEquals(media.getNodeType(), profile.getMediaNodeType());
+
+        // Check that another valid assignment is preserved
+
+        barn.setNodeType(profile.getFarmNodeType());
+        cow.setNodeType(profile.getBarnNodeType());
+        root.walk(store::updateObject);
+        
+        assertTrue(service.assignNodeTypes(profile, root));
+        
+        assertEquals(root.getNodeType(), profile.getFarmNodeType());
+        assertEquals(barn.getNodeType(), profile.getFarmNodeType());
+        assertEquals(cow.getNodeType(), profile.getBarnNodeType());
+        assertEquals(media.getNodeType(), profile.getMediaNodeType());
+    }   
 }
