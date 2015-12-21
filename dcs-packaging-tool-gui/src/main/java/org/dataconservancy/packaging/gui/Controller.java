@@ -26,6 +26,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.dataconservancy.dcs.util.Util;
 import org.dataconservancy.packaging.gui.presenter.Presenter;
 import org.dataconservancy.packaging.gui.util.PackageToolPopup;
 import org.dataconservancy.packaging.tool.api.DomainProfileService;
@@ -340,15 +341,18 @@ public class Controller {
                 packageState.setPackageTree(ipmRdfTransformService.transformToRDF(packageTree));
             }
             if(packageStateFile == null){
-                FilenameValidator validator = new FilenameValidator();
-                String defaultFileName = packageStateFileExtension;
-                if (!defaultStateFileName.getValueSafe().isEmpty() && validator.isValid(defaultStateFileName.getValue())) {
-                    defaultFileName = defaultStateFileName.getValue();
-                    if (!defaultStateFileName.getValue().endsWith(".dcp")) {
-                        defaultFileName += ".dcp";
+                if (Util.isEmptyOrNull(packageStateFileChooser.getInitialFileName())) {
+                    FilenameValidator validator = new FilenameValidator();
+                    String defaultFileName = packageStateFileExtension;
+                    if (!defaultStateFileName.getValueSafe().isEmpty() &&
+                        validator.isValid(defaultStateFileName.getValue())) {
+                        defaultFileName = defaultStateFileName.getValue();
+                        if (!defaultStateFileName.getValue().endsWith(".dcp")) {
+                            defaultFileName += ".dcp";
+                        }
                     }
+                    packageStateFileChooser.setInitialFileName(defaultFileName);
                 }
-                packageStateFileChooser.setInitialFileName(defaultFileName);
                 packageStateFile = showSaveFileDialog(packageStateFileChooser);
             }
             if (packageStateFile != null) {
