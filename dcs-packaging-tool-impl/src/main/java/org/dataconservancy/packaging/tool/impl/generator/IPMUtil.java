@@ -35,7 +35,7 @@ public class IPMUtil {
 
         while (!node.isRoot()) {
             node = node.getParent();
-            if (node.getFileInfo() != null) {
+            if (node.getFileInfo() != null && !node.getFileInfo().isFile()) {
                 pathStack.push("/");
                 pathStack.push(name(node));
             }
