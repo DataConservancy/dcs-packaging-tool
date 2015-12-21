@@ -101,7 +101,7 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
         errorTextArea=new TextArea();
         errorTextArea.setWrapText(true);
         errorTextArea.setEditable(false);
-        errorTextArea.setPrefRowCount(6);
+        errorTextArea.setPrefRowCount(5);
         errorTextArea.getStyleClass().add(ERROR_TEXT_AREA);
 
         footerView.setRight(footerControls);

@@ -69,9 +69,10 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                     if (selectedDir != null) {
                         view.getChooseContentDirectoryTextField().setText(selectedDir.getPath());
-                        //view.getSelectedPackageDescriptionTextField().setText("");
+
                         //If the error message happens to be visible erase it.
-                        view.getErrorTextArea().setVisible(false);
+                        clearError();
+                        
                         directoryChooser.setInitialDirectory(selectedDir);
                     }
                 });
@@ -102,7 +103,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
 
                     ipmBuilderService.setOnFailed(workerStateEvent -> {
                         displayExceptionMessage(workerStateEvent.getSource().getException());
-                        view.getErrorTextArea().setVisible(true);
+
                         ipmBuilderService.reset();
                         controller.getCrossPageProgressIndicatorPopUp().hide();
                     });
@@ -122,15 +123,12 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
             } else if (selectedDir != null &&
                     (!selectedDir.exists() ||
                          !selectedDir.canRead())) {
-                view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
-                view.getErrorTextArea().setVisible(true);
+                showError(TextFactory.getText(ErrorKey.INACCESSIBLE_CONTENT_DIR));
             } else {
-                view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
-                view.getErrorTextArea().setVisible(true);
+                showError(TextFactory.getText(ErrorKey.BASE_DIRECTORY_NOT_SELECTED));
             }
         } catch (Exception e) {
-            view.getErrorTextArea().setText(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE + "\n" + e.getMessage());
-            view.getErrorTextArea().setVisible(true);
+            showError(Messages.MessageKey.ERROR_CREATING_NEW_PACKAGE + "\n" + e.getMessage());
             log.error(e.getMessage());
         }
 
@@ -139,7 +137,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     @Override
     public void clear() {
         view.getChooseContentDirectoryTextField().setText("");
-        view.getErrorTextArea().setText("");
+        clearError();
     }
 
     public javafx.scene.Node display() {
@@ -148,8 +146,7 @@ public class CreateNewPackagePresenterImpl extends BasePresenterImpl
     }
 
     protected void displayExceptionMessage(Throwable throwable) {
-        view.getErrorTextArea().setText(throwable.getMessage());
-        view.getErrorTextArea().setVisible(true);
+        showError(throwable.getMessage());
     }
 
     @Override

@@ -99,7 +99,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         view.setupWindowBuilder();
 
-        view.getErrorTextArea().setVisible(false);
+        clearError();
 
         displayPackageTree();
 
@@ -124,7 +124,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             try {
                 getController().savePackageStateFile();
             } catch (IOException | RDFTransformException e) {
-                view.getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+                showError(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
             }
         });
 
@@ -507,7 +507,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         for (TreeItem<Node> nodeToIgnore : nodesToIgnore) {
             ipmService.ignoreNode(nodeToIgnore.getValue(), ignored);
 
-            view.getErrorTextArea().setVisible(false);
+            clearError();
         }
 
         //To aid in being able to unignore multiple items at once we just check the entire tree for validity and then walk the tree to find types that need to be changed.
@@ -521,8 +521,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
             nodesToIgnore.stream().filter(nodeToIgnore -> !getController().getDomainProfileService().assignNodeTypes(getController().getPrimaryDomainProfile(), nodeToIgnore.getValue())).forEach(nodeToIgnore -> {
                 ipmService.ignoreNode(nodeToIgnore.getValue(), true);
-                view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.UNIGNORE_ERROR));
-                view.getErrorTextArea().setVisible(true);
+                showError(TextFactory.getText(ErrorKey.UNIGNORE_ERROR));
             });
         }
 
@@ -648,10 +647,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         } catch (IOException e) {
             log.error(e.getMessage());
-            view.getErrorTextArea().setText(
+            showError(
                 TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) +
                     e.getMessage());
-            view.getErrorTextArea().setVisible(true);
         }
     }
 
@@ -662,10 +660,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             resultMap = ipmService.refreshTreeContent(node);
         } catch (IOException e) {
             log.error(e.getMessage());
-            view.getErrorTextArea().setText(
+            showError(
                 TextFactory.getText(ErrorKey.REFRESH_ERROR) +
                     e.getMessage());
-            view.getErrorTextArea().setVisible(true);
         }
 
         return resultMap;
@@ -731,6 +728,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     /**
      * A {@link javafx.concurrent.Service} which executes the {@link javafx.concurrent.Task} for validating the node properties in the tree.
      */
+    @SuppressWarnings("unused")
     private class PropertyValidationService extends Service<String> {
 
         Node node;

@@ -108,13 +108,6 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
         contentScrollPane.setContent(content);
 
         setCenter(contentScrollPane);
-        
-        //Create a label to show any status messages at the top of the screen.
-        HBox status = new HBox();
-        status.getChildren().add(errorTextArea);
-        status.setAlignment(Pos.TOP_CENTER);
-
-        content.getChildren().add(status);
 
         //Create a section for setting the packaging options.
         VBox packagingSection = new VBox(4);

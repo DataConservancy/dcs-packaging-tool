@@ -95,7 +95,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         view.getHeaderViewHelpLink().setOnAction(arg0 -> view.showHelpPopup());
 
         //Clear out any values from the previous run
-        view.getErrorTextArea().setText("");
+        clearError();
         view.getCurrentOutputDirectoryTextField().setText("");
         generationParams = null;
         loadPackageGenerationParams();
@@ -127,14 +127,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             if (workerStateEvent.getSource().getMessage() == null ||
                     workerStateEvent.getSource().getMessage().isEmpty()) {
                 Throwable e = workerStateEvent.getSource().getException();
-                view.getErrorTextArea().setText(
-                    TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
+                    showError(TextFactory.getText(ErrorKey.PACKAGE_GENERATION_CREATION_ERROR) +
                                 " " + e.getMessage());
             } else {
-                view.getErrorTextArea().setText(workerStateEvent.getSource().getMessage());
+                showError(workerStateEvent.getSource().getMessage());
             }
 
-            view.getErrorTextArea().setVisible(true);
             view.scrollToTop();
             backgroundService.reset();
         });
@@ -143,9 +141,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             if (Platform.isFxApplicationThread()) {
                 view.getProgressPopup().hide();
             }
-            view.getErrorTextArea().setText(workerStateEvent.getSource().getMessage());
-            //view.getErrorLabel().setTextFill(Color.RED);
-            view.getErrorTextArea().setVisible(true);
+            showError(workerStateEvent.getSource().getMessage());
             view.scrollToTop();
             backgroundService.reset();
         });
@@ -189,7 +185,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         // This listener is for choosing to overwrite a package file; closes the window and proceeds
         view.getOkFileOverwriteButton().setOnAction(actionEvent -> {
             view.getFileOverwriteWarningPopup().hide();
-            view.getErrorTextArea().setVisible(false);
+            clearError();
             view.getProgressPopup().show();
             backgroundService.setOverwriteFile(true);
             backgroundService.execute();
@@ -301,13 +297,12 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
         * package, otherwise an error message is displayed informing the user what went wrong
         * and error is logged.
         */
-        view.getErrorTextArea().setVisible(false);
+        clearError();
         if (Platform.isFxApplicationThread()) {
             try {
                 controller.savePackageStateFile();
             } catch (IOException | RDFTransformException e) {
-                view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
-                view.getErrorTextArea().setVisible(true);
+                showError(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
             }
             view.getProgressPopup().show();
         }
@@ -429,8 +424,7 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
 
         //As an absolute fall back if the parameters can't be loaded from anywhere set them in the code.
         if (generationParams == null) {
-            view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR));
-            view.getErrorTextArea().setVisible(true);
+            showError(TextFactory.getText(ErrorKey.PARAM_LOADING_ERROR));
             loadDefaultPackageGenerationParams();
         }
 
@@ -556,9 +550,8 @@ public class PackageGenerationPresenterImpl extends BasePresenterImpl implements
             if (filePath != null && !filePath.isEmpty()) {
                 File outputDirectory = new File(filePath);
                 if (!outputDirectory.exists() &&!outputDirectory.mkdirs()) {
-                        view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR) +
+                        showError(TextFactory.getText(ErrorKey.OUTPUT_DIR_NOT_CREATED_ERROR) +
                         " Failed to create directory " + filePath);
-                        view.getErrorTextArea().setVisible(true);
                 } else {
                     packageLocation = outputDirectory;
                     generationParams.addParam(GeneralParameterNames.PACKAGE_LOCATION, packageLocation.getAbsolutePath());
