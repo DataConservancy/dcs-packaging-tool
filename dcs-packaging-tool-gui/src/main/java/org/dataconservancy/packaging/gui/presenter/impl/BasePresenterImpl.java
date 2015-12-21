@@ -17,6 +17,7 @@
 package org.dataconservancy.packaging.gui.presenter.impl;
 
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
 import org.dataconservancy.packaging.gui.Controller;
 import org.dataconservancy.packaging.gui.Errors;
 import org.dataconservancy.packaging.gui.InternalProperties;
@@ -102,6 +103,7 @@ public abstract class BasePresenterImpl implements Presenter {
         textArea.setText(msg);
        // label.setTextFill(Color.RED);
         textArea.setVisible(true);
+        ((BorderPane) view).setTop(textArea);
     }
     
     /**
@@ -112,5 +114,6 @@ public abstract class BasePresenterImpl implements Presenter {
         
         textArea.setText("");
         textArea.setVisible(false);
+        ((BorderPane) view).setTop(null);
     }
 }
