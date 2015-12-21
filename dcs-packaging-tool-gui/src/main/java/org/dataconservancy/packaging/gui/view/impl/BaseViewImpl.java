@@ -299,7 +299,6 @@ public abstract class BaseViewImpl<T extends Presenter> extends BorderPane imple
     public Hyperlink getHeaderViewHelpLink() {
         return headerView.getHelpLink();
     }
-    
-    @Override
+
     public TextArea getErrorTextArea(){ return errorTextArea;}
 }

@@ -111,11 +111,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
     }
 
     @Override
-    public TextArea getErrorTextArea() {
-        return errorTextArea;
-    }
-
-    @Override
     public TextField getChooseContentDirectoryTextField() {
         return currentBaseDirectory;
     }

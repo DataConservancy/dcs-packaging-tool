@@ -59,7 +59,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
     //The value of the combobox domain profiles
     private ComboBox<String> domainProfilesComboBox;
 
-    //private Label errorLabel;
     private ScrollPane contentScrollPane;
     private VBox content;
     private VBox requiredVBox;

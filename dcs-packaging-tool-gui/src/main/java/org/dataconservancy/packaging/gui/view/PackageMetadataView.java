@@ -77,12 +77,6 @@ public interface PackageMetadataView extends View<PackageMetadataPresenter> {
     void setupOptionalFields(List<PackageMetadata> optionalPackageMetadataList);
 
     /**
-     * Gets the TextArea that is used to show any error message at the top.
-     * @return the errorTextArea
-     */
-    TextArea getErrorTextArea();
-
-    /**
      * Clears all the fields
      *
      */

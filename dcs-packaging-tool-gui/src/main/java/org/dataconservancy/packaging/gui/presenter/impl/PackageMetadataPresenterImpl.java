@@ -192,6 +192,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
     @Override
     public void onBackPressed() {
         if (areAllFieldsEmpty()) {
+            clearError();
             controller.goToPreviousPage();
             return;
         }
