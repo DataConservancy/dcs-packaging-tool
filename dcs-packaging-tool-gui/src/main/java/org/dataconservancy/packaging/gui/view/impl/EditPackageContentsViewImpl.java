@@ -575,6 +575,8 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             SeparatorMenuItem separator =  new SeparatorMenuItem();
             separator.setStyle("-fx-color: #FFFFFF");
             itemList.add(separator);
+            //if there is an error, clear it
+            presenter.clearError();
         }
 
 

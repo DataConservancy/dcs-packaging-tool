@@ -48,4 +48,9 @@ public interface Presenter {
      * @param internalProperties  the InternalProperties object
      */
     void setInternalProperties(InternalProperties internalProperties);
+
+    /**
+     * Clears the error TextArea in the view
+     */
+    void clearError();
 }
