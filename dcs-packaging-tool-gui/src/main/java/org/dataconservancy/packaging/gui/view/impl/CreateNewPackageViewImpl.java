@@ -61,7 +61,6 @@ public class CreateNewPackageViewImpl extends BaseViewImpl<CreateNewPackagePrese
 
         setCenter(content);
         content.setAlignment(Pos.TOP_CENTER);
-        content.getChildren().add(errorTextArea);
 
         //Create a vbox that will display the options for generating a package, either selecting a base directory or
         //choosing an existing package description. 

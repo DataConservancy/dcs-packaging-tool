@@ -78,7 +78,7 @@ public abstract class BasePresenterImpl implements Presenter {
         try {
             getController().savePackageStateFile();
         } catch (IOException | RDFTransformException e) {
-            view.getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+            showError(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToPreviousPage();
     }
@@ -87,7 +87,7 @@ public abstract class BasePresenterImpl implements Presenter {
         try {
             getController().savePackageStateFile();
         } catch (IOException | RDFTransformException e) {
-            view.getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+            showError(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
         }
         getController().goToNextPage();
     }
