@@ -102,8 +102,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
                 try {
                     domainProfileURI = new URI(getController().getPackageState().getPackageMetadataValues(GeneralParameterNames.DOMAIN_PROFILE).get(0));
                 } catch (URISyntaxException e) {
-                    view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.DOMAIN_PROFILE_PARSE_ERROR));
-                    view.getErrorTextArea().setVisible(true);
+                    showError(TextFactory.getText(ErrorKey.DOMAIN_PROFILE_PARSE_ERROR));
                     view.scrollToTop();
                 }
 
@@ -158,8 +157,7 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
             try{
                getController().savePackageStateFile();
             } catch (IOException | RDFTransformException e){
-                view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
-                view.getErrorTextArea().setVisible(true);
+                showError(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                 view.scrollToTop();
             }
         });
@@ -171,25 +169,22 @@ public class PackageMetadataPresenterImpl extends BasePresenterImpl implements P
         updatePackageState();
 
         if(!validateRequiredFields()){
-            view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));
-            view.getErrorTextArea().setVisible(true);
+            showError(TextFactory.getText(ErrorKey.MISSING_REQUIRED_FIELDS));;
             view.scrollToTop();
         } else if(!view.areAllFieldsValid()) {
-            view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.SOME_FIELDS_INVALID));
-            view.getErrorTextArea().setVisible(true);
+            showError(TextFactory.getText(ErrorKey.SOME_FIELDS_INVALID));
             view.scrollToTop();
         } else  {
              if (Platform.isFxApplicationThread()) {
                 try {
                     getController().savePackageStateFile();
                 } catch (IOException | RDFTransformException e) {
-                    view.getErrorTextArea().setText(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
-                    view.getErrorTextArea().setVisible(true);
+                    showError(TextFactory.getText(ErrorKey.IO_CREATE_ERROR));
                     view.scrollToTop();
                 }
             }
 
-            view.getErrorTextArea().setVisible(false);
+            clearError();
             super.onContinuePressed();
         }
     }

@@ -87,13 +87,6 @@ public class PackageMetadataViewImpl extends BaseViewImpl<PackageMetadataPresent
         contentScrollPane.setContent(content);
         setCenter(contentScrollPane);
 
-        //Create a label to show any status messages at the top of the screen.
-        HBox status = new HBox();
-        status.getChildren().add(errorTextArea);
-        status.setAlignment(Pos.TOP_CENTER);
-
-        content.getChildren().add(status);
-
         requiredVBox = new VBox(5);
 
         VBox requiredLabelVBox = createSectionLabel(TextFactory.getText(LabelKey.REQUIRED_FIELDS_LABEL));
