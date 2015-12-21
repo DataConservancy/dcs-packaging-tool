@@ -149,6 +149,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
 
         //Create a box for the actual predicate definition.
         HBox predicateBox = new HBox(15);
+        predicateBox.setAlignment(Pos.CENTER_LEFT);
         Label predicateLabel = new Label(TextFactory.getText(Labels.LabelKey.PREDICATE_LABEL));
         predicateLabel.setMinWidth(100);
         predicateLabel.setWrapText(true);
