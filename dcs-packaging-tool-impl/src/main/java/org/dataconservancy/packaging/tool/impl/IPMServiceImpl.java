@@ -398,7 +398,7 @@ public class IPMServiceImpl implements IPMService {
      * @throws IOException If there is a problem reading from the file system.
      */
     private void buildContentRoots(Node node, Node newTree) throws IOException {
-        if (node.getChildren() != null) {
+        if (node.getChildren() != null && node.getFileInfo() != null) {
             for (Node child : node.getChildren()) {
                 if (child.getFileInfo() != null && Paths.get(child.getFileInfo().getLocation()).toFile().exists()) {
                     if (!Paths.get(child.getFileInfo().getLocation()).startsWith(Paths.get(node.getFileInfo().getLocation()))) {
