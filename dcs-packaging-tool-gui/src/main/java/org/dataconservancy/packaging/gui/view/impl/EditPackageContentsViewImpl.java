@@ -81,6 +81,7 @@ import org.dataconservancy.packaging.tool.model.dprofile.PropertyType;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -563,7 +564,11 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     }
                     if (file != null) {
                         //Remap the node to the new file and check all it's descendants to see if they can be remapped also.
-                        ipmService.remapNode(packageNode, file.toPath());
+                        try {
+                            ipmService.remapNode(packageNode, file.toPath());
+                        } catch (IOException e) {
+                            getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+                        }
 
                         //Redisplay the tree to update the warnings
                         presenter.displayPackageTree();

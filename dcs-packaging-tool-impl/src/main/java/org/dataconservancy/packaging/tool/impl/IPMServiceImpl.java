@@ -1,5 +1,6 @@
 package org.dataconservancy.packaging.tool.impl;
 
+import org.dataconservancy.dcs.util.FilePathUtil;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.impl.support.FilenameValidatorService;
@@ -346,7 +347,11 @@ public class IPMServiceImpl implements IPMService {
     }
 
     @Override
-    public void remapNode(Node node, Path newPath) {
+    public void remapNode(Node node, Path newPath) throws IOException {
+        if (!FilePathUtil.hasValidFilePath(newPath.toFile())) {
+            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + newPath.toString());
+        }
+
         Path oldPath = null;
         if (node.getFileInfo().getLocation() != null) {
             oldPath = Paths.get(node.getFileInfo().getLocation());
@@ -365,7 +370,7 @@ public class IPMServiceImpl implements IPMService {
                     if (newChildPath.toFile().exists()) {
                         remapNode(child, newChildPath);
                     }
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException | IOException e) {
                     //If this path can't be relativized we won't automatically remap
                 }
             });
