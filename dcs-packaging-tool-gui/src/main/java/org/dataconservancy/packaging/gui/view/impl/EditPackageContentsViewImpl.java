@@ -567,7 +567,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                         try {
                             ipmService.remapNode(packageNode, file.toPath());
                         } catch (IOException e) {
-                            getErrorTextArea().setText(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
+                            presenter.showError(TextFactory.getText(Errors.ErrorKey.IO_CREATE_ERROR));
                         }
 
                         //Redisplay the tree to update the warnings

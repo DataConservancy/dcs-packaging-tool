@@ -50,6 +50,11 @@ public interface Presenter {
     void setInternalProperties(InternalProperties internalProperties);
 
     /**
+     * Shows an error message in the view
+     */
+    void showError(String message);
+
+    /**
      * Clears the error TextArea in the view
      */
     void clearError();
