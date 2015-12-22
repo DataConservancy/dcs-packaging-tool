@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <Product Id="9eb19be3-0bde-41c3-9426-c534db4c64e3" Name="DC Package Tool" Language="1033" Version="1.0.1" Manufacturer="Data Conservancy" UpgradeCode="ba78c392-1b9c-4665-be68-1b46e13c4931">
+    <Product Id="9eb19be3-0bde-41c3-9426-c534db4c64e3" Name="DC Package Tool" Language="1033" Version="1.0.2" Manufacturer="Data Conservancy" UpgradeCode="ba78c392-1b9c-4665-be68-1b46e13c4931">
         <Package Description="none" Comments="None" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <!-- We use RemoveFolderEx to ensure application folder is fully 

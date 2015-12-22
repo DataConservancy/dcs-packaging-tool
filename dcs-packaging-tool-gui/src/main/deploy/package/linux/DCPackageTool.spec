@@ -1,6 +1,6 @@
 Summary: GUI for describing data and generating data packages from file system.
 Name: DCPackageTool
-Version: 1.0.1
+Version: 1.0.2
 Release: 1
 License: Apache License, Version 2.0
 Vendor: Data Conservancy <dc-ird@googlegroups.com>
