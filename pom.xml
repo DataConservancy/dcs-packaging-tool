@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dataconservancy.pkgtool</groupId>
   <artifactId>dcs-packaging-tool</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
   <name>DCS Packaging Tools</name>
 
@@ -344,7 +344,7 @@
     <connection>scm:git:https://github.com/DataConservancy/dcs.git</connection>
     <developerConnection>scm:git:https://github.com/DataConservancy/dcs.git</developerConnection>
     <url>https://github.com/DataConservancy/dcs/tree/master/dcs-packaging-tool</url>
-    <tag>HEAD</tag>
+    <tag>dcs-packaging-tool-1.0.2</tag>
   </scm>
   
   <repositories>
