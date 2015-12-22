@@ -33,6 +33,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,8 +54,13 @@ public class IPMServiceImpl implements IPMService {
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
-        List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
-        if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
+        List<String> invalidNamesList = new ArrayList<>();
+
+        visitedFiles.clear();
+        Node root;
+        root = createTree(null, path, invalidNamesList);
+        
+    	if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
             String invalidNames = "";
             for (int i = 0; i < invalidNamesList.size(); i++) {
                 invalidNames += invalidNamesList.get(i);
@@ -66,17 +72,13 @@ public class IPMServiceImpl implements IPMService {
 
             throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + invalidNames);
         }
-
-        visitedFiles.clear();
-        Node root;
-        root = createTree(null, path);
         return root;
     }
 
     /*
      * Creates a Node in the tree for the given path, and will recurse the file structure to add all child files and folders.
      */
-    private Node createTree(Node parent, Path path) throws IOException {
+    private Node createTree(Node parent, Path path, List<String> invalidNames) throws IOException {
         //Check if the process is being cancelled by GUI
         if (Thread.currentThread().isInterrupted()) {
             return null;
@@ -112,6 +114,12 @@ public class IPMServiceImpl implements IPMService {
         Node node = null;
         //Just as a fail safe ensure the file exists before adding.
         if (path.toRealPath().toFile().exists()) {
+        	
+        	/* Validate the path name */
+        	if (!validatorService.isValid(path.toRealPath())) {
+        		invalidNames.add(path.toRealPath().toString());
+        	}
+        	
             node = new Node(uriGenerator.generateNodeURI());
 
             FileInfo info = new FileInfo(path.toRealPath());
@@ -143,11 +151,12 @@ public class IPMServiceImpl implements IPMService {
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
-                    createTree(node, childPath);
+                    createTree(node, childPath, invalidNames);
                 }
 
             }
         }
+        
         return node;
     }
 
