@@ -99,6 +99,17 @@
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
         </plugin>
+        
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <configuration>
+            <excludes>            
+              <exclude>src/main/resources/**/*.help</exclude>
+              <exclude>src/main/resources/userProperties.json</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
 
       </plugins>
       

@@ -91,6 +91,16 @@
           </execution>
         </executions>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>src/test/resources/**/*.txt</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>

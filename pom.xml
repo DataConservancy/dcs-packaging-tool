@@ -146,6 +146,33 @@
     </pluginManagement>
 
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <configuration>
+          <excludeSubProjects>true</excludeSubProjects>
+          <excludes>
+            <exclude>dcs-packaging-tool-shared/src/main/resources/SignatureFiles/**</exclude>
+            <exclude>dcs-packaging-tool-shared/src/test/resources/**/*.txt</exclude>
+            <exclude>dcs-packaging-tool-impl/src/test/resources/**/*.txt</exclude>
+            <exclude>dcs-packaging-tool-integration/src/test/resources/**/*.txt</exclude>
+            <exclude>dcs-packaging-tool-ser/src/test/resources/org/dataconservancy/packaging/tool/ser/**</exclude>
+            <exclude>dcs-packaging-tool-gui/src/main/resources/**/*.help</exclude>
+            <exclude>dcs-packaging-tool-gui/src/main/resources/userProperties.json</exclude>
+            <exclude>dcs-packaging-tool-ontologies/src/main/resources/*.ttl</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>rat-license-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

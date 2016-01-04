@@ -27,6 +27,24 @@ under the License.
     <version>1.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>dcs-packaging-tool-ontologies</artifactId>
+  
+  <build>
+    
+    <plugins>
+      
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <configuration>
+          <excludes>            
+            <exclude>src/main/resources/*.ttl</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      
+    </plugins>
+    
+  </build>
 
   <dependencies>
     <dependency>
