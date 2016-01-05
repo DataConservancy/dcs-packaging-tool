@@ -185,3 +185,9 @@
 .RequiredPropertyExplanation {
     -fx-font-size: 12;
 }
+
+.DropEnteredBoxHighlight {
+    -fx-border-color: #2F8D83;
+    -fx-effect: dropshadow( one-pass-box , #4BA299,
+        3, 0.0, 3, 3);
+}

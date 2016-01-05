@@ -30,6 +30,8 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -367,6 +369,9 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                 propertyValueBox.updateInputControl(propertyValueBox.getValue(), true, PropertyValueHint.MULTI_LINE_TEXT, "");
             }
 
+            //Since we've updated the property input box we need to reinitialize the drag and drop controls.
+            setupDragAndDropControls(propertyValueBox.getPropertyInput());
+
             propertyValueBox.getPropertyInput().setPrefWidth(250);
             propertyValueBox.getPropertyInput().textProperty().addListener(emptyPropertyValueListener);
             propertyValueBox.getPropertyInput().textProperty().addListener(emptyPropertyListener);
@@ -380,8 +385,63 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
         emptyPropertyValueListener.fieldAdded();
         emptyPropertyListener.fieldAdded();
 
+        //Initialize the field to handle the drop portion of dragged values from the tree.
+        setupDragAndDropControls(propertyValueBox.getPropertyInput());
+
         return propertyValueBox;
     }
+
+    //Sets all the necessary event handlers on the text input control to support the dropping of values dragged from the tree.
+    private void setupDragAndDropControls(TextInputControl propertyInput) {
+        //If something is dragged over the text input box make sure it's a value we can accept.
+        propertyInput.setOnDragOver(event -> {
+            //Make sure the item wasn't dragged from this box (currently not supported but maybe in the future, and that it's of type string.
+            if (event.getGestureSource() != propertyInput &&
+                    event.getDragboard().hasString()) {
+                /* allow value to be copied */
+                event.acceptTransferModes(TransferMode.COPY);
+            }
+
+            event.consume();
+        });
+
+        //If something is dragged over the text input box and we can accept it update the css of the box to indicate we can take the value.
+        propertyInput.setOnDragEntered(event -> {
+            //A potential drag has entered the input box highlight the borders if we can accept the content.
+            if (event.getGestureSource() != propertyInput &&
+                 event.getDragboard().hasString()) {
+                propertyInput.getStyleClass().add(DROP_ENTERED_BOX_HIGHLIGHT);
+            }
+
+            event.consume();
+        });
+
+        //If the drag exits the text input box, remove the special highlighting.
+        propertyInput.setOnDragExited(event -> {
+            /* mouse moved away, remove the graphical cues */
+            propertyInput.getStyleClass().removeAll(DROP_ENTERED_BOX_HIGHLIGHT);
+
+            event.consume();
+        });
+
+        //If the dragged item is dropped on the text property copy the value to the box.
+        propertyInput.setOnDragDropped(event -> {
+            /* data dropped */
+            /* if there is a string data on dragboard, read it and use it */
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasString()) {
+               propertyInput.setText(db.getString());
+               success = true;
+            }
+            /* let the source know whether the string was successfully
+             * transferred and used */
+            event.setDropCompleted(success);
+
+            event.consume();
+        });
+    }
+
     /*
      * Cell factor for the Namespace selection box, basically we just display the label of the the vocabulary, in the drop down list.
      */

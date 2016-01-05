@@ -69,4 +69,5 @@ public interface CssConstants {
     String REQUIRED_PROPERTY_EXPLANATION = "RequiredPropertyExplanation";
     String NO_FILE_ENTITY = "NoFileEntityText";
     String ERROR_TEXT_AREA = "ErrorTextArea";
+    String DROP_ENTERED_BOX_HIGHLIGHT = "DropEnteredBoxHighlight";
 }
