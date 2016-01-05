@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2015 Johns Hopkins University
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product Id="9eb19be3-0bde-41c3-9426-c534db4c64e3" Name="DC Package Tool" Language="1033" Version="1.0.2" Manufacturer="Data Conservancy" UpgradeCode="ba78c392-1b9c-4665-be68-1b46e13c4931">
         <Package Description="none" Comments="None" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
