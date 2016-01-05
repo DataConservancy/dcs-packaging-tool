@@ -46,7 +46,10 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -98,16 +101,16 @@ import java.util.stream.Collectors;
  */
 public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContentsPresenter> implements EditPackageContentsView {
 
-    private TreeTableView<Node> artifactTree;
+    private TreeTableView<Node> nodeTree;
 
-    private Stage artifactDetailsWindow;
-    private Scene artifactDetailsScene;
+    private Stage nodePropertiesWindow;
+    private Scene nodePropertiesScene;
     private Node popupNode;
     private IPMService ipmService;
     private Map<Node, NodeComparison> refreshResult;
 
     //Warning popup and controls
-    public PackageToolPopup warningPopup;
+    private PackageToolPopup warningPopup;
     private Button warningPopupPositiveButton;
     private Button warningPopupNegativeButton;
     private CheckBox hideFutureWarningPopupCheckBox;
@@ -161,9 +164,9 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         setCenter(content);
 
         if (Platform.isFxApplicationThread()) {
-            artifactDetailsWindow = new Stage();
-            artifactDetailsWindow.setMinWidth(540);
-            artifactDetailsWindow.setMinHeight(500);
+            nodePropertiesWindow = new Stage();
+            nodePropertiesWindow.setMinWidth(540);
+            nodePropertiesWindow.setMinHeight(500);
         }
 
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
@@ -212,25 +215,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getChildren().add(showIgnored);
 
         //The main element of the view a tree of all the package artifacts.
-        artifactTree = new TreeTableView<>();
+        nodeTree = new TreeTableView<>();
 
-        artifactTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        nodeTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         //disable column sorting in the view
-        artifactTree.setSortPolicy(treeTableView -> false);
-
-        artifactTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (artifactDetailsWindow != null && artifactDetailsWindow.isShowing()) {
-                //If new value is null it means the node has been removed, so close the window
-                if (newValue == null) {
-                    artifactDetailsWindow.close();
-                } else {
-                    presenter.saveCurrentNode();
-                    showNodePropertiesWindow(newValue.getValue(), null);
-                }
-
-            }
-        });
+        nodeTree.setSortPolicy(treeTableView -> false);
 
         //set up the columns for the artifact, its type and the options control
         TreeTableColumn<Node, HBox> packageResourceColumn = new TreeTableColumn<>(TextFactory.getText(LabelKey.PACKAGE_RESOURCE_LABEL));
@@ -245,7 +235,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         actionColumn.setPrefWidth(100); //make wide enough to comfortably fit image and vertical scroll bar
         
         // Dynamically resize resource column to take up space, add 2 here to get rid of horizontal scroll bar
-        packageResourceColumn.prefWidthProperty().bind(artifactTree.widthProperty().subtract(typeColumn.getWidth() + actionColumn.getWidth() + 2));
+        packageResourceColumn.prefWidthProperty().bind(nodeTree.widthProperty().subtract(typeColumn.getWidth() + actionColumn.getWidth() + 2));
 
         //For these cell factories p.getValue returns the TreeItem<Node> p.getValue.getValue returns the node.
         packageResourceColumn.setCellValueFactory(p -> {
@@ -351,19 +341,19 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
                                     nodeContextMenu.setAutoHide(true);
 
-                                    ObservableList<TreeItem<Node>> selectedItems = artifactTree.getSelectionModel().getSelectedItems();
+                                    ObservableList<TreeItem<Node>> selectedItems = nodeTree.getSelectionModel().getSelectedItems();
 
                                     //If no rows are selected or the current row isn't selected add the current row to the selection
                                     //This is to help keep behavior consistent
-                                    if (selectedItems == null || selectedItems.isEmpty() || !selectedItems.contains(artifactTree.getTreeItem(getIndex()))) {
+                                    if (selectedItems == null || selectedItems.isEmpty() || !selectedItems.contains(nodeTree.getTreeItem(getIndex()))) {
                                         //If ctrl is pressed add the row otherwise, replace selection
                                         if (e.isControlDown()) {
-                                            artifactTree.getSelectionModel().select(getIndex());
+                                            nodeTree.getSelectionModel().select(getIndex());
                                         } else {
-                                            artifactTree.getSelectionModel().clearAndSelect(getIndex());
+                                            nodeTree.getSelectionModel().clearAndSelect(getIndex());
                                         }
 
-                                        selectedItems = artifactTree.getSelectionModel().getSelectedItems();
+                                        selectedItems = nodeTree.getSelectionModel().getSelectedItems();
                                     }
 
                                     //Loop through the selected nodes and determine if they're all ignored, and the possible available node transforms.
@@ -404,15 +394,15 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             }
         });
 
-        artifactTree.getColumns().add(packageResourceColumn);
-        artifactTree.getColumns().add(typeColumn);
-        artifactTree.getColumns().add(actionColumn);
+        nodeTree.getColumns().add(packageResourceColumn);
+        nodeTree.getColumns().add(typeColumn);
+        nodeTree.getColumns().add(actionColumn);
 
         //set up row factory to allow for a little alternate row styling for ignored package artifacts
-        artifactTree.setRowFactory(new Callback<TreeTableView<Node>, TreeTableRow<Node>>() {
+        nodeTree.setRowFactory(new Callback<TreeTableView<Node>, TreeTableRow<Node>>() {
             @Override
              public TreeTableRow<Node> call(TreeTableView<Node> ttv) {
-                return new TreeTableRow<Node>() {
+                TreeTableRow<Node> nodeTreeTableRow = new TreeTableRow<Node>() {
                     @Override
                     public void updateItem(Node packageNode, boolean empty) {
                         super.updateItem(packageNode, empty);
@@ -423,10 +413,35 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                         }
                     }
                 };
+
+                //If the user drags over a row initiate the drag and drop code to copy the value of the domain object associated with the row.
+                nodeTreeTableRow.setOnDragDetected(event -> {
+                    //If drag was detected start drag and drop with the copy mode.
+                    Dragboard db = nodeTreeTableRow.startDragAndDrop(TransferMode.COPY);
+
+                    //Put the id of the domain object on the clipboard to copy.
+                    ClipboardContent content1 = new ClipboardContent();
+                    content1.putString(nodeTreeTableRow.getTreeItem().getValue().getDomainObject().toString());
+                    db.setContent(content1);
+
+                    event.consume();
+
+                });
+
+                //If the user clicks on a row update the content of the node property window if it's open.
+                nodeTreeTableRow.setOnMouseClicked(event -> {
+                    if (nodePropertiesWindow != null && nodePropertiesWindow.isShowing()) {
+                        //If new value is null it means the node has been removed, so close the window
+                        presenter.saveCurrentNode();
+                        showNodePropertiesWindow(nodeTreeTableRow.getTreeItem().getValue(), null);
+                    }
+
+                });
+                return nodeTreeTableRow;
             }
         });
 
-        content.getChildren().add(artifactTree);
+        content.getChildren().add(nodeTree);
 
         ImageView missingFileIndicator = new ImageView("/images/orange_exclamation.png");
         missingFileIndicator.setFitHeight(20);
@@ -442,7 +457,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         legend.getChildren().add(missingFile);
 
         content.getChildren().add(legend);
-        VBox.setVgrow(artifactTree, Priority.ALWAYS);
+        VBox.setVgrow(nodeTree, Priority.ALWAYS);
 
         //Controls for the package artifact popup
         cancelPopupLink = new Hyperlink(TextFactory.getText(LabelKey.CANCEL_BUTTON));
@@ -467,12 +482,12 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
     @Override
     public TreeItem<Node> getRoot() {
-        return artifactTree.getRoot();
+        return nodeTree.getRoot();
     }
 
     @Override
     public TreeTableView<Node> getArtifactTreeView() {
-        return artifactTree;
+        return nodeTree;
     }
 
     @Override
@@ -498,7 +513,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             itemList.add(propertiesItem);
             propertiesItem.setOnAction(actionEvent -> {
                 showNodePropertiesWindow(packageNode, label);
-                artifactTree.getSelectionModel().select(selectedItems.get(0));
+                nodeTree.getSelectionModel().select(selectedItems.get(0));
             });
             List<NodeType> childNodeTypes = presenter.getPossibleChildTypes(packageNode);
 
@@ -663,7 +678,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
     @Override
     public void showNodePropertiesWindow(Node packageNode, javafx.scene.Node anchorNode) {
 
-        if (artifactDetailsWindow != null) {
+        if (nodePropertiesWindow != null) {
             popupNode = packageNode;
 
             List<Property> userDefinedProperties = null;
@@ -674,10 +689,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             Pane propertiesPane = windowBuilder.buildArtifactPropertiesLayout(packageNode, metadataInheritanceButtonMap, presenter.getController().getDomainProfileService(),
                                                                               userDefinedProperties);
 
-            if (artifactDetailsScene == null) {
-                artifactDetailsScene = new Scene(propertiesPane, 540, 500);
+            if (nodePropertiesScene == null) {
+                nodePropertiesScene = new Scene(propertiesPane, 540, 500);
             } else {
-                artifactDetailsScene.setRoot(propertiesPane);
+                nodePropertiesScene.setRoot(propertiesPane);
             }
 
             String windowTitle = "";
@@ -686,10 +701,10 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             }
 
             windowTitle += "Properties";
-            artifactDetailsWindow.setTitle(windowTitle);
-            artifactDetailsWindow.setScene(artifactDetailsScene);
+            nodePropertiesWindow.setTitle(windowTitle);
+            nodePropertiesWindow.setScene(nodePropertiesScene);
 
-            if (!artifactDetailsWindow.isShowing()) {
+            if (!nodePropertiesWindow.isShowing()) {
                 if (anchorNode != null) {
                     Point2D point = anchorNode.localToScene(0.0, 0.0);
                     double x = getScene().getWindow().getX() + point.getX();
@@ -699,17 +714,16 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
                     x -= 500;
                     y -= 100;
 
-                    artifactDetailsWindow.setX(x);
-                    artifactDetailsWindow.setY(y);
+                    nodePropertiesWindow.setX(x);
+                    nodePropertiesWindow.setY(y);
                 }
-                artifactDetailsWindow.show();
+                nodePropertiesWindow.show();
             }
         }
     }
 
-    @Override
-    public Stage getArtifactDetailsWindow() {
-        return artifactDetailsWindow;
+    public Stage getNodePropertiesWindow() {
+        return nodePropertiesWindow;
     }
 
     @Override

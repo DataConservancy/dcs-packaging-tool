@@ -58,7 +58,7 @@ public interface EditPackageContentsView extends View<EditPackageContentsPresent
      * Retrieves the stage that represents the window used for the editing package artifacts.
      * @return the stage that shows the artifact properties edit screen
      */
-    Stage getArtifactDetailsWindow();
+    Stage getNodePropertiesWindow();
     
     /**
      * Displays the artifact details window.

@@ -117,8 +117,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         //Displays the file selector, and then saves the package description to the given file. 
         view.getSaveButton().setOnAction(arg0 -> {
-            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
-                view.getArtifactDetailsWindow().hide();
+            if (view.getNodePropertiesWindow() != null && view.getNodePropertiesWindow().isShowing()) {
+                view.getNodePropertiesWindow().hide();
             }
 
             try {
@@ -130,20 +130,20 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
         //Cancels the property popup, which closes the popup with out saving any changes.
         view.getCancelPopupHyperlink().setOnAction(arg0 -> {
-            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
-                view.getArtifactDetailsWindow().hide();
+            if (view.getNodePropertiesWindow() != null && view.getNodePropertiesWindow().isShowing()) {
+                view.getNodePropertiesWindow().hide();
             }
         });
 
-        if (view.getArtifactDetailsWindow() != null) {
-            view.getArtifactDetailsWindow().setOnCloseRequest(event -> saveCurrentNode());
+        if (view.getNodePropertiesWindow() != null) {
+            view.getNodePropertiesWindow().setOnCloseRequest(event -> saveCurrentNode());
         }
         
         //Saves any changes made in the package artifact property popup
         view.getApplyPopupButton().setOnAction(arg0 -> {
             saveCurrentNode();
-            if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
-                view.getArtifactDetailsWindow().hide();
+            if (view.getNodePropertiesWindow() != null && view.getNodePropertiesWindow().isShowing()) {
+                view.getNodePropertiesWindow().hide();
             }
         });
 
@@ -189,8 +189,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     @Override
     public void onContinuePressed() {
         //Close property window if it's showing
-        if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
-            view.getArtifactDetailsWindow().hide();
+        if (view.getNodePropertiesWindow() != null && view.getNodePropertiesWindow().isShowing()) {
+            view.getNodePropertiesWindow().hide();
         }
 
         //Perform simple validation to make sure the tree structure is valid.
@@ -246,8 +246,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     @Override
     public void onBackPressed() {
-        if (view.getArtifactDetailsWindow() != null && view.getArtifactDetailsWindow().isShowing()) {
-            view.getArtifactDetailsWindow().hide();
+        if (view.getNodePropertiesWindow() != null && view.getNodePropertiesWindow().isShowing()) {
+            view.getNodePropertiesWindow().hide();
         }
 
         //Perform simple validation to make sure the package description is valid.
@@ -403,7 +403,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
     }
 
-    protected TreeItem<Node> buildTree(Node node, boolean showIgnoredArtifacts) {
+    private TreeItem<Node> buildTree(Node node, boolean showIgnoredArtifacts) {
         final TreeItem<Node> item = new TreeItem<>(node);
 
         item.expandedProperty().addListener((observableValue, oldValue, newValue) -> {
@@ -458,7 +458,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         return null;
     }
 
-    protected void applyMetadataInheritance(Node node) {
+    private void applyMetadataInheritance(Node node) {
         Set<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
 
         if (node.getChildren() != null) {
