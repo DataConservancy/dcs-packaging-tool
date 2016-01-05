@@ -80,14 +80,14 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
     private CheckBox sha1CheckBox;
 
     //Popup to warn of existing package file overwrite
-    public PackageToolPopup packageFileExistsWarningPopup;
-    public Button cancelOverwriteButton;
-    public Button okOverwriteButton;
+    private PackageToolPopup packageFileExistsWarningPopup;
+    private Button cancelOverwriteButton;
+    private Button okOverwriteButton;
     
     //Popup when generation was successful and the controls of the popup. 
-    public PackageToolPopup packageGenerationSuccessPopup;
-    public Hyperlink noThanksLink;
-    public Button createAnotherPackageButton;
+    private PackageToolPopup packageGenerationSuccessPopup;
+    private Hyperlink noThanksLink;
+    private Button createAnotherPackageButton;
     
     private ProgressDialogPopup progressDialogPopup;
 
@@ -237,9 +237,22 @@ public class PackageGenerationViewImpl extends BaseViewImpl<PackageGenerationPre
 
         md5CheckBox = new CheckBox(TextFactory.getText(LabelKey.MD5_CHECKBOX));
         checksumOptions.getChildren().add(md5CheckBox);
+        md5CheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !sha1CheckBox.isSelected()) {
+                md5CheckBox.setSelected(true);
+            }
+
+        });
 
         sha1CheckBox = new CheckBox(TextFactory.getText(LabelKey.SHA1_CHECKBOX));
         checksumOptions.getChildren().add(sha1CheckBox);
+
+        sha1CheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !md5CheckBox.isSelected()) {
+                sha1CheckBox.setSelected(true);
+            }
+
+        });
 
         packagingOptionsRowTwo.getChildren().add(checksumOptions);
 
