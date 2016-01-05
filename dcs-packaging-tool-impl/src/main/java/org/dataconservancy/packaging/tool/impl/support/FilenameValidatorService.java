@@ -90,4 +90,8 @@ public class FilenameValidatorService {
         });
         return invalidFilenames;
     }
+    
+    public boolean isValid(Path path) {
+    	return filenameValidator.isValid(path.getFileName().toString());
+    }
 }
