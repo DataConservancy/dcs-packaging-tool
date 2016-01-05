@@ -46,8 +46,11 @@ import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
@@ -162,6 +165,23 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
 
         content.getStyleClass().add(EDIT_PACKAGE_CONTENTS_VIEW_CLASS);
         setCenter(content);
+
+        content.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.C && event.isControlDown()) {
+                if (nodeTree != null) {
+                    final Clipboard clipboard = Clipboard.getSystemClipboard();
+                    final ClipboardContent clipboardContent = new ClipboardContent();
+
+                    String selectedNodeIds = "";
+                    for (TreeItem<Node> selectedNode : nodeTree.getSelectionModel().getSelectedItems()) {
+                        selectedNodeIds += selectedNode.getValue().getDomainObject() + "\n";
+                    }
+
+                    clipboardContent.putString(selectedNodeIds);
+                    clipboard.setContent(clipboardContent);
+                }
+            }
+        });
 
         if (Platform.isFxApplicationThread()) {
             nodePropertiesWindow = new Stage();
