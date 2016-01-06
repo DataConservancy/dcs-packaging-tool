@@ -16,14 +16,33 @@ under the License.
 -->
 ## Data Conservancy Packaging tool ##
 
-This is a description of the DCS packaging tool
+The Data Conservancy Packaging Tool is a JavaFX GUI used to
+describe and package digital content.
 
-### Quick start ###
+The packaging tool produces packages that are compliant with
+the following specifications:
+
+* [BagIt][bagit]
+* [Data Conservancy BagIt Profile][bagit-profile]
+* [Data Conservancy Packaging Specification][package-spec].
+
+> Note: the Data Conservancy specifications are managed 
+> separately, [here][spechome].
+
+Full documentation is available on our [wiki][dc-wiki].
+
+### Releases ###
+
+Releases are cataloged on the [GitHub Releases page][gh-releases].
+
+### Developer Quick Start ###
 
 #### Prerequisites ####
  - Oracle JDK 8 with Java FX
 
 ####To build the entire tool ####
+
+Clone this repository.
 
  `mvn clean install`
   
@@ -34,3 +53,10 @@ Some tests require creating symbolic linksx which is a priviliged operation on W
 
     cd dcs-packaging-tool-gui
     mvn jfx:run
+
+[bagit]: http://www.ietf.org/id/draft-kunze-bagit-12.txt "BagIt 0.97"
+[bagit-profile]: http://dataconservancy.github.io/dc-packaging-spec/dc-bagit-profile-1.0.html "Data Conservancy BagIt Profile"
+[package-spec]: http://dataconservancy.github.io/dc-packaging-spec/dc-packaging-spec-1.0.html "Data Conservancy Packaging Specification"
+[spec-home]: http://dataconservancy.github.io/dc-packaging-spec/ "Data Conservancy Packaging Specification Home"
+[gh-releases]: https://github.com/DataConservancy/dcs-packaging-tool/releases "Package Tool Release Page"
+[dc-wiki]: https://wiki.library.jhu.edu/display/DCSDOCPKG/Package+Tools+Documentation+Home "Data Conservancy Documentation"
