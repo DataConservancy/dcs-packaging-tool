@@ -27,7 +27,7 @@ the following specifications:
 * [Data Conservancy Packaging Specification][package-spec].
 
 > Note: the Data Conservancy specifications are managed 
-> separately, [here][spechome].
+> separately, [here][spec-home].
 
 Full documentation is available on our [wiki][dc-wiki].
 
