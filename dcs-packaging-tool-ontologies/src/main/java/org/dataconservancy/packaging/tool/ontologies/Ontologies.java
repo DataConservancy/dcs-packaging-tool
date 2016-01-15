@@ -66,6 +66,8 @@ public interface Ontologies {
 
     String NS_RDFG = "http://www.w3.org/2004/03/trix/rdfg-1/";
 
+    String NS_IANA = "http://www.iana.org/assignments/relation/";
+
 
     /**
      * Central map of prefixes, consistent with all ontologies used herein.

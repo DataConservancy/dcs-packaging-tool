@@ -30,6 +30,8 @@ import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.determineSerialization;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
+import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_IANA;
+import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_LDP;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputStream;
 
 /**
@@ -46,10 +48,9 @@ public class OreReMBuilder
         Resource rem = state.manifest.createResource("");
         Resource aggregation = state.manifest.createResource("#Aggregation");
 
-        Property rdfType =
-                state.manifest.createProperty(Ontologies.NS_RDF + "type");
-        Property describes =
-                state.manifest.createProperty(NS_ORE + "describes");
+        Property rdfType = state.manifest.createProperty(Ontologies.NS_RDF + "type");
+        Property describes = state.manifest.createProperty(NS_ORE + "describes");
+        Property ianaDescribes = state.manifest.createProperty(NS_IANA + "describes");
 
         rem.addProperty(rdfType,
                         state.manifest.createResource(NS_ORE + "ResourceMap"));
@@ -66,6 +67,8 @@ public class OreReMBuilder
     public void visitNode(Node node, PackageModelBuilderState state) {
         Resource aggregation = state.manifest.getResource("#Aggregation");
         Property aggregates = state.manifest.getProperty(NS_ORE + "aggregates");
+        Property rdfType = state.manifest.getProperty(Ontologies.NS_RDF + "type");
+        Property ianaDescribes = state.manifest.getProperty(NS_IANA + "describes");
 
         if (!node.isIgnored()) {
 
@@ -75,6 +78,14 @@ public class OreReMBuilder
 
             aggregation.addProperty(aggregates, state.manifest
                     .createResource(serializationLocation.toString()));
+
+            if(node.hasChildren()){
+               Resource resource = state.manifest.createResource(serializationLocation.toString());
+               resource.addProperty(rdfType, NS_LDP + "Container");
+            } else if (node.getFileInfo() != null && node.getFileInfo().isFile()){
+                Resource resource = state.manifest.createResource(serializationLocation.toString());
+                resource.addProperty(ianaDescribes, node.getFileInfo().getLocation().toString());
+            }
         }
 
     }
