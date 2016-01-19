@@ -157,7 +157,7 @@
             <exclude>dcs-packaging-tool-shared/src/test/resources/**/*.txt</exclude>
             <exclude>dcs-packaging-tool-impl/src/test/resources/**/*.txt</exclude>
             <exclude>dcs-packaging-tool-integration/src/test/resources/**/*.txt</exclude>
-            <exclude>dcs-packaging-tool-ser/src/test/resources/org/dataconservancy/packaging/tool/ser/**</exclude>
+            <exclude>**/src/test/resources/org/dataconservancy/packaging/tool/ser/**</exclude>
             <exclude>dcs-packaging-tool-gui/src/main/resources/**/*.help</exclude>
             <exclude>dcs-packaging-tool-gui/src/main/resources/userProperties.json</exclude>
             <exclude>dcs-packaging-tool-ontologies/src/main/resources/*.ttl</exclude>
