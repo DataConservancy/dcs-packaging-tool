@@ -51,6 +51,7 @@ public class OreReMBuilder
         Property rdfType = state.manifest.createProperty(Ontologies.NS_RDF + "type");
         Property describes = state.manifest.createProperty(NS_ORE + "describes");
         Property ianaDescribes = state.manifest.createProperty(NS_IANA + "describes");
+        Property ldpContains = state.manifest.createProperty(NS_LDP + "contains");
 
         rem.addProperty(rdfType,
                         state.manifest.createResource(NS_ORE + "ResourceMap"));
@@ -69,9 +70,9 @@ public class OreReMBuilder
         Property aggregates = state.manifest.getProperty(NS_ORE + "aggregates");
         Property rdfType = state.manifest.getProperty(Ontologies.NS_RDF + "type");
         Property ianaDescribes = state.manifest.getProperty(NS_IANA + "describes");
+        Property ldpContains  = state.manifest.getProperty(NS_LDP + "contains");
 
         if (!node.isIgnored()) {
-
             URI serializationLocation =
                     state.domainObjectSerializationLocations.get(node
                             .getIdentifier());
@@ -79,12 +80,22 @@ public class OreReMBuilder
             aggregation.addProperty(aggregates, state.manifest
                     .createResource(serializationLocation.toString()));
 
-            if(node.hasChildren()){
-               Resource resource = state.manifest.createResource(serializationLocation.toString());
-               resource.addProperty(rdfType, NS_LDP + "Container");
-            } else if (node.getFileInfo() != null && node.getFileInfo().isFile()){
+            if (node.getFileInfo() != null && node.getFileInfo().isFile()){
                 Resource resource = state.manifest.createResource(serializationLocation.toString());
                 resource.addProperty(ianaDescribes, node.getFileInfo().getLocation().toString());
+            } else {
+                Resource resource = state.manifest.createResource(serializationLocation.toString());
+                resource.addProperty(rdfType, NS_LDP + "Container");
+                if(node.hasChildren()){
+                    for (Node child : node.getChildren()){
+                        if(!child.isIgnored()) {
+                            URI childSerializationLocation =
+                                    state.domainObjectSerializationLocations.get(child
+                                            .getIdentifier());
+                            resource.addProperty(ldpContains, childSerializationLocation.toString());
+                        }
+                    }
+                }
             }
         }
 

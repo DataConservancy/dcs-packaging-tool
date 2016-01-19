@@ -87,6 +87,9 @@ public class OreRemBuilderTest {
                                                                  .getIdentifier()
                                                                  .toString()
                                                                  + "#ser"));
+        });
+
+        root.walk(node -> {
             serializer.visitNode(node, state);
         });
 
@@ -143,7 +146,12 @@ public class OreRemBuilderTest {
                         .getIdentifier(), URI.create(node.getIdentifier()
                         .toString() + "#ser"));
             }
-            serializer.visitNode(node, state);
+        });
+
+        root.walk(node -> {
+            if(!node.isIgnored()) {
+                serializer.visitNode(node, state);
+            }
         });
 
         serializer.finish(state);
