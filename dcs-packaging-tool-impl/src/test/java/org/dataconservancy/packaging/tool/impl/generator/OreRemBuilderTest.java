@@ -45,6 +45,7 @@ import org.dataconservancy.packaging.tool.impl.generator.mocks.FunctionalAssembl
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
 
@@ -115,6 +116,17 @@ public class OreRemBuilderTest {
                         .values().contains(uri)));
         state.domainObjectSerializationLocations.values()
                 .forEach(uri -> assertTrue(aggregatedResources.contains(uri)));
+
+
+        //make sure all the resources show up in the ReM
+        assertTrue(rem.contains(state.domainObjectSerializationLocations.get(root
+                            .getIdentifier()).toString()));
+        assertTrue(rem.contains(state.domainObjectSerializationLocations.get(child1
+                            .getIdentifier()).toString()));
+        assertTrue(rem.contains(state.domainObjectSerializationLocations.get(child2
+                            .getIdentifier()).toString()));
+        assertTrue(rem.contains(state.domainObjectSerializationLocations.get(leaf
+                            .getIdentifier()).toString()));
     }
 
     @Test
@@ -173,6 +185,17 @@ public class OreRemBuilderTest {
                         .values().contains(uri)));
         state.domainObjectSerializationLocations.values()
                 .forEach(uri -> assertTrue(aggregatedResources.contains(uri)));
+
+        //make sure only unignored resources show up in the ReM
+        assertTrue(rem.contains(state.domainObjectSerializationLocations.get(root
+                .getIdentifier()).toString()));
+        assertTrue(rem.contains(state.domainObjectSerializationLocations.get(child1
+                .getIdentifier()).toString()));
+        assertNull(state.domainObjectSerializationLocations.get(child2
+                .getIdentifier()));
+        assertNull(state.domainObjectSerializationLocations.get(leaf
+                .getIdentifier()));
+
     }
 
     private String getRemAsString() throws IOException {
@@ -189,4 +212,5 @@ public class OreRemBuilderTest {
 
         return content;
     }
+
 }
