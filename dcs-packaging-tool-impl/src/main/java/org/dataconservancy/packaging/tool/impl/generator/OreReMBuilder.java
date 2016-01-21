@@ -92,7 +92,7 @@ public class OreReMBuilder
                             URI childSerializationLocation =
                                     state.domainObjectSerializationLocations.get(child
                                             .getIdentifier());
-                            resource.addProperty(ldpContains, childSerializationLocation.toString());
+                            resource.addProperty(ldpContains, state.manifest.createResource(childSerializationLocation.toString()));
                         }
                     }
                 }
