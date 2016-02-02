@@ -62,6 +62,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -340,8 +341,12 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                     for (ProfilePropertyBox subPropertyBox : complexPropertyBoxes) {
                         subPropertyValues.addAll(getPropertiesFromBox(subPropertyBox));
                     }
-                    newComplexProperty.setComplexValue(subPropertyValues);
-                    controller.getDomainProfileService().addProperty(view.getPopupNode(), newComplexProperty);
+
+                    //Check to make sure the complex property wasn't empty
+                    if (!subPropertyValues.isEmpty()) {
+                        newComplexProperty.setComplexValue(subPropertyValues);
+                        controller.getDomainProfileService().addProperty(view.getPopupNode(), newComplexProperty);
+                    }
                 }
             }
         }
@@ -470,7 +475,12 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                                                                !child.isIgnored() &&
                                                                    child.getDomainObject() !=
                                                                        null).forEach(child -> {
-                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> controller.getDomainProfileService().addProperty(child, inheritablePropertyValue));
+                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> {
+                                List<Property> existingPropertyValues = controller.getDomainProfileService().getProperties(child, inheritablePropertyType);
+                                if (!existingPropertyValues.contains(inheritablePropertyValue)) {
+                                    controller.getDomainProfileService().addProperty(child, inheritablePropertyValue);
+                                }
+                            });
                             if (child.getChildren() != null) {
                                 applyMetadataInheritance(child);
                             }
