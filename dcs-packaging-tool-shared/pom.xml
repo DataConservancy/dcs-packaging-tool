@@ -69,6 +69,7 @@
           <excludes>
             <exclude>src/main/resources/SignatureFiles/**</exclude>
             <exclude>src/test/resources/**/*.txt</exclude>
+            <exclude>src/test/resources/SampleFiles/jpgFileNoExtension</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -107,6 +107,7 @@
             <excludes>            
               <exclude>src/main/resources/**/*.help</exclude>
               <exclude>src/main/resources/userProperties.json</exclude>
+              <exclude>dcs-pkg-tool-gui.log</exclude>
             </excludes>
           </configuration>
         </plugin>
