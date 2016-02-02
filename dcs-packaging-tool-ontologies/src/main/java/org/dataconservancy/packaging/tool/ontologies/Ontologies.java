@@ -89,6 +89,8 @@ public interface Ontologies {
                     put("ore", NS_ORE);
                     put("pcdm", NS_PCDM);
                     put("prof", NS_DCS_PKGTOOL_PROFILE);
+                    put("ldp", NS_LDP);
+                    put("iana", NS_IANA);
                 }
             };
 }

@@ -1,12 +1,9 @@
 /*
  * Copyright 2015 Johns Hopkins University
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,18 +45,19 @@ public class OreReMBuilder
         Resource rem = state.manifest.createResource("");
         Resource aggregation = state.manifest.createResource("#Aggregation");
 
-        Property rdfType = state.manifest.createProperty(Ontologies.NS_RDF + "type");
-        Property describes = state.manifest.createProperty(NS_ORE + "describes");
-        Property ianaDescribes = state.manifest.createProperty(NS_IANA + "describes");
-        Property ldpContains = state.manifest.createProperty(NS_LDP + "contains");
+        Property rdfType =
+                state.manifest.createProperty(Ontologies.NS_RDF + "type");
+        Property describes =
+                state.manifest.createProperty(NS_ORE + "describes");
 
         rem.addProperty(rdfType,
                         state.manifest.createResource(NS_ORE + "ResourceMap"));
         rem.addProperty(describes, aggregation);
 
-        aggregation.addProperty(rdfType,
-                                state.manifest.createResource(NS_ORE
-                                        + "Aggregation"));
+        aggregation
+                .addProperty(rdfType,
+                             state.manifest
+                                     .createResource(NS_ORE + "Aggregation"));
 
     }
 
@@ -67,32 +65,60 @@ public class OreReMBuilder
     @Override
     public void visitNode(Node node, PackageModelBuilderState state) {
         Resource aggregation = state.manifest.getResource("#Aggregation");
+        Resource ldpContainer =
+                state.manifest.getResource(NS_LDP + "Container");
         Property aggregates = state.manifest.getProperty(NS_ORE + "aggregates");
-        Property rdfType = state.manifest.getProperty(Ontologies.NS_RDF + "type");
-        Property ianaDescribes = state.manifest.getProperty(NS_IANA + "describes");
-        Property ldpContains  = state.manifest.getProperty(NS_LDP + "contains");
+        Property rdfType =
+                state.manifest.getProperty(Ontologies.NS_RDF + "type");
+        Property ianaDescribes =
+                state.manifest.getProperty(NS_IANA + "describes");
+        Property ldpContains = state.manifest.getProperty(NS_LDP + "contains");
 
         if (!node.isIgnored()) {
-            URI serializationLocation =
-                    state.domainObjectSerializationLocations.get(node
-                            .getIdentifier());
+            URI serializationLocation = state.domainObjectSerializationLocations
+                    .get(node.getIdentifier());
 
-            aggregation.addProperty(aggregates, state.manifest
-                    .createResource(serializationLocation.toString()));
+            aggregation.addProperty(aggregates,
+                                    state.manifest
+                                            .createResource(serializationLocation
+                                                    .toString()));
 
-            if (node.getFileInfo() != null && node.getFileInfo().isFile()){
-                Resource resource = state.manifest.createResource(serializationLocation.toString());
-                resource.addProperty(ianaDescribes, node.getFileInfo().getLocation().toString());
+            if (node.getFileInfo() != null && node.getFileInfo().isFile()) {
+                Resource resource = state.manifest
+                        .createResource(serializationLocation.toString());
+                resource.addProperty(ianaDescribes,
+                                     state.manifest.getResource(node
+                                             .getFileInfo().getLocation()
+                                             .toString()));
             } else {
-                Resource resource = state.manifest.createResource(serializationLocation.toString());
-                resource.addProperty(rdfType, NS_LDP + "Container");
-                if(node.hasChildren()){
-                    for (Node child : node.getChildren()){
-                        if(!child.isIgnored()) {
+                Resource resource = state.manifest
+                        .createResource(serializationLocation.toString());
+                resource.addProperty(rdfType, ldpContainer);
+                if (node.hasChildren()) {
+                    for (Node child : node.getChildren()) {
+                        if (!child.isIgnored()) {
                             URI childSerializationLocation =
-                                    state.domainObjectSerializationLocations.get(child
-                                            .getIdentifier());
-                            resource.addProperty(ldpContains, state.manifest.createResource(childSerializationLocation.toString()));
+                                    state.domainObjectSerializationLocations
+                                            .get(child.getIdentifier());
+
+                            /*
+                             * Point to file content if file, otherwise domain
+                             * object serialization
+                             */
+                            if (child.getFileInfo() != null
+                                    && child.getFileInfo().isFile()) {
+                                resource.addProperty(ldpContains,
+                                                     state.manifest
+                                                             .createResource(child
+                                                                     .getFileInfo()
+                                                                     .getLocation()
+                                                                     .toString()));
+                            } else {
+                                resource.addProperty(ldpContains,
+                                                     state.manifest
+                                                             .createResource(childSerializationLocation
+                                                                     .toString()));
+                            }
                         }
                     }
                 }

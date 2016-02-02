@@ -1,12 +1,9 @@
 /*
  * Copyright 2015 Johns Hopkins University
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,8 +59,8 @@ public class RdfUtil {
     private static final Logger LOG = LoggerFactory.getLogger(RdfUtil.class);
 
     @SuppressWarnings("unchecked")
-    private static final Map<String, String> PREFIX_MAP = MapUtils
-            .invertMap(Ontologies.PREFIX_MAP);
+    private static final Map<String, String> PREFIX_MAP =
+            MapUtils.invertMap(Ontologies.PREFIX_MAP);
 
     /**
      * Select all triples that are "local" to the given subject.
@@ -77,7 +74,6 @@ public class RdfUtil {
      * <code>http://example.org/x#foo</code>)</li>
      * <li>is a blank node traversable by the URI or any related hash URIs</li>
      * </ul>
-     * 
      * 
      * @param subject
      *        a resource that is the Subject of at least one statement.
@@ -148,7 +144,8 @@ public class RdfUtil {
         subject.getModel().listStatements(subject, null, (RDFNode) null)
                 .filterKeep(stmnt -> stmnt.getObject().isAnon())
                 .mapWith(stmnt -> stmnt.getObject().asResource())
-                .forEachRemaining(bnode -> blankNodes.addAll(blankNodesReachableFrom(bnode)));
+                .forEachRemaining(bnode -> blankNodes
+                        .addAll(blankNodesReachableFrom(bnode)));
 
         return blankNodes;
     }
@@ -156,8 +153,10 @@ public class RdfUtil {
     /**
      * Get a bare (non-hashed) version of a URI, by stripping off any hash
      * portion.
-     * @param uri the URI
-     * @return  the stripped version of the URI
+     * 
+     * @param uri
+     *        the URI
+     * @return the stripped version of the URI
      */
     public static String bare(String uri) {
         String s = uri + "#";
@@ -170,8 +169,15 @@ public class RdfUtil {
          * actually use
          */
         Map<String, String> prefixes = new HashMap<>();
+        /* Predicates */
         model.listStatements()
                 .mapWith(stmt -> stmt.getPredicate().getNameSpace())
+                .filterKeep(PREFIX_MAP::containsKey).toSet()
+                .forEach(ns -> prefixes.put(PREFIX_MAP.get(ns), ns));
+        
+        /* Objects  */
+        model.listStatements().filterKeep(s -> s.getObject().isResource())
+                .mapWith(s -> s.getObject().asResource().getNameSpace())
                 .filterKeep(PREFIX_MAP::containsKey).toSet()
                 .forEach(ns -> prefixes.put(PREFIX_MAP.get(ns), ns));
 
@@ -192,28 +198,35 @@ public class RdfUtil {
             writer.write(model, out, null);
         } else {
             RDFDataMgr.createGraphWriter(format).write(out,
-                                                        model.getGraph(),
-                                                        PrefixMapFactory
-                                                                .create(prefixes),
-                                                        null,
-                                                        null);
+                                                       model.getGraph(),
+                                                       PrefixMapFactory
+                                                               .create(prefixes),
+                                                       null,
+                                                       null);
         }
 
         return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
-     * Determines the preferred serialization for RDF-based package resources.  This method consults the supplied
-     * {@code PackageGenerationParameters} for a preferred format.  A default {@code RDFFormat} may be supplied, which
-     * will be returned if the preferred serialization cannot be determined.  The default format may be {@code null},
+     * Determines the preferred serialization for RDF-based package resources.
+     * This method consults the supplied
+     * {@code PackageGenerationParameters} for a preferred format. A default
+     * {@code RDFFormat} may be supplied, which
+     * will be returned if the preferred serialization cannot be determined. The
+     * default format may be {@code null},
      * which is interpreted as {@code RDFFormat#TURTLE_PRETTY}.
      *
-     * @param params the package generation parameters
-     * @param defaultFormat the default format to use, may be {@code null}
+     * @param params
+     *        the package generation parameters
+     * @param defaultFormat
+     *        the default format to use, may be {@code null}
      * @return the {@code RDFFormat} to use when serializing package resources
-     * @throws IllegalArgumentException if the supplied {@code params} are {@code null}
+     * @throws IllegalArgumentException
+     *         if the supplied {@code params} are {@code null}
      */
-    public static RDFFormat determineSerialization(PackageGenerationParameters params, RDFFormat defaultFormat) {
+    public static RDFFormat determineSerialization(PackageGenerationParameters params,
+                                                   RDFFormat defaultFormat) {
 
         if (params == null) {
             throw new IllegalArgumentException("Supplied PackageGenerationParameters must not be null.");
@@ -225,12 +238,14 @@ public class RdfUtil {
 
         RDFFormat format = defaultFormat;
 
-        if (params.getParam(REM_SERIALIZATION_FORMAT) != null &&
-                !params.getParam(REM_SERIALIZATION_FORMAT).isEmpty()) {
+        if (params.getParam(REM_SERIALIZATION_FORMAT) != null
+                && !params.getParam(REM_SERIALIZATION_FORMAT).isEmpty()) {
 
-            final String selectedSerialization = params.getParam(REM_SERIALIZATION_FORMAT).get(0);
+            final String selectedSerialization =
+                    params.getParam(REM_SERIALIZATION_FORMAT).get(0);
             try {
-                SERIALIZATION_FORMAT selectedFormat = SERIALIZATION_FORMAT.valueOf(selectedSerialization);
+                SERIALIZATION_FORMAT selectedFormat =
+                        SERIALIZATION_FORMAT.valueOf(selectedSerialization);
 
                 switch (selectedFormat) {
                     case JSONLD:
@@ -244,8 +259,10 @@ public class RdfUtil {
                         break;
                 }
             } catch (IllegalArgumentException e) {
-                LOG.warn("Unsupported serialization format requested: '" + selectedSerialization + "', " +
-                        "returning default serialization '" + format.toString() + "'" );
+                LOG.warn("Unsupported serialization format requested: '"
+                        + selectedSerialization + "', "
+                        + "returning default serialization '"
+                        + format.toString() + "'");
             }
         }
 
