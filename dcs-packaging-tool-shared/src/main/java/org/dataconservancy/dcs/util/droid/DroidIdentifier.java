@@ -244,6 +244,7 @@ public class DroidIdentifier {
             identificationRequest = new FileSystemIdentificationRequest(metadata, requestIdentifier);
             FileInputStream inputStream = new FileInputStream(file);
             identificationRequest.open(inputStream);
+            inputStream.close();
         }
         catch (Exception e) {
             log.error("Could not open identification request.", e);
