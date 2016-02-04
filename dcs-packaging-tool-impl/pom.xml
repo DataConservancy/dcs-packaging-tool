@@ -61,6 +61,8 @@
             <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
             <dcs.package.tool.test.content>${project.basedir}/src/test/resources</dcs.package.tool.test.content>
             <logback.configurationFile>${project.basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
+            <fileCount>100</fileCount>
+            <directoryDepth>100</directoryDepth>
           </systemPropertyVariables>
         </configuration>
       </plugin>
