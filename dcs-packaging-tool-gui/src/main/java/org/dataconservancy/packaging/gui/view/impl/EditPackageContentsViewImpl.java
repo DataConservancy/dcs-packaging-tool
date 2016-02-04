@@ -167,7 +167,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         setCenter(content);
 
         content.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.C && event.isControlDown()) {
+            if (event.getCode() == KeyCode.C && event.isShortcutDown()) {
                 if (nodeTree != null) {
                     final Clipboard clipboard = Clipboard.getSystemClipboard();
                     final ClipboardContent clipboardContent = new ClipboardContent();
