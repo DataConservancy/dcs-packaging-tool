@@ -61,4 +61,28 @@ public class FilenameValidatorServiceTest {
         List<String> invalidNames = validatorService.findInvalidFilenames(tempDir.toPath());
         assertEquals(0, invalidNames.size());
     }
+
+    @Test
+    public void testGoodFileName() throws IOException {
+        File tmpDir = tmpfolder.newFolder("DownloadsGood");
+        File file = new File(tmpDir, "25fea3503a8be1be");
+        file.createNewFile();
+
+        FilenameValidatorService validatorService = new FilenameValidatorService();
+
+        List<String> invalidNames = validatorService.findInvalidFilenames(tmpDir.toPath());
+        assertEquals(0, invalidNames.size());
+    }
+
+    @Test
+    public void testBadFileName() throws IOException {
+        File tmpDir = tmpfolder.newFolder("DownloadsBad");
+        File file = new File(tmpDir, "25fea3503a8be1be~") ;
+        file.createNewFile();
+
+        FilenameValidatorService validatorService = new FilenameValidatorService();
+
+        List<String> invalidNames = validatorService.findInvalidFilenames(tmpDir.toPath());
+        assertEquals(1, invalidNames.size());
+    }
 }

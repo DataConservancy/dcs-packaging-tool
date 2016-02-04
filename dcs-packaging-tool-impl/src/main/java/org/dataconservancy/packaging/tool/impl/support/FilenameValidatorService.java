@@ -30,7 +30,7 @@ import java.util.List;
  * This service is responsible for checking all filenames in a filesystem tree which is being
  * considered for processing into a package, and flagging all filenames which violate naming conventions
  * which have been implemented in the interest of cross-platform compatibility.
- * This validator checks for validity of file paths as defined by the Data Conservancy BagIt Provile Version 1.0
+ * This validator checks for validity of file paths as defined by the Data Conservancy BagIt Profile Version 1.0
  */
 public class FilenameValidatorService {
 
@@ -60,7 +60,7 @@ public class FilenameValidatorService {
                     throws IOException {
 
                 if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString());
+                    invalidFilenames.add(path.toString() + " : bad component is " + path.getFileName().toString() );
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
@@ -76,7 +76,7 @@ public class FilenameValidatorService {
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
                 if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString());
+                    invalidFilenames.add(path.toString() + " : bad component is " + path.getFileName().toString());
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
