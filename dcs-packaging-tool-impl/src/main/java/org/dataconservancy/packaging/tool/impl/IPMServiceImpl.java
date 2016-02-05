@@ -54,13 +54,11 @@ public class IPMServiceImpl implements IPMService {
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
-        //List<String> invalidNamesList = new ArrayList<>();
-
         List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
 
         visitedFiles.clear();
         Node root;
-        root = createTree(null, path, invalidNamesList);
+        root = createTree(null, path);
         
     	if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
             String invalidNames = "";
@@ -80,7 +78,7 @@ public class IPMServiceImpl implements IPMService {
     /*
      * Creates a Node in the tree for the given path, and will recurse the file structure to add all child files and folders.
      */
-    private Node createTree(Node parent, Path path, List<String> invalidNames) throws IOException {
+    private Node createTree(Node parent, Path path) throws IOException {
         //Check if the process is being cancelled by GUI
         if (Thread.currentThread().isInterrupted()) {
             return null;
@@ -116,12 +114,7 @@ public class IPMServiceImpl implements IPMService {
         Node node = null;
         //Just as a fail safe ensure the file exists before adding.
         if (path.toRealPath().toFile().exists()) {
-        	
-        	/* Validate the path name */
-        	//if (!validatorService.isValid(path.toRealPath())) {
-        	//	invalidNames.add(path.toRealPath().toString());
-        	//}
-        	
+
             node = new Node(uriGenerator.generateNodeURI());
 
             FileInfo info = new FileInfo(path.toRealPath());
@@ -153,7 +146,7 @@ public class IPMServiceImpl implements IPMService {
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
-                    createTree(node, childPath, invalidNames);
+                    createTree(node, childPath);
                 }
 
             }

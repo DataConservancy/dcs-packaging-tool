@@ -46,16 +46,16 @@ public class FilenameValidator implements Validator {
             vr.setMessage(" file name may not be \"..\"");
         } else if(containsAny(fileName,blacklist)){
             vr.setResult(false);
-            vr.setMessage(" file name contains an illegal character: one of " + blacklist);
+            vr.setMessage(" file name contains an illegal character: one or more of " + blacklist);
         } else if(matcher.matches()){
             vr.setResult(false);
-            vr.setMessage(" name is a Windows reserved file name");
+            vr.setMessage(" file name is a Windows reserved file name");
         } else if (fileName.length() > 255){
             vr.setResult(false);
             vr.setMessage(" file name is too long, may not exceed " + maxNameLength +" characters");
         } else if((v=containsIllegalUnicode(fileName)) >= 0){
             vr.setResult(false);
-            vr.setMessage(" file name contains an illegal unicode characters at position " + v +"; this character may not be visible");
+            vr.setMessage(" file name contains an illegal unicode character at index " + v +"; this character may not be visible");
         } else {
             vr.setResult(true);
         }
