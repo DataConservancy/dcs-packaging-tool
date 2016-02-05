@@ -85,4 +85,5 @@ public class FilenameValidatorServiceTest {
         List<String> invalidNames = validatorService.findInvalidFilenames(tmpDir.toPath());
         assertEquals(1, invalidNames.size());
     }
+
 }

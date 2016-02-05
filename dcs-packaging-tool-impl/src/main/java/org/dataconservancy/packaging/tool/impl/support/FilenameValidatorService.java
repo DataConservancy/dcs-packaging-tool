@@ -60,7 +60,7 @@ public class FilenameValidatorService {
                     throws IOException {
 
                 if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString() + " : bad component is " + path.getFileName().toString() );
+                    invalidFilenames.add(path.toString());
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
@@ -76,7 +76,7 @@ public class FilenameValidatorService {
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
                 if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString() + " : bad component is " + path.getFileName().toString());
+                    invalidFilenames.add(path.toString());
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {

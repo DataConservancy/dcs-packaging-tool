@@ -117,7 +117,7 @@ public class IPMServiceImpl implements IPMService {
         	
         	/* Validate the path name */
         	if (!validatorService.isValid(path.toRealPath())) {
-        		invalidNames.add(path.toRealPath().toString() + " : bad component is " + path.toRealPath().getFileName());
+        		invalidNames.add(path.toRealPath().toString());
         	}
         	
             node = new Node(uriGenerator.generateNodeURI());
