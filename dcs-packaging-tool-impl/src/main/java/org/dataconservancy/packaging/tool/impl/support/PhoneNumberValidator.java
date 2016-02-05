@@ -33,7 +33,8 @@ public class PhoneNumberValidator implements C14NValidator {
     static String genericExitPrefix = "+";
 
     @Override
-    public boolean isValid(String phoneNumber) {
+    public ValidatorResult isValid(String phoneNumber) {
+        ValidatorResult vr = new ValidatorResult();
 
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         PhoneNumber numberProto;
@@ -46,13 +47,16 @@ public class PhoneNumberValidator implements C14NValidator {
             }
 
         } catch (NumberParseException e) {
-           return false;
+            vr.setResult(false);
+           return vr;
         }
 
         if(numberProto != null) {
-            return phoneUtil.isValidNumber(numberProto);
+            vr.setResult(phoneUtil.isValidNumber(numberProto));
+            return vr;
         } else {
-            return false;
+            vr.setResult(false);
+            return vr;
         }
     }
 

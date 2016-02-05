@@ -24,17 +24,22 @@ import java.net.URISyntaxException;
 public class URIValidator implements Validator {
 
     @Override
-    public boolean isValid(String string) {
+    public ValidatorResult isValid(String string) {
+        ValidatorResult vr = new ValidatorResult();
         try {
             URI uri = new URI(string);
             if (uri.getScheme() == null || uri.getScheme().isEmpty()) {
-                return false;
+                vr.setResult(false);
+                return vr;
             } else if (uri.getSchemeSpecificPart() == null || uri.getSchemeSpecificPart().isEmpty()) {
-                return false;
+                vr.setResult(false);
+                return vr;
             }
-            return true;
+            vr.setResult(true);
+            return vr;
         } catch (URISyntaxException e) {
-            return false;
+            vr.setResult(false);
+            return vr;
         }
     }
 }

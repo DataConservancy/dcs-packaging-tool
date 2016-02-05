@@ -28,8 +28,10 @@ public class EmailValidator implements Validator {
     private final static Pattern emailPattern = Pattern.compile("^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$");
 
     @Override
-    public boolean isValid(String email) {
-        return emailPattern.matcher(email).matches();
+    public ValidatorResult isValid(String email) {
+        ValidatorResult vr = new ValidatorResult();
+        vr.setResult(emailPattern.matcher(email).matches());
+        return vr;
     }
 
 }

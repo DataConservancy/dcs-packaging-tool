@@ -59,7 +59,7 @@ public class FilenameValidatorService {
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                     throws IOException {
 
-                if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
+                if (!filenameValidator.isValid(path.getFileName().toString()).getResult() || path.toString().length() > 1024) {
                     invalidFilenames.add(path.toString());
                 }
 
@@ -75,7 +75,7 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
+                if (!filenameValidator.isValid(path.getFileName().toString()).getResult() || path.toString().length() > 1024) {
                     invalidFilenames.add(path.toString());
                 }
 
@@ -92,6 +92,6 @@ public class FilenameValidatorService {
     }
     
     public boolean isValid(Path path) {
-    	return filenameValidator.isValid(path.getFileName().toString());
+    	return filenameValidator.isValid(path.getFileName().toString()).getResult();
     }
 }

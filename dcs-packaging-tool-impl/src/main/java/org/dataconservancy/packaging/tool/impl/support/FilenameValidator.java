@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This validator checks for validity of file path components as defined by the Data Conservancy BagIt Provile Version 1.0
+ * This validator checks for validity of file path components as defined by the Data Conservancy BagIt Profile Version 1.0
  * To check a path for validity, a caller should apply this to each component in the path.
  *
  */
@@ -31,8 +31,10 @@ public class FilenameValidator implements Validator {
     private String blacklist = "<>:\"/\\|?*~";
 
     @Override
-    public boolean isValid(String filename) {
-        return (!isInvalidFileName(filename));
+    public ValidatorResult isValid(String filename) {
+        ValidatorResult vr = new ValidatorResult();
+        vr.setResult(!isInvalidFileName(filename));
+        return vr;
     }
 
     protected boolean isInvalidFileName(String fileName) {

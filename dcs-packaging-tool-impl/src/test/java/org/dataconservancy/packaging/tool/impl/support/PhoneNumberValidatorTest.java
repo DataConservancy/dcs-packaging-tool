@@ -34,53 +34,53 @@ public class PhoneNumberValidatorTest {
 
     @Test
     public void testValidNumbers(){
-        assertTrue(pnv.isValid("410 555 1234"));
-        assertTrue(pnv.isValid("410 555-1234"));
-        assertTrue(pnv.isValid("(410) 555-1234"));
-        assertTrue(pnv.isValid("4105551234"));
-        assertTrue(pnv.isValid("+919769321013"));
-        assertTrue(pnv.isValid("1 800 MOO COWW"));
+        assertTrue(pnv.isValid("410 555 1234").getResult());
+        assertTrue(pnv.isValid("410 555-1234").getResult());
+        assertTrue(pnv.isValid("(410) 555-1234").getResult());
+        assertTrue(pnv.isValid("4105551234").getResult());
+        assertTrue(pnv.isValid("+919769321013").getResult());
+        assertTrue(pnv.isValid("1 800 MOO COWW").getResult());
         //international number as dialed from the US, which is the default
-        assertTrue(pnv.isValid("011 41 44 668 1800"));
+        assertTrue(pnv.isValid("011 41 44 668 1800").getResult());
     }
 
     @Test
     public void testValidNumbersNoSpaces() throws Exception {
-        assertTrue(pnv.isValid("4105551234"));
-        assertTrue(pnv.isValid("410555-1234"));
-        assertTrue(pnv.isValid("(410)555-1234"));
-        assertTrue(pnv.isValid("4105551234"));
-        assertTrue(pnv.isValid("+919769321013"));
-        assertTrue(pnv.isValid("1800MOOCOWW"));
+        assertTrue(pnv.isValid("4105551234").getResult());
+        assertTrue(pnv.isValid("410555-1234").getResult());
+        assertTrue(pnv.isValid("(410)555-1234").getResult());
+        assertTrue(pnv.isValid("4105551234").getResult());
+        assertTrue(pnv.isValid("+919769321013").getResult());
+        assertTrue(pnv.isValid("1800MOOCOWW").getResult());
         //international number as dialed from the US, which is the default
-        assertTrue(pnv.isValid("01141446681800"));
+        assertTrue(pnv.isValid("01141446681800").getResult());
     }
 
     @Test
     public void testValidExtensions(){
-        assertTrue(pnv.isValid("410 555 1234 x346"));
-        assertTrue(pnv.isValid("410 555-1234 ext346"));
-        assertTrue(pnv.isValid("(410) 555-1234 extension 346"));
-        assertTrue(pnv.isValid("4105551234 ext 346"));
-        assertTrue(pnv.isValid("4105551234 #346"));
-        assertTrue(pnv.isValid("+919769321013 x 3467"));
-        assertTrue(pnv.isValid("+919769321013 # 3467"));
+        assertTrue(pnv.isValid("410 555 1234 x346").getResult());
+        assertTrue(pnv.isValid("410 555-1234 ext346").getResult());
+        assertTrue(pnv.isValid("(410) 555-1234 extension 346").getResult());
+        assertTrue(pnv.isValid("4105551234 ext 346").getResult());
+        assertTrue(pnv.isValid("4105551234 #346").getResult());
+        assertTrue(pnv.isValid("+919769321013 x 3467").getResult());
+        assertTrue(pnv.isValid("+919769321013 # 3467").getResult());
     }
 
     @Test
     public void testInvalidNumbers(){
-        assertFalse(pnv.isValid("444 555 1234"));
-        assertFalse(pnv.isValid("444 555-1234"));
-        assertFalse(pnv.isValid("(444) 555-1234"));
-        assertFalse(pnv.isValid("4445551234"));
-        assertFalse(pnv.isValid("410 555 1234 MOOOOOO"));
+        assertFalse(pnv.isValid("444 555 1234").getResult());
+        assertFalse(pnv.isValid("444 555-1234").getResult());
+        assertFalse(pnv.isValid("(444) 555-1234").getResult());
+        assertFalse(pnv.isValid("4445551234").getResult());
+        assertFalse(pnv.isValid("410 555 1234 MOOOOOO").getResult());
     }
 
     @Test
     public void testInvalidExtensions(){
-        assertFalse(pnv.isValid("410 555 1234 m 123"));
-        assertFalse(pnv.isValid("410 555 1234 m123"));
-        assertTrue(pnv.isValid("6104589880z"));
+        assertFalse(pnv.isValid("410 555 1234 m 123").getResult());
+        assertFalse(pnv.isValid("410 555 1234 m123").getResult());
+        assertTrue(pnv.isValid("6104589880z").getResult());
     }
 
     /**
@@ -109,17 +109,17 @@ public class PhoneNumberValidatorTest {
 
         // A Vietnamese number
         phoneNumberAsEnteredByUser = "+84-901232323";
-        assertTrue(pnv.isValid(phoneNumberAsEnteredByUser));
+        assertTrue(pnv.isValid(phoneNumberAsEnteredByUser).getResult());
         assertEquals("+84 90 123 23 23", pnv.canonicalize(phoneNumberAsEnteredByUser));
 
         // USA number, no spaces
         phoneNumberAsEnteredByUser = "6104589880";
-        assertTrue(pnv.isValid(phoneNumberAsEnteredByUser));
+        assertTrue(pnv.isValid(phoneNumberAsEnteredByUser).getResult());
         assertEquals("+1 610-458-9880", pnv.canonicalize(phoneNumberAsEnteredByUser));
 
         // Our problematic exemplar, a USA number with a trailing z
         phoneNumberAsEnteredByUser = "6104589880z";
-        assertTrue(pnv.isValid(phoneNumberAsEnteredByUser));
+        assertTrue(pnv.isValid(phoneNumberAsEnteredByUser).getResult());
         assertEquals("+1 610-458-9880", pnv.canonicalize(phoneNumberAsEnteredByUser));
     }
 

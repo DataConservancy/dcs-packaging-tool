@@ -85,7 +85,7 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
         }
 
         if (validator != null && newValue != null && !newValue.isEmpty()) {
-            boolean result = validator.isValid(newValue);
+            boolean result = validator.isValid(newValue).getResult();
 
             if (result) {
                 switch (validationType) {
