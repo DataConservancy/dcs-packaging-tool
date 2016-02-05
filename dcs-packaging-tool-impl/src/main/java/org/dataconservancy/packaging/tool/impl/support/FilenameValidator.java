@@ -30,17 +30,36 @@ public class FilenameValidator implements Validator {
     private Pattern pattern = Pattern.compile(windowsReservedNamesRegex);
     private String blacklist = "<>:\"/\\|?*~";
 
-    @Override
-    public ValidatorResult isValid(String filename) {
-        ValidatorResult vr = new ValidatorResult();
-        vr.setResult(!isInvalidFileName(filename));
-        return vr;
-    }
+    private int maxNameLength = 255;
 
-    protected boolean isInvalidFileName(String fileName) {
+    @Override
+    public ValidatorResult isValid(String fileName) {
         Matcher matcher = pattern.matcher(fileName);
-        return fileName.equals(".") || fileName.equals("..") || containsAny(fileName, blacklist) || matcher.matches() ||
-                fileName.length() >= 256 || containsIllegalUnicode(fileName);
+        ValidatorResult vr = new ValidatorResult();
+        int v;
+
+        if(fileName.equals(".")){
+            vr.setResult(false);
+            vr.setMessage(" file name may not be \".\"");
+        } else if(fileName.equals("..")){
+            vr.setResult(false);
+            vr.setMessage(" file name may not be \"..\"");
+        } else if(containsAny(fileName,blacklist)){
+            vr.setResult(false);
+            vr.setMessage(" file name contains an illegal character: one of " + blacklist);
+        } else if(matcher.matches()){
+            vr.setResult(false);
+            vr.setMessage(" name is a Windows reserved file name");
+        } else if (fileName.length() > 255){
+            vr.setResult(false);
+            vr.setMessage(" file name is too long, may not exceed " + maxNameLength +" characters");
+        } else if((v=containsIllegalUnicode(fileName)) >= 0){
+            vr.setResult(false);
+            vr.setMessage(" file name contains an illegal unicode characters at position " + v +"; this character may not be visible");
+        } else {
+            vr.setResult(true);
+        }
+        return vr;
     }
 
     private static boolean containsAny(String fileName, String blacklist) {
@@ -55,15 +74,16 @@ public class FilenameValidator implements Validator {
         return false;
     }
 
-    private static boolean containsIllegalUnicode(String fileName) {
+    private static int containsIllegalUnicode(String fileName) {
+        int position = -1;
         for (int i = 0; i < fileName.length(); i++) {
             char c = fileName.charAt(i);
             int j = (int) c;
             if (((Integer.parseInt("00", 16) <= j) && (j <= Integer.parseInt("1f", 16))) ||
                     (j >= Integer.parseInt("7f", 16))) { //0x7f is Delete
-                return true;
+                position = i;
             }
         }
-        return false;
+        return position;
     }
 }

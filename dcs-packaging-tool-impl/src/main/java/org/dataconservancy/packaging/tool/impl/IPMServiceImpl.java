@@ -54,7 +54,9 @@ public class IPMServiceImpl implements IPMService {
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
-        List<String> invalidNamesList = new ArrayList<>();
+        //List<String> invalidNamesList = new ArrayList<>();
+
+        List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
 
         visitedFiles.clear();
         Node root;
@@ -70,7 +72,7 @@ public class IPMServiceImpl implements IPMService {
                 }
             }
 
-            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + invalidNames);
+            throw new IOException("Error creating package tree. The following names were invalid:\n\n" + invalidNames);
         }
         return root;
     }
@@ -116,9 +118,9 @@ public class IPMServiceImpl implements IPMService {
         if (path.toRealPath().toFile().exists()) {
         	
         	/* Validate the path name */
-        	if (!validatorService.isValid(path.toRealPath())) {
-        		invalidNames.add(path.toRealPath().toString());
-        	}
+        	//if (!validatorService.isValid(path.toRealPath())) {
+        	//	invalidNames.add(path.toRealPath().toString());
+        	//}
         	
             node = new Node(uriGenerator.generateNodeURI());
 

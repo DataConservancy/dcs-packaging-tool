@@ -58,9 +58,9 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                     throws IOException {
-
-                if (!filenameValidator.isValid(path.getFileName().toString()).getResult() || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString());
+                ValidatorResult vr = filenameValidator.isValid(path.getFileName().toString());
+                if (!vr.getResult() || path.toString().length() > 1024) {
+                    invalidFilenames.add(path.toString() + vr.getMessage());
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
@@ -75,8 +75,9 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                if (!filenameValidator.isValid(path.getFileName().toString()).getResult() || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString());
+                ValidatorResult vr = filenameValidator.isValid(path.getFileName().toString());
+                if (!vr.getResult() || path.toString().length() > 1024) {
+                    invalidFilenames.add(path.toString() + vr.getMessage());
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
