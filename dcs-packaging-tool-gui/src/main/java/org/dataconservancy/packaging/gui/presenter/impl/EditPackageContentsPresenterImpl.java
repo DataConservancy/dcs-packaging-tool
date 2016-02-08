@@ -294,7 +294,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                                     null) {
                                     validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
                                 }
-                                if (validator == null || validator.isValid((String) value)) {
+                                if (validator == null || validator.isValid((String) value).getResult()) {
                                     newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
                                     properties.add(newProperty);
                                 }
@@ -310,7 +310,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                                 null) {
                                 validator = ValidatorFactory.getValidator(propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueHint());
                             }
-                            if (validator == null || validator.isValid((String) value)) {
+                            if (validator == null || validator.isValid((String) value).getResult()) {
                                 Property newProperty = propertyFormatService.parsePropertyValue(propertyBox.getPropertyConstraint().getPropertyType(), (String) value);
                                 properties.add(newProperty);
                             }
@@ -381,7 +381,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
                         propertyType.getPropertyValueType().equals(PropertyValueType.URI)) {
                         Validator uriValidator = ValidatorFactory.getValidator(PropertyValueHint.URI);
                         if (uriValidator == null ||
-                            uriValidator.isValid(propertyBox.getValueAsString())) {
+                            uriValidator.isValid(propertyBox.getValueAsString()).getResult()) {
                             try {
                                 newProperty.setUriValue(new URI(propertyBox.getValueAsString()));
                             } catch (URISyntaxException e) {
@@ -658,7 +658,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         } catch (IOException e) {
             log.error(e.getMessage());
             showError(
-                TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) +
+                TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) + "\n" +
                     e.getMessage());
         }
     }
@@ -671,7 +671,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         } catch (IOException e) {
             log.error(e.getMessage());
             showError(
-                TextFactory.getText(ErrorKey.REFRESH_ERROR) +
+                TextFactory.getText(ErrorKey.REFRESH_ERROR) + "\n" +
                     e.getMessage());
         }
 

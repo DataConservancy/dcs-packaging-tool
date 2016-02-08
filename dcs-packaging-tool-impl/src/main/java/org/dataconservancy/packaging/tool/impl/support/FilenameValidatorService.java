@@ -50,6 +50,7 @@ public class FilenameValidatorService {
      */
     public final List<String> findInvalidFilenames(Path rootDirectoryPath) throws IOException {
         List<String> invalidFilenames = new ArrayList<>();
+        int maxPathLength = 1024; //max path length per Data Conservancy BagIt Profile 1.0
 
         List<Path> visitedPaths = new ArrayList<>();
 
@@ -58,9 +59,12 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs)
                     throws IOException {
-
-                if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString() + " : bad component is " + path.getFileName().toString() );
+                ValidatorResult vr = filenameValidator.isValid(path.getFileName().toString());
+                if (!vr.getResult()){
+                    invalidFilenames.add(path.toString() + vr.getMessage());
+                }
+                if (path.toString().length() > maxPathLength){
+                     invalidFilenames.add(path.toString() + " path too long, may not exceed " + maxPathLength + " characters");
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
@@ -75,8 +79,12 @@ public class FilenameValidatorService {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes mainAtts)
                     throws IOException {
-                if (!filenameValidator.isValid(path.getFileName().toString()) || path.toString().length() > 1024) {
-                    invalidFilenames.add(path.toString() + " : bad component is " + path.getFileName().toString());
+                ValidatorResult vr = filenameValidator.isValid(path.getFileName().toString());
+                if (!vr.getResult()){
+                    invalidFilenames.add(path.toString() + vr.getMessage());
+                }
+                if (path.toString().length() > maxPathLength){
+                    invalidFilenames.add(path.toString() + " path too long, may not exceed " + maxPathLength + " characters");
                 }
 
                 if (visitedPaths.contains(path.toRealPath())) {
@@ -92,6 +100,6 @@ public class FilenameValidatorService {
     }
     
     public boolean isValid(Path path) {
-    	return filenameValidator.isValid(path.getFileName().toString());
+    	return filenameValidator.isValid(path.getFileName().toString()).getResult();
     }
 }

@@ -26,15 +26,15 @@ public class FilenameValidatorTest {
 
     @Test
     public void testBlacklistedCharacters(){
-        Assert.assertFalse(fnv.isValid("has:Colon"));
-        Assert.assertFalse(fnv.isValid("has\"Quote"));
-        Assert.assertFalse(fnv.isValid("has*Asterisk"));
-        Assert.assertFalse(fnv.isValid("has/Solidus"));
-        Assert.assertFalse(fnv.isValid("has<LessThan"));
-        Assert.assertFalse(fnv.isValid("has>GreaterThan"));
-        Assert.assertFalse(fnv.isValid("has\\ReverseSolus"));
-        Assert.assertFalse(fnv.isValid("has|VerticalLine"));
-        Assert.assertFalse(fnv.isValid("has~Tilde"));
+        Assert.assertFalse(fnv.isValid("has:Colon").getResult());
+        Assert.assertFalse(fnv.isValid("has\"Quote").getResult());
+        Assert.assertFalse(fnv.isValid("has*Asterisk").getResult());
+        Assert.assertFalse(fnv.isValid("has/Solidus").getResult());
+        Assert.assertFalse(fnv.isValid("has<LessThan").getResult());
+        Assert.assertFalse(fnv.isValid("has>GreaterThan").getResult());
+        Assert.assertFalse(fnv.isValid("has\\ReverseSolus").getResult());
+        Assert.assertFalse(fnv.isValid("has|VerticalLine").getResult());
+        Assert.assertFalse(fnv.isValid("has~Tilde").getResult());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class FilenameValidatorTest {
         Assert.assertFalse(fnv.isValid("12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
                 "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
                 "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
-                "1234567890123456" ));      //256 characters
+                "1234567890123456" ).getResult());      //256 characters
     }
 
     @Test
@@ -50,29 +50,29 @@ public class FilenameValidatorTest {
         Assert.assertTrue(fnv.isValid("12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
                 "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
                 "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
-                "123456789012345" ));      //255 characters
+                "123456789012345" ).getResult());      //255 characters
     }
 
     @Test
     public void testFunkyCharactersNotOK(){
-        Assert.assertFalse(fnv.isValid("FileNameOKExceptFor页"));
+        Assert.assertFalse(fnv.isValid("FileNameOKExceptFor页").getResult());
     }
 
     @Test
     public void testReservedNames(){
-        Assert.assertFalse(fnv.isValid("COM1"));
-        Assert.assertFalse(fnv.isValid("COM1.txt"));
-        Assert.assertTrue(fnv.isValid("COMPACT"));
-        Assert.assertFalse(fnv.isValid("LPT1"));
-        Assert.assertTrue(fnv.isValid("LPT0"));
-        Assert.assertTrue(fnv.isValid("COM10"));
+        Assert.assertFalse(fnv.isValid("COM1").getResult());
+        Assert.assertFalse(fnv.isValid("COM1.txt").getResult());
+        Assert.assertTrue(fnv.isValid("COMPACT").getResult());
+        Assert.assertFalse(fnv.isValid("LPT1").getResult());
+        Assert.assertTrue(fnv.isValid("LPT0").getResult());
+        Assert.assertTrue(fnv.isValid("COM10").getResult());
     }
 
     @Test
     public void testBadComponents(){
-        Assert.assertFalse(fnv.isValid("."));
-        Assert.assertFalse(fnv.isValid(".."));
-        Assert.assertFalse(fnv.isValid("~"));
+        Assert.assertFalse(fnv.isValid(".").getResult());
+        Assert.assertFalse(fnv.isValid("..").getResult());
+        Assert.assertFalse(fnv.isValid("~").getResult());
     }
 
 }

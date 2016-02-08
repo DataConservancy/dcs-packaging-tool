@@ -345,7 +345,7 @@ public class Controller {
                     FilenameValidator validator = new FilenameValidator();
                     String defaultFileName = packageStateFileExtension;
                     if (!defaultStateFileName.getValueSafe().isEmpty() &&
-                        validator.isValid(defaultStateFileName.getValue())) {
+                        validator.isValid(defaultStateFileName.getValue()).getResult()) {
                         defaultFileName = defaultStateFileName.getValue();
                         if (!defaultStateFileName.getValue().endsWith(".dcp")) {
                             defaultFileName += ".dcp";

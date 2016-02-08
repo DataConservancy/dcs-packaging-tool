@@ -32,13 +32,13 @@ public class EmailValidatorTest {
 
     @Test
     public void testValidEmails() {
-        Assert.assertTrue(ev.isValid("blah@blah.com"));
+        Assert.assertTrue(ev.isValid("blah@blah.com").getResult());
     }
 
     @Test
     public void testInvalidEmails() {
-        Assert.assertFalse(ev.isValid("jack.com"));
-        Assert.assertFalse(ev.isValid("@jack.com"));
+        Assert.assertFalse(ev.isValid("jack.com").getResult());
+        Assert.assertFalse(ev.isValid("@jack.com").getResult());
     }
 
 }

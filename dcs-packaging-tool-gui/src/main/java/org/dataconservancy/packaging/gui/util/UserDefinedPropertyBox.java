@@ -195,7 +195,7 @@ public class UserDefinedPropertyBox extends VBox implements CssConstants {
                     propertyType.setLabel(s);
                     propertyType.setDescription(s);
 
-                    if (uriValidator != null && uriValidator.isValid(s)) {
+                    if (uriValidator != null && uriValidator.isValid(s).getResult()) {
 
                         try {
                             propertyType.setDomainPredicate(new URI(s));

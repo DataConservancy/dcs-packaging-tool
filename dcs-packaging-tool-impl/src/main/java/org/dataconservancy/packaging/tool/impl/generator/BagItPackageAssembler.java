@@ -40,6 +40,7 @@ import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.api.Package;
 import org.dataconservancy.packaging.tool.impl.PackageChecksumServiceImpl;
 import org.dataconservancy.packaging.tool.impl.support.FilenameValidator;
+import org.dataconservancy.packaging.tool.impl.support.ValidatorResult;
 import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
@@ -813,7 +814,7 @@ public class BagItPackageAssembler implements PackageAssembler {
      */
     private boolean isValidPathString(String pathString){
         for(String component : pathString.split("/")){
-            if(!filenameValidator.isValid(component)){
+            if(!filenameValidator.isValid(component).getResult()){
                 return false;
             }
         }

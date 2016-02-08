@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Johns Hopkins University
+ * Copyright 2016 Johns Hopkins University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,29 @@
 package org.dataconservancy.packaging.tool.impl.support;
 
 /**
- * An interface for validators
+ * A support class for validators to facilitate returning a message as well as the boolean result of a validation test.
+ * The message is most useful for describing the reason for a validation failure
  */
-public interface Validator {
+public class ValidatorResult {
 
-     ValidatorResult isValid(String string);
+    String message;
+
+    boolean result;
+
+    public boolean getResult(){
+        return result;
+    };
+
+    public void setResult(boolean result){
+        this.result = result;
+    };
+
+    public String getMessage(){
+        return message;
+    };
+
+    public void setMessage(String message){
+        this.message = message;
+    };
 }
+

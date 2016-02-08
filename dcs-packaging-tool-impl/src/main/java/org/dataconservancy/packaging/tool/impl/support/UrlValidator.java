@@ -23,8 +23,10 @@ import org.dataconservancy.dcs.util.UriUtility;
 public class UrlValidator implements Validator {
 
     @Override
-    public boolean isValid(String uriString) {
-        return UriUtility.isHttpUrl(uriString);
+    public ValidatorResult isValid(String uriString) {
+        ValidatorResult vr = new ValidatorResult();
+        vr.setResult(UriUtility.isHttpUrl(uriString));
+        return vr;
     }
 
 }

@@ -54,31 +54,19 @@ public class IPMServiceImpl implements IPMService {
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
-        List<String> invalidNamesList = new ArrayList<>();
-
         visitedFiles.clear();
         Node root;
-        root = createTree(null, path, invalidNamesList);
-        
-    	if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
-            String invalidNames = "";
-            for (int i = 0; i < invalidNamesList.size(); i++) {
-                invalidNames += invalidNamesList.get(i);
+        root = createTree(null, path);
 
-                if (i + 1 < invalidNamesList.size()) {
-                    invalidNames += "\n";
-                }
-            }
+        validateFileNames(path);
 
-            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + invalidNames);
-        }
         return root;
     }
 
     /*
      * Creates a Node in the tree for the given path, and will recurse the file structure to add all child files and folders.
      */
-    private Node createTree(Node parent, Path path, List<String> invalidNames) throws IOException {
+    private Node createTree(Node parent, Path path) throws IOException {
         //Check if the process is being cancelled by GUI
         if (Thread.currentThread().isInterrupted()) {
             return null;
@@ -114,12 +102,7 @@ public class IPMServiceImpl implements IPMService {
         Node node = null;
         //Just as a fail safe ensure the file exists before adding.
         if (path.toRealPath().toFile().exists()) {
-        	
-        	/* Validate the path name */
-        	if (!validatorService.isValid(path.toRealPath())) {
-        		invalidNames.add(path.toRealPath().toString() + " : bad component is " + path.toRealPath().getFileName());
-        	}
-        	
+
             node = new Node(uriGenerator.generateNodeURI());
 
             FileInfo info = new FileInfo(path.toRealPath());
@@ -151,7 +134,7 @@ public class IPMServiceImpl implements IPMService {
                     if (Thread.currentThread().isInterrupted()) {
                         break;
                     }
-                    createTree(node, childPath, invalidNames);
+                    createTree(node, childPath);
                 }
 
             }
@@ -375,9 +358,8 @@ public class IPMServiceImpl implements IPMService {
 
     @Override
     public void remapNode(Node node, Path newPath) throws IOException {
-        if (!FilePathUtil.hasValidFilePath(newPath.toFile())) {
-            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + newPath.toString());
-        }
+
+        validateFileNames(newPath);
 
         Path oldPath = null;
         if (node.getFileInfo().getLocation() != null) {
@@ -472,5 +454,26 @@ public class IPMServiceImpl implements IPMService {
         }
 
         return foundNode;
+    }
+
+    /**
+     * This method will check filenames in the given path for validity against the Cata Conservancy BagIt profile
+     * specification, version 1.0
+     * @param path The path to check filenames for
+     * @throws IOException
+     */
+    private void validateFileNames(Path path) throws IOException {
+        List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
+        if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
+            String invalidNames = "";
+            for (int i = 0; i < invalidNamesList.size(); i++) {
+                invalidNames += invalidNamesList.get(i);
+
+                if (i + 1 < invalidNamesList.size()) {
+                    invalidNames += "\n";
+                }
+            }
+            throw new IOException("Error creating package tree. The following names were invalid:\n\n" + invalidNames);
+        }
     }
 }
