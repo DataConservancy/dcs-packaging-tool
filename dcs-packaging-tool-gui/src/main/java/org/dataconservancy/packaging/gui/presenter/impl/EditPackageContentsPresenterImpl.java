@@ -658,7 +658,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         } catch (IOException e) {
             log.error(e.getMessage());
             showError(
-                TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) +
+                TextFactory.getText(ErrorKey.ADD_CONTENT_ERROR) + "\n" +
                     e.getMessage());
         }
     }
@@ -671,7 +671,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         } catch (IOException e) {
             log.error(e.getMessage());
             showError(
-                TextFactory.getText(ErrorKey.REFRESH_ERROR) +
+                TextFactory.getText(ErrorKey.REFRESH_ERROR) + "\n" +
                     e.getMessage());
         }
 

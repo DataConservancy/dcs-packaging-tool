@@ -54,24 +54,12 @@ public class IPMServiceImpl implements IPMService {
     @Override
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
-        List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
-
         visitedFiles.clear();
         Node root;
         root = createTree(null, path);
-        
-    	if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
-            String invalidNames = "";
-            for (int i = 0; i < invalidNamesList.size(); i++) {
-                invalidNames += invalidNamesList.get(i);
 
-                if (i + 1 < invalidNamesList.size()) {
-                    invalidNames += "\n";
-                }
-            }
+        validateFileNames(path);
 
-            throw new IOException("Error creating package tree. The following names were invalid:\n\n" + invalidNames);
-        }
         return root;
     }
 
@@ -370,9 +358,8 @@ public class IPMServiceImpl implements IPMService {
 
     @Override
     public void remapNode(Node node, Path newPath) throws IOException {
-        if (!FilePathUtil.hasValidFilePath(newPath.toFile())) {
-            throw new IOException("Error creating package tree. File names must not be a Windows reserved file name or contain any of the illegal characters    \" *  /  :  <  >  ?  \\  |  ~ \nThe following names were invalid:\n\n" + newPath.toString());
-        }
+
+        validateFileNames(newPath);
 
         Path oldPath = null;
         if (node.getFileInfo().getLocation() != null) {
@@ -467,5 +454,26 @@ public class IPMServiceImpl implements IPMService {
         }
 
         return foundNode;
+    }
+
+    /**
+     * This method will check filenames in the given path for validity against the Cata Conservancy BagIt profile
+     * specification, version 1.0
+     * @param path The path to check filenames for
+     * @throws IOException
+     */
+    private void validateFileNames(Path path) throws IOException {
+        List<String> invalidNamesList = validatorService.findInvalidFilenames(path);
+        if (invalidNamesList != null && !invalidNamesList.isEmpty()) {
+            String invalidNames = "";
+            for (int i = 0; i < invalidNamesList.size(); i++) {
+                invalidNames += invalidNamesList.get(i);
+
+                if (i + 1 < invalidNamesList.size()) {
+                    invalidNames += "\n";
+                }
+            }
+            throw new IOException("Error creating package tree. The following names were invalid:\n\n" + invalidNames);
+        }
     }
 }
