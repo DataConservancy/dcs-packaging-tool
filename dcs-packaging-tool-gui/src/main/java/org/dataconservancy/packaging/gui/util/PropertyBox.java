@@ -23,6 +23,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Control;
 import org.dataconservancy.packaging.tool.model.dprofile.PropertyValueType;
 
+/**
+ * Abstraction to allow the GUI to interact with all properties in a standard way, without needing to know the property types (in most cases).
+ */
 public interface PropertyBox {
 
     /**

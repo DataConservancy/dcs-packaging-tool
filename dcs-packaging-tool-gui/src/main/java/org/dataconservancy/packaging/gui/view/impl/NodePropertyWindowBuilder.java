@@ -58,6 +58,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class responsible for building the Node Property window. This class has no control over how this window is displayed it just returns a simple Pane.
+ */
 public class NodePropertyWindowBuilder implements CssConstants {
 
     private BorderPane nodePropertiesWindow;
@@ -87,9 +90,17 @@ public class NodePropertyWindowBuilder implements CssConstants {
         this.applyPopupButton = applyPopupButton;
 
         this.disciplineLoadingService = disciplineLoadingService;
-        loadAvailableRelationships();
+        loadAvailableUserDefinedProperties();
     }
 
+    /**
+     * Function for building the artifact properties window.
+     * @param node The node whose properties should be displayed
+     * @param metadataInheritanceButtonMap The properties and checkboxes corresponding to available inheritable fields.
+     * @param profileService The profile service to user for retrieving properties of the node.
+     * @param userDefinedPropertyValues Any user defined properties that are created.
+     * @return A pane with the node properties views.
+     */
     public Pane buildArtifactPropertiesLayout(Node node,
                                               Map<PropertyType, CheckBox> metadataInheritanceButtonMap,
                                               DomainProfileService profileService, List<Property> userDefinedPropertyValues) {
@@ -120,14 +131,15 @@ public class NodePropertyWindowBuilder implements CssConstants {
         return userDefinedProperties;
     }
 
-    /*
-     * Creates an artifact details popup. This popup's content is a tabbed view, with a tab for general properties,
-     * creator properties, and relationships.
-     * @param artifact
+    /**
+     * Creates an artifact details view. This popup's content is a tabbed view, with a tab for each domain object,
+     * and a tab for user defined properties.
+     * @param node The node whose properties will be diplayed.
+     * @param userDefinedProperties The list of user defined properties created for this node.
      */
     private void createNodePropertiesView(Node node, List<Property> userDefinedProperties) {
 
-        //The property popup will consist of the three tabs, general, creator and relationships.
+        //The tab pane will consist of a tab for each domain object and one for user defined properties
         TabPane propertiesPopup = new TabPane();
 
         //Create the property tab for the main node type.
@@ -140,7 +152,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
             }
         }
 
-        //Create the relationship tab that displays all relationships the artifact has.
+        //Create the user defined properties tab that displays all user defined properties the artifact has.
         Tab relationshipTab = new Tab();
         relationshipTab.setClosable(false);
         relationshipTab.setText(TextFactory.getText(Labels.LabelKey.USER_PROPERTIES_LABEL));
@@ -168,6 +180,13 @@ public class NodePropertyWindowBuilder implements CssConstants {
         nodePropertiesWindow.setBottom(popupControls);
     }
 
+    /**
+     * Creates a tab for the all the domain properties the node has for the given node type.
+     * These will typically correspond to different domain objects the node represents.
+     * @param node The node being displayed.
+     * @param nodeType The specific node type for this tab.
+     * @return The tab view to add to the tab pane
+     */
     private Tab createNodeTypeTab(Node node, NodeType nodeType) {
         Tab propertiesTab = new Tab();
         propertiesTab.setClosable(false);
@@ -194,6 +213,7 @@ public class NodePropertyWindowBuilder implements CssConstants {
         List<PropertyConstraint> sortedProperties = new ArrayList<>();
 
         //Get the property name key set and then create a sorted list from it.
+        //Currently properties are sorted so that required properties appear first
         sortedProperties.addAll(nodeType.getPropertyConstraints());
         sortProperties(sortedProperties);
 
@@ -242,9 +262,9 @@ public class NodePropertyWindowBuilder implements CssConstants {
     }
 
     /**
-     * Creates the inheritance tab in the popup.
+     * Creates the inheritance section of the view
      * @param node The popup node
-     * @return inheritance tab or null if nothing to do
+     * @return The vbox with the inheritance controls, if there are no inheritable fields it will return an empty vbox.
      */
     public VBox createInheritanceGroup(final Node node) {
 
@@ -287,6 +307,11 @@ public class NodePropertyWindowBuilder implements CssConstants {
         return inheritanceBox;
     }
 
+    /**
+     * Creates an Hbox that represents the inheritance control, this is currently a label and a checkbox
+     * @param propertyType The property type that can be inherited.
+     * @return The HBox with the inheritance controls for the property.
+     */
     private HBox createInheritanceBox(PropertyType propertyType) {
         HBox propertyBox = new HBox(30);
 
@@ -307,14 +332,14 @@ public class NodePropertyWindowBuilder implements CssConstants {
         return propertyBox;
     }
 
-    /*
+    /**
      * Creates the user defined properties tab in the popup. User defined properties are handled differently because they break the notion of the profile
-     * @param artifact
-     * @return
+     * @param userDefinedPropertyValues The list of existing user defined properties
+     * @return A VBox with all of the user defined properties and the controls for adding new properties.
      */
     private VBox createUserDefinedPropertiesTab(List<Property> userDefinedPropertyValues) {
-        final VBox relationshipsBox = new VBox(38);
-        relationshipsBox.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
+        final VBox userDefinedPropertiesBox = new VBox(38);
+        userDefinedPropertiesBox.getStyleClass().add(NODE_PROPERTY_WINDOW_CLASS);
 
         final double addNewButtonMaxWidth = 200;
 
@@ -323,19 +348,22 @@ public class NodePropertyWindowBuilder implements CssConstants {
 
         addNewUserDefinedPropertyButton.setMaxWidth(addNewButtonMaxWidth);
 
+        //Listener for disabling the add new button when fields of a user defined property box are empty.
         final EmptyFieldButtonDisableListener addNewRelationshipListener = new EmptyFieldButtonDisableListener(addNewUserDefinedPropertyButton);
 
+        //If there are no user defined properties already set create a new one and we're done
         if (userDefinedPropertyValues == null || userDefinedPropertyValues.isEmpty()) {
             UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyVocabularies, addNewRelationshipListener);
-            relationshipsBox.getChildren().add(userDefinedPropertyBox);
+            userDefinedPropertiesBox.getChildren().add(userDefinedPropertyBox);
             userDefinedProperties.add(userDefinedPropertyBox);
             addNewUserDefinedPropertyButton.setDisable(true);
         } else {
-            Map<PropertyType, List<String>> propertyMap = sortAlreadySetPropertyValues(userDefinedPropertyValues);
-            //Otherwise loop through the PropertyTypes and create a box for each one.
+            //Get the string labels for all of the user defined properties to display in the GUI.
+            Map<PropertyType, List<String>> propertyMap = getLabelsForExistingUserDefinedProperties(userDefinedPropertyValues);
+            //Now loop through the properties and create controls for each
             for (PropertyType propertyType : propertyMap.keySet()) {
                 UserDefinedPropertyBox userDefinedPropertyBox = new UserDefinedPropertyBox(propertyType, propertyMap.get(propertyType), availableUserDefinedPropertyVocabularies, addNewRelationshipListener);
-                relationshipsBox.getChildren().add(userDefinedPropertyBox);
+                userDefinedPropertiesBox.getChildren().add(userDefinedPropertyBox);
                 userDefinedProperties.add(userDefinedPropertyBox);
 
                 if (propertyMap.get(propertyType) == null || propertyMap.get(propertyType).isEmpty()) {
@@ -344,23 +372,28 @@ public class NodePropertyWindowBuilder implements CssConstants {
             }
         }
 
-        relationshipsBox.getChildren().add(addNewUserDefinedPropertyButton);
+        userDefinedPropertiesBox.getChildren().add(addNewUserDefinedPropertyButton);
 
 
         addNewUserDefinedPropertyButton.setOnAction(arg0 -> {
             UserDefinedPropertyBox newUserDefinedPropertyBox = new UserDefinedPropertyBox(null, null, availableUserDefinedPropertyVocabularies, addNewRelationshipListener);
             userDefinedProperties.add(newUserDefinedPropertyBox);
-            int buttonIndex = relationshipsBox.getChildren().indexOf(addNewUserDefinedPropertyButton);
+            int buttonIndex = userDefinedPropertiesBox.getChildren().indexOf(addNewUserDefinedPropertyButton);
 
-            relationshipsBox.getChildren().add(buttonIndex, newUserDefinedPropertyBox);
+            userDefinedPropertiesBox.getChildren().add(buttonIndex, newUserDefinedPropertyBox);
 
             addNewUserDefinedPropertyButton.setDisable(true);
         });
 
-        return relationshipsBox;
+        return userDefinedPropertiesBox;
     }
 
-    private Map<PropertyType, List<String>> sortAlreadySetPropertyValues(List<Property> propertyValues) {
+    /**
+     * Loops through all the user defined properties and fetches the string values for them for displaying in the GUI.
+     * @param propertyValues The list of user defined properties.
+     * @return A map with the property type and the list of string values for each property.
+     */
+    private Map<PropertyType, List<String>> getLabelsForExistingUserDefinedProperties(List<Property> propertyValues) {
         Map<PropertyType, List<String>> propertyMap = new HashMap<>();
 
         for (Property property : propertyValues) {
@@ -411,7 +444,11 @@ public class NodePropertyWindowBuilder implements CssConstants {
         });
     }
 
-    private void loadAvailableRelationships() {
+    /**
+     * There are certain defined properties that can be used in the user defined properties window. This code loads them.
+     * They are used to populate drop down lists for when users don't actually want to enter their properties.
+     */
+    private void loadAvailableUserDefinedProperties() {
 
         try {
             InputStream is = Configuration.getConfigurationFileInputStream(Configuration.ConfigFile.USER_PROPS);
@@ -421,6 +458,9 @@ public class NodePropertyWindowBuilder implements CssConstants {
         }
     }
 
+    /**
+     * PropertyCategoryBox is a class that represents grouping of property controls.
+     */
     private class PropertyCategoryBox extends VBox {
         PropertyCategoryBox(String title) {
             setSpacing(10);

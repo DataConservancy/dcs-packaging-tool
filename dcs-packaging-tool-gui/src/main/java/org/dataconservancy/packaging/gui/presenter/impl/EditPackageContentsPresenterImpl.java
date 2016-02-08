@@ -62,7 +62,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -116,7 +115,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     private void bind() {
 
-        //Displays the file selector, and then saves the package description to the given file. 
+        //If the property window is showing we go ahead and close it. We then tell the controller to save state
         view.getSaveButton().setOnAction(arg0 -> {
             if (view.getNodePropertiesWindow() != null && view.getNodePropertiesWindow().isShowing()) {
                 view.getNodePropertiesWindow().hide();
@@ -136,6 +135,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
             }
         });
 
+        //Anytime the window is closed we save the current node.
         if (view.getNodePropertiesWindow() != null) {
             view.getNodePropertiesWindow().setOnCloseRequest(event -> saveCurrentNode());
         }
@@ -151,6 +151,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         //Gets the button that's used to dismiss validation error popup.
         view.getReenableWarningsButton().setOnAction(actionEvent -> preferences.putBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false));
 
+        //If the user chooses to accept the results of a refresh we call the IPM service to merge the two trees together.
+        //We then assign types to all nodes, and update the display
         view.getRefreshPopupPositiveButton().setOnAction(event -> {
             ipmService.mergeTree(controller.getPackageTree(), view.getRefreshResult());
             List<Node> currentlyIgnoredNodes = new ArrayList<>();
@@ -175,6 +177,7 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         view.getRefreshPopupNegativeButton().setOnAction(event -> view.getRefreshPopup().hide());
     }
 
+    //Helper method to recursively get all ignored that are descendants of the passed in node, including the passed in node.
     private void getIgnoredNodes(Node node, List<Node> ignoredNodes) {
         if (node.isIgnored()) {
             ignoredNodes.add(node);
@@ -222,6 +225,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     }
 
+    /*
+     * This method is part of the code to validate that nodes have all their required properties. This code path is currently unused.
+     * This code simply marks the row with a red exclamation mark if it's invalid. This is problematic however because if the row refreshes, the valid status is not saved,
+     * so the red exclamation mark will be wiped out.
+     */
     private void markNodeAsInvalid(Node node) {
         TreeItem<Node> invalidItem = findItem(node);
 
@@ -237,6 +245,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
     }
 
+    /*
+     * This code is also part of the unused node validation. This code removes graphics from the row when it becomes valid.
+     */
     private void markNodeAsValid(Node node) {
         TreeItem<Node> validItem = findItem(node);
 
@@ -265,6 +276,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         super.onBackPressed();
     }
 
+    /*
+     * A helper method for saving properties from the node properties window. This takes the profile property boxes in the window gets the values, and populates property objects.
+     */
     private List<Property> getPropertiesFromBox(ProfilePropertyBox propertyBox) {
         List<Property> properties = new ArrayList<>();
         if (propertyBox.getPropertyConstraint().getPropertyType().getPropertyValueType() !=
@@ -323,6 +337,9 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         return properties;
     }
 
+    /*
+     * Saves information from a ProfilePropertyBox in the node property window to the node.
+     */
     private void savePropertyFromBox(ProfilePropertyBox propertyBox) {
         if (!propertyBox.getPropertyConstraint().getPropertyType().isReadOnly()) {
             //First remove all properties of the given type, to be replaced with the new ones
@@ -408,6 +425,11 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }
     }
 
+    /*
+     * This class is slightly misnamed as the tree is really built in the IPMService.
+     * This class merely transforms that into a JavaFx tree. It then ensures that visible state is maintained
+     * by expanding any nodes that were previously expanded.
+     */
     private TreeItem<Node> buildTree(Node node, boolean showIgnoredArtifacts) {
         final TreeItem<Node> item = new TreeItem<>(node);
 
@@ -426,7 +448,10 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         
         return item;
     }
-    
+
+    /*
+     * Used to find the TreeItem that corresponds to a given IPM Node.
+     */
     public TreeItem<Node> findItem(Node node) {
         return findItem(view.getArtifactTreeView().getRoot(), node);
     }
@@ -463,8 +488,17 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         return null;
     }
 
+    /*
+     * Method for applying inherited fields to descendant nodes.
+     * The important thing to remember here is that when saving nodes we strip out blank values.
+     * This method assumes that to be true so it never worries/checks for blank values.
+     *
+     * It does however check to make sure the property value doesn't exist on the node before adding it.
+     *
+     * The method also does no validation in terms of property constraints.
+     */
     private void applyMetadataInheritance(Node node) {
-        Set<org.dataconservancy.packaging.tool.model.dprofile.PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
+        Set<PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
 
         if (node.getChildren() != null) {
             inheritablePropertyTypes.stream().filter(inheritablePropertyType -> view.getInheritMetadataCheckBoxMap().get(inheritablePropertyType).isSelected()).forEach(inheritablePropertyType -> {
@@ -583,7 +617,8 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
         }    
     }
 
-    //Sorts the tree items in the provided list. //This has been made profile agnostic it now just sorts based on whether the node is a directory
+    //Sorts the tree items in the provided list.
+    // This has been made profile agnostic it now just sorts based on whether the node is a directory
     private void sortChildren(ObservableList<TreeItem<Node>> children) {
         FXCollections.sort(children, (o1, o2) -> {
 
@@ -701,6 +736,15 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
 
     /*
      * Validates that all required properties are filled in for a given node.
+     * This code is currently not used anywhere.
+     *
+     * The main issue with this approach is that we're not storing the valid state anywhere on the node.
+     *
+     * So if something changes in the tree all nodes affected by that change have to be revalidated, even if their properties didn't change.
+     * This is especially problematic because we do redraw the tree in several places in the code, check for callers of buildTree method. Any time that method is called
+     * the entire tree must be re-validated for the view to work correctly.
+     *
+     * This method should only be called in the service below so it runs off the UI thread.
      */
     private void validateNodeProperties(Node node, StringBuilder errBuilder) {
         if (Thread.currentThread().isInterrupted()) {

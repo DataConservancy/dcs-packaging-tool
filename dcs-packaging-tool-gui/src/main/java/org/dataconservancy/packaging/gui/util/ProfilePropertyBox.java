@@ -48,6 +48,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * ProfilePropertyBox is a class to represent properties that come from a Domain Profile.
+ *
+ * Each box represents one property and is made up of a list of {@link PropertyBox}s.
+ */
 public class ProfilePropertyBox extends VBox implements CssConstants {
     PropertyConstraint propertyConstraint;
     List<PropertyBox> propertyBoxes;
@@ -94,6 +99,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
 
         final GroupPropertyChangeListener listener = new GroupPropertyChangeListener(addNewButton);
 
+        //If the property is complex we have to go through and create sub property boxes
         if (propertyConstraint.getPropertyType().getPropertyValueType().equals(PropertyValueType.COMPLEX)) {
             addNewButton.setText(TextFactory.format(Messages.MessageKey.ADD_NEW_MESSAGE, propertyConstraint.getPropertyType().getLabel()));
             subPropertyBoxes = new ArrayList<>();
@@ -116,7 +122,7 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
                 getChildren().add(groupSeparator);
             }
         } else {
-
+            //Otherwise create a property box for each existing property and one for the empty property box.
             propertyBoxes = new ArrayList<>();
 
             if (existingProperties != null && !existingProperties.isEmpty()) {
@@ -173,6 +179,9 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
 
     }
 
+    /*
+     * Creates the correct property box for the property type.
+     */
     private PropertyBox generatePropertyBox(Object initialValue, boolean editable, PropertyType propertyType) {
         if (propertyType != null && propertyType.getPropertyValueType() != null) {
             switch (propertyType.getPropertyValueType()) {
@@ -202,6 +211,10 @@ public class ProfilePropertyBox extends VBox implements CssConstants {
         return new TextPropertyBox(initialValue, editable, null, "");
     }
 
+    /*
+     * For complex properties we create property boxes for each sub property. This is slightly more complicated, because we need to track all of these sub property boxes,
+     * to ensure the required fields are not empty before a new complex property can be added.
+     */
     private void createChildProfilePropertyBoxes(List<Property> existingProperties, GroupPropertyChangeListener listener, VBox propertyValueBox) {
         List<PropertyConstraint> sortedProperties = new ArrayList<>();
 

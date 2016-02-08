@@ -166,6 +166,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
         content.getStyleClass().add(EDIT_PACKAGE_CONTENTS_VIEW_CLASS);
         setCenter(content);
 
+        //This code handles the copy/paste functionality that allows you to copy the id of a domain object into a user defined relationship target
         content.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.C && event.isShortcutDown()) {
                 if (nodeTree != null) {
@@ -189,6 +190,7 @@ public class EditPackageContentsViewImpl extends BaseViewImpl<EditPackageContent
             nodePropertiesWindow.setMinHeight(500);
         }
 
+        //This preference stores whether or not we're going to show the property loss warning, this warning can be disabled by the user
         preferences = Preferences.userRoot().node(internalProperties.get(InternalProperties.InternalPropertyKey.PREFERENCES_NODE_NAME));
         boolean hideWarningPopup = preferences.getBoolean(internalProperties.get(InternalProperties.InternalPropertyKey.HIDE_PROPERTY_WARNING_PREFERENCE), false);
 
