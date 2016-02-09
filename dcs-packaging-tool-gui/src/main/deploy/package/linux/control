@@ -13,7 +13,7 @@
 # specific language governing permissions and limitations
 # under the License.
 Package: dc-package-tool
-Version: 1.0.2
+Version: 1.0.3
 Section: utils
 Maintainer: Data Conservancy <dc-ird@googlegroups.com>
 Priority: optional
