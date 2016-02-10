@@ -24,7 +24,7 @@ under the License.
   <parent>
     <groupId>org.dataconservancy.pkgtool</groupId>
     <artifactId>dcs-packaging-tool</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
   </parent>
   <artifactId>dcs-packaging-tool-profiles</artifactId>
   <packaging>pom</packaging>
