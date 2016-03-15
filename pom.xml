@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.dataconservancy</groupId>
     <artifactId>project-pom</artifactId>
-    <version>5</version>
+    <version>8</version>
     <relativePath />
   </parent>
 
