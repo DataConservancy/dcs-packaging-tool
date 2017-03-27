@@ -190,4 +190,39 @@ public class PackageGenerationParameters {
                 "params=" + params +
                 '}';
     }
+
+    /**
+     * Creates a string representation of the package generation parameters.
+     * The string can be parsed by PropertiesConfigurationParametersBuilder.buildParameters(),
+     * which allows it to be passed as a stream by applications to the packaging classes.
+     * @return String representation of the current parameter set.
+     */
+    public String toParametersString() {
+        StringBuilder builder = new StringBuilder();
+        // Add each parameter
+        for (String key : getKeys()) {
+            List<String> vals = getParam(key);
+            if (vals != null && !vals.isEmpty()) {
+                if (vals.size() == 1) {
+                    // Add a parameter with a single value
+                    String addition = key + "=" + vals.get(0) + "\n";
+                    builder.append(addition);
+                } else {
+                    // Add a parameter with multiple values
+                    boolean multiple = false;
+                    String addition = key + "=";
+                    builder.append(addition);
+                    for (String val : vals) {
+                        if (multiple) {
+                            builder.append(",");
+                        }
+                        builder.append(val);
+                        multiple = true;
+                    }
+                    builder.append("\n");
+                }
+            }
+        }
+        return builder.toString();
+    }
 }
