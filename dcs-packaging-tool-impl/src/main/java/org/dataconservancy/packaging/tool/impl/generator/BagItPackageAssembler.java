@@ -738,7 +738,9 @@ public class BagItPackageAssembler implements PackageAssembler {
             try {
                 CompressorOutputStream compressedStream = new CompressorStreamFactory()
                         .createCompressorOutputStream(compressionFormat, new FileOutputStream(compressedFile));
-                IOUtils.copy(new FileInputStream(file), compressedStream);
+                FileInputStream uncompressedStream = new FileInputStream(file);
+                IOUtils.copy(uncompressedStream, compressedStream);
+                uncompressedStream.close();
                 compressedStream.close();
             } catch (FileNotFoundException e) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_FILE_NOT_FOUND_EXCEPTION, e,
