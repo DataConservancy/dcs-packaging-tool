@@ -735,11 +735,10 @@ public class BagItPackageAssembler implements PackageAssembler {
     private File compressFile(File file) throws PackageToolException {
         if (compressionFormat != null) {
             File compressedFile = new File(packageLocationDir, file.getName()+ "." + compressionFormat);
-            try {
-                CompressorOutputStream compressedStream = new CompressorStreamFactory()
+            try (CompressorOutputStream compressedStream = new CompressorStreamFactory()
                         .createCompressorOutputStream(compressionFormat, new FileOutputStream(compressedFile));
-                IOUtils.copy(new FileInputStream(file), compressedStream);
-                compressedStream.close();
+                FileInputStream uncompressedStream = new FileInputStream(file)) {
+                IOUtils.copy(uncompressedStream, compressedStream);
             } catch (FileNotFoundException e) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_FILE_NOT_FOUND_EXCEPTION, e,
                         "Exception occurred when compressing the serialized bag.");
