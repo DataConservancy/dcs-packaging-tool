@@ -246,7 +246,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
         //Creating base directory for the bag based on specified package name
         if (!packageLocationDir.exists()) {
-            log.info("Creating bag base dir: " + packageLocationDir.getPath());
+            log.debug("Creating bag base dir: " + packageLocationDir.getPath());
             boolean isDirCreated = packageLocationDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -267,7 +267,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         bagBaseDir = new File(packageLocationDir, packageName);
         //Creating base directory for the bag based on specified package name
         if (!bagBaseDir.exists()) {
-            log.info("Creating bag base dir: " + bagBaseDir.getPath());
+            log.debug("Creating bag base dir: " + bagBaseDir.getPath());
             boolean isDirCreated = bagBaseDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -286,7 +286,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         payloadDir = new File(bagBaseDir, "data");
         //Creating payloadDir
         if (!payloadDir.exists()) {
-            log.info("Creating payload dir: " + payloadDir.getPath());
+            log.debug("Creating payload dir: " + payloadDir.getPath());
             boolean isDirCreated = payloadDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -297,7 +297,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         //Creating the package info directory
         pkgInfoDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/PKG-INFO");
         if (!pkgInfoDir.exists()) {
-            log.info("Creating package structure dir :" + pkgInfoDir.getPath());
+            log.debug("Creating package structure dir :" + pkgInfoDir.getPath());
             boolean isDirCreated = pkgInfoDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -308,7 +308,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         //Creating the ontology directory
         ontologyDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/ONT");
         if (!ontologyDir.exists()) {
-            log.info("Creating ontology dir :" + ontologyDir.getPath());
+            log.debug("Creating ontology dir :" + ontologyDir.getPath());
             boolean isDirCreated = ontologyDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -319,7 +319,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         //Creating the ORE-ReM directory
         remDir = new File(pkgInfoDir, "ORE-REM");
         if (!remDir.exists()) {
-            log.info("Creating ORE-ReM dir :" + remDir.getPath());
+            log.debug("Creating ORE-ReM dir :" + remDir.getPath());
             boolean isDirCreated = remDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -330,7 +330,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         //Creating the package state directory
         stateDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/STATE");
         if (!stateDir.exists()) {
-            log.info("Creating Package State dir :" + stateDir.getPath());
+            log.debug("Creating Package State dir :" + stateDir.getPath());
             boolean isDirCreated = stateDir.mkdirs();
             if (!isDirCreated) {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
@@ -354,10 +354,10 @@ public class BagItPackageAssembler implements PackageAssembler {
         try {
             decodedPath = new String(URLCodec.decodeUrl(path.getBytes()));
 
-            log.info("validating path: " + decodedPath);
+            log.debug("validating path: " + decodedPath);
 
             if(!isValidPathString(decodedPath)){
-                log.info("Invalid path string:" + decodedPath);
+                log.warn("Invalid path string:" + decodedPath);
                 try {
                     FileUtils.cleanDirectory(bagBaseDir);
                 } catch (IOException e) {
@@ -366,7 +366,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_INVALID_FILENAME);
             }
 
-            log.info(("Reserving " + path));
+            log.debug(("Reserving " + path));
 
             File containingDirectory =  null;
             if (type.equals(PackageResourceType.DATA)) {
@@ -387,7 +387,7 @@ public class BagItPackageAssembler implements PackageAssembler {
 
             //Create folders in the path
             if (!newFile.getParentFile().exists()) {
-                log.info("Creating parent folders");
+                log.debug("Creating parent folders");
                 boolean isDirCreated = newFile.getParentFile().mkdirs();
                 if (!isDirCreated) {
                     throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
@@ -553,7 +553,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 }
             }
         } catch (IOException e) {
-            log.warn("Could not removed files and/or directory created during package generation." + e.getMessage());
+            log.warn("Could not remove files and/or directory created during package generation." + e.getMessage());
         }
 
         return pkg;
