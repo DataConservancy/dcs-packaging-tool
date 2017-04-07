@@ -33,29 +33,30 @@ public class FilenameValidator implements Validator {
     private int maxNameLength = 255;
 
     @Override
-    public ValidatorResult isValid(String fileName) {
-        Matcher matcher = pattern.matcher(fileName);
+    public ValidatorResult isValid(String pathComponent) {
+        Matcher matcher = pattern.matcher(pathComponent);
         ValidatorResult vr = new ValidatorResult();
         int v;
 
-        if(fileName.equals(".")){
+        if(pathComponent.equals(".")){
             vr.setResult(false);
-            vr.setMessage(" file name may not be \".\"");
-        } else if(fileName.equals("..")){
+            vr.setMessage(" path component may not be \".\"");
+        } else if(pathComponent.equals("..")){
             vr.setResult(false);
-            vr.setMessage(" file name may not be \"..\"");
-        } else if(containsAny(fileName,blacklist)){
+            vr.setMessage(" path component may not be \"..\"");
+        } else if(containsAny(pathComponent,blacklist)){
             vr.setResult(false);
-            vr.setMessage(" file name contains an illegal character: one or more of " + blacklist);
+            vr.setMessage(" path component contains an illegal character: one or more of " + blacklist);
         } else if(matcher.matches()){
             vr.setResult(false);
-            vr.setMessage(" file name is a Windows reserved file name");
-        } else if (fileName.length() > 255){
+            vr.setMessage(String.format("'%s' is a reserved path component", pathComponent));
+        } else if (pathComponent.length() > 255){
             vr.setResult(false);
-            vr.setMessage(" file name is too long, may not exceed " + maxNameLength +" characters");
-        } else if((v=containsIllegalUnicode(fileName)) >= 0){
+            vr.setMessage(" path component is too long, may not exceed " + maxNameLength +" characters");
+        } else if((v=containsIllegalUnicode(pathComponent)) >= 0){
             vr.setResult(false);
-            vr.setMessage(" file name contains an illegal unicode character at index " + v +"; this character may not be visible");
+            vr.setMessage(String.format(" path component '%s' contains an illegal unicode character at index %s; " +
+                    "this character may not be visible", pathComponent, v));
         } else {
             vr.setResult(true);
         }
@@ -82,6 +83,7 @@ public class FilenameValidator implements Validator {
             if (((Integer.parseInt("00", 16) <= j) && (j <= Integer.parseInt("1f", 16))) ||
                     (j >= Integer.parseInt("7f", 16))) { //0x7f is Delete
                 position = i;
+                break;
             }
         }
         return position;

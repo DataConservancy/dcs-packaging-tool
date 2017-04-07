@@ -283,7 +283,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating payload directory
-        payloadDir = new File(bagBaseDir, "data");
+        payloadDir = new File(bagBaseDir, PackageResourceType.DATA.getRelativePackageLocation());
         //Creating payloadDir
         if (!payloadDir.exists()) {
             log.info("Creating payload dir: " + payloadDir.getPath());
@@ -295,7 +295,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package info directory
-        pkgInfoDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/PKG-INFO");
+        pkgInfoDir = new File(bagBaseDir, PackageResourceType.METADATA.getRelativePackageLocation());
         if (!pkgInfoDir.exists()) {
             log.info("Creating package structure dir :" + pkgInfoDir.getPath());
             boolean isDirCreated = pkgInfoDir.mkdirs();
@@ -306,7 +306,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the ontology directory
-        ontologyDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/ONT");
+        ontologyDir = new File(bagBaseDir, PackageResourceType.ONTOLOGY.getRelativePackageLocation());
         if (!ontologyDir.exists()) {
             log.info("Creating ontology dir :" + ontologyDir.getPath());
             boolean isDirCreated = ontologyDir.mkdirs();
@@ -317,7 +317,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the ORE-ReM directory
-        remDir = new File(pkgInfoDir, "ORE-REM");
+        remDir = new File(bagBaseDir, PackageResourceType.ORE_REM.getRelativePackageLocation());
         if (!remDir.exists()) {
             log.info("Creating ORE-ReM dir :" + remDir.getPath());
             boolean isDirCreated = remDir.mkdirs();
@@ -328,7 +328,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package state directory
-        stateDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/STATE");
+        stateDir = new File(bagBaseDir, PackageResourceType.PACKAGE_STATE.getRelativePackageLocation());
         if (!stateDir.exists()) {
             log.info("Creating Package State dir :" + stateDir.getPath());
             boolean isDirCreated = stateDir.mkdirs();
@@ -354,18 +354,6 @@ public class BagItPackageAssembler implements PackageAssembler {
         try {
             decodedPath = new String(URLCodec.decodeUrl(path.getBytes()));
 
-            log.info("validating path: " + decodedPath);
-
-            if(!isValidPathString(decodedPath)){
-                log.info("Invalid path string:" + decodedPath);
-                try {
-                    FileUtils.cleanDirectory(bagBaseDir);
-                } catch (IOException e) {
-                    log.warn("Exception thrown when cleaning existing directory: " + e.getMessage());
-                }
-                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_INVALID_FILENAME);
-            }
-
             log.info(("Reserving " + path));
 
             File containingDirectory =  null;
@@ -390,8 +378,9 @@ public class BagItPackageAssembler implements PackageAssembler {
                 log.info("Creating parent folders");
                 boolean isDirCreated = newFile.getParentFile().mkdirs();
                 if (!isDirCreated) {
-                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
+                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP, "  Error creating " + newFile.getParentFile());
                 }
+
                 if (isDirectory && !newFile.mkdir()) {
                     throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
                 }
@@ -407,7 +396,12 @@ public class BagItPackageAssembler implements PackageAssembler {
                 relativeURI = URI.create(relativeURI.toString() + "/");
             }
 
-            fileURIMap.put(relativeURI, newFile.toURI());
+            URI reserved;
+            if ((reserved = fileURIMap.putIfAbsent(relativeURI, newFile.toURI())) != null) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DUPLICATE_RESOURCE,
+                        String.format("%s has already been reserved as %s", newFile, relativeURI));
+            }
+
 
             if (!isDirectory) {
                 switch(type){
@@ -811,16 +805,26 @@ public class BagItPackageAssembler implements PackageAssembler {
      * @param pathString the string representation of the relative file path
      * @return  whether the file name is valid
      */
-    private boolean isValidPathString(String pathString){
-        for(String component : pathString.split("/")){
-            if(!filenameValidator.isValid(component).getResult()){
-                return false;
+    private ValidatorResult isValidPathString(String pathString) {
+        ValidatorResult result = null;
+
+        if (pathString.getBytes().length > 1024){
+            return new ValidatorResult(false, "Path is longer than 1024 bytes.");
+        }
+
+        for (String component : pathString.split("/")) {
+            if (!(result = filenameValidator.isValid(component)).getResult()) {
+                break;
             }
         }
-        if (pathString.length() > 1024){
-            return false;
+
+        if (result == null) {
+            // Should never happen
+            throw new RuntimeException("Null ValidatorResult received from FilenameValidator for " +
+                    "pathString '" + pathString + "'");
         }
-        return true;
+
+        return result;
     }
 
     private void validateArchivingFormat() {
