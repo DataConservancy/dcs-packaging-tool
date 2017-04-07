@@ -16,10 +16,12 @@
 
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import java.net.URI;
 
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import java.util.HashMap;
@@ -36,6 +38,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.util.ResourceUtils;
 
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.dataconservancy.packaging.tool.ontologies.Ontologies;
 import org.dataconservancy.packaging.tool.ser.PackageStateSerializer;
@@ -46,6 +49,9 @@ import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.determineSerialization;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.toInputStream;
+import static org.dataconservancy.packaging.tool.impl.generator.RemediationUtil.remediatePath;
+import static org.dataconservancy.packaging.tool.impl.generator.RemediationUtil.unique;
+import static org.dataconservancy.packaging.tool.model.BagItParameterNames.BAGIT_PROFILE_ID;
 
 /**
  * Serializes domain object graphs into individual resources in a bag.
@@ -131,17 +137,12 @@ class DomainObjectResourceBuilder
                     URI originalDomainObjectURI = node.getDomainObject();
 
                     /* This is where the domain object will be serialized */
-                    URI newDomainObjectURI =
-                            state.assembler
-                                    .reserveResource(OBJECT_PATH
-                                                             + path(node,
-                                                                    "."
-                                                                            + determineSerialization(state.params,
-                                                                                                     RDFFormat.TURTLE_PRETTY)
-                                                                                    .getLang()
-                                                                                    .getFileExtensions()
-                                                                                    .get(0)),
-                                                     PackageResourceType.DATA);
+                    URI newDomainObjectURI = null;
+                    try {
+                        newDomainObjectURI = reserveObjectResource(node, state);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e.getMessage(), e);
+                    }
 
                     state.domainObjectSerializationLocations.put(node
                             .getIdentifier(), newDomainObjectURI);
@@ -150,15 +151,7 @@ class DomainObjectResourceBuilder
                             && node.getFileInfo().isFile()) {
                         try {
                             URI newFileLocation =
-                                    state.assembler
-                                            .createResource(BINARY_PATH
-                                                                    + path(node,
-                                                                           ""),
-                                                            PackageResourceType.DATA,
-                                                            node.getFileInfo()
-                                                                    .getLocation()
-                                                                    .toURL()
-                                                                    .openStream());
+                                    createBinaryResource(node, state);
 
                             URI originalFileLocation =
                                     node.getFileInfo().getLocation();
@@ -223,6 +216,71 @@ class DomainObjectResourceBuilder
                               state.renamedResources);
                     }
                 });
+    }
+
+    private URI createBinaryResource(Node node, PackageModelBuilderState state) throws IOException, URISyntaxException {
+        URI resource;
+        try {
+            resource = state.assembler
+                    .createResource(BINARY_PATH + remediatePath(path(node, ""), profileId(state)),
+                            PackageResourceType.DATA,
+                            node.getFileInfo()
+                                    .getLocation()
+                                    .toURL()
+                                    .openStream());
+        } catch (PackageToolException e) {
+            if (e.getCode() == 409) {
+                // handle duplicate reservation
+                String uniquePath = unique(node, remediatePath(path(node, ""), profileId(state)));
+                resource = state.assembler
+                        .createResource(BINARY_PATH + uniquePath,
+                                PackageResourceType.DATA,
+                                node.getFileInfo()
+                                        .getLocation()
+                                        .toURL()
+                                        .openStream());
+            } else {
+                throw e;
+            }
+
+        }
+
+        return resource;
+    }
+
+    private URI reserveObjectResource(Node node, PackageModelBuilderState state) throws URISyntaxException {
+        URI resource;
+        try {
+            resource = state.assembler
+                    .reserveResource(OBJECT_PATH +
+                                    remediatePath(
+                                            path(node, "." +
+                                                    determineSerialization(state.params,
+                                                            RDFFormat.TURTLE_PRETTY)
+                                                            .getLang().getFileExtensions().get(0)),
+                            profileId(state)),
+                            PackageResourceType.DATA);
+        } catch (PackageToolException e) {
+            if (e.getCode() == 409) {
+                // handle duplicate reservation
+                String uniquePath = unique(node, remediatePath(
+                        path(node, "." +
+                                determineSerialization(state.params,
+                                        RDFFormat.TURTLE_PRETTY)
+                                        .getLang().getFileExtensions().get(0)),
+                        profileId(state)));
+                resource = state.assembler
+                        .reserveResource(OBJECT_PATH + uniquePath, PackageResourceType.DATA);
+            } else {
+                throw e;
+            }
+        }
+
+        return resource;
+    }
+
+    private static String profileId(PackageModelBuilderState state) {
+        return state.params.getParam(BAGIT_PROFILE_ID, 0);
     }
 
     /* Serialize the domain object, and save the binary content */

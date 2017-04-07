@@ -283,7 +283,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating payload directory
-        payloadDir = new File(bagBaseDir, "data");
+        payloadDir = new File(bagBaseDir, PackageResourceType.DATA.getRelativePackageLocation());
         //Creating payloadDir
         if (!payloadDir.exists()) {
             log.debug("Creating payload dir: " + payloadDir.getPath());
@@ -295,7 +295,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package info directory
-        pkgInfoDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/PKG-INFO");
+        pkgInfoDir = new File(bagBaseDir, PackageResourceType.METADATA.getRelativePackageLocation());
         if (!pkgInfoDir.exists()) {
             log.debug("Creating package structure dir :" + pkgInfoDir.getPath());
             boolean isDirCreated = pkgInfoDir.mkdirs();
@@ -306,7 +306,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the ontology directory
-        ontologyDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/ONT");
+        ontologyDir = new File(bagBaseDir, PackageResourceType.ONTOLOGY.getRelativePackageLocation());
         if (!ontologyDir.exists()) {
             log.debug("Creating ontology dir :" + ontologyDir.getPath());
             boolean isDirCreated = ontologyDir.mkdirs();
@@ -317,7 +317,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the ORE-ReM directory
-        remDir = new File(pkgInfoDir, "ORE-REM");
+        remDir = new File(bagBaseDir, PackageResourceType.ORE_REM.getRelativePackageLocation());
         if (!remDir.exists()) {
             log.debug("Creating ORE-ReM dir :" + remDir.getPath());
             boolean isDirCreated = remDir.mkdirs();
@@ -328,7 +328,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         }
 
         //Creating the package state directory
-        stateDir = new File(bagBaseDir, "META-INF/org.dataconservancy.packaging/STATE");
+        stateDir = new File(bagBaseDir, PackageResourceType.PACKAGE_STATE.getRelativePackageLocation());
         if (!stateDir.exists()) {
             log.debug("Creating Package State dir :" + stateDir.getPath());
             boolean isDirCreated = stateDir.mkdirs();

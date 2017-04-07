@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
@@ -35,7 +36,13 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 
+import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
+import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
+import org.dataconservancy.packaging.tool.impl.SimpleURIGenerator;
+import org.dataconservancy.packaging.tool.impl.URIGenerator;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
+import org.dataconservancy.packaging.tool.model.PackageToolException;
+import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,10 +54,20 @@ import org.dataconservancy.packaging.tool.model.PackageState;
 import org.dataconservancy.packaging.tool.model.ipm.FileInfo;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
+import static org.apache.commons.codec.digest.DigestUtils.shaHex;
+import static org.dataconservancy.packaging.tool.impl.generator.IPMUtil.path;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.endsWith;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DomainObjectResourceBuilderTest {
 
@@ -437,6 +454,62 @@ public class DomainObjectResourceBuilderTest {
 
     }
 
+    @Test
+    public void testHandleDuplicateReservation() throws Exception {
+        DomainObjectResourceBuilder underTest = new DomainObjectResourceBuilder();
+
+        URIGenerator uriGen = new SimpleURIGenerator();
+        PackageModelBuilderState state = bootstrap1();
+        state.assembler = mock(PackageAssembler.class);
+
+        when(state.assembler.reserveResource("obj/" + path(state.tree, ".ttl"), PackageResourceType.DATA))
+                .thenThrow(new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DUPLICATE_RESOURCE));
+
+        final String expectedSuffix = shaHex(state.tree.getIdentifier().toString());
+        final AtomicBoolean matchedSuffix = new AtomicBoolean(Boolean.FALSE);
+        when(state.assembler.reserveResource(endsWith(expectedSuffix), any(PackageResourceType.class)))
+                .then(invocationOnMock -> {
+                    matchedSuffix.set(Boolean.TRUE);
+                    return uriGen.generateDomainObjectURI(state.tree);
+                });
+
+        underTest.init(state);
+
+        verify(state.assembler, times(2)).reserveResource(anyString(), any(PackageResourceType.class));
+
+        assertTrue(matchedSuffix.get());
+    }
+
+    @Test
+    public void testHandleDuplicateCreation() throws Exception {
+        DomainObjectResourceBuilder underTest = new DomainObjectResourceBuilder();
+
+        URIGenerator uriGen = new SimpleURIGenerator();
+        PackageModelBuilderState state = bootstrap2();
+        Node child = state.tree.getChildren().get(0);
+        state.assembler = mock(PackageAssembler.class);
+
+        when(state.assembler.createResource(
+                eq("bin/" + path(child, "")), eq(PackageResourceType.DATA), any(InputStream.class)))
+                .thenThrow(new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DUPLICATE_RESOURCE));
+
+        final String expectedSuffix = shaHex(child.getIdentifier().toString());
+        final AtomicBoolean matchedSuffix = new AtomicBoolean(Boolean.FALSE);
+        when(state.assembler.createResource(
+                endsWith(expectedSuffix), any(PackageResourceType.class), any(InputStream.class)))
+                .then(invocationOnMock -> {
+                    matchedSuffix.set(Boolean.TRUE);
+                    return uriGen.generateDomainObjectURI(state.tree);
+                });
+
+        underTest.init(state);
+
+        verify(state.assembler, times(2))
+                .createResource(anyString(), any(PackageResourceType.class), any(InputStream.class));
+
+        assertTrue(matchedSuffix.get());
+    }
+
     /* Bootstrap a single complex domain object */
     private PackageModelBuilderState bootstrap1() throws Exception {
         PackageState pkgState = new PackageState();
@@ -464,6 +537,7 @@ public class DomainObjectResourceBuilderTest {
         state.tree = treeNode;
         state.pkgState = pkgState;
         state.renamedResources = new HashMap<>();
+        state.params = new PackageGenerationParameters();
 
         return state;
     }
@@ -508,6 +582,7 @@ public class DomainObjectResourceBuilderTest {
         state.tree = treeNode;
         state.pkgState = pkgState;
         state.renamedResources = new HashMap<>();
+        state.params = new PackageGenerationParameters();
 
         return state;
     }

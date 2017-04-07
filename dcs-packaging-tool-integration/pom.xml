@@ -48,6 +48,7 @@ under the License.
         <configuration>
           <excludes>
             <exclude>src/test/resources/**/*.txt</exclude>
+            <exclude>src/test/resources/TestContent/**</exclude>
           </excludes>
         </configuration>
       </plugin>

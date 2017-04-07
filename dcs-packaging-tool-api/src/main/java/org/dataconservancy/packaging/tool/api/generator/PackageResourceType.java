@@ -16,24 +16,76 @@
 
 package org.dataconservancy.packaging.tool.api.generator;
 
+import java.util.Arrays;
+
 /**
- * Describes the type of resource being included in a package. The intended use of this is to
- * support the assigning of locations withing the package to resources of different types.
+ * Describes the type of resource being included in a package, and their relative location inside the package. The
+ * intended use of this is to support the assigning of locations withing the package to resources of different types.
  */
 public enum PackageResourceType {
-    /** Package data files/content */
-    DATA,
 
-    /** The type for an ORE-ReM file */
-    ORE_REM,
+    /**
+     * Custodial content of the package; domain objects and binary files are both considered to be the custodial
+     * content of the package.
+     */
+    DATA("data"),
 
-    /** Ontologies used in building the package */
-    ONTOLOGY,
+    /**
+     * Domain objects which describe the binary data contained in package.  Considered to be part of the custodial content of the package.
+     */
+    DOMAIN_OBJECT("data/obj"),
 
-    /** Other package-related metadata (e.g.business objects, etc) */
-    METADATA,
+    /**
+     * Binary data contained in the package.  Considered to be part of the custodial content of the package.
+     */
+    BINARY_DATA("data/bin"),
 
-    /** The Package State file */
-    PACKAGE_STATE
+    /**
+     * Metadata describing the custodial content; the {@link #ORE_REM} is considered a form of metadata.
+     */
+    METADATA("META-INF/org.dataconservancy.packaging/PKG-INFO"),
 
+    /**
+     * The ORE-REM describing the graph of objects in the package
+     */
+    ORE_REM("META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM"),
+
+    /**
+     * The ontologies used by the domain objects
+     */
+    ONTOLOGY("META-INF/org.dataconservancy.packaging/ONT"),
+
+    /**
+     * The package state, used by the DC Package Tool GUI
+     */
+    PACKAGE_STATE("META-INF/org.dataconservancy.packaging/STATE");
+
+    /**
+     * The relative location of the resource within the package.  Resources of a particular type will placed in the
+     * package underneath this location.
+     */
+    private final String relativePackageLocation;
+
+    private PackageResourceType(String relativePackageLocation) {
+        this.relativePackageLocation = relativePackageLocation;
+    }
+
+    /**
+     * The relative location of the resource within the package.  Resources of a particular type will be placed in the
+     * package somewhere underneath this location.
+     *
+     * @return the relative location of a resource within the package
+     */
+    public String getRelativePackageLocation() {
+        return relativePackageLocation;
+    }
+
+    public static PackageResourceType forRelativePackageLocation(String relativeLocation) {
+        return Arrays.stream(PackageResourceType.values())
+                .findFirst()
+                .filter(candidate -> candidate.getRelativePackageLocation().equals(relativeLocation))
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Unable to determine the package resource type for path '" + relativeLocation + "'"));
+    }
 }
