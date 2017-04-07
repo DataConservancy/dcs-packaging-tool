@@ -18,7 +18,6 @@ package org.dataconservancy.packaging.tool.impl;
  */
 
 
-import org.dataconservancy.dcs.util.FilePathUtil;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.impl.support.FilenameValidatorService;
@@ -33,7 +32,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,8 +55,6 @@ public class IPMServiceImpl implements IPMService {
         visitedFiles.clear();
         Node root;
         root = createTree(null, path);
-
-        validateFileNames(path);
 
         return root;
     }
@@ -358,8 +354,6 @@ public class IPMServiceImpl implements IPMService {
 
     @Override
     public void remapNode(Node node, Path newPath) throws IOException {
-
-        validateFileNames(newPath);
 
         Path oldPath = null;
         if (node.getFileInfo().getLocation() != null) {

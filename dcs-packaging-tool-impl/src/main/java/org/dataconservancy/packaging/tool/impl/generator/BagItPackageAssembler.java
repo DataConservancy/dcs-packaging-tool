@@ -353,19 +353,7 @@ public class BagItPackageAssembler implements PackageAssembler {
         String decodedPath;
         try {
             decodedPath = new String(URLCodec.decodeUrl(path.getBytes()));
-
-            log.debug("validating path: " + decodedPath);
-
-            if(!isValidPathString(decodedPath)){
-                log.warn("Invalid path string:" + decodedPath);
-                try {
-                    FileUtils.cleanDirectory(bagBaseDir);
-                } catch (IOException e) {
-                    log.warn("Exception thrown when cleaning existing directory: " + e.getMessage());
-                }
-                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_INVALID_FILENAME);
-            }
-
+            
             log.debug(("Reserving " + path));
 
             File containingDirectory =  null;
@@ -390,8 +378,9 @@ public class BagItPackageAssembler implements PackageAssembler {
                 log.debug("Creating parent folders");
                 boolean isDirCreated = newFile.getParentFile().mkdirs();
                 if (!isDirCreated) {
-                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
+                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP, "  Error creating " + newFile.getParentFile());
                 }
+
                 if (isDirectory && !newFile.mkdir()) {
                     throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP);
                 }
@@ -811,16 +800,26 @@ public class BagItPackageAssembler implements PackageAssembler {
      * @param pathString the string representation of the relative file path
      * @return  whether the file name is valid
      */
-    private boolean isValidPathString(String pathString){
-        for(String component : pathString.split("/")){
-            if(!filenameValidator.isValid(component).getResult()){
-                return false;
+    private ValidatorResult isValidPathString(String pathString) {
+        ValidatorResult result = null;
+
+        if (pathString.getBytes().length > 1024){
+            return new ValidatorResult(false, "Path is longer than 1024 bytes.");
+        }
+
+        for (String component : pathString.split("/")) {
+            if (!(result = filenameValidator.isValid(component)).getResult()) {
+                break;
             }
         }
-        if (pathString.length() > 1024){
-            return false;
+
+        if (result == null) {
+            // Should never happen
+            throw new RuntimeException("Null ValidatorResult received from FilenameValidator for " +
+                    "pathString '" + pathString + "'");
         }
-        return true;
+
+        return result;
     }
 
     private void validateArchivingFormat() {

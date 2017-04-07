@@ -93,11 +93,6 @@ public class PropertyValidationListener implements ChangeListener<String>, CssCo
                     case URL:
                     case EMAIL:
                     case URI:
-                    case FILE_NAME:
-                        if (validator instanceof C14NValidator) {
-                            String c14nValue = ((C14NValidator) validator).canonicalize(newValue);
-                            textPropertyBox.getPropertyInput().setText(c14nValue);
-                        }
                         textPropertyBox.getChildren().remove(validationLabel);
                         validationImageLabel.setGraphic(successImage);
                         validationImageLabel.setVisible(true);

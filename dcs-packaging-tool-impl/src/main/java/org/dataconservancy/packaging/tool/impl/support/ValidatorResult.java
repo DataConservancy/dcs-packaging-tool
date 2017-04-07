@@ -26,6 +26,19 @@ public class ValidatorResult {
 
     boolean result;
 
+    public ValidatorResult() {
+
+    }
+
+    public ValidatorResult(boolean result) {
+        this.result = result;
+    }
+
+    public ValidatorResult(boolean result, String message) {
+        this.message = message;
+        this.result = result;
+    }
+
     public boolean getResult(){
         return result;
     };
