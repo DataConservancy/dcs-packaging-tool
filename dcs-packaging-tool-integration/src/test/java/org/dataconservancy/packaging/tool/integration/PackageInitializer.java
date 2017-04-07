@@ -57,7 +57,7 @@ public class PackageInitializer {
                     ipmService
                             .createTreeFromFileSystem(Paths
                                     .get(this.getClass()
-                                            .getResource("/TestContent/README")
+                                            .getResource("/TestContent/foo")
                                             .toURI()).getParent()
                                     .resolve("Parent_Dir"));
 

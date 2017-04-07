@@ -70,10 +70,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.codec.digest.DigestUtils.shaHex;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.copy;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.cut;
 import static org.dataconservancy.packaging.tool.impl.generator.RdfUtil.selectLocal;
@@ -84,6 +87,7 @@ import static org.dataconservancy.packaging.tool.ontologies.Ontologies.NS_ORE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -162,13 +166,89 @@ public class PackageGenerationTest {
                 });
     }
 
+    @Test
+    public void verifyRemediationTest() throws Exception {
+
+        PackageState state = initializer.initialize(DCS_PROFILE);
+
+        Set<URI> originalFileLocations = new HashSet<>();
+
+        ipm2rdf.transformToNode(state.getPackageTree())
+                .walk(node -> originalFileLocations.add(node.getFileInfo()
+                        .getLocation()));
+
+        // The package should contain two files:
+        // - READMX
+        // - READMÉ
+        //
+        // The file with the acute E will be remediated to a resource named 'READMX', which will collide with
+        // an existing resource of the same name.
+
+        // assert that our sample problem files are in the content to be packaged
+        assertTrue(originalFileLocations.stream().anyMatch(uri -> uri.getPath().endsWith("READMX")));
+        // 0x0301 is the UTF-16 encoding of the 'COMBINING ACUTE ACCENT' combining diacritic
+        assertTrue(originalFileLocations.stream().anyMatch(uri -> uri.getPath().endsWith("README" + '\u0301')));
+
+        OpenedPackage opened = packager.createPackage(state, folder.getRoot());
+
+        AtomicBoolean foundIllegal = new AtomicBoolean(Boolean.FALSE);
+        AtomicBoolean foundRemediated = new AtomicBoolean(Boolean.FALSE);
+        AtomicReference<String> remediatedFilename = new AtomicReference<>();
+        AtomicBoolean foundCollision = new AtomicBoolean(Boolean.FALSE);
+        AtomicReference<String> collidingFilename = new AtomicReference<>();
+
+        // Walk the generated package, and make sure that
+        // 1. That a resource with illegal characters does not exist
+        // 2. That a resource named 'READMX' does exist
+        // 3. That a resource named after the SHA-1 hex of its identifier exists
+        // 4. That those two resources originate from two different files in the original package content
+        opened.getPackageTree()
+                .walk(node -> {
+                    if (node.getFileInfo() == null || !node.getFileInfo().isFile()) {
+                        return;
+                    }
+
+                    System.err.println(node.getFileInfo().getName());
+                    System.err.println("  " + node.getFileInfo().getLocation().toString());
+
+                    // this should not happen, because a file name with invalid characters should have
+                    // been remediated prior to being inserted into the package
+                    if (node.getFileInfo().getLocation().getPath().endsWith("README" + '\u0301')) {
+                        foundIllegal.set(Boolean.TRUE);
+                    }
+
+                    if (node.getFileInfo().getLocation().getPath()
+                            .endsWith(shaHex(node.getIdentifier().toString()))) {
+                        foundRemediated.set(Boolean.TRUE);
+                        remediatedFilename.set(node.getFileInfo().getName());
+                        // short circuit
+                        return;
+                    }
+
+                    if (node.getFileInfo().getName().equals("READMX") ||
+                            node.getFileInfo().getName().equals("READMÉ")) {
+                        foundCollision.set(Boolean.TRUE);
+                        collidingFilename.set(node.getFileInfo().getName());
+                    }
+                });
+
+        assertFalse(foundIllegal.get());
+        assertTrue(foundCollision.get());
+        assertTrue(foundRemediated.get());
+
+        assertNotNull(remediatedFilename.get());
+        assertNotNull(collidingFilename.get());
+        assertNotEquals(remediatedFilename.get(), collidingFilename.get());
+
+    }
+
     /*
-     * XXX It may be presumptuous to assume this should pass. This verifies that
-     * there are no property errors (e.g. missing required properties). It may
-     * be a conscious choice of certain profiles to have property requirements
-     * that cannot be met by automated means, thus requiring inteligent
-     * human/author action in the UI before this kind of test would pass.
-     */
+         * XXX It may be presumptuous to assume this should pass. This verifies that
+         * there are no property errors (e.g. missing required properties). It may
+         * be a conscious choice of certain profiles to have property requirements
+         * that cannot be met by automated means, thus requiring inteligent
+         * human/author action in the UI before this kind of test would pass.
+         */
     @Test
     @Ignore
     public void propertyErrorTest() {
