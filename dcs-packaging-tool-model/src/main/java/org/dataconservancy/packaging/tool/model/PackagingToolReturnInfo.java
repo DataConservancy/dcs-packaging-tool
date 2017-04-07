@@ -57,7 +57,8 @@ public enum PackagingToolReturnInfo {
     PKG_ASSEMBLER_INVALID_PARAMS (406, "One or more initial parameters for the package assembler was invalid "),
     PKG_ASSEMBLER_STRAY_FILE (407, "One or more of the files provided to the package assembler do not reside under the specified" +
             " content root location"),
-    PKG_ASSEMBLER_INVALID_FILENAME (408, "One or more of the files provided to the package assembler has an invalid file name."),
+    PKG_ASSEMBLER_INVALID_FILENAME (408, "One or more of the files provided to the package assembler has an invalid file name, or the file path was too long"),
+    PKG_ASSEMBLER_DUPLICATE_RESOURCE(409, "The resource at the specified path has already been reserved"),
 
     /* exception relating to Package Generator */
     PKG_UNEXPECTED_PACKAGING_FORMAT ( 501, "Package format provided was not as expected."),
