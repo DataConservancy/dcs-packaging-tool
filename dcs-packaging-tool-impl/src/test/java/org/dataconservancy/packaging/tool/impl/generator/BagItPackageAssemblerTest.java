@@ -15,7 +15,9 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
+import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -30,7 +32,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
 
 import org.dataconservancy.packaging.tool.api.Package;
-import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.model.BagItParameterNames;
 import org.dataconservancy.packaging.tool.model.GeneralParameterNames;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
@@ -75,6 +76,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:/test-applicationContext.xml"})
 public class BagItPackageAssemblerTest {
@@ -231,46 +234,28 @@ public class BagItPackageAssemblerTest {
     }
 
     @Test
-    public void testReserveURIFailsForBadDataFile(){
-        String filePath = "bad~file:name";
-        expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        underTest.reserveResource(filePath, PackageResourceType.DATA);
+    public void testReserveDuplicateResource() throws Exception {
+        underTest.reserveResource("path/to/file.txt", PackageResourceType.DATA);
+        try {
+            underTest.reserveResource("path/to/file.txt", PackageResourceType.DATA);
+            fail("Expected a PackageToolException to be thrown!");
+        } catch (PackageToolException e) {
+            // expected
+            assertEquals(409, e.getCode());
+        }
     }
 
     @Test
-    public void testReserveURIFailsForBadMetadataDataFile(){
-        String filePath = "bad~file:name";
-        expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        underTest.reserveResource(filePath, PackageResourceType.METADATA);
+    public void testCreateDuplicateResource() throws Exception {
+        underTest.createResource("path/to/file.txt", PackageResourceType.DATA, new NullInputStream(-1));
+        try {
+            underTest.createResource("path/to/file.txt", PackageResourceType.DATA, new NullInputStream(-1));
+            fail("Expected a PackageToolException to be thrown!");
+        } catch (PackageToolException e) {
+            // expected
+            assertEquals(409, e.getCode());
+        }
     }
-
-    @Test
-    public void testReserveURIFailsForBadReMFile(){
-        String filePath = "bad~file:name";
-        expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        underTest.reserveResource(filePath, PackageResourceType.ORE_REM);
-    }
-
-    @Test
-    public void testReserveURIFailsForBadOntologyFile(){
-        String filePath = "bad~file:name";
-        expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        underTest.reserveResource(filePath, PackageResourceType.ONTOLOGY);
-    }
-
-    @Test
-    public void testReserveURIFailsForBadStateFile(){
-        String filePath = "bad~file:name";
-        expected.expect(PackageToolException.class);
-        expected.expectMessage("One or more of the files provided to the package assembler has an invalid file name.");
-        underTest.reserveResource(filePath, PackageResourceType.PACKAGE_STATE);
-    }
-
-
 
     @Test
     public void testPutResource() throws IOException {

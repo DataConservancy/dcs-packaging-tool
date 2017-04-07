@@ -396,7 +396,12 @@ public class BagItPackageAssembler implements PackageAssembler {
                 relativeURI = URI.create(relativeURI.toString() + "/");
             }
 
-            fileURIMap.put(relativeURI, newFile.toURI());
+            URI reserved;
+            if ((reserved = fileURIMap.putIfAbsent(relativeURI, newFile.toURI())) != null) {
+                throw new PackageToolException(PackagingToolReturnInfo.PKG_ASSEMBLER_DUPLICATE_RESOURCE,
+                        String.format("%s has already been reserved as %s", newFile, relativeURI));
+            }
+
 
             if (!isDirectory) {
                 switch(type){
