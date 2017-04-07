@@ -16,5 +16,4 @@ release.properties
 *.releaseBackup
 *.bak
 bin/
-.gitattributes
 .gitignore
