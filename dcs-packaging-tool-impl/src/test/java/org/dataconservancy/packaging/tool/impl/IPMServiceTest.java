@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,7 +134,7 @@ public class IPMServiceTest {
 
         try {
             Files.createSymbolicLink(link, subdir.toPath());
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException | FileSystemException e) {
             /* Nothing we can do if the system doesn't support symlinks */
             return;
         }
@@ -166,7 +167,7 @@ public class IPMServiceTest {
 
         try {
             Files.createSymbolicLink(link, linkedFile.toPath());
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException | FileSystemException e) {
             /* Nothing we can do if the system doesn't support symlinks */
             return;
         }
@@ -203,7 +204,7 @@ public class IPMServiceTest {
 
         try {
             Files.createSymbolicLink(link, linkedDir.toPath());
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException | FileSystemException e) {
             /* Nothing we can do if the system doesn't support symlinks */
             return;
         }

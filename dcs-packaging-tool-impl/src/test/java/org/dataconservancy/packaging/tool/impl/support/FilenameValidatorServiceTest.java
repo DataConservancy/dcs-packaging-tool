@@ -26,6 +26,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,7 +52,7 @@ public class FilenameValidatorServiceTest {
 
         try {
             Files.createSymbolicLink(link, tempDir.toPath());
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException | FileSystemException e) {
             /* Nothing we can do if the system doesn't support symlinks */
             return;
         }
