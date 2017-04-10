@@ -1,2 +1,3 @@
-# Make sure line endings are correct for SER files so tests run on Windows
+# Make sure line endings are correct for files so tests run on Windows
 *.ser text eol=lf
+*.txt text eol=lf
