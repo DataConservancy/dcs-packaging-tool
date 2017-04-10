@@ -76,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -238,7 +239,9 @@ public class BagItPackageAssembler implements PackageAssembler {
             if (packageStagingLocationParameterValue != null && !packageStagingLocationParameterValue.isEmpty()) {
                 packageStagingLocationName = packageStagingLocationParameterValue;
             } else {
-                packageStagingLocationName = System.getProperty("java.io.tmpdir") + File.separator + "DCS-PackageToolStaging";
+                packageStagingLocationName = System.getProperty("java.io.tmpdir") +
+                        File.separator + "DCS-PackageToolStaging" +
+                        File.separator + UUID.randomUUID().toString();
             }
         }
 
