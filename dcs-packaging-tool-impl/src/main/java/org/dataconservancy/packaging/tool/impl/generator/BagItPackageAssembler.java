@@ -656,6 +656,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                     .createArchiveOutputStream(archivingFormat, new BufferedOutputStream(fos));
             if (aos instanceof TarArchiveOutputStream) {
                 ((TarArchiveOutputStream) aos).setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+                ((TarArchiveOutputStream) aos).setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_POSIX);
             }
             // Get to putting all the files in the compressed output file
             if (bagBaseDir.listFiles() != null) {

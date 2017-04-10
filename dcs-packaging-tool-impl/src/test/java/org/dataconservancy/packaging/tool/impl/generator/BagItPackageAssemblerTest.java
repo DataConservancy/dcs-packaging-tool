@@ -258,6 +258,21 @@ public class BagItPackageAssemblerTest {
     }
 
     @Test
+    public void testAssembleTarWithLargeFile() throws Exception {
+        PackageGenerationParameters params = new PackageGenerationParameters();
+        setupCommonPackageParams(params, packageMetadata);
+        params.removeParam(BagItParameterNames.ARCHIVING_FORMAT);
+        params.addParam(BagItParameterNames.ARCHIVING_FORMAT, ArchiveStreamFactory.TAR);
+
+        underTest = new BagItPackageAssembler();
+        underTest.init(params, packageMetadata);
+
+        underTest.createResource("path/to/largefile.bin", PackageResourceType.DATA,
+                new NullInputStream(077777777777L + 1));
+        underTest.assemblePackage();
+    }
+
+    @Test
     public void testPutResource() throws IOException {
         //Reserve a URI
         String filePath = "metadataFile.txt";
