@@ -30,12 +30,14 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 
+import static java.lang.Math.pow;
+
 public class PropertyFormatServiceImpl implements PropertyFormatService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     // array of labels used to format file size into B, kB, MB, GB, TB, PB, EB, ZB or YB value
     //TODO these should be moved into a resource somewhere so they can be changed, internationalized, etc.
-    private static final String[] sizeLabels = {" Bytes", " kB", " MB", " GB", " TB", " PB", " EB", " ZB", " YB"};
+    static final String[] sizeLabels = {" Bytes", " KiB", " MiB", " GiB", " TiB", " PiB", " EiB", " ZiB", " YiB"};
 
     @Override
     public String formatPropertyValue(Property value) {
@@ -74,17 +76,24 @@ public class PropertyFormatServiceImpl implements PropertyFormatService {
                     }
                     break;
                 case FILE_SIZE:
-                    final DecimalFormat twoDecimalForm = new DecimalFormat("#.##");
+                    final DecimalFormat bytes = new DecimalFormat("#");
+                    final DecimalFormat twoDecimalForm = new DecimalFormat("0.00");
                     double doubleValue = Double.parseDouble(rawPropertyValue);
-                    int i = 0;
-                    int test = 1;
-                    while (doubleValue >= test * 1000 &&
-                        i < sizeLabels.length - 1) {
-                        test *= 1000;
-                        i++;
+                    for (int pow = 1; pow <= 9; pow++) {
+                        String label = sizeLabels[pow - 1];
+                        DecimalFormat decFormat;
+                        if (pow == 1) {
+                            decFormat = bytes;
+                        } else {
+                            decFormat = twoDecimalForm;
+                        }
+
+                        if (doubleValue / pow(1024, pow) < 1 || pow == 9) {
+                            rawPropertyValue = String.format("%s%s",
+                                    decFormat.format(doubleValue / (pow(1024, pow - 1))), label);
+                            break;
+                        }
                     }
-                    String sizeLabel = (doubleValue == 1) ? " Byte" : sizeLabels[i];
-                    rawPropertyValue = twoDecimalForm.format(doubleValue / test) + sizeLabel;
                     break;
             }
         }

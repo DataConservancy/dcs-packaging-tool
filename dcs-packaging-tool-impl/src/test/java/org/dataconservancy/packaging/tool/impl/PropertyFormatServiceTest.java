@@ -59,7 +59,40 @@ public class PropertyFormatServiceTest {
         sizeType.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
         Property sizeProperty = new Property(sizeType);
         sizeProperty.setLongValue(4624327L);
-        assertEquals("4.62 MB", underTest.formatPropertyValue(sizeProperty));
+        assertEquals("4.41 MiB", underTest.formatPropertyValue(sizeProperty));
+
+        //Try the biggest allowable file size
+        sizeType = new PropertyType();
+        sizeType.setPropertyValueType(PropertyValueType.LONG);
+        sizeType.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
+        sizeProperty = new Property(sizeType);
+        sizeProperty.setLongValue(Long.parseUnsignedLong("9223372036854775807"));
+        assertEquals("8.00 EiB", underTest.formatPropertyValue(sizeProperty));
+
+        // Try the biggest allowable file size, plus 1
+        // TODO: whoopsie
+        sizeType = new PropertyType();
+        sizeType.setPropertyValueType(PropertyValueType.LONG);
+        sizeType.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
+        sizeProperty = new Property(sizeType);
+        sizeProperty.setLongValue(Long.parseUnsignedLong("9223372036854775807") + 1);
+        assertEquals("-9223372036854776000 Bytes", underTest.formatPropertyValue(sizeProperty));
+
+        //Try some bytes
+        sizeType = new PropertyType();
+        sizeType.setPropertyValueType(PropertyValueType.LONG);
+        sizeType.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
+        sizeProperty = new Property(sizeType);
+        sizeProperty.setLongValue(Long.parseUnsignedLong("1024"));
+        assertEquals("1.00 KiB", underTest.formatPropertyValue(sizeProperty));
+
+        //Try some bytes
+        sizeType = new PropertyType();
+        sizeType.setPropertyValueType(PropertyValueType.LONG);
+        sizeType.setPropertyValueHint(PropertyValueHint.FILE_SIZE);
+        sizeProperty = new Property(sizeType);
+        sizeProperty.setLongValue(Long.parseUnsignedLong("1023"));
+        assertEquals("1023 Bytes", underTest.formatPropertyValue(sizeProperty));
 
         //Tests that phone numbers are correctly formatted to remove uri prefix.
         PropertyType phoneType = new PropertyType();
