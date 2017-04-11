@@ -187,10 +187,11 @@ public class PackageGenerationTest {
         // assert that our sample problem files are in the content to be packaged
         assertTrue(originalFileLocations.stream().anyMatch(uri -> uri.getPath().endsWith("READMX")));
         // 0x0301 is the UTF-16 encoding of the 'COMBINING ACUTE ACCENT' combining diacritic
+        // 0x00c9 is the UTF-16 encoding of 'LATIN CAPITAL LETTER E WITH ACUTE'
         assertTrue(originalFileLocations.stream()
                 .peek(u -> System.err.println("'" + u.getPath() + "''"))
-                .anyMatch(uri -> uri.getPath().endsWith("README" + '\u0301')));
-        
+                .anyMatch(uri -> (uri.getPath().endsWith("README" + '\u0301')) || (uri.getPath().endsWith("READM" + '\u00c9'))));
+
         OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
         AtomicBoolean foundIllegal = new AtomicBoolean(Boolean.FALSE);
