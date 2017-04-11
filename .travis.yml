@@ -8,6 +8,7 @@ cache:
   directories:
     - $HOME/.m2
 before_script:
+  - df -H
   - echo "MAVEN_OPTS='-Xmx1024m'" > ~/.mavenrc
   - openssl aes-256-cbc -K $encrypted_e1c876630212_key -iv $encrypted_e1c876630212_iv -in settings.tar.enc -out settings.tar -d && tar -xf settings.tar && cat known_hosts >> ~/.ssh/known_hosts || true
 script:
