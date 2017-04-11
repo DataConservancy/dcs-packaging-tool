@@ -28,9 +28,7 @@
   </parent>
   
   <properties>
-    <dcs.pkg.tool.buildNumber>Local</dcs.pkg.tool.buildNumber>
-    <dcs.pkg.tool.buildTimeStamp>Local</dcs.pkg.tool.buildTimeStamp>
-    <dcs.pkg.tool.repository.revision.number>Local</dcs.pkg.tool.repository.revision.number>
+    <dcs.pkg.tool.buildNumber>${project.parent.version}</dcs.pkg.tool.buildNumber>
     <dcs.package.tool.package.dir>${project.build.testOutputDirectory}/generated-packages</dcs.package.tool.package.dir>
     <dcs.package.tool.staging.dir>${project.build.testOutputDirectory}/package-staging</dcs.package.tool.staging.dir>
   </properties>
@@ -73,11 +71,49 @@
         </plugin>
 
         <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>timestamp-property</id>
+              <goals>
+                <goal>timestamp-property</goal>
+              </goals>
+              <configuration>
+                <name>dcs.pkg.tool.buildTimeStamp</name>
+                <pattern>yyyy-MM-dd</pattern>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>create</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <doCheck>false</doCheck>
+            <doUpdate>false</doUpdate>
+            <shortRevisionLength>8</shortRevisionLength>
+            <buildNumberPropertyName>dcs.pkg.tool.repository.revision.number</buildNumberPropertyName>
+          </configuration>
+        </plugin>
+
+        <plugin>
           <groupId>com.zenjava</groupId>
           <artifactId>javafx-maven-plugin</artifactId>
           <configuration>
             <mainClass>org.dataconservancy.packaging.gui.App</mainClass>
             <additionalAppResources>${project.build.directory}/maven-shared-archive-resources</additionalAppResources>
+            <nativeReleaseVersion>1.0.4</nativeReleaseVersion>
+            <identifier>DC Package Tool</identifier>
           </configuration>
         </plugin>
 
