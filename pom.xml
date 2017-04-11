@@ -161,6 +161,11 @@
             <exclude>dcs-packaging-tool-gui/src/main/resources/**/*.help</exclude>
             <exclude>dcs-packaging-tool-gui/src/main/resources/userProperties.json</exclude>
             <exclude>dcs-packaging-tool-ontologies/src/main/resources/*.ttl</exclude>
+            <exclude>.travis.yml</exclude>
+            <exclude>settings.tar</exclude>
+            <exclude>settings.tar.enc</exclude>
+            <exclude>known_hosts</exclude>
+            <exclude>settings.xml</exclude>
           </excludes>
         </configuration>
         <executions>
