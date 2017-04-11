@@ -172,6 +172,7 @@
             <exclude>settings.tar.enc</exclude>
             <exclude>known_hosts</exclude>
             <exclude>settings.xml</exclude>
+            <exclude>**/**identity**</exclude>
           </excludes>
         </configuration>
         <executions>
