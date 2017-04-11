@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
@@ -143,7 +144,7 @@ public class BagItPackageAssemblerTest {
     }
 
     @After
-    public void cleanUp() {
+    public void cleanUp() throws IOException {
         File packageDir = new File(packageLocationName);
         cleanupDirectory(packageDir);
 
@@ -156,9 +157,10 @@ public class BagItPackageAssemblerTest {
         }
 
         File tempArchive = new File(packageName + ".tar");
-        tempArchive.deleteOnExit();
+        FileUtils.forceDeleteOnExit(tempArchive);
+
         File fakeArchive = new File(packageName + ".fake");
-        fakeArchive.deleteOnExit();
+        FileUtils.forceDeleteOnExit(fakeArchive);
     }
 
     @Test
@@ -915,7 +917,7 @@ public class BagItPackageAssemblerTest {
         packageMetadata.put(BagItParameterNames.PACKAGE_MANIFEST, Collections.singletonList(RemURI));
     }
 
-    private void cleanupDirectory(File directory) {
+    private void cleanupDirectory(File directory) throws IOException {
         if (!directory.isDirectory()) return;
 
         for (File f : directory.listFiles()) {
@@ -923,8 +925,11 @@ public class BagItPackageAssemblerTest {
                 cleanupDirectory(f);
             }
 
-            if (!f.delete()) {
-                log.info("Couldn't delete: " + f.getPath());
+            try {
+                FileUtils.forceDelete(f);
+            } catch (IOException e) {
+                log.info("Couldn't delete: " + f.getPath() + ": " + e.getMessage());
+                throw e;
             }
         }
     }
