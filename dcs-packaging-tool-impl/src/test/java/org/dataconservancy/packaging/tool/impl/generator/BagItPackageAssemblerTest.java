@@ -16,6 +16,7 @@
 package org.dataconservancy.packaging.tool.impl.generator;
 
 import org.apache.commons.io.DirectoryWalker;
+import org.apache.commons.io.FileSystemUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
@@ -65,6 +66,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
@@ -124,7 +128,18 @@ public class BagItPackageAssemblerTest {
     public TestName testName = new TestName();
 
     @Before
-    public void setUp() throws URISyntaxException {
+    public void setUp() throws URISyntaxException, IOException {
+
+        for (FileStore store: FileSystems.getDefault().getFileStores()) {
+            long total = store.getTotalSpace() / 1024 / 1024 / 1024;
+            long used = (store.getTotalSpace() - store.getUnallocatedSpace()) / 1024 / 1024 /1024;
+            long avail = store.getUsableSpace() / 1024 / 1024 / 1024;
+            System.err.format("%s %-20s total: %12d used: %12d avail: %12d%n",
+                    testName.getMethodName(),
+                    store, total, used, avail);
+        }
+
+
         //Set up parameters
         packageName = "WillardDoodle";
         packageLocationName = packageLocation.getAbsolutePath();
@@ -160,7 +175,7 @@ public class BagItPackageAssemblerTest {
 
         walker.doWalk(packageDir);
         System.err.printf("Before clean-up: %s#%s: total size of files under %s: %s GiB\n",
-                testName.getClass().getName(),
+                this.getClass().getName(),
                 testName.getMethodName(),
                 packageDir.getAbsolutePath(),
                 String.valueOf(packageFiles.stream()
@@ -186,7 +201,7 @@ public class BagItPackageAssemblerTest {
         FileUtils.forceDeleteOnExit(fakeArchive);
 
         System.err.printf("After clean-up: %s#%s: total size of files under %s: %s GiB\n",
-                testName.getClass().getName(),
+                this.getClass().getName(),
                 testName.getMethodName(),
                 packageDir.getAbsolutePath(),
                 String.valueOf(packageFiles.stream().filter(File::isFile).mapToLong(f -> Long.parseUnsignedLong(String.valueOf(f.length()))).sum()/1024/1024/1024));
