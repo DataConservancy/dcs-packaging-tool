@@ -12,8 +12,8 @@ before_script:
   - echo "MAVEN_OPTS='-Xmx1024m'" > ~/.mavenrc
   - openssl aes-256-cbc -K $encrypted_e1c876630212_key -iv $encrypted_e1c876630212_iv -in settings.tar.enc -out settings.tar -d && tar -xf settings.tar && cat known_hosts >> ~/.ssh/known_hosts || true
 script:
-  - true ; [[ $TRAVIS_PULL_REQUEST != "false" ]] && mvn verify || false
-  - true ; [[ $TRAVIS_PULL_REQUEST == "false" ]] && mvn -s ./settings.xml deploy || false
+  - true ; [[ $TRAVIS_PULL_REQUEST != "false" ]] && mvn -Pconstrained verify || false
+  - true ; [[ $TRAVIS_PULL_REQUEST == "false" ]] && mvn -Pconstrained -s ./settings.xml deploy || false
 jdk:
   - oraclejdk8
 after_script:

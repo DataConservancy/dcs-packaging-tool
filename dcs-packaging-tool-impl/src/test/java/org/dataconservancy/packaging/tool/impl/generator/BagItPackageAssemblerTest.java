@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
+import org.dataconservancy.packaging.tool.impl.ResourceConstrained;
 import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -45,6 +46,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
@@ -313,6 +315,7 @@ public class BagItPackageAssemblerTest {
         }
     }
 
+    @Category(ResourceConstrained.class)
     @Test
     public void testAssembleTarWithLargeFile() throws Exception {
         PackageGenerationParameters params = new PackageGenerationParameters();
