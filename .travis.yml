@@ -4,11 +4,13 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+      - xvfb
 cache:
   directories:
     - $HOME/.m2
 before_script:
-  - df -H
+  - Xvfb :99 &>/dev/null &
+  - export DISPLAY=:99
   - echo "MAVEN_OPTS='-Xmx1024m'" > ~/.mavenrc
   - openssl aes-256-cbc -K $encrypted_e1c876630212_key -iv $encrypted_e1c876630212_iv -in settings.tar.enc -out settings.tar -d && tar -xf settings.tar && cat known_hosts >> ~/.ssh/known_hosts || true
 script:
@@ -16,5 +18,3 @@ script:
   - true ; [[ $TRAVIS_PULL_REQUEST == "false" ]] && mvn -Pconstrained -s ./settings.xml deploy || false
 jdk:
   - oraclejdk8
-after_script:
-  - df -H
