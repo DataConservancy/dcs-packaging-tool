@@ -187,8 +187,10 @@ public class PackageGenerationTest {
         // assert that our sample problem files are in the content to be packaged
         assertTrue(originalFileLocations.stream().anyMatch(uri -> uri.getPath().endsWith("READMX")));
         // 0x0301 is the UTF-16 encoding of the 'COMBINING ACUTE ACCENT' combining diacritic
-        assertTrue(originalFileLocations.stream().anyMatch(uri -> uri.getPath().endsWith("README" + '\u0301')));
-
+        assertTrue(originalFileLocations.stream()
+                .peek(u -> System.err.println("'" + u.getPath() + "''"))
+                .anyMatch(uri -> uri.getPath().endsWith("README" + '\u0301')));
+        
         OpenedPackage opened = packager.createPackage(state, folder.getRoot());
 
         AtomicBoolean foundIllegal = new AtomicBoolean(Boolean.FALSE);
