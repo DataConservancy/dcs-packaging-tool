@@ -216,7 +216,8 @@ public class PackageGenerationTest {
 
                     // this should not happen, because a file name with invalid characters should have
                     // been remediated prior to being inserted into the package
-                    if (node.getFileInfo().getLocation().getPath().endsWith("README" + '\u0301')) {
+                    if (node.getFileInfo().getLocation().getPath().endsWith("README" + '\u0301') ||
+                            node.getFileInfo().getLocation().getPath().endsWith("READM" + '\u00c9') ) {
                         foundIllegal.set(Boolean.TRUE);
                     }
 
