@@ -16,3 +16,5 @@ script:
   - true ; [[ $TRAVIS_PULL_REQUEST == "false" ]] && mvn -s ./settings.xml deploy || false
 jdk:
   - oraclejdk8
+after_script:
+  - df -H
