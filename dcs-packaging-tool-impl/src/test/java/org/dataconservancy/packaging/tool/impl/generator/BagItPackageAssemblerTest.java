@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import org.apache.commons.io.DirectoryWalker;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
@@ -44,6 +45,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 import org.slf4j.Logger;
@@ -65,6 +67,8 @@ import java.net.URL;
 
 import java.nio.file.Paths;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,6 +120,9 @@ public class BagItPackageAssemblerTest {
     @Rule
     public ExpectedException expected = ExpectedException.none();
 
+    @Rule
+    public TestName testName = new TestName();
+
     @Before
     public void setUp() throws URISyntaxException {
         //Set up parameters
@@ -146,6 +153,22 @@ public class BagItPackageAssemblerTest {
     @After
     public void cleanUp() throws IOException {
         File packageDir = new File(packageLocationName);
+
+        List<File> packageFiles = new ArrayList<>();
+
+        FileDirectoryWalker walker = new FileDirectoryWalker(packageFiles);
+
+        walker.doWalk(packageDir);
+        System.err.printf("Before clean-up: %s#%s: total size of files under %s: %s GiB\n",
+                testName.getClass().getName(),
+                testName.getMethodName(),
+                packageDir.getAbsolutePath(),
+                String.valueOf(packageFiles.stream()
+                        .filter(File::isFile)
+                        .peek(f -> System.err.println("!!! Summing " + f.getName()))
+                        .mapToLong(f ->
+                                Long.parseUnsignedLong(String.valueOf(f.length()))).sum() / 1024 / 1024 / 1024));
+
         cleanupDirectory(packageDir);
 
         File tempDir = new File(packageName);
@@ -161,6 +184,12 @@ public class BagItPackageAssemblerTest {
 
         File fakeArchive = new File(packageName + ".fake");
         FileUtils.forceDeleteOnExit(fakeArchive);
+
+        System.err.printf("After clean-up: %s#%s: total size of files under %s: %s GiB\n",
+                testName.getClass().getName(),
+                testName.getMethodName(),
+                packageDir.getAbsolutePath(),
+                String.valueOf(packageFiles.stream().filter(File::isFile).mapToLong(f -> Long.parseUnsignedLong(String.valueOf(f.length()))).sum()/1024/1024/1024));
     }
 
     @Test
@@ -931,6 +960,24 @@ public class BagItPackageAssemblerTest {
                 log.info("Couldn't delete: " + f.getPath() + ": " + e.getMessage());
                 throw e;
             }
+        }
+    }
+
+    private static class FileDirectoryWalker extends DirectoryWalker<File> {
+        private final List<File> packageFiles;
+
+        public FileDirectoryWalker(List<File> packageFiles) {
+            this.packageFiles = packageFiles;
+        }
+
+        @Override
+        protected void handleFile(File file, int depth, Collection<File> results) throws IOException {
+            System.err.println("*** Handling " + file.getName());
+            packageFiles.add(file);
+        }
+
+        public void doWalk(File baseDir) throws IOException {
+            walk(baseDir, packageFiles);
         }
     }
 }
