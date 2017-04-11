@@ -167,6 +167,16 @@ public class BagItPackageAssemblerTest {
 
     @After
     public void cleanUp() throws IOException {
+
+        for (FileStore store: FileSystems.getDefault().getFileStores()) {
+            long total = store.getTotalSpace() / 1024 / 1024 / 1024;
+            long used = (store.getTotalSpace() - store.getUnallocatedSpace()) / 1024 / 1024 /1024;
+            long avail = store.getUsableSpace() / 1024 / 1024 / 1024;
+            System.err.format("%s %-20s total: %12d used: %12d avail: %12d%n",
+                    testName.getMethodName(),
+                    store, total, used, avail);
+        }
+        
         File packageDir = new File(packageLocationName);
 
         List<File> packageFiles = new ArrayList<>();
