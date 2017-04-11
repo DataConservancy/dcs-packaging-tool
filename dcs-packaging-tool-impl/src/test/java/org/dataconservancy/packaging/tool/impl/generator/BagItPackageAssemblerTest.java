@@ -15,9 +15,13 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import org.apache.commons.io.DirectoryWalker;
+import org.apache.commons.io.FileSystemUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
+import org.dataconservancy.packaging.tool.impl.ResourceConstrained;
 import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -42,7 +46,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 import org.slf4j.Logger;
@@ -62,8 +68,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -115,8 +126,22 @@ public class BagItPackageAssemblerTest {
     @Rule
     public ExpectedException expected = ExpectedException.none();
 
+    @Rule
+    public TestName testName = new TestName();
+
     @Before
-    public void setUp() throws URISyntaxException {
+    public void setUp() throws URISyntaxException, IOException {
+
+        for (FileStore store: FileSystems.getDefault().getFileStores()) {
+            long total = store.getTotalSpace() / 1024 / 1024 / 1024;
+            long used = (store.getTotalSpace() - store.getUnallocatedSpace()) / 1024 / 1024 /1024;
+            long avail = store.getUsableSpace() / 1024 / 1024 / 1024;
+            System.err.format("%s %-20s total: %12d used: %12d avail: %12d%n",
+                    testName.getMethodName(),
+                    store, total, used, avail);
+        }
+
+
         //Set up parameters
         packageName = "WillardDoodle";
         packageLocationName = packageLocation.getAbsolutePath();
@@ -143,8 +168,34 @@ public class BagItPackageAssemblerTest {
     }
 
     @After
-    public void cleanUp() {
+    public void cleanUp() throws IOException {
+
+        for (FileStore store: FileSystems.getDefault().getFileStores()) {
+            long total = store.getTotalSpace() / 1024 / 1024 / 1024;
+            long used = (store.getTotalSpace() - store.getUnallocatedSpace()) / 1024 / 1024 /1024;
+            long avail = store.getUsableSpace() / 1024 / 1024 / 1024;
+            System.err.format("%s %-20s total: %12d used: %12d avail: %12d%n",
+                    testName.getMethodName(),
+                    store, total, used, avail);
+        }
+        
         File packageDir = new File(packageLocationName);
+
+        List<File> packageFiles = new ArrayList<>();
+
+        FileDirectoryWalker walker = new FileDirectoryWalker(packageFiles);
+
+        walker.doWalk(packageDir);
+        System.err.printf("Before clean-up: %s#%s: total size of files under %s: %s GiB\n",
+                this.getClass().getName(),
+                testName.getMethodName(),
+                packageDir.getAbsolutePath(),
+                String.valueOf(packageFiles.stream()
+                        .filter(File::isFile)
+                        .peek(f -> System.err.println("!!! Summing " + f.getName()))
+                        .mapToLong(f ->
+                                Long.parseUnsignedLong(String.valueOf(f.length()))).sum() / 1024 / 1024 / 1024));
+
         cleanupDirectory(packageDir);
 
         File tempDir = new File(packageName);
@@ -156,9 +207,16 @@ public class BagItPackageAssemblerTest {
         }
 
         File tempArchive = new File(packageName + ".tar");
-        tempArchive.deleteOnExit();
+        FileUtils.forceDeleteOnExit(tempArchive);
+
         File fakeArchive = new File(packageName + ".fake");
-        fakeArchive.deleteOnExit();
+        FileUtils.forceDeleteOnExit(fakeArchive);
+
+        System.err.printf("After clean-up: %s#%s: total size of files under %s: %s GiB\n",
+                this.getClass().getName(),
+                testName.getMethodName(),
+                packageDir.getAbsolutePath(),
+                String.valueOf(packageFiles.stream().filter(File::isFile).mapToLong(f -> Long.parseUnsignedLong(String.valueOf(f.length()))).sum()/1024/1024/1024));
     }
 
     @Test
@@ -257,6 +315,7 @@ public class BagItPackageAssemblerTest {
         }
     }
 
+    @Category(ResourceConstrained.class)
     @Test
     public void testAssembleTarWithLargeFile() throws Exception {
         PackageGenerationParameters params = new PackageGenerationParameters();
@@ -915,7 +974,7 @@ public class BagItPackageAssemblerTest {
         packageMetadata.put(BagItParameterNames.PACKAGE_MANIFEST, Collections.singletonList(RemURI));
     }
 
-    private void cleanupDirectory(File directory) {
+    private void cleanupDirectory(File directory) throws IOException {
         if (!directory.isDirectory()) return;
 
         for (File f : directory.listFiles()) {
@@ -923,9 +982,30 @@ public class BagItPackageAssemblerTest {
                 cleanupDirectory(f);
             }
 
-            if (!f.delete()) {
-                log.info("Couldn't delete: " + f.getPath());
+            try {
+                FileUtils.forceDelete(f);
+            } catch (IOException e) {
+                log.info("Couldn't delete: " + f.getPath() + ": " + e.getMessage());
+                throw e;
             }
+        }
+    }
+
+    private static class FileDirectoryWalker extends DirectoryWalker<File> {
+        private final List<File> packageFiles;
+
+        public FileDirectoryWalker(List<File> packageFiles) {
+            this.packageFiles = packageFiles;
+        }
+
+        @Override
+        protected void handleFile(File file, int depth, Collection<File> results) throws IOException {
+            System.err.println("*** Handling " + file.getName());
+            packageFiles.add(file);
+        }
+
+        public void doWalk(File baseDir) throws IOException {
+            walk(baseDir, packageFiles);
         }
     }
 }
