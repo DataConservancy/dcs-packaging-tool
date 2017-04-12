@@ -46,13 +46,100 @@ Clone this repository.
 
  `mvn clean install`
   
-Some tests require creating symbolic linksx which is a priviliged operation on Windows.  To run tests without tests requiring escalated privileges:
+Some tests require creating symbolic links which is a privileged operation on Windows.  To run all tests _except_ those requiring escalated privileges:
 `mvn clean install -P unprivileged`
+
+Some tests also create large, temporary, files for testing (~8 GB) which may not be accommodated by machines with limited resources.  To run all tests _except_ those requiring large amounts of resources:
+ `mvn clean install -P constrained` 
+ 
+ You can skip both kinds of tests by running:
+ `mvn clean install -Pconstrained,unprivileged`
+
 
 #### To run the package tool GUI ####
 
     cd dcs-packaging-tool-gui
     mvn jfx:run
+    
+### Creating a release ###
+
+#### Requirements
+
+* Oracle Java 8 >= 1.8.0-40
+* Maven 3.3.9 or greater
+
+#### Preparation
+
+* Releases are cut from the `master` branch
+* The `HEAD` commit hash of `master` for your local git repository should match the `HEAD` commit hash of your `https://github.com/DataConservancy/dcs-packaging-tool.git` remote (named `upstream`, in these instructions) 
+  * e.g. the commit shown by `git show master` and `git show upstream/master` should be the same
+* There should be no modified, unversioned, or staged files in your local git repository (check with `git status`)
+* The Travis build for `master` should be green
+* Know what version you are releasing (e.g. `1.0.4`)
+* Know what the next development version should be (e.g. `1.0.5-SNAPSHOT`)
+* Note the commit hash of `HEAD`, useful if you need to roll back
+
+#### Perform the release
+
+* `mvn release:prepare`
+  * Bumps the version in the POMs to the release version (e.g. from `1.0.4-SNAPSHOT` to `1.0.4`)
+  * Tags the release
+  * Checks out the newly created tag
+  * Builds the tag
+
+At this point, you can look at your git commit log to see if everything looks ok.  Nothing has been pushed yet, so if you see a mistake, it is easy to roll back.  To roll back:
+ * `mvn release:clean`
+ * `git reset --hard HEAD^`
+ * `git tag -D <newly created tag>` (use `git tag` to list the tags)
+ 
+ If all goes well with `mvn release:prepare`, then you're ready to _perform_ the release.
+ 
+ * `mvn release:perform`
+   * Deploys release artifacts to the Maven repository
+   * Bumps the version in the POMs to the next development version (e.g. from `1.0.4` to `1.0.5-SNAPSHOT`)
+   
+At this point, you can _still_ look at your git commit log to see if everything looks ok!  Nothing has been pushed yet, so if you see a mistake, it is _mostly_ easy to roll back.  To roll back:
+
+ * `mvn release:clean`
+ * `git reset --hard HEAD^^`
+ * `git tag -D <newly created tag>` (use `git tag` to list the tags)
+ * Depending on the situation, you may need to delete deployed release artifacts from the Maven repository
+ 
+If all went well with `mvn release:perform`, push your changes to `https://github.com/DataConservancy/dcs-packaging-tool.git`, making the release official.  Alternately, open a PR, which will make the release official upon merging.
+
+Finally, push the tags to `https://github.com/DataConservancy/dcs-packaging-tool.git` (`git push --tags upstream`).
+
+#### Create native installers
+
+After the release has been pushed to `master`, native installers for MacOS, Windows, and Linux need to be created.
+
+They _must_ be created from the release tag.  This insures that build metadata like the commit hash, the tag, and version number of the tool are consistent across the three platforms, and of course, insures that they are all cut from identical code.
+
+* `git checkout <tag>`
+
+##### MacOS
+
+To create the MacOS native installer, cd into `dcs-package-tool-gui`, and run:
+ 
+ * `mvn clean jfx:native`
+ 
+ The installer will be located at `dcs-packaging-tool-gui/target/jfx/native/DC Package Tool-1.0.4.dmg`
+ 
+ ##### Linux
+ 
+ * TODO
+ 
+ ##### Windows
+ 
+ * TODO
+
+
+#### Create GitHub release
+
+* A release should be created on the GitHub releases [page][gh-releases]
+* Some release notes should be prepared, summarizing major changes
+* The native installers should be uploaded to the release page, and their checksums noted
+
 
 [bagit]: http://www.ietf.org/id/draft-kunze-bagit-12.txt "BagIt 0.97"
 [bagit-profile]: http://dataconservancy.github.io/dc-packaging-spec/dc-bagit-profile-1.0.html "Data Conservancy BagIt Profile"
