@@ -18,6 +18,7 @@ package org.dataconservancy.packaging.tool.impl;
  */
 
 
+import org.apache.commons.io.DirectoryWalker;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
 import org.dataconservancy.packaging.tool.impl.support.FilenameValidatorService;
@@ -26,12 +27,13 @@ import org.dataconservancy.packaging.tool.model.ipm.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +41,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class IPMServiceImpl implements IPMService {
-    private Set<Path> visitedFiles = new HashSet<>();
+    private Map<URI, File> fileUris = new HashMap<>();
+    private Map<File, Node> fileToNode = new HashMap<>();
+    private Set<Node> visitedFiles = new HashSet<>();
     private final URIGenerator uriGenerator;
     private FilenameValidatorService validatorService;
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -53,90 +57,44 @@ public class IPMServiceImpl implements IPMService {
     public Node createTreeFromFileSystem(Path path) throws IOException {
 
         visitedFiles.clear();
-        Node root;
-        root = createTree(null, path);
+        fileUris.clear();
+        fileToNode.clear();
 
-        return root;
-    }
+        Walker walker = new Walker();
 
-    /*
-     * Creates a Node in the tree for the given path, and will recurse the file structure to add all child files and folders.
-     */
-    private Node createTree(Node parent, Path path) throws IOException {
-        //Check if the process is being cancelled by GUI
-        if (Thread.currentThread().isInterrupted()) {
-            return null;
-        }
-
-        //Tests to ensure any symbolic links do not create cycles in the tree.
-        try {
-            if (visitedFiles.contains(path.toRealPath())) {
-                if (Files.isSymbolicLink(path)) {
-                    log.warn("Symbolic link cycle detected." +
-                                              "Fix offending symbolic link at " +
-                                              path.toFile().toString() +
-                                              ", which points to " +
-                                              path.toRealPath());
-                    return null;
-                } else {
-                    log.warn("Symbolic link cycle detected." +
-                                              "There is a symbolic link under " +
-                                              path.getRoot().toString() +
-                                              " which points to " + path +
-                                              ".  Find the link and remove it.");
-                    return null;
-                }
-            } else {
-                visitedFiles.add(path.toRealPath());
+        Thread walkerThread = new Thread(() -> {
+            try {
+                walker.doWalk(path.toFile(), visitedFiles);
+            } catch (IOException e) {
+                walker.cancel();
             }
-        } catch (IOException e) {
-            log.error("Error getting path for file", e);
-            throw new IOException(
-                "Error determining canonical path of " + path.toFile(), e);
-        }
+        });
 
-        Node node = null;
-        //Just as a fail safe ensure the file exists before adding.
-        if (path.toRealPath().toFile().exists()) {
+        walkerThread.start();
 
-            node = new Node(uriGenerator.generateNodeURI());
-
-            FileInfo info = new FileInfo(path.toRealPath());
-            node.setFileInfo(info);
-
-            //If it's not the root set the parent child information.
-            if (parent != null) {
-                parent.addChild(node);
-
-                //If the parent of this new node was previously ignored, ignore this node as well.
-                if (parent.isIgnored()) {
-                    node.setIgnored(true);
-                }
-
-                node.setParent(parent);
+        while (walkerThread.isAlive()) {
+            if (Thread.currentThread().isInterrupted()) {
+                walker.cancel();
             }
-
-            //If the file is hidden or starts with a "." set it to ignored.
-            //The "." semantics are carried over from the old rules based approach.
-            //but do not ignore the root node in any case
-            if (parent != null && (Files.isHidden(path.toRealPath()) || path.toRealPath().getFileName().toString().startsWith("."))) {
-                node.setIgnored(true);
-            }
-
-            //If the path represents a directory loop through all children and add them to the tree.
-            if (Files.isDirectory(path.toRealPath())) {
-                DirectoryStream<Path> stream = Files.newDirectoryStream(path.toRealPath());
-                for (Path childPath : stream) {
-                    if (Thread.currentThread().isInterrupted()) {
-                        break;
-                    }
-                    createTree(node, childPath);
-                }
-
+            try {
+                walkerThread.join(1000 * 5);
+            } catch (InterruptedException e) {
+                // ignore
             }
         }
-        
-        return node;
+
+        visitedFiles.parallelStream().forEach(visitedNode -> {
+            final File file = fileUris.get(visitedNode.getIdentifier());
+            final FileInfo fi;
+            try {
+                fi = new FileInfo(file.toPath().toRealPath());
+                visitedNode.setFileInfo(fi);
+            } catch (IOException e) {
+                log.warn("Unable to resolve file path '{}': {}", file.toPath(), e.getMessage(), e);
+            }
+        });
+
+        return walker.getRoot();
     }
 
     @Override
@@ -468,6 +426,110 @@ public class IPMServiceImpl implements IPMService {
                 }
             }
             throw new IOException("Error creating package tree. The following names were invalid:\n\n" + invalidNames);
+        }
+    }
+
+    private class Walker extends DirectoryWalker<Node> {
+
+        private boolean verifyExists = true;
+
+        private boolean ignoreHidden = true;
+
+        private boolean ignoreDot = true;
+
+        private Node root = null;
+
+        private Path rootPath = null;
+
+        private volatile boolean cancelled = false;
+
+        private Walker() {
+
+        }
+
+        private Walker(boolean verifyExists, boolean ignoreHidden, boolean ignoreDot) {
+            this.verifyExists = verifyExists;
+            this.ignoreHidden = ignoreHidden;
+            this.ignoreDot  = ignoreDot;
+        }
+
+        private void doWalk(File baseDir, Collection<Node> results) throws IOException {
+            super.walk(baseDir, results);
+        }
+
+        @Override
+        protected boolean handleDirectory(File directory, int depth, Collection<Node> results) throws IOException {
+            return handle(directory, depth, results);
+        }
+
+        @Override
+        protected void handleFile(File file, int depth, Collection<Node> results) throws IOException {
+            handle(file, depth, results);
+        }
+
+        private boolean handle(File file, int depth, Collection<Node> results) throws IOException {
+            final Path fileAsPath = file.toPath();
+
+            if (Files.isSymbolicLink(fileAsPath) && fileAsPath.toRealPath().startsWith(rootPath)) {
+                // ignore: the symbolic link is targeting a file underneath the root
+                return false;
+            }
+
+            final URI nodeUri = uriGenerator.generateNodeURI();
+            final Node node = new Node(nodeUri);
+
+            fileUris.put(nodeUri, file);
+            fileToNode.put(file, node);
+            results.add(node);
+
+            if (root == null) {
+                root = node;
+                rootPath = fileAsPath.toRealPath();
+            } else {
+                Node parent = fileToNode.get(file.getParentFile());
+                node.setParent(parent);
+                parent.addChild(node);
+            }
+
+            if (Files.isHidden(fileAsPath) && ignoreHidden) {
+                node.setIgnored(true);
+            }
+
+            if (fileAsPath.getFileName().startsWith(".") && ignoreDot) {
+                node.setIgnored(true);
+            }
+
+            if (node.getParent() != null && node.getParent().isIgnored()) {
+                node.setIgnored(node.getParent().isIgnored());
+            }
+
+            if (!verifyExists || file.exists()) {
+                results.add(node);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void cancel() {
+            cancelled = true;
+        }
+
+        @Override
+        protected void handleCancelled(File startDirectory, Collection<Node> results, CancelException cancel)
+                throws IOException {
+            visitedFiles.clear();
+            fileUris.clear();
+            fileToNode.clear();
+        }
+
+        @Override
+        protected boolean handleIsCancelled(File file, int depth, Collection<Node> results) throws IOException {
+            return cancelled;
+        }
+
+        private Node getRoot() {
+            return root;
         }
     }
 }

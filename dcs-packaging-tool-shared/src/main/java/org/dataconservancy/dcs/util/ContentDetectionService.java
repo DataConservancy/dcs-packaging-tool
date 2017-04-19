@@ -41,7 +41,8 @@ public class ContentDetectionService {
 
     private DroidDriver droidDriver = new DroidDriver();
 
-    private static final ContentDetectionService contentDetectionService = new ContentDetectionService();
+    private static final ThreadLocal<ContentDetectionService> contentDetectionService =
+            ThreadLocal.withInitial(ContentDetectionService::new);
 
 
     /**
@@ -56,7 +57,7 @@ public class ContentDetectionService {
      * @return an instance of ContentDetectionService
      */
     public static ContentDetectionService getInstance() {
-        return contentDetectionService;
+        return contentDetectionService.get();
     }
 
 

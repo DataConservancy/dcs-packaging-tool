@@ -18,6 +18,7 @@ package org.dataconservancy.packaging.tool.model.ipm;
  */
 
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -25,13 +26,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.dataconservancy.dcs.model.DetectedFormat;
-import org.dataconservancy.dcs.util.ChecksumGeneratorVerifier;
 import org.dataconservancy.dcs.util.ContentDetectionService;
 
 /**
@@ -64,15 +71,32 @@ public class FileInfo {
                 checksums = new HashMap<>();
                 formats = new ArrayList<>();
 
-                InputStream md5Fis = Files.newInputStream(path);
-                String md5Checksum = ChecksumGeneratorVerifier.generateMD5checksum(md5Fis);
-                checksums.put(Algorithm.MD5, md5Checksum);
-                md5Fis.close();
+                MessageDigest md5 = null;
+                MessageDigest sha1 = null;
 
-                InputStream sha1Fis = Files.newInputStream(path);
-                String sha1Checksum = ChecksumGeneratorVerifier.generateSHA1checksum(sha1Fis);
-                checksums.put(Algorithm.SHA1, sha1Checksum);
-                sha1Fis.close();
+                try {
+                    md5 = MessageDigest.getInstance("MD5");
+                    sha1 = MessageDigest.getInstance("SHA-1");
+                } catch (NoSuchAlgorithmException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+
+                try (ChecksumCalculatingInputStream in = new ChecksumCalculatingInputStream(
+                        Files.newInputStream(path), Arrays.asList(md5, sha1))) {
+
+                    IOUtils.copy(in, new NullOutputStream());
+
+                    in.digests().forEach((md, digest) -> {
+                        String encoded = Hex.encodeHexString(digest);
+                        if (md.getAlgorithm().equals("MD5")) {
+                            checksums.put(Algorithm.MD5, encoded);
+                        }
+
+                        if (md.getAlgorithm().equals("SHA-1")) {
+                            checksums.put(Algorithm.SHA1, encoded);
+                        }
+                    });
+                }
 
                 List<DetectedFormat> fileFormats = ContentDetectionService.getInstance().detectFormats(path.toFile());
                 for (DetectedFormat format : fileFormats) {
@@ -540,6 +564,47 @@ public class FileInfo {
             return "FileInfoAttributes [lastModifiedTime=" + lastModifiedTime + ", creationTime=" + creationTime
                     + ", isRegularFile=" + isRegularFile + ", isDirectory=" + isDirectory + ", isSymbolicLink="
                     + isSymbolicLink + ", size=" + size + "]";
+        }
+    }
+
+    static class ChecksumCalculatingInputStream extends FilterInputStream {
+
+        private Collection<MessageDigest> digests;
+
+        protected ChecksumCalculatingInputStream(InputStream in, Collection<MessageDigest> digests) {
+            super(in);
+            this.digests = digests;
+        }
+
+        @Override
+        public int read() throws IOException {
+            int b = super.read();
+
+            if (b > -1) {
+                digests.forEach(md -> md.update((byte)b));
+            }
+
+            return b;
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return this.read(b, 0, b.length);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            int count = super.read(b, off, len);
+
+            if (count > -1) {
+                digests.forEach(md -> md.update(b, off, count));
+            }
+
+            return count;
+        }
+
+        Map<MessageDigest, byte[]> digests() {
+            return digests.stream().collect(HashMap::new, (map, md) -> map.put(md, md.digest()), HashMap::putAll);
         }
     }
 }
