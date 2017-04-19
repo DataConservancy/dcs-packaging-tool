@@ -86,7 +86,7 @@ public class RdfUtil {
         /* Add all triples that are related fragments */
         String baseURI = bare(subject.toString());
         subject.getModel().listSubjects()
-                .filterKeep(s -> s.toString().startsWith(baseURI))
+                .filterKeep(s -> bare(s.toString()).equals(baseURI))
                 .forEachRemaining(subjects::add);
 
         /* All traversable blank nodes are also included */

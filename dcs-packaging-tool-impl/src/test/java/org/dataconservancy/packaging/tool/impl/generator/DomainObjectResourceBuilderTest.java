@@ -23,6 +23,7 @@ import java.net.URL;
 
 import java.nio.file.Paths;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
@@ -40,6 +41,7 @@ import org.dataconservancy.packaging.tool.api.generator.PackageAssembler;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
 import org.dataconservancy.packaging.tool.impl.SimpleURIGenerator;
 import org.dataconservancy.packaging.tool.impl.URIGenerator;
+import org.dataconservancy.packaging.tool.impl.generator.mocks.MockPackageAssembler;
 import org.dataconservancy.packaging.tool.model.PackageGenerationParameters;
 import org.dataconservancy.packaging.tool.model.PackageToolException;
 import org.dataconservancy.packaging.tool.model.PackagingToolReturnInfo;
@@ -59,12 +61,15 @@ import static org.dataconservancy.packaging.tool.impl.generator.IPMUtil.path;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.endsWith;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -510,6 +515,31 @@ public class DomainObjectResourceBuilderTest {
         assertTrue(matchedSuffix.get());
     }
 
+    @Test
+    public void singleResourcePerDomainObject() throws Exception {
+        PackageModelBuilderState state = bootstrap3();
+        state.assembler = spy(new FunctionalAssemblerMock(folder.getRoot()));
+
+        DomainObjectResourceBuilder underTest = new DomainObjectResourceBuilder();
+
+        underTest.init(state);
+
+        AtomicInteger reservedResources = new AtomicInteger(0);
+        doAnswer(invocation -> {
+            InputStream domainObjectGraphIn = invocation.getArgumentAt(1, InputStream.class);
+            assertNotNull(domainObjectGraphIn);
+            Model domainObjectGraph = ModelFactory.createDefaultModel()
+                    .read(domainObjectGraphIn, "foo", "TTL");
+            assertEquals(1, domainObjectGraph.listSubjects().toList().size());
+            reservedResources.getAndIncrement();
+            return null;
+        }).when(state.assembler).putResource(any(), any());
+
+        state.tree.walk(n -> underTest.visitNode(n, state));
+
+        assertEquals(3, reservedResources.get());
+    }
+
     /* Bootstrap a single complex domain object */
     private PackageModelBuilderState bootstrap1() throws Exception {
         PackageState pkgState = new PackageState();
@@ -586,4 +616,71 @@ public class DomainObjectResourceBuilderTest {
 
         return state;
     }
+
+    /* Bootstrap a tree of two domain objects, where the two domain objects
+    *  share a common uri prefix */
+    private PackageModelBuilderState bootstrap3() throws Exception {
+        PackageState pkgState = new PackageState();
+
+        /* Create the IPM tree */
+        Node treeNode = new Node(URI.create("http://example.org/3"));
+        treeNode.setDomainObject(URI
+                .create("http://example.org/TestDomainObjects/3"));
+        treeNode.setFileInfo(new FileInfo(Paths.get(getClass()
+                .getResource("/TestDomainObjects/3/AntSamp3_5_04.xls").toURI()).getParent()));
+
+        assertNotNull(treeNode.getFileInfo().getLocation());
+
+        Node xls = new Node(URI.create("http://example.org/3/AntSamp3_5_04.xls"));
+        xls.setParent(treeNode);
+        xls.setDomainObject(URI
+                .create("http://example.org/TestDomainObjects/3/AntSamp3_5_04.xls"));
+        xls.setFileInfo(new FileInfo(Paths.get(getClass()
+                .getResource("/TestDomainObjects/3/AntSamp3_5_04.xls").toURI())));
+
+        assertNotNull(xls.getFileInfo().getLocation());
+
+        Node xlsx = new Node(URI.create("http://example.org/3/AntSamp3_5_04.xlsx"));
+        xlsx.setParent(treeNode);
+        xlsx.setDomainObject(URI
+                .create("http://example.org/TestDomainObjects/3/AntSamp3_5_04.xlsx"));
+        xlsx.setFileInfo(new FileInfo(Paths.get(getClass()
+                .getResource("/TestDomainObjects/3/AntSamp3_5_04.xlsx").toURI())));
+
+        assertNotNull(xlsx.getFileInfo().getLocation());
+
+        treeNode.setChildren(Arrays.asList(xls, xlsx));
+        pkgState.setDomainObjectRDF(ModelFactory.createDefaultModel());
+
+
+        try (InputStream in =
+                     this.getClass()
+                             .getResourceAsStream("/TestDomainObjects/3/3.ttl")) {
+            pkgState.getDomainObjectRDF().read(in, null, "TTL");
+        }
+
+        try (InputStream in =
+                     this.getClass()
+                             .getResourceAsStream("/TestDomainObjects/3/AntSamp3_5_04.xlsx.ttl")) {
+            pkgState.getDomainObjectRDF().read(in, null, "TTL");
+        }
+
+        try (InputStream in =
+                     this.getClass()
+                             .getResourceAsStream("/TestDomainObjects/3/AntSamp3_5_04.xls.ttl")) {
+            pkgState.getDomainObjectRDF().read(in, null, "TTL");
+        }
+
+        PackageModelBuilderState state = new PackageModelBuilderState();
+        state.domainObjects =
+                ModelFactory.createModelForGraph(pkgState.getDomainObjectRDF()
+                        .getGraph());
+        state.tree = treeNode;
+        state.pkgState = pkgState;
+        state.renamedResources = new HashMap<>();
+        state.params = new PackageGenerationParameters();
+
+        return state;
+    }
+
 }
