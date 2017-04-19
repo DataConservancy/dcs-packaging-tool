@@ -124,8 +124,8 @@ public class IPMServiceIT {
 
         Node subDirFileNode = findNodeForFile(root, subDirFile.toPath().toRealPath().toUri());
         assertNotNull(subDirFileNode);
-        assertTrue(subDirFileNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1).equalsIgnoreCase(newSha1Checksum));
-        assertTrue(subDirFileNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5).equalsIgnoreCase(newMd5Checksum));
+        assertEquals(subDirFileNode.getFileInfo().getChecksum(FileInfo.Algorithm.SHA1), newSha1Checksum);
+        assertEquals(subDirFileNode.getFileInfo().getChecksum(FileInfo.Algorithm.MD5), newMd5Checksum);
     }
 
     /**
