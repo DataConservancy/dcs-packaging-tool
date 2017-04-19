@@ -311,7 +311,7 @@ class DomainObjectResourceBuilder
                     .listSubjects()
                     .toSet()
                     .stream()
-                    .filter(subject -> subject.toString().contains(baseURI))
+                    .filter(subject -> bare(subject.toString()).equals(baseURI))
                     .forEach(subject -> ResourceUtils.renameResource(subject,
                                                                      subject.toString()
                                                                              .replaceFirst(baseURI,

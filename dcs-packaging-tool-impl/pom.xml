@@ -119,6 +119,7 @@
         <configuration>
           <excludes>
             <exclude>src/test/resources/**/*.txt</exclude>
+            <exclude>src/test/resources/**/*.xls*</exclude>
             <exclude>src/test/resources/**/*.ser</exclude>
           </excludes>
         </configuration>
