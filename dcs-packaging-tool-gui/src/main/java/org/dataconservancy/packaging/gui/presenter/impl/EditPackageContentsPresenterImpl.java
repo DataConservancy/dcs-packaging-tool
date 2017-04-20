@@ -32,6 +32,7 @@ import org.dataconservancy.packaging.gui.TextFactory;
 import org.dataconservancy.packaging.gui.presenter.EditPackageContentsPresenter;
 import org.dataconservancy.packaging.gui.util.ProfilePropertyBox;
 import org.dataconservancy.packaging.gui.view.EditPackageContentsView;
+import org.dataconservancy.packaging.tool.api.DomainProfileService;
 import org.dataconservancy.packaging.tool.api.IPMService;
 import org.dataconservancy.packaging.tool.api.PropertyFormatService;
 import org.dataconservancy.packaging.tool.api.support.NodeComparison;
@@ -500,29 +501,53 @@ public class EditPackageContentsPresenterImpl extends BasePresenterImpl implemen
     private void applyMetadataInheritance(Node node) {
         Set<PropertyType> inheritablePropertyTypes = view.getInheritMetadataCheckBoxMap().keySet();
 
-        if (node.getChildren() != null) {
-            inheritablePropertyTypes.stream().filter(inheritablePropertyType -> view.getInheritMetadataCheckBoxMap().get(inheritablePropertyType).isSelected()).forEach(inheritablePropertyType -> {
-                List<Property> inheritablePropertyValues = controller.getDomainProfileService().getProperties(node, inheritablePropertyType);
-                if (inheritablePropertyValues != null) {
-                    for (Property inheritablePropertyValue : inheritablePropertyValues) {
-                        node.getChildren().stream().filter(child ->
-                                                               !child.isIgnored() &&
-                                                                   child.getDomainObject() !=
-                                                                       null).forEach(child -> {
-                            child.getNodeType().getPropertyConstraints().stream().filter(constraint -> constraint.getPropertyType().equals(inheritablePropertyType)).forEach(constraint -> {
-                                List<Property> existingPropertyValues = controller.getDomainProfileService().getProperties(child, inheritablePropertyType);
-                                if (!existingPropertyValues.contains(inheritablePropertyValue)) {
-                                    controller.getDomainProfileService().addProperty(child, inheritablePropertyValue);
-                                }
-                            });
-                            if (child.getChildren() != null) {
-                                applyMetadataInheritance(child);
-                            }
-                        });
-                    }
-                }
-            });
+        if (node.getChildren() == null) {
+            return;
         }
+
+        inheritablePropertyTypes
+                .stream()
+                .filter(inheritablePropertyType -> isSelected(inheritablePropertyType, view))
+                .forEach(inheritablePropertyType -> {
+
+                    final DomainProfileService domainProfileService = controller.getDomainProfileService();
+
+                    List<Property> inheritablePropertyValues = domainProfileService
+                            .getProperties(node, inheritablePropertyType);
+
+                    if (inheritablePropertyValues == null) {
+                        return;
+                    }
+
+                    inheritablePropertyValues.forEach(inheritablePropertyValue -> {
+                        node.getChildren()
+                                .stream()
+                                .filter(child -> !child.isIgnored() && child.getDomainObject() != null)
+                                .forEach(child -> {
+                                    child.getNodeType().getPropertyConstraints()
+                                            .stream()
+                                            .filter(constraint -> constraint.getPropertyType()
+                                                    .equals(inheritablePropertyType))
+                                            .forEach(constraint -> {
+                                                List<Property> existingPropertyValues =
+                                                        domainProfileService
+                                                                .getProperties(child, inheritablePropertyType);
+                                                if (!existingPropertyValues.contains(inheritablePropertyValue)) {
+                                                    domainProfileService
+                                                            .addProperty(child, inheritablePropertyValue);
+                                                }
+                                            });
+                                    if (child.getChildren() != null) {
+                                        applyMetadataInheritance(child);
+                                    }
+                                });
+                    });
+
+                });
+    }
+
+    private static boolean isSelected(PropertyType propertyType, EditPackageContentsView view) {
+        return view.getInheritMetadataCheckBoxMap().get(propertyType).isSelected();
     }
 
     @Override
