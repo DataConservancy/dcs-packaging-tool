@@ -112,7 +112,7 @@
           <configuration>
             <mainClass>org.dataconservancy.packaging.gui.App</mainClass>
             <additionalAppResources>${project.build.directory}/maven-shared-archive-resources</additionalAppResources>
-            <nativeReleaseVersion>1.0.4</nativeReleaseVersion>
+            <nativeReleaseVersion>${project.parent.version}</nativeReleaseVersion>
             <identifier>DC Package Tool</identifier>
           </configuration>
         </plugin>
