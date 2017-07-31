@@ -237,6 +237,11 @@ public class BagItPackageAssembler implements PackageAssembler {
                 packageStagingLocationName = packageLocationParameterValue;
         } else {
             if (packageStagingLocationParameterValue != null && !packageStagingLocationParameterValue.isEmpty()) {
+                if (!new File(packageLocationParameterValue).isAbsolute()) {
+                    throw new PackageToolException(PackagingToolReturnInfo.PKG_DIR_CREATION_EXP,
+                            "\nAttempt to create staging directory for the package at \"" + packageLocationParameterValue +
+                            "\" failed. The 'Package-Staging-Location' parameter must specify an absolute path.");
+                }
                 packageStagingLocationName = packageStagingLocationParameterValue + File.separator + UUID.randomUUID().toString();
             } else {
                 packageStagingLocationName = System.getProperty("java.io.tmpdir") +
