@@ -237,7 +237,7 @@ public class BagItPackageAssembler implements PackageAssembler {
                 packageStagingLocationName = packageLocationParameterValue;
         } else {
             if (packageStagingLocationParameterValue != null && !packageStagingLocationParameterValue.isEmpty()) {
-                packageStagingLocationName = packageStagingLocationParameterValue;
+                packageStagingLocationName = packageStagingLocationParameterValue + File.separator + UUID.randomUUID().toString();
             } else {
                 packageStagingLocationName = System.getProperty("java.io.tmpdir") +
                         File.separator + "DCS-PackageToolStaging" +

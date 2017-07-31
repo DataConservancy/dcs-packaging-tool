@@ -15,6 +15,7 @@
  */
 package org.dataconservancy.packaging.tool.impl.generator;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.dataconservancy.packaging.tool.api.PackagingFormat;
 import org.dataconservancy.packaging.tool.api.generator.PackageResourceType;
@@ -72,6 +73,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -161,6 +164,9 @@ public class BagItPackageAssemblerTest {
         tempArchive.deleteOnExit();
         File fakeArchive = new File(packageName + ".fake");
         fakeArchive.deleteOnExit();
+
+        assertTrue("Failed to delete package staging directory " + packageStagingLocation,
+                FileUtils.deleteQuietly(packageStagingLocation));
     }
 
     @Test
@@ -205,9 +211,12 @@ public class BagItPackageAssemblerTest {
         String expectedURI = "bag://" + packageName + "/"
                 +  "data" + "/" + filePath + '/';
         assertTrue(expectedURI.equals(result.toString()));
-        
+
+        final File stagingDirectory = findStagingDirectory(packageStagingLocation);
+
         assertTrue(Paths
-                   .get(URI.create(packageStagingLocation.toURI().toString()
+                   .get(URI.create(
+                           stagingDirectory.toURI().toString()
                            + packageName + "/data/" + filePath)).toFile().exists());
     }
 
@@ -930,5 +939,16 @@ public class BagItPackageAssemblerTest {
                 log.info("Couldn't delete: " + f.getPath());
             }
         }
+    }
+
+    private static File findStagingDirectory(File baseDir) {
+        assertNotNull("Supplied baseDir must not be null", baseDir);
+        final File[] candidateDirs = baseDir.listFiles(File::isDirectory);
+        assertNotNull("Expected to find a staging directory under '" + baseDir + "', but no directories were found.",
+                candidateDirs);
+        assertEquals("Expected to find a single staging directory under '" + baseDir + "', but found " +
+                candidateDirs.length + " instead: " + Stream.of(candidateDirs).map(File::toString).collect(Collectors.joining(",")), 1, candidateDirs.length);
+
+        return candidateDirs[0];
     }
 }
