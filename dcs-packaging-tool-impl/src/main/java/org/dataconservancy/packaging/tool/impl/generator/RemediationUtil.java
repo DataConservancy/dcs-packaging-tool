@@ -22,6 +22,7 @@ import org.dataconservancy.packaging.tool.impl.support.validation.SubstitutionRe
 import org.dataconservancy.packaging.tool.impl.support.validation.TruncationRemediation;
 import org.dataconservancy.packaging.tool.model.ipm.Node;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -155,7 +156,7 @@ class RemediationUtil {
         final Path path = Paths.get(locationHint);
         final StringBuilder remediatedPath = new StringBuilder();
 
-        if (path.isAbsolute()) {
+        if (path.toString().startsWith(File.separator)) {
             remediatedPath.append("/");
         }
 
@@ -172,7 +173,7 @@ class RemediationUtil {
             remediatedPath.append("/");
         }
 
-        return remediatedPath.toString();
+        return remediatedPath.toString().replace(File.separatorChar, '/');
     }
 
 }
