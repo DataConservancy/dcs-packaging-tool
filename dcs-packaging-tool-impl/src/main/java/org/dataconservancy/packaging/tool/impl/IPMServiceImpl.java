@@ -495,7 +495,7 @@ public class IPMServiceImpl implements IPMService {
                 node.setIgnored(true);
             }
 
-            if (fileAsPath.getFileName().startsWith(".") && ignoreDot) {
+            if (fileAsPath.getFileName().toString().startsWith(".") && ignoreDot) {
                 node.setIgnored(true);
             }
 
