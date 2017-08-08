@@ -401,40 +401,43 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
 
-        Set<String> files = new HashSet<>();
-        ArchiveEntry entry = ais.getNextEntry();
-        while (entry != null) {
-            files.add(entry.getName().replace("\\", "/"));
-            entry = ais.getNextEntry();
+            Set<String> files = new HashSet<>();
+            ArchiveEntry entry = ais.getNextEntry();
+            while (entry != null) {
+                files.add(entry.getName().replace("\\", "/"));
+                entry = ais.getNextEntry();
+            }
+
+            //Make sure that the packageName is set properly (packageName + contentype extension)
+            String expectedPackageName = packageName.concat(".tar").concat(".gz");
+            Assert.assertEquals(expectedPackageName, pkg.getPackageName());
+
+            // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
+            // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
+            // and the directory structure under META-INF
+            assertEquals(16, files.size());
+
+            // make sure that expected files are in there
+            String pathSep = "/";
+            String bagFilePath = packageName + pathSep;
+            assertTrue(files.contains(bagFilePath + "bagit.txt"));
+            assertTrue(files.contains(bagFilePath + "bag-info.txt"));
+            assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
+            assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
         }
-
-        //Make sure that the packageName is set properly (packageName + contentype extension)
-        String expectedPackageName = packageName.concat(".tar").concat(".gz");
-        Assert.assertEquals(expectedPackageName, pkg.getPackageName());
-
-        // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
-        // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
-        // and the directory structure under META-INF
-        assertEquals(16, files.size());
-
-        // make sure that expected files are in there
-        String pathSep = "/";
-        String bagFilePath = packageName + pathSep;
-        assertTrue(files.contains(bagFilePath + "bagit.txt"));
-        assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + dataFileName));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
     }
 
     /**
@@ -498,40 +501,43 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP, pkg.serialize());
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.ZIP, serializedPackage)) {
 
-        Set<String> files = new HashSet<>();
-        ArchiveEntry entry = ais.getNextEntry();
-        while (entry != null) {
-            files.add(entry.getName().replace("\\", "/"));
-            entry = ais.getNextEntry();
+            Set<String> files = new HashSet<>();
+            ArchiveEntry entry = ais.getNextEntry();
+            while (entry != null) {
+                files.add(entry.getName().replace("\\", "/"));
+                entry = ais.getNextEntry();
+            }
+
+            //Make sure that the packageName is set properly (packageName + contentype extension)
+            String expectedPackageName = packageName.concat(".zip");
+            Assert.assertEquals(expectedPackageName, pkg.getPackageName());
+
+
+            // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
+            // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
+            // and the directory structure under META-INF
+            assertEquals(16, files.size());
+
+            // make sure that expected files are in there
+            String pathSep = "/";
+            String bagFilePath = packageName + pathSep;
+            assertTrue(files.contains(bagFilePath + "bagit.txt"));
+            assertTrue(files.contains(bagFilePath + "bag-info.txt"));
+            assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
+            assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
         }
-
-        //Make sure that the packageName is set properly (packageName + contentype extension)
-        String expectedPackageName = packageName.concat(".zip");
-        Assert.assertEquals(expectedPackageName, pkg.getPackageName());
-
-
-        // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
-        // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
-        // and the directory structure under META-INF
-        assertEquals(16, files.size());
-
-        // make sure that expected files are in there
-        String pathSep = "/";
-        String bagFilePath = packageName + pathSep;
-        assertTrue(files.contains(bagFilePath + "bagit.txt"));
-        assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep + "org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep + "metadataFile.txt"));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
     }
 
     /**
@@ -574,38 +580,41 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, pkg.serialize());
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, serializedPackage)) {
+            
+            Set<String> files = new HashSet<>();
+            ArchiveEntry entry = ais.getNextEntry();
+            while (entry != null) {
+                files.add(entry.getName().replace("\\", "/"));
+                entry = ais.getNextEntry();
+            }
 
-        Set<String> files = new HashSet<>();
-        ArchiveEntry entry = ais.getNextEntry();
-        while (entry != null) {
-            files.add(entry.getName().replace("\\", "/"));
-            entry = ais.getNextEntry();
+            //Make sure that the packageName is set properly (packageName + contentype extension)
+            String expectedPackageName = packageName.concat(".tar");
+            Assert.assertEquals(expectedPackageName, pkg.getPackageName());
+
+            // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
+            // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
+            assertEquals(16, files.size());
+
+            // make sure that expected files are in there
+            String pathSep = "/";
+            String bagFilePath = packageName + pathSep;
+            assertTrue(files.contains(bagFilePath + "bagit.txt"));
+            assertTrue(files.contains(bagFilePath + "bag-info.txt"));
+            assertTrue(files.contains(bagFilePath + "META-INF" + pathSep +"org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep +"metadataFile.txt"));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
+            assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
+            assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO"+ pathSep ));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
+            assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
         }
-
-        //Make sure that the packageName is set properly (packageName + contentype extension)
-        String expectedPackageName = packageName.concat(".tar");
-        Assert.assertEquals(expectedPackageName, pkg.getPackageName());
-
-        // There should be 10 files: the 2 files above, bagit.txt, bag-info.txt
-        // directories data and data/myProject, 2 manifest files and 2 tag-manifest files
-        assertEquals(16, files.size());
-
-        // make sure that expected files are in there
-        String pathSep = "/";
-        String bagFilePath = packageName + pathSep;
-        assertTrue(files.contains(bagFilePath + "bagit.txt"));
-        assertTrue(files.contains(bagFilePath + "bag-info.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep +"org.dataconservancy.packaging" + pathSep + "PKG-INFO" + pathSep +"metadataFile.txt"));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep));
-        assertTrue(files.contains(bagFilePath + "data" + pathSep + "myProject" + pathSep + "dataFile.txt"));
-        assertTrue(files.contains(bagFilePath + "META-INF" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO"+ pathSep ));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/PKG-INFO/ORE-REM" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/STATE" + pathSep));
-        assertTrue(files.contains(bagFilePath + "META-INF/org.dataconservancy.packaging/ONT" + pathSep));
     }
 
     /**
@@ -627,34 +636,37 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        TarArchiveInputStream ais = (TarArchiveInputStream)(new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis));
-
-        String bagInfo = "";
-        TarArchiveEntry entry = ais.getNextTarEntry();
-        while (entry != null) {
-            if (entry.getName().contains("bag-info.txt")) {
-                byte[] content = new byte[(int)entry.getSize()];
-                ais.read(content, 0, (int)entry.getSize());
-                bagInfo = new String(content);
-                break;
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                TarArchiveInputStream ais = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
+            
+            String bagInfo = "";
+            TarArchiveEntry entry = ais.getNextTarEntry();
+            while (entry != null) {
+                if (entry.getName().contains("bag-info.txt")) {
+                    byte[] content = new byte[(int)entry.getSize()];
+                    ais.read(content, 0, (int)entry.getSize());
+                    bagInfo = new String(content);
+                    break;
+                }
+                entry = ais.getNextTarEntry();
             }
-            entry = ais.getNextTarEntry();
+
+            // Test that expected initial parameters are present
+            String expected = GeneralParameterNames.PACKAGE_NAME + ": " + packageName;
+            assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
+
+            // These two values should be 0 since there is nothing in the test package this time.
+            expected = BagItParameterNames.BAG_SIZE + ": 0";
+            assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
+            expected = BagItParameterNames.PAYLOAD_OXUM + ": 0";
+            assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
+
+            // Test the post-init parameter
+            expected = paramName + ": " + paramValue;
+            assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
         }
-
-        // Test that expected initial parameters are present
-        String expected = GeneralParameterNames.PACKAGE_NAME + ": " + packageName;
-        assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
-
-        // These two values should be 0 since there is nothing in the test package this time.
-        expected = BagItParameterNames.BAG_SIZE + ": 0";
-        assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
-        expected = BagItParameterNames.PAYLOAD_OXUM + ": 0";
-        assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
-
-        // Test the post-init parameter
-        expected = paramName + ": " + paramValue;
-        assertTrue("Expected to find: " + expected, bagInfo.contains(expected));
     }
 
     /**
@@ -679,22 +691,25 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                TarArchiveInputStream ais = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
 
-        Set<String> files = new HashSet<>();
-        ArchiveEntry entry = ais.getNextEntry();
-        while (entry != null) {
-            files.add(entry.getName());
-            entry = ais.getNextEntry();
+            Set<String> files = new HashSet<>();
+            ArchiveEntry entry = ais.getNextEntry();
+            while (entry != null) {
+                files.add(entry.getName());
+                entry = ais.getNextEntry();
+            }
+
+            // make sure that expected files are in there
+            String bagFilePath = packageName + "/";
+            assertTrue(files.contains(bagFilePath + "manifest-md5.txt"));
+            assertTrue(files.contains(bagFilePath + "tagmanifest-md5.txt"));
+            assertFalse(files.contains(bagFilePath + "manifest-sha1.txt"));
+            assertFalse(files.contains(bagFilePath + "tagmanifest-sha1.txt"));
         }
-
-        // make sure that expected files are in there
-        String bagFilePath = packageName + "/";
-        assertTrue(files.contains(bagFilePath + "manifest-md5.txt"));
-        assertTrue(files.contains(bagFilePath + "tagmanifest-md5.txt"));
-        assertFalse(files.contains(bagFilePath + "manifest-sha1.txt"));
-        assertFalse(files.contains(bagFilePath + "tagmanifest-sha1.txt"));
     }
 
     /**
@@ -727,22 +742,25 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
 
-        Set<String> files = new HashSet<>();
-        ArchiveEntry entry = ais.getNextEntry();
-        while (entry != null) {
-            files.add(entry.getName());
-            entry = ais.getNextEntry();
+            Set<String> files = new HashSet<>();
+            ArchiveEntry entry = ais.getNextEntry();
+            while (entry != null) {
+                files.add(entry.getName());
+                entry = ais.getNextEntry();
+            }
+
+            // make sure that expected files are in there
+            String bagFilePath = packageName + "/";
+            assertTrue(files.contains(bagFilePath + "manifest-md5.txt"));
+            assertTrue(files.contains(bagFilePath + "tagmanifest-md5.txt"));
+            assertTrue(files.contains(bagFilePath + "manifest-sha1.txt"));
+            assertTrue(files.contains(bagFilePath + "tagmanifest-sha1.txt"));
         }
-
-        // make sure that expected files are in there
-        String bagFilePath = packageName + "/";
-        assertTrue(files.contains(bagFilePath + "manifest-md5.txt"));
-        assertTrue(files.contains(bagFilePath + "tagmanifest-md5.txt"));
-        assertTrue(files.contains(bagFilePath + "manifest-sha1.txt"));
-        assertTrue(files.contains(bagFilePath + "tagmanifest-sha1.txt"));
     }
 
     /**
@@ -774,22 +792,25 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
 
-        Set<String> files = new HashSet<>();
-        ArchiveEntry entry = ais.getNextEntry();
-        while (entry != null) {
-            files.add(entry.getName());
-            entry = ais.getNextEntry();
+            Set<String> files = new HashSet<>();
+            ArchiveEntry entry = ais.getNextEntry();
+            while (entry != null) {
+                files.add(entry.getName());
+                entry = ais.getNextEntry();
+            }
+
+            // make sure that expected files are in there
+            String bagFilePath = packageName + "/";
+            assertTrue(files.contains(bagFilePath + "manifest-md5.txt"));
+            assertTrue(files.contains(bagFilePath + "tagmanifest-md5.txt"));
+            assertFalse(files.contains(bagFilePath + "manifest-sha1.txt"));
+            assertFalse(files.contains(bagFilePath + "tagmanifest-sha1.txt"));
         }
-
-        // make sure that expected files are in there
-        String bagFilePath = packageName + "/";
-        assertTrue(files.contains(bagFilePath + "manifest-md5.txt"));
-        assertTrue(files.contains(bagFilePath + "tagmanifest-md5.txt"));
-        assertFalse(files.contains(bagFilePath + "manifest-sha1.txt"));
-        assertFalse(files.contains(bagFilePath + "tagmanifest-sha1.txt"));
     }
 
     @Test
@@ -806,10 +827,13 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
 
-        assertNotNull(ais.getNextEntry());
+            assertNotNull(ais.getNextEntry());
+        }
     }
 
     @Test
@@ -871,9 +895,12 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, pkg.serialize());
+        try (
+                InputStream serializedPackage = pkg.serialize();
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, serializedPackage)) {
 
-        assertNotNull(ais.getNextEntry());
+            assertNotNull(ais.getNextEntry());
+        }
     }
 
     @Test
@@ -889,10 +916,13 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, pkg.serialize());
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis);
+        try (   
+                InputStream serializedPackage = pkg.serialize();
+                CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.GZIP, serializedPackage);
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, cis)) {
 
-        assertNotNull(ais.getNextEntry());
+            assertNotNull(ais.getNextEntry());
+        }
     }
 
     @Test
@@ -907,9 +937,12 @@ public class BagItPackageAssemblerTest {
 
         Package pkg = underTest.assemblePackage();
 
-        ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, pkg.serialize());
+        try (
+                InputStream serializedPackage = pkg.serialize();
+                ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, serializedPackage)) {
 
-        assertNotNull(ais.getNextEntry());
+            assertNotNull(ais.getNextEntry());
+        }
     }
 
     private void setupCommonPackageParams(PackageGenerationParameters params, Map<String, List<String>> packageMetadata) {
